@@ -1,0 +1,74 @@
+<div class="flex flex-col flex-auto min-w-0">
+  <div class="flex flex-col sm:flex-row flex-0 sm:items-center sm:justify-between p-6 sm:py-8 sm:px-10 border-b bg-card dark:bg-transparent">
+    <div class="flex-1 min-w-0">
+      <div class="flex flex-wrap items-center font-medium">
+        <div>
+          <a class="whitespace-nowrap text-primary-500">TMS</a>
+        </div>
+        <div class="flex items-center ml-1 whitespace-nowrap">
+          <mat-icon class="fuse-horizontal-navigation-item-icon" [svgIcon]="'heroicons_solid:chevron-right'"></mat-icon>
+          <a class="ml-1 text-primary-500">Mantenimiento</a>
+        </div>
+        <!-- <div class="flex items-center ml-1 whitespace-nowrap">
+          <mat-icon class="fuse-horizontal-navigation-item-icon" [svgIcon]="'heroicons_solid:chevron-right'"></mat-icon>
+          <a class="ml-1 text-primary-500" [routerLink]="['/trafico/integrado']">Proveedo</a>
+        </div> -->
+      </div>
+      <div class="mt-2">
+        <h2 class="text-3xl md:text-4xl font-extrabold tracking-tight leading-7 sm:leading-10 truncate"> Listado de proveedores  </h2>
+      </div>
+    </div>
+  </div>
+
+  <div class="flex flex-col p-6 sm:py-8 sm:px-10 border-b bg-card dark:bg-transparent">
+
+    <div class="button-group mb-4">
+      <p-button  label="Nuevo proveedor" icon="fa fa-paper-plane" (onClick)="nuevo()">
+     
+      </p-button>
+    
+
+
+
+
+    </div>
+  <div class="flex flex-col min-w-0 w-full">
+    <div class="p-1">
+     
+
+
+        <p-table [columns]="cols" [value]="provedores" 
+        class="w-full" [paginator]="true" [rows]="10" 
+        [tableStyle]="{ 'table-layout': 'fixed', 'width': '100%' }"
+            selectionMode="single" >
+          <ng-template pTemplate="header" let-columns>
+            <tr>
+                <th [ngStyle]="{'width': col.width}" *ngFor="let col of columns" pResizableColumn [pSortableColumn]="col.field">
+                    {{col.header}}
+                    <p-sortIcon [field]="col.field" ariaLabel="Activate to sort" ariaLabelDesc="Activate to sort in descending order" ariaLabelAsc="Activate to sort in ascending order"></p-sortIcon>
+                </th>
+            </tr>
+        </ng-template>
+
+      <ng-template pTemplate="body" let-rowData let-columns="columns">
+      <tr [pSelectableRow]="rowData">
+
+          <!-- <td class="ui-resizable-column"> {{rowData.id }}</td> -->
+          <td class="ui-resizable-column">
+       
+              <p-button size="small" severity="danger"   icon="fa fa-trash"></p-button>
+              <p-button  size="small" severity="secondary"   icon="fa fa-edit"></p-button>
+        </td>
+          <td style="text-align: left;" class="ui-resizable-column"> {{rowData.tipo}}</td>
+          <td style="text-align: left;" class="word-wrap ui-resizable-column"> {{rowData.razonSocial}}</td>
+          <td style="text-align: left;" class="ui-resizable-column"> {{rowData.ruc}}</td>
+          <td style="text-align: left;" class="ui-resizable-column"> {{rowData.direccion}}</td>
+          <td style="text-align: left;" class="ui-resizable-column"> {{rowData.ubigeo}}</td>
+          <td style="text-align: left;" class="ui-resizable-column"> {{rowData.telefono}}</td>
+         
+      </tr>
+      </ng-template>
+      </p-table>
+    </div>
+  </div>
+</div>

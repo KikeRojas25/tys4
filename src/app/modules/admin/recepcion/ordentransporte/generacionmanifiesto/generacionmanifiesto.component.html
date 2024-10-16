@@ -1,0 +1,230 @@
+<div class="flex flex-col flex-auto min-w-0 bg-card">
+  <div class="flex flex-col sm:flex-row flex-0 sm:items-center sm:justify-between p-6 sm:py-8 sm:px-10 border-b bg-card dark:bg-transparent">
+    <div class="flex-1 min-w-0">
+      <div class="flex flex-wrap items-center font-medium">
+        <div>
+          <a class="whitespace-nowrap text-primary-500">TMS</a>
+        </div>
+        <div class="flex items-center ml-1 whitespace-nowrap">
+          <mat-icon class="fuse-horizontal-navigation-item-icon" [svgIcon]="'heroicons_solid:chevron-right'"></mat-icon>
+          <a class="ml-1 text-primary-500">Tráfico</a>
+        </div>
+      </div>
+      <div class="mt-2">
+        <h2 class="text-3xl md:text-4xl font-extrabold tracking-tight leading-7 sm:leading-10 truncate">Generación de Manifiestos Virtuales</h2>
+      </div>
+    </div>
+  </div>
+
+  <div class="main-content container-fluid p-6">
+      <div class="card-body">
+        <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+          <!-- Cliente -->
+          <div>
+            <label>Cliente:</label>
+            <p-dropdown name="clientes"   
+                        [options]="clientes" [(ngModel)]="model.idcliente"
+                        scrollHeight="30vh" class="input-form-field"
+                        [virtualScroll]="true" itemSize="30" 
+                        [style]="{'width':'100%'}" [resetFilterOnHide]="false" 
+                        [filter]="true">
+              <ng-template let-item pTemplate="selectedItem">
+                <span>{{item.label}}</span>
+              </ng-template>
+            </p-dropdown>
+          </div>
+
+          <!-- Inicio -->
+          <div>
+            <label>Fecha de Inicio:</label>
+            <p-calendar [(ngModel)]="dateInicio" baseZIndex="100" 
+                        dateFormat="dd/mm/yy" placeholder="Seleccione una fecha">
+            </p-calendar>
+          </div>
+
+          <!-- Fin -->
+          <div>
+            <label>Fecha de Final:</label>
+            <p-calendar [(ngModel)]="dateFin" baseZIndex="100" 
+                        dateFormat="dd/mm/yy" placeholder="Seleccione una fecha">
+            </p-calendar>
+          </div>
+
+          <!-- Estado (opcional si se requiere) -->
+          <div>
+            <label>Estado:</label>
+            <p-dropdown name="estados" [options]="estados" 
+                        [(ngModel)]="model.idestado" scrollHeight="20vh" 
+                        [style]="{'width':'100%'}" filter="false">
+              <ng-template let-item pTemplate="selectedItem">
+                <span>{{item.label}}</span>
+              </ng-template>
+            </p-dropdown>
+          </div>
+
+          <!-- Nro OT -->
+          <div>
+            <label>Nro OT:</label>
+            <input pInputText [(ngModel)]="model.numcp" (keydown.enter)="buscar()" 
+                   [style]="{'width':'100%'}" placeholder="Ingrese Nro OT" />
+          </div>
+
+          <!-- Nro Manifiesto -->
+          <div>
+            <label>Nro Manifiesto:</label>
+            <input pInputText [(ngModel)]="model.nummanifiesto"  (keydown.enter)="buscar()" 
+                   [style]="{'width':'100%'}" placeholder="Ingrese Manifiesto" />
+          </div>
+
+          <!-- Nro HR -->
+          <div>
+            <label>Nro HR:</label>
+            <input pInputText [(ngModel)]="model.numhojaruta"  (keydown.enter)="buscar()" 
+                   [style]="{'width':'100%'}" placeholder="Ingrese HR" />
+          </div>
+
+          <!-- Referencia -->
+          <div>
+            <label>Referencia:</label>
+            <input pInputText [(ngModel)]="model.referencia" (keydown.enter)="buscar()" 
+                   [style]="{'width':'100%'}" placeholder="Ingrese Referencia" />
+          </div>
+        </div>
+
+        <!-- Botones -->
+        <div class="flex justify-left space-x-4 mt-4 mb-4">
+          <p-button label="Buscar" icon="pi pi-search" severity="primary" (click)="buscar()">
+          </p-button>
+          <p-button label="OTs Agregadas" icon="pi pi-file" severity="success"  (onClick)="verots()" class="p-button-primary">
+          </p-button>
+          <p-button label="Agregar selección"  icon="pi pi-plus" severity="success"  (onClick)="agregarots()" class="p-button-primary">
+          </p-button>
+        </div>
+      </div>
+
+      <!-- Órdenes de Transporte -->
+      <!-- <div class="p-mb-2">
+        <p-button label="Despachar" icon="pi pi-plus" (onClick)="save('info')">
+        </p-button>
+      </div> -->
+
+      <!-- Tabla -->
+      <p-table [value]="ordenes" [paginator]="true" [rows]="10" 
+               [rowsPerPageOptions]="[20,40,60,120]" 
+               [columns]="cols" [resizableColumns]="true" 
+               [tableStyle]="{ 'table-layout': 'fixed', 'width': '100%' }"
+               [scrollable]="false" [selection]="selected" 
+               selectionMode="multiple" [(selection)]="selected">
+
+        <!-- Column Definitions -->
+        <ng-template pTemplate="colgroup" let-columns>
+          <colgroup>
+            <col *ngFor="let col of columns" [style.width]="col.width">
+          </colgroup>
+        </ng-template>
+
+        <!-- Table Header -->
+        <ng-template pTemplate="header" let-columns>
+          <tr>
+            <th *ngFor="let col of columns" [style]="col.width" [pSortableColumn]="col.field">
+              {{ col.header }}
+            </th>
+          </tr>
+        </ng-template>
+
+        <!-- Table Body -->
+        <ng-template pTemplate="body" let-rowData let-columns="columns">
+          <tr [pSelectableRow]="rowData">
+            <!-- Acción -->
+            <td>
+              <p-button icon="pi pi-search"    title="ver" severity="secondary"  size="small"  (click)="vertracking(rowData.idordentrabajo)">    </p-button>
+            </td>
+
+            <!-- Datos de la orden -->
+            <td>
+              <a style="cursor: pointer; text-decoration: underline;" (click)="verot(rowData.idordentrabajo)">
+                {{ rowData.numcp }}
+              </a>
+            </td>
+            <td style="text-align: center;">{{ rowData.fecharecojo | date:'dd/MM/yyyy' }}</td>
+            <td style="text-align: center;">{{ rowData.fechadespacho | date:'dd/MM/yyyy '}}</td>
+            <td class="word-wrap">{{ rowData.razonsocial }}</td>
+            <td class="word-wrap">{{ rowData.destinatario }}</td>
+            <!-- <td class="word-wrap">{{ rowData.numManifiestoTroncal }}</td>
+            <td class="word-wrap">{{ rowData.numhojarutatroncal }}</td> -->
+       
+            <td class="word-wrap" [ngClass]="rowData.estado == 'Registrado' ? 'very-old-car' : (rowData.estado == 'Programado' ? 'old-car' : '')">
+              {{ rowData.estado }}
+            </td>
+            <td class="word-wrap"> {{ rowData.origen }}</td>
+            <td class="word-wrap"> {{ rowData.destino }}</td>
+
+            <td>S/. {{ rowData.subtotal }}</td>
+            <td class="word-wrap">
+              <a style="cursor: pointer; text-decoration: underline;" (click)="vermanifiesto(rowData.idManifiesto)">
+              {{ rowData.nummanifiesto }}
+              </a>
+            </td>
+            <td class="word-wrap">
+              <a style="cursor: pointer; text-decoration: underline;" (click)="verhojaruta(rowData.idDespacho)">
+              
+              {{ rowData.numhojaruta }}
+            </a>
+            <td>{{ rowData.bulto }}</td>
+            <td>{{ rowData.peso }}</td>
+            <td>{{ rowData.pesovol }}</td>
+          </tr>
+        </ng-template>
+      </p-table>
+    </div>
+</div>
+
+
+<p-dialog header="Tracking OT" [modal]="true" [(visible)]="dialoglifecycle" [style]="{ width: '105rem' }">
+
+
+
+
+
+
+</p-dialog>
+
+<p-sidebar [(visible)]="sidebarVisible" position="left" styleClass="w-1/2">
+  <ng-template pTemplate="header">
+    <span class="font-semibold text-xl">OTs seleccionadas</span>
+</ng-template>
+  <div class="p-4 bg-gray-50 rounded-md shadow-lg">
+
+    <table class="table-auto w-full bg-white rounded-md shadow-lg">
+      <thead class="bg-blue-600 text-white">
+        <tr>
+          <th class="p-2 text-left">OT</th>
+          <th class="p-2 text-left">Cliente</th>
+          <th class="p-2 text-left">Acciones</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr *ngFor="let ot of seleccionadas; let i = index" class="border-b">
+          <td class="p-2">{{ ot.numcp }}</td>
+          <td class="p-2">{{ ot.razonsocial }}</td>
+          <td class="p-2">
+            <p-button icon="fa fa-trash" severity="danger" (click)="eliminarOT(i)"> </p-button>
+          </td>
+        </tr>
+      </tbody>
+    </table>
+  
+    <!-- Botón fuera de la tabla -->
+    <div class="mt-4">
+      <p-button severity="dark"  (click)="generarManifiesto()">
+        Generar Manifiesto
+      </p-button>
+    </div>
+  </div>
+  
+    
+  
+
+
+</p-sidebar>
+<p-toast />

@@ -1,0 +1,177 @@
+
+<div class="flex flex-col flex-auto min-w-0">
+  <div class="flex flex-col sm:flex-row flex-0 sm:items-center sm:justify-between p-6 sm:py-8 sm:px-10 border-b bg-card dark:bg-transparent">
+    <div class="flex-1 min-w-0">
+      <div class="flex flex-wrap items-center font-medium">
+        <div>
+          <a class="whitespace-nowrap text-primary-500">TMS</a>
+        </div>
+        <div class="flex items-center ml-1 whitespace-nowrap">
+          <mat-icon class="fuse-horizontal-navigation-item-icon" [svgIcon]="'heroicons_solid:chevron-right'"></mat-icon>
+          <a class="ml-1 text-primary-500">Tráfico</a>
+        </div>
+      </div>
+      <div class="mt-2">
+        <h2 class="text-3xl md:text-4xl font-extrabold tracking-tight leading-7 sm:leading-10 truncate"> Módulo Integrado </h2>
+      </div>
+    </div>
+  </div>
+
+
+  <div class="flex flex-col min-w-0 w-full">
+
+
+
+    <p-tabView styleClass="tabview-custom">
+      <p-tabPanel>
+          <ng-template pTemplate="header">
+              <div class="flex align-items-center gap-2">
+                   <i class="fa fa-truck" ></i>
+                  <span class="font-bold white-space-nowrap m-0">
+                      Ver Troncal
+                  </span>
+              </div>
+          </ng-template>
+            <p-panel header="TRONCAL" class="w-full mb-3">
+
+
+            <p-table [columns]="cols" dataKey="idhojaruta"
+            [tableStyle]="{ 'table-layout': 'fixed', 'width': '100%' }"
+            [value]="ordenes"  selectionMode="single" scrollable="true"  [scrollHeight]="'600px'"
+            sortField="numHojaruta"  
+            [rows]="200" >
+
+
+            
+
+            <ng-template pTemplate="header" let-columns>
+              <tr>
+                <!-- Encabezado con colores y estilos -->
+                <th colspan="7" style="text-align: center; color: white; width: 60%"></th>
+              
+                <th colspan="4" style="text-align: center; color: white; background-color: rgb(251, 192, 45); width: 20%">EN RUTA</th>
+                <th colspan="3" style="text-align: center; color: white; background-color: rgb(0, 121, 107); width: 20%">% AVANCE MANIFIESTOS</th>
+              </tr>
+            <tr>
+                <th *ngFor="let col of columns" [ngStyle]="{'width': col.width}"  [pSortableColumn]="col.field">
+                {{col.header}}
+                </th>
+            </tr>
+            </ng-template>
+
+          
+
+            <ng-template pTemplate="body" let-rowData>
+            <tr [pSelectableRow]="rowData">
+                <td class="text-center">
+                  <p-button icon="pi pi-search" severity="success" (click)="verDetalle(rowData.idhojaruta)" size="small" ></p-button>
+                  <p-button icon="pi pi-paperclip" severity="warning" (click)="verHojaRuta(rowData.idDespacho)" size="small" ></p-button>
+
+                </td>
+                <td class="text-center" style="white-space: normal; word-wrap: break-word; overflow-wrap: break-word;">{{rowData.proveedor}}</td>
+                <td class="text-center">{{rowData.placa}}</td>
+                <td class="text-center cursor-pointer" (click)="ver(rowData.idhojaruta)">
+                  {{ rowData.numHojaRuta }}
+                  </td>
+                <td class="text-center">{{rowData.fechaDespacho | date: 'dd/MM/yyyy'}}</td>
+                <td class="text-center">{{rowData.origen}}</td>
+                <td class="text-center">{{rowData.destino}}</td>
+
+
+                <td class="text-center">{{rowData.cantidad}}</td>
+                <td class="text-center">{{rowData.bulto}}</td>
+                <td class="text-center">{{rowData.peso | number:'1.0-0'}}</td>
+                <td class="text-center">{{rowData.volumen | number:'1.0-0'}}</td>
+
+                <td class="text-center">{{rowData.totalManifiestos}}</td>
+                <td class="text-center">{{rowData.manifiestosCerrados}}</td>
+                <td class="text-center">
+                  <p-progressBar [value]="getIntegerPercentage(rowData)" 
+                  [showValue]="true" ></p-progressBar>
+                </td>
+
+
+            </tr>
+            </ng-template>
+
+       
+            </p-table>
+
+            </p-panel>
+        </p-tabPanel>
+        <p-tabPanel>
+          <ng-template pTemplate="header">
+            <div class="flex align-items-center gap-2">
+              <i class="fa fa-bus" ></i>
+                <span class="font-bold white-space-nowrap m-0">
+                    Ver Pendientes
+                </span>
+            </div>
+        </ng-template>
+
+          <p-panel header="PENDIENTES" class="w-full mb-3">
+
+          <p-table [columns]="cols2" dataKey="iddepartamento"
+          [value]="ordenes2"  
+          sortField="zona"
+          [tableStyle]="{ 'table-layout': 'fixed', 'width': '100%' }"
+           selectionMode="single" scrollable="true"  [scrollHeight]="'600px'"
+          [rows]="20"  [responsive]="true">
+
+          <ng-template pTemplate="header" let-columns>
+            <tr>
+              <!-- Encabezado con colores y estilos -->
+              <th colspan="2" style="text-align: center; color: white; width: 30%"></th>
+            
+              <th colspan="3" style="text-align: center; color: white; background-color: #fbc02d; width: 20%">RECEPCIÓN</th>
+              <th colspan="3" style="text-align: center; color: white; background-color: #0288D1; width: 20%">RECOJO</th>
+              <th colspan="3" style="text-align: center; color: white; background-color: #03A9F4; width: 20%">ENTREGA</th>
+              <th colspan="1" style="text-align: center; color: white; background-color: #B3E5FC; width: 10%">RECABAR CARGOS</th>
+              <th colspan="1" style="text-align: center; color: white; background-color: rgb(0, 121, 107); width: 10%">ENVIAR CARGOS</th>
+            </tr>
+          <tr>
+            <th *ngFor="let col of columns" [ngStyle]="{'width': col.width}"  [pSortableColumn]="col.field">
+            {{col.header}}
+            </th>
+          </tr>
+          </ng-template>
+
+          <ng-template pTemplate="body" let-rowData>
+          <tr [pSelectableRow]="rowData">
+         
+          <td class="text-left">{{ rowData.departamento }}</td>
+          <td class="text-left cursor-pointer" (click)="verRepartidor(rowData.idproveedor)">
+            {{ rowData.repartidor }}
+            </td>
+
+          <td class="text-center">{{rowData.cantidad_recepcion}}</td>
+          <td class="text-center">{{rowData.bulto_recepcion}}</td>
+          <td class="text-center">{{rowData.peso_recepcion | number:'1.0-0'}}</td>
+
+
+          <td class="text-center">{{rowData.cantidad_recojo}}</td>
+          <td class="text-center">{{rowData.bulto_recojo}}</td>
+          <td class="text-center">{{rowData.peso_recojo | number:'1.0-0'}}</td>
+
+
+          <td class="text-center">{{rowData.cantidad_enreparto}}</td>
+          <td class="text-center">{{rowData.bulto_enreparto}}</td>
+          <td class="text-center">{{rowData.peso_enreparto | number:'1.0-0'}}</td>
+
+          <td class="text-center">{{rowData.cantidad_recabarcargo}}</td>
+          <td class="text-center">{{rowData.cantidad_enviocargo}}</td> 
+
+
+          </tr>
+          </ng-template>
+
+       
+          </p-table>
+
+          </p-panel>
+      </p-tabPanel>
+    </p-tabView>
+  
+</div>
+
+</div>

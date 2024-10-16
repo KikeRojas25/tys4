@@ -1,0 +1,154 @@
+<div class="flex flex-col flex-auto min-w-0 bg-card">
+  <div class="flex flex-col sm:flex-row flex-0 sm:items-center sm:justify-between p-6 sm:py-8 sm:px-10 border-b bg-card dark:bg-transparent">
+    <div class="flex-1 min-w-0">
+      <div class="flex flex-wrap items-center font-medium">
+        <div>
+          <a class="whitespace-nowrap text-primary-500">TMS</a>
+        </div>
+        <div class="flex items-center ml-1 whitespace-nowrap">
+          <mat-icon class="fuse-horizontal-navigation-item-icon" [svgIcon]="'heroicons_solid:chevron-right'"></mat-icon>
+          <a class="ml-1 text-primary-500">Despacho</a>
+        </div>
+      </div>
+      <div class="mt-2">
+        <h2 class="text-3xl md:text-4xl font-extrabold tracking-tight leading-7 sm:leading-10 truncate">Despacho de almacén</h2>
+      </div>
+    </div>
+  </div>
+
+  <div class="main-content container-fluid p-6">
+
+  <div class="w-full">
+    <div class="border border-primary shadow-md rounded-lg">
+      <div class="bg-primary text-white p-3">
+        <b>Pre-Hojas de ruta generadas</b>
+      </div>
+
+      <div class="p-4">
+
+        <div class="flex gap-4 mb-4 mt-2">
+          <button class='btn btn-primary' pButton iconPos="left" label="Agregar OT" icon="pi pi-plus" (click)="agregar()"></button>
+          <button class='btn btn-secondary' pButton iconPos="left" label="Refrescar" icon="pi pi-refresh" (click)="actualizar()"></button>
+        </div>
+
+        <p-table [columns]="cols" selectionMode="single" [style]="{width:'100%'}" dataKey="idDespacho"
+                 [rowsPerPageOptions]="[20,40,60,120]" [value]="ordenes2" #dt [paginator]="true" 
+                 [tableStyle]="{ 'table-layout': 'fixed', 'width': '100%' }"        (onRowSelect)="ver($event)"
+                 (onRowSelect)="ver($event)" [rows]="10"  [responsive]="true">
+          
+          <ng-template pTemplate="colgroup" let-columns>
+            <colgroup>
+              <col *ngFor="let col of columns" [ngStyle]="{'width': col.width}">
+            </colgroup>
+          </ng-template>
+
+          <ng-template pTemplate="header" let-columns>
+            <tr>
+              <th *ngFor="let col of columns" [ngStyle]="{'width': col.width}" pResizableColumn [pSortableColumn]="col.field">
+                {{ col.header }}
+              </th>
+            </tr>
+          </ng-template>
+
+          <ng-template pTemplate="body" let-rowData let-index="rowIndex">
+            <tr [pSelectableRow]="rowData">
+              <td class="text-center">{{ rowData.placa }}</td>
+              <td class="text-center">{{ rowData.nombrechofer }}</td>
+              <td class="text-center">{{ rowData.numHojaRuta }}</td>
+              <td class="text-center">{{ rowData.proveedor }}</td>
+              <td class="text-center">{{ rowData.precinto }}</td>
+              <td class="text-left">
+                <p-button *ngIf="rowData.precinto === 'SI'"  sererity="danger"  label="Gen. Manifiestos" title='Imprimir HR' (click)='imprimirManifiesto(rowData)'></p-button>
+              </td>
+            </tr>
+          </ng-template>
+        </p-table>
+
+      </div>
+
+    </div>
+  </div>
+
+  <div *ngIf="this.ordenes.length > 0" class="w-full mt-6">
+    <div class="border border-primary shadow-md rounded-lg">
+      <div class="bg-primary text-white p-3">
+        <b>Ver detalle</b>
+      </div>
+      
+      <div class="p-4">
+
+        <div class="card card-border-color titulo row mb-4">
+          <div class="flex justify-between">
+            <div>Hoja de ruta: <b>{{ model.numhojaruta }}</b></div>
+            <div>Placa: <b>{{ model.placa }}</b></div>
+            <div>Conductor: <b>{{ model.nombrechofer }}</b></div>
+            <div>Fecha hora salida (Planificador): <b>{{ model.fechahoraplanning }}</b></div>
+          </div>
+        </div>
+
+        <div class="bg-primary text-white p-3">
+          <b>Manifiestos Generados</b>
+          <div class="flex gap-4 mt-4">
+            <!-- <button *ngIf="estado !== 'Creado'" class='btn btn-primary' pButton iconPos="left" label="Generar hoja de Carga" icon="fa fa-check" (click)="guardar()" type="button"></button>
+            <button *ngIf="estado === 'Creado'" class='btn btn-primary' pButton iconPos="left" label="Imprimir hoja de Carga" (click)="imprimirCarga()" type="button"></button>
+            <button *ngIf="estado === 'Creado' && esalmacen === true" class='btn btn-primary' pButton iconPos="left" label="Imprimir GRT" (click)="imprimirGrt()" type="button"></button>
+            <button *ngIf="estado === 'Creado' && esalmacen === true" class='btn btn-primary' pButton iconPos="left" label="Confirmar estiba" icon="fa fa-plus" (click)="confirmarDespacho()" type="button"></button>
+            <button *ngIf="estado === 'Creado' && esalmacen === true" class='btn btn-primary' pButton iconPos="left" label="Armar Valija" icon="fa fa-plus" (click)="armadoValija()" type="button"></button>
+            <button *ngIf="estado === 'Creado' && esalmacen === true" class='btn btn-primary' pButton iconPos="left" label="Asignar Precinto" icon="fa fa-plus" (click)="asignarPrecinto()" type="button"></button>
+            <button *ngIf="esalmacen === true" class='btn btn-danger' pButton iconPos="left" label="Desasignar OTs" icon="fa fa-minus" (click)="desasignarOts()" type="button"></button>
+ -->
+
+
+            <button  class='btn btn-primary' pButton iconPos="left" label="Generar hoja de Carga" icon="fa fa-check" (click)="guardar()" type="button"></button>
+            <button  class='btn btn-primary' pButton iconPos="left" label="Imprimir hoja de Carga" (click)="imprimirCarga()" type="button"></button>
+            <button  class='btn btn-primary' pButton iconPos="left" label="Imprimir GRT" (click)="imprimirGrt()" type="button"></button>
+            <button  class='btn btn-primary' pButton iconPos="left" label="Confirmar estiba" icon="fa fa-plus" (click)="confirmarDespacho()" type="button"></button>
+            <button  class='btn btn-primary' pButton iconPos="left" label="Armar Valija" icon="fa fa-plus" (click)="armadoValija()" type="button"></button>
+            <button  class='btn btn-primary' pButton iconPos="left" label="Asignar Precinto" icon="fa fa-plus" (click)="asignarPrecinto()" type="button"></button>
+            <button *ngIf="esalmacen === true" class='btn btn-danger' pButton iconPos="left" label="Desasignar OTs" icon="fa fa-minus" (click)="desasignarOts()" type="button"></button>
+
+
+
+          </div>
+        </div>
+
+        <p-table [columns]="cols2" (onRowReorder)="onRowReorder()" [style]="{width:'100%'}" editMode="row" dataKey="idmanifiesto"
+                 [rowsPerPageOptions]="[20,40,60,120]" [value]="ordenes" #dt [paginator]="true" [rows]="10" [responsive]="true">
+          
+          <ng-template pTemplate="colgroup" let-columns>
+            <colgroup>
+              <col *ngFor="let col of columns" [ngStyle]="{'width': col.width}">
+            </colgroup>
+          </ng-template>
+
+          <ng-template pTemplate="header" let-columns>
+            <tr>
+              <th [ngStyle]="{'width': col.width}" *ngFor="let col of columns" pResizableColumn [pSortableColumn]="col.field">
+                {{ col.header }}
+              </th>
+            </tr>
+          </ng-template>
+
+          <ng-template pTemplate="body" let-rowData let-index="rowIndex">
+            <tr [pSelectableRow]="rowData" [pReorderableRow]="index">
+              <td>
+                <span class="pi pi-bars" pReorderableRowHandle></span>
+              </td>
+              <td class="text-center">{{ rowData.nummanifiesto }}</td>
+              <td class="text-left">{{ rowData.provincia }}</td>
+              <td class="text-center">{{ rowData.tipooperacion }}</td>
+              <td [ngClass]="rowData.estado == 'Por Despachar' ? 'very-old-car' : (rowData.estado == 'Por Entregar' ? '' : rowData.estado == 'Entregado' ? 'old-car' : null)">
+                {{ rowData.estado }}
+              </td>
+              <td class="text-left">{{ rowData.idorden }}</td>
+            </tr>
+          </ng-template>
+        </p-table>
+
+      </div>
+    </div>
+  </div>
+
+<!-- 
+  <p-confirmDialog header="Confirmación" icon="pi pi-exclamation-triangle"></p-confirmDialog> -->
+</div>

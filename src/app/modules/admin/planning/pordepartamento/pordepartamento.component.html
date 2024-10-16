@@ -1,0 +1,151 @@
+
+<div class="flex flex-col flex-auto min-w-0 bg-card">
+  <div class="flex flex-col sm:flex-row flex-0 sm:items-center sm:justify-between p-6 sm:py-8 sm:px-10 border-b bg-card dark:bg-transparent">
+    <div class="flex-1 min-w-0">
+      <div class="flex flex-wrap items-center font-medium">
+        <div>
+          <a class="whitespace-nowrap text-primary-500">TMS</a>
+        </div>
+        <div class="flex items-center ml-1 whitespace-nowrap">
+          <mat-icon class="fuse-horizontal-navigation-item-icon" [svgIcon]="'heroicons_solid:chevron-right'"></mat-icon>
+          <a class="ml-1 text-primary-500">Planeamiento</a>
+        </div>
+      </div>
+      <div class="mt-2">
+        <h2 class="text-3xl md:text-4xl font-extrabold tracking-tight leading-7 sm:leading-10 truncate"> Planificación por Departamento </h2>
+      </div>
+    </div>
+  </div>
+
+<!-- 
+<div class="container mx-auto px-4"> -->
+  <div class="main-content container-fluid p-6">
+      <div class="flex flex-col min-w-0 w-full">
+
+        <!-- <div class="bg-white border border-blue-500 rounded-lg shadow">
+          <div class="bg-blue-500 text-white px-4 py-2 rounded-t-lg">
+            <b>Filtro de búsqueda</b>
+          </div> -->
+          <div class="p-1">
+            <div class="grid grid-cols-1 md:grid-cols-4 gap-4">
+            
+                <p-dropdown name="estaciones"
+                            [options]="estaciones"
+                            [(ngModel)]="model.idestacionorigen"
+                            class="w-full"
+                            scrollHeight="20vh"
+                            appendTo="body"
+                            [disabled]="estacionhabilitada"
+                            [baseZIndex]="100000"
+                            [virtualScroll]="true"
+                            itemSize="4"
+                            [resetFilterOnHide]="false"
+                            [hideTransitionOptions]="'0ms'"
+                            (onChange)="reload()"
+                            [showTransitionOptions]="'0ms'"
+                            placeholder="Seleccione una estación"
+                            filter="false">
+                  <ng-template let-item pTemplate="selectedItem">
+                    <span class="align-middle">{{item.label}}</span>
+                  </ng-template>
+                </p-dropdown>
+                <div class="mb-5">
+                  <p-button class="w-[200px]"
+                          label="Planificar"
+                          icon="fa fa-file"
+                          severity="secondary"
+                          (click)="planificar()"
+                          >
+                  </p-button>
+                </div>
+            </div>
+          </div>
+
+
+        <div class="bg-white border border-blue-500 rounded-lg shadow mt-4">
+          <!-- <div class="bg-blue-500 text-white px-4 py-2 rounded-t-lg">
+            <b>Programación Provincia</b>
+          </div> -->
+          <div class="p-4 grid grid-cols-1 md:grid-cols-2 gap-4">
+        
+
+            <!-- <div class="col-span-1">
+              <agm-map [latitude]="lat" [longitude]="lng" [zoom]="zoom">
+                <agm-marker *ngFor="let data of ordenes; let i = index"
+                            [latitude]="data.lat"
+                            [longitude]="data.lng"
+                            [label]="{color: 'black', text: data.cantidad.toString() }"
+                            [iconUrl]="{
+                              url: '/assets/img/27-512.png',
+                              scaledSize: {
+                                  width: 40,
+                                  height: 40
+                              }
+                            }">
+                </agm-marker>
+              </agm-map>
+            </div> -->
+
+            <div class="col-span-2">
+            
+
+              <p-table [columns]="cols"
+                      dataKey="iddepartamento"
+                      [rowsPerPageOptions]="[20,40,60,120]"
+                      [value]="ordenes2"
+                      #dt
+                      selectionMode="multiple"
+                      sortField="zona"
+                      [(selection)]="selectedDepartaments"
+                      [rows]="20"
+                      [responsive]="true">
+                <ng-template pTemplate="header" let-columns>
+                  <tr>
+                    <th class="px-2 py-2" [ngStyle]="{'width': col.width}" *ngFor="let col of columns" pResizableColumn [pSortableColumn]="col.field">
+                      {{col.header}}
+                    </th>
+                  </tr>
+                </ng-template>
+
+            
+
+                <ng-template pTemplate="body" let-rowData let-expanded="expanded" let-columns="columns">
+                  <tr [pSelectableRow]="rowData">
+                    <td class="px-2 py-2 text-left">
+                      <p-button size="small"
+                              severity="warning"
+                              icon="fa fa-search"
+                              (click)="verDetalle(rowData)">
+                      </p-button>
+                    </td>
+                    <td class="px-2 py-2 text-center">{{ rowData.zona }}</td>
+                    <td class="px-2 py-2 text-center">{{ rowData.departamento }}</td>
+                    <td class="px-2 py-2 text-center">{{rowData.cantidad}}</td>
+                    <td class="px-2 py-2 text-center">{{rowData.bulto}}</td>
+                    <td class="px-2 py-2 text-center">{{rowData.peso | number:'1.0-0'}}</td>
+                    <td class="px-2 py-2 text-center">{{rowData.volumen | number:'1.0-0'}}</td>
+                    <td class="px-2 py-2 text-center">S/.{{rowData.subtotal | number:'1.0-0'}}</td>
+                  </tr>
+                </ng-template>
+
+                <ng-template pTemplate="footer">
+                  <tr>
+                    <td colspan="3" class="text-center">Totales</td>
+                    <td class="text-center">{{otsTotal | number:'1.0-0'}}</td>
+                    <td class="text-center">{{bultosTotal | number:'1.0-0'}}</td>
+                    <td class="text-center">{{pesoTotal | number:'1.0-0'}}</td>
+                    <td></td>
+                    <td class="text-center">S/.{{subtotalTotal | number:'1.0-0'}}</td>
+                  </tr>
+                </ng-template>
+              </p-table>
+            </div>
+          </div>
+
+      </div>
+
+    </div>
+</div>
+  <!-- </div> -->
+</div>
+

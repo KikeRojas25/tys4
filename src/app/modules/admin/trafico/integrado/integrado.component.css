@@ -1,0 +1,12 @@
+.rojo .p-progressbar-value {
+    background-color: red;
+  }
+  
+  .amarillo .p-progressbar-value {
+    background-color: yellow;
+  }
+  
+  .verde .p-progressbar-value {
+    background-color: green;
+  }
+

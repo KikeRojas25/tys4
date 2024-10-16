@@ -1,0 +1,5 @@
+.word-wrap {
+    white-space: normal; /* Permitir saltos de línea */
+    word-wrap: break-word; /* Romper palabras largas */
+  }
+  

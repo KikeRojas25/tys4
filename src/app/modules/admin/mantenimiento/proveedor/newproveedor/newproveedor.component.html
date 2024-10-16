@@ -1,0 +1,167 @@
+<div class="flex flex-col flex-auto min-w-0">
+  <div class="flex flex-col sm:flex-row flex-0 sm:items-center sm:justify-between p-6 sm:py-8 sm:px-10 border-b bg-card dark:bg-transparent">
+    <div class="flex-1 min-w-0">
+      <div class="flex flex-wrap items-center font-medium">
+        <div>
+          <a class="whitespace-nowrap text-primary-500">TMS</a>
+        </div>
+        <div class="flex items-center ml-1 whitespace-nowrap">
+          <mat-icon class="fuse-horizontal-navigation-item-icon" [svgIcon]="'heroicons_solid:chevron-right'"></mat-icon>
+          <a class="ml-1 text-primary-500">Mantenimiento</a>
+        </div>
+        <div class="flex items-center ml-1 whitespace-nowrap">
+          <mat-icon class="fuse-horizontal-navigation-item-icon" [svgIcon]="'heroicons_solid:chevron-right'"></mat-icon>
+          <a class="ml-1 text-primary-500" [routerLink]="['/trafico/integrado']">Nuevo Proveedor</a>
+        </div>
+      </div>
+      
+    </div>
+  </div>
+
+  <div class="flex flex-col min-w-0 w-full">
+
+
+    
+
+        <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+
+              <div class="field flex flex-col">
+                  <label  for="tipoproveedor">Tipo Proveedor (*) </label>
+                  <p-dropdown name="tipoproveedor"
+                  [virtualScroll]="true" itemSize="30"
+                    [options]="tipos" [(ngModel)]="model.idtiproveedor"
+                    [showClear]="true" class="input-form-field"
+                      placeholder="Seleccione un tipo"  
+                    [style]="{'width':'100%'}" [resetFilterOnHide]="false"
+                    [hideTransitionOptions]="'0ms'" required
+                    [filter]="true"
+                    [showTransitionOptions]="'0ms'">
+                        <ng-template let-item pTemplate="selectedItem">
+                            <span style="vertical-align:left;">{{item.label}}</span>
+                        </ng-template>
+                  </p-dropdown>
+              </div>
+              <div class="field flex flex-col">
+                <label  for="bultos">RUC (*) </label>
+                 <p-inputNumber  name="bultos"  inputId="integeronly"  [useGrouping]="false"  [min]="0" [(ngModel)]="model.ruc"  ></p-inputNumber>
+              </div>
+              
+              <div class="field flex flex-col col-span-2">
+                <label for="puntollegada">Razón Social (*) </label>
+                <input pInputText  minlength="5" maxlength="150"  required class="form-control col-md-12"  autocomplete="off" [(ngModel)]="model.puntollegada" name="puntollegada" #puntollegada="ngModel" type="text">
+                <div *ngIf="puntollegada.invalid && (puntollegada.dirty || puntollegada.touched)"
+                        class="alert-danger">
+
+                      <div *ngIf="puntollegada.errors.required">
+                        Requiere de una dirección
+                      </div>
+                      <div *ngIf="puntollegada.errors.minlength">
+                        No puede contener menos de 5 caracteres.
+                      </div>
+                    </div>
+
+                </div>
+              
+          
+
+             
+
+
+              <div class="field flex flex-col">
+                <label>Ubigeo (*)  :</label>
+
+                <p-dropdown name="ubigeo"
+                    [options]="ubigeo"  [(ngModel)]="model.idorigen"
+                    scrollHeight="30vh"  class="input-form-field"
+                    [virtualScroll]="true" itemSize="70"
+                    [style]="{'width':'100%'}" required 
+                    placeholder="Seleccione un ubigeo"  
+                    [resetFilterOnHide]="false"
+                    [hideTransitionOptions]="'0ms'"
+                    [showTransitionOptions]="'0ms'"
+                    [filter]="true">
+                        <ng-template let-item pTemplate="selectedItem">
+                            <span style="vertical-align:left;">{{item.label}}</span>
+                        </ng-template>
+                  </p-dropdown>
+
+
+              </div>
+
+
+      
+              <div class="field flex flex-col col-span-2">
+                <label for="puntollegada">Dirección principal (*)  </label>
+                <input pInputText  minlength="5" maxlength="150"  required class="form-control col-md-12"  autocomplete="off" [(ngModel)]="model.puntollegada" name="puntollegada" #puntollegada="ngModel" type="text">
+                <div *ngIf="puntollegada.invalid && (puntollegada.dirty || puntollegada.touched)"
+                        class="alert-danger">
+
+                      <div *ngIf="puntollegada.errors.required">
+                        Requiere de una dirección
+                      </div>
+                      <div *ngIf="puntollegada.errors.minlength">
+                        No puede contener menos de 5 caracteres.
+                      </div>
+                    </div>
+
+                </div>
+
+                <div class="field flex flex-col col-span-2">
+                  <label for="puntollegada">Persona Contacto (*) </label>
+                  <input pInputText  minlength="5" maxlength="150"  required class="form-control col-md-12"  autocomplete="off" [(ngModel)]="model.puntollegada" name="puntollegada" #puntollegada="ngModel" type="text">
+                  <div *ngIf="puntollegada.invalid && (puntollegada.dirty || puntollegada.touched)"
+                          class="alert-danger">
+  
+                        <div *ngIf="puntollegada.errors.required">
+                          Requiere de una dirección
+                        </div>
+                        <div *ngIf="puntollegada.errors.minlength">
+                          No puede contener menos de 5 caracteres.
+                        </div>
+                      </div>
+  
+                  </div>
+                
+                <div class="field flex flex-col">
+                  <label  for="bultos">Teléfono (*) </label>
+                   <p-inputNumber  name="bultos"  inputId="integeronly"  [useGrouping]="false"  [min]="0" [(ngModel)]="model.ruc"  ></p-inputNumber>
+                </div>
+  
+
+         
+
+         
+        
+             
+          
+         
+         
+
+
+
+         
+
+        </div>
+    
+
+
+        <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+
+
+
+        
+
+              </div>
+                <div class="row pt-2 pt-sm-5 mt-1">
+                  <div class="col-sm-6 pl-0">
+                    <p class="text-right">
+                      <p-button   class="btn btn-space btn-primary" type="submit">Guardar</p-button>
+                      <p-button  [routerLink]="['/seguimiento/ordenrecojo']" routerLinkActive="router-link-active"  class="btn btn-space btn-secondary">Cancel</p-button>
+                    </p>
+                  </div>
+                </div>
+
+
+
+  </div>
+</div>

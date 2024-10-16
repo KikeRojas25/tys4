@@ -1,0 +1,237 @@
+<div class="flex flex-col flex-auto min-w-0 bg-card">
+  <!-- Cabecera -->
+  <div class="flex flex-col sm:flex-row flex-0 sm:items-center sm:justify-between p-6 sm:py-8 sm:px-10 border-b bg-card dark:bg-transparent">
+    <div class="flex-1 min-w-0">
+      <div class="flex flex-wrap items-center font-medium">
+        <div>
+          <a class="whitespace-nowrap text-primary-500">TMS</a>
+        </div>
+        <div class="flex items-center ml-1 whitespace-nowrap">
+          <mat-icon class="fuse-horizontal-navigation-item-icon" [svgIcon]="'heroicons_solid:chevron-right'"></mat-icon>
+          <a class="ml-1 text-primary-500">Seguimiento</a>
+        </div>
+      </div>
+      <div class="mt-2">
+        <h2 class="text-3xl md:text-4xl font-extrabold tracking-tight leading-7 sm:leading-10 truncate">Generación de Manifiestos Virtuales</h2>
+      </div>
+    </div>
+  </div>
+
+  <div class="main-content container-fluid p-6 w-full">
+    <div class="card card-border-color card-border-color-primary">
+      <div class="card-body grid grid-cols-1 lg:grid-cols-2 gap-4">
+        <!-- Órdenes Seleccionadas - Ocupa toda la primera fila -->
+        <div class="col-span-1 lg:col-span-2 w-full">
+          <label for="numcp" class="block mb-1">Órdenes Seleccionadas</label>
+          <input pInputText required name="numcp" [(ngModel)]="model.ots" type="text" class="form-control w-full p-inputtext p-component"
+            style="font-size: large; color: #fff; background-color: #3d3dea;" />
+        </div>
+
+        <!-- Hoja de Ruta, Fecha de Envío en la misma fila -->
+        <div class="grid grid-cols-1 lg:grid-cols-3 gap-4 col-span-1 lg:col-span-3 w-full">
+          <div class="field flex flex-col">
+            <label class="block mb-1">Hoja de Ruta:</label>
+            <p-dropdown name="hojasruta" scrollheight="40vh" [style]="{'width':'100%'}" required [options]="hojasRuta" appendto="body"
+              placeholder="Nueva Hoja de Ruta" [filter]="true" [(ngModel)]="model.numHojaRuta" (onChange)="onHojaRutaChange($event)">
+              <ng-template let-item pTemplate="selectedItem">
+                <span class="align-middle">{{item.label}}</span>
+              </ng-template>
+            </p-dropdown>
+          </div>
+
+          <div class="field flex flex-col">
+            <label class="block mb-1">Tipo de Operación:(*)</label>
+            <p-dropdown name="tiposoperacion" scrollheight="20vh" [style]="{'width':'100%'}" required [options]="tiposoperacion" appendto="body"
+              itemsize="4" placeholder="Seleccione un tipo de operación" [(ngModel)]="model.idtipoOperacion">
+              <ng-template let-item pTemplate="selectedItem">
+                <span class="align-middle">{{item.label}}</span>
+              </ng-template>
+            </p-dropdown>
+          </div>
+        </div>
+
+        <!-- Campos comunes: Fecha Envío, Origen y Destino -->
+        <div class="grid grid-cols-1 lg:grid-cols-3 gap-4 col-span-1 lg:col-span-3 w-full">
+          <div class="field flex flex-col">
+            <label class="block mb-1">Fecha Envío: (*)</label>
+            <p-calendar appendto="body" [(ngModel)]="model.fechasalida" basezindex="100" [style]="{'width':'100%'}" name="fechahorasalida" dateformat="dd/mm/yy" class="w-full"></p-calendar>
+          </div>
+          <div class="field flex flex-col">
+            <label>Origen :</label>
+
+            <p-dropdown name="ubigeo"
+                [options]="ubigeo"  [(ngModel)]="model.idorigen"
+                scrollHeight="30vh"  class="input-form-field"
+                [virtualScroll]="true" itemSize="70"
+                [style]="{'width':'100%'}" required 
+                [resetFilterOnHide]="false"
+                [hideTransitionOptions]="'0ms'"
+                [showTransitionOptions]="'0ms'"
+                [filter]="true">
+                    <ng-template let-item pTemplate="selectedItem">
+                        <span style="vertical-align:left;">{{item.label}}</span>
+                    </ng-template>
+              </p-dropdown>
+
+
+          </div>
+            <div class="field flex flex-col">
+              <label>Destino :</label>
+
+              <p-dropdown name="destino"
+              [options]="ubigeo"  [(ngModel)]="model.iddestino"
+              scrollHeight="30vh"  class="input-form-field"
+              [virtualScroll]="true" itemSize="70"
+              [style]="{'width':'100%'}"
+              [resetFilterOnHide]="false"
+              [hideTransitionOptions]="'0ms'"
+
+              [showTransitionOptions]="'0ms'" required
+              [filter]="true">
+              <ng-template let-item pTemplate="selectedItem">
+                <span style="vertical-align:left;">{{item.label}}</span>
+              </ng-template>
+              </p-dropdown>
+
+          </div>
+        </div>
+
+        <!-- Placa y Conductor: Solo si Hoja de Ruta es nueva y no hay hoja seleccionada -->
+        <div *ngIf="isNuevaHojaRuta && model.idtipoOperacion !== 123" class="grid grid-cols-1 lg:grid-cols-3 gap-4 col-span-1 lg:col-span-3 w-full">
+          <div class="field flex flex-col">
+            <label>Placa:</label>
+            <p-dropdown name="placa" [options]="placas" [(ngModel)]="model.idvehiculo" scrollHeight="30vh" class="input-form-field"
+              [virtualScroll]="true" itemSize="70" [style]="{'width':'100%'}" required [resetFilterOnHide]="false" [hideTransitionOptions]="'0ms'"
+              [showTransitionOptions]="'0ms'" [filter]="true">
+              <ng-template let-item pTemplate="selectedItem">
+                <span style="vertical-align:left;">{{item.label}}</span>
+              </ng-template>
+            </p-dropdown>
+          </div>
+
+          <div class="field flex flex-col col-span-2">
+            <label>Conductor :</label>
+            <p-dropdown name="conductor"
+                [options]="conductores"  [(ngModel)]="model.idchofer"
+                scrollHeight="30vh"  class="input-form-field"
+                [virtualScroll]="true" itemSize="70"
+                [style]="{'width':'100%'}" required
+                [resetFilterOnHide]="false"
+                [hideTransitionOptions]="'0ms'"
+                [showTransitionOptions]="'0ms'"
+                [filter]="true">
+                    <ng-template let-item pTemplate="selectedItem">
+                        <span style="vertical-align:left;">{{item.label}}</span>
+                    </ng-template>
+              </p-dropdown>
+          </div>
+        </div>
+
+        <!-- Proveedor: Solo si hoja de ruta es nueva y entrega a tercero -->
+        <div class="grid grid-cols-1 lg:grid-cols-3 gap-4 col-span-1 lg:col-span-3 w-full">
+          <div class="field flex flex-col">
+            <label class="block mb-1">Remitente</label>
+            <p-dropdown name="proveedor" [options]="proveedores" 
+            [virtualScroll]="true"
+            [virtualScrollItemSize]="38" 
+              [(ngModel)]="model.IdRemitente" scrollHeight="30vh" class="input-form-field"
+              [style]="{'width':'100%'}" required [filter]="true">
+              <ng-template let-item pTemplate="selectedItem">
+                <span class="align-middle">{{item.label}}</span>
+              </ng-template>
+            </p-dropdown>
+          </div>
+      
+          <div class="field flex flex-col">
+            <label class="block mb-1">Destinatario (Repartidor)</label>
+            <p-dropdown name="proveedor" [options]="proveedores" 
+            [virtualScroll]="true"
+            [virtualScrollItemSize]="38" 
+              [(ngModel)]="model.IdDestinatario" scrollHeight="30vh" class="input-form-field"
+              [style]="{'width':'100%'}" required [filter]="true">
+              <ng-template let-item pTemplate="selectedItem">
+                <span class="align-middle">{{item.label}}</span>
+              </ng-template>
+            </p-dropdown>
+          </div>
+        </div>
+
+        <!-- Campos para distribución por agencia: Peso, Bultos, Precio, Consignado, Agencia -->
+        <div *ngIf="model.idtipoOperacion === 123" class="grid grid-cols-1 lg:grid-cols-2 gap-4 col-span-1 lg:col-span-3 w-full">
+          <div class="field flex flex-col">
+            <label class="block mb-1">Peso:</label>
+            <p-inputNumber  [(ngModel)]="model.pesoagencia"  inputId="minmaxfraction" 
+            mode="decimal"  class="form-control w-full"
+            [minFractionDigits]="2" 
+            [maxFractionDigits]="5" />
+          </div>
+          <div class="field flex flex-col">
+            <label class="block mb-1">Bultos:</label>
+            <p-inputNumber  [(ngModel)]="model.bultoagencia" inputId="integeronly"  class="form-control w-full" />
+          </div>
+          <div class="field flex flex-col">
+            <label class="block mb-1">Factura:</label>
+            <input pInputText [(ngModel)]="model.nrofactura" type="text" class="form-control w-full" />
+          </div>
+          <div class="field flex flex-col">
+            <label class="block mb-1">Consignado:</label>
+            <input pInputText [(ngModel)]="model.consignadoagencia" type="text" class="form-control w-full" />
+          </div>
+          <div class="field flex flex-col">
+            <label class="block mb-1">Clave:</label>
+            <input pInputText [(ngModel)]="model.claveagencia" type="text" class="form-control w-full" />
+          </div>
+          <div class="field flex flex-col">
+            <label class="block mb-1">Nro Remito:</label>
+            <input pInputText [(ngModel)]="model.nroremito" type="text" class="form-control w-full" />
+          </div>
+
+          <div class="field flex flex-col">
+            <label class="block mb-1">Costo Envio:</label>
+            <p-inputNumber     inputId="minmaxfraction" 
+            mode="decimal"  class="form-control w-full"
+            [minFractionDigits]="2" 
+            [maxFractionDigits]="5" [(ngModel)]="model.costoenvio" />
+          </div>
+   
+
+
+
+          <div class="field flex flex-col">
+            <label class="block mb-1">Agencia:</label>
+            
+            <p-dropdown name="agencia" [options]="agencias" 
+            [virtualScroll]="true"
+            [virtualScrollItemSize]="38" 
+            [(ngModel)]="model.idagencia" scrollHeight="30vh" class="input-form-field"
+              [style]="{'width':'100%'}" required [filter]="true">
+              <ng-template let-item pTemplate="selectedItem">
+                <span class="align-middle">{{item.label}}</span>
+              </ng-template>
+            </p-dropdown>
+          </div>
+        </div>
+      <p-button label="Ver Manifiesto" (onClick)="showDialog()" severity="danger"></p-button>
+      </div>
+    </div>
+  </div>
+</div>
+
+
+
+
+<!-- Diálogo para mostrar la información -->
+<p-dialog header="Información Generada" [(visible)]="display" [modal]="true" [responsive]="true" (onHide)="display = false">
+  <div>
+    <pre>{{ obtenerInformacion() }}</pre>
+  </div>
+  <p-footer>
+    <p-button label="Generar" (onClick)="generarmanifiesto()" severity="danger"></p-button>
+    <button pButton label="Cerrar" icon="pi pi-times" (click)="display = false"></button>
+
+  </p-footer>
+</p-dialog>
+
+<p-toast />
+
+<p-confirmDialog />

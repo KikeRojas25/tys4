@@ -1,0 +1,559 @@
+<div class="flex flex-col flex-auto min-w-0">
+  <div class="flex flex-col sm:flex-row flex-0 sm:items-center sm:justify-between p-6 sm:py-8 sm:px-10 border-b bg-card dark:bg-transparent">
+    <div class="flex-1 min-w-0">
+      <div class="flex flex-wrap items-center font-medium">
+        <div>
+          <a class="whitespace-nowrap text-primary-500">TMS</a>
+        </div>
+        <div class="flex items-center ml-1 whitespace-nowrap">
+          <mat-icon class="fuse-horizontal-navigation-item-icon" [svgIcon]="'heroicons_solid:chevron-right'"></mat-icon>
+          <a class="ml-1 text-primary-500">Recepción</a>
+        </div>
+        <div class="flex items-center ml-1 whitespace-nowrap">
+          <mat-icon class="fuse-horizontal-navigation-item-icon" [svgIcon]="'heroicons_solid:chevron-right'"></mat-icon>
+          <a class="ml-1 text-primary-500" [routerLink]="['/trafico/integrado']">Ordén de Transporte</a>
+        </div>
+      </div>
+      <div class="mt-2">
+        <h2 class="text-3xl md:text-4xl font-extrabold tracking-tight leading-7 sm:leading-10 truncate"> Crear OT  </h2>
+      </div>
+    </div>
+  </div>
+
+  <div class="flex flex-col min-w-0 w-full">
+
+
+    
+
+  <form #f="ngForm"  (ngSubmit)="registrar()" >
+
+    <p-panel header="Datos generales" class="w-full mb-3">
+
+        <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+
+              <div class="field flex flex-col">
+                  <label  for="clientes">Cliente (*) </label>
+                  <p-dropdown name="clientes"
+                  [virtualScroll]="true" itemSize="30"
+                    [options]="clientes" [(ngModel)]="model.idcliente"
+                    [showClear]="true" class="input-form-field"
+                      placeholder="Seleccione un cliente"  (onChange)="cargarDestinatario()"
+                    [style]="{'width':'100%'}" [resetFilterOnHide]="false"
+                    [hideTransitionOptions]="'0ms'" required
+                    [filter]="true"
+                    [showTransitionOptions]="'0ms'">
+                        <ng-template let-item pTemplate="selectedItem">
+                            <span style="vertical-align:left;">{{item.label}}</span>
+                        </ng-template>
+                  </p-dropdown>
+                  <div *ngIf="f.controls['clientes']?.invalid && (f.controls['clientes']?.dirty || f.controls['clientes']?.touched)"
+                  class="alert-danger">
+                  <div *ngIf="f.controls['clientes']?.errors?.required">
+                      Requiere seleccionar un cliente.
+                  </div>
+              </div>
+              </div>
+              <div class="field flex flex-col">
+                <label  for="clientes">Remitente (*) 
+                    <a href="#" class="text-sm text-blue-500 underline ml-2" (click)="mismoremitente = false">
+                      Elegir otro
+                    </a> 
+                </label>
+                <p-dropdown name="remitente"
+                [virtualScroll]="true" itemSize="30"
+                  [options]="clientes" [(ngModel)]="model.idremitente" [disabled]="mismoremitente"
+                  [showClear]="true" class="input-form-field"
+                    placeholder="Seleccione un remitente"
+                  [style]="{'width':'100%'}" [resetFilterOnHide]="false"
+                  [hideTransitionOptions]="'0ms'" required
+                  [showTransitionOptions]="'0ms'"
+                  [filter]="true">
+                      <ng-template let-item pTemplate="selectedItem">
+                          <span style="vertical-align:left;">{{item.label}}</span>
+                      </ng-template>
+                </p-dropdown>
+                <div *ngIf="f.controls['remitente']?.invalid && (f.controls['remitente']?.dirty || f.controls['remitente']?.touched)"
+                class="alert-danger">
+                <div *ngIf="f.controls['remitente']?.errors?.required">
+                    Requiere seleccionar un remitente.
+                </div>
+            </div>
+
+              </div>
+            <div class="field flex flex-col">
+                <label>Destinatario (*) :
+                  <a href="#" class="text-sm text-blue-500 underline ml-2" (click)="mismodestinatario = false">
+                    Elegir otro
+                  </a> 
+
+                </label>
+              <p-dropdown name="destinatario"
+                  [virtualScroll]="true" itemSize="30"  [disabled]="mismodestinatario"
+                  [options]="clientes" [(ngModel)]="model.iddestinatario"
+                  [showClear]="true" class="input-form-field"
+                  placeholder="Seleccione un destinatario"
+                  [style]="{'width':'100%'}" [resetFilterOnHide]="false"
+                  [hideTransitionOptions]="'0ms'" required
+                  [showTransitionOptions]="'0ms'"
+                  [filter]="true">
+                  <ng-template let-item pTemplate="selectedItem">
+                  <span style="vertical-align:left;">{{item.label}}</span>
+                  </ng-template>
+              </p-dropdown>
+              <div *ngIf="f.controls['destinatario']?.invalid && (f.controls['destinatario']?.dirty || f.controls['destinatario']?.touched)"
+                  class="alert-danger">
+                  <div *ngIf="f.controls['destinatario']?.errors?.required">
+                      Requiere seleccionar un destinatario.
+                  </div>
+                 </div>
+              </div> 
+
+              <div class="field flex flex-col">
+                <label>Origen (*) :</label>
+
+                <p-dropdown name="ubigeo"
+                    [options]="ubigeo"  [(ngModel)]="model.idorigen"
+                    scrollHeight="30vh"  class="input-form-field"
+                    [virtualScroll]="true" itemSize="70"
+                    [style]="{'width':'100%'}" required (onChange)="cargarFormula()"
+                    [resetFilterOnHide]="false"
+                    [hideTransitionOptions]="'0ms'"
+                    [showTransitionOptions]="'0ms'"
+                    [filter]="true">
+                        <ng-template let-item pTemplate="selectedItem">
+                            <span style="vertical-align:left;">{{item.label}}</span>
+                        </ng-template>
+                  </p-dropdown>
+                  <div *ngIf="f.controls['ubigeo']?.invalid && (f.controls['ubigeo']?.dirty || f.controls['ubigeo']?.touched)"
+                    class="alert-danger">
+                    <div *ngIf="f.controls['ubigeo']?.errors?.required">
+                        Requiere seleccionar un origen.
+                    </div>
+                 </div>
+
+
+              </div>
+
+              <div class="field flex flex-col col-span-2">
+              <label for="puntopartida2">Dirección (*) </label>
+                  <input pInputText  minlength="5" maxlength="150"  required class="form-control col-md-12"  autocomplete="off" [(ngModel)]="model.puntopartida2" name="puntopartida2" #puntopartida2="ngModel" type="text">
+                  <div *ngIf="puntopartida2.invalid && (puntopartida2.dirty || puntopartida2.touched)"
+                  class="alert-danger">
+
+                  <div *ngIf="puntopartida2.invalid && (puntopartida2.dirty || puntopartida2.touched)"
+                  class="alert-danger">
+                  <div *ngIf="puntopartida2.errors.required">
+                      Requiere de una dirección.
+                  </div>
+                  <div *ngIf="puntopartida2.errors.minlength">
+                      No puede contener menos de 5 caracteres.
+                  </div>
+              </div>
+              </div>
+
+              </div>
+
+
+              <div class="field flex flex-col">
+              <label>Destino :</label>
+
+              <p-dropdown name="destino"
+                  [options]="ubigeo"  [(ngModel)]="model.iddestino"
+                  scrollHeight="30vh"  class="input-form-field"
+                  [virtualScroll]="true" itemSize="70"
+                  [style]="{'width':'100%'}" (onChange)="cargarFormula()"
+                  [resetFilterOnHide]="false"
+                  [hideTransitionOptions]="'0ms'"
+
+                  [showTransitionOptions]="'0ms'" required
+                  [filter]="true">
+                  <ng-template let-item pTemplate="selectedItem">
+                    <span style="vertical-align:left;">{{item.label}}</span>
+                  </ng-template>
+              </p-dropdown>
+              <div *ngIf="f.controls['destino']?.invalid && (f.controls['destino']?.dirty || f.controls['destino']?.touched)"
+                  class="alert-danger">
+                  <div *ngIf="f.controls['destino']?.errors?.required">
+                      Requiere seleccionar un destino.
+                  </div>
+              </div>
+
+
+              </div>
+
+
+              <div class="field flex flex-col col-span-2">
+                <label for="puntollegada">Dirección </label>
+                <input pInputText  minlength="5" maxlength="150"  required class="form-control col-md-12"  autocomplete="off" [(ngModel)]="model.puntollegada" name="puntollegada" #puntollegada="ngModel" type="text">
+                <div *ngIf="puntollegada.invalid && (puntollegada.dirty || puntollegada.touched)"
+                        class="alert-danger">
+
+                      <div *ngIf="puntollegada.errors.required">
+                        Requiere de una dirección
+                      </div>
+                      <div *ngIf="puntollegada.errors.minlength">
+                        No puede contener menos de 5 caracteres.
+                      </div>
+                    </div>
+
+                </div>
+        </div>
+
+
+    </p-panel>
+
+     <p-panel header="Datos del portador" class="w-full mb-3">
+
+        <div class="grid grid-cols-1 md:grid-cols-4 gap-4">
+
+          <div class="field flex flex-col">
+            <label>Placa de recojo :</label>
+
+            <p-dropdown name="placa"
+                [options]="vehiculos"  [(ngModel)]="model.idvehiculo"
+                scrollHeight="30vh"  class="input-form-field"
+                [virtualScroll]="true" itemSize="70"
+                [style]="{'width':'100%'}" required
+                [resetFilterOnHide]="false"
+                [hideTransitionOptions]="'0ms'"
+                [showTransitionOptions]="'0ms'"
+                [filter]="true">
+                    <ng-template let-item pTemplate="selectedItem">
+                        <span style="vertical-align:left;">{{item.label}}</span>
+                    </ng-template>
+              </p-dropdown>
+              <div *ngIf="f.controls['placa']?.invalid && (f.controls['placa']?.dirty || f.controls['placa']?.touched)"
+                  class="alert-danger">
+                  <div *ngIf="f.controls['placa']?.errors?.required">
+                      Requiere seleccionar una placa.
+                  </div>
+              </div>
+
+
+          </div>
+          <div class="field flex flex-col col-span-2">
+            <label>Conductor de recojo :</label>
+
+            <p-dropdown name="conductor"
+                [options]="choferes"  [(ngModel)]="model.idchofer"
+                scrollHeight="30vh"  class="input-form-field"
+                [virtualScroll]="true" itemSize="70"
+                [style]="{'width':'100%'}" required
+                [resetFilterOnHide]="false"
+                [hideTransitionOptions]="'0ms'"
+                [showTransitionOptions]="'0ms'"
+                [filter]="true">
+                    <ng-template let-item pTemplate="selectedItem">
+                        <span style="vertical-align:left;">{{item.label}}</span>
+                    </ng-template>
+              </p-dropdown>
+
+              <div *ngIf="f.controls['conductor']?.invalid && (f.controls['conductor']?.dirty || f.controls['conductor']?.touched)"
+              class="alert-danger">
+              <div *ngIf="f.controls['conductor']?.errors?.required">
+                  Requiere seleccionar un conductor.
+              </div>
+          </div>
+
+
+          </div>
+          <div class="field flex flex-col">
+            <label>Fecha de recojo :</label>
+
+            <p-calendar  name="fecharecojo" 
+            [(ngModel)]="model.fecharecojo" 
+            required
+            [iconDisplay]="'input'" 
+            [showIcon]="true" 
+            inputId="icondisplay" />
+
+            <div *ngIf="f.controls['fecharecojo']?.invalid && (f.controls['fecharecojo']?.dirty || f.controls['fecharecojo']?.touched)"
+                class="alert-danger">
+                <div *ngIf="f.controls['fecharecojo']?.errors?.required">
+                    Requiere seleccionar una fecha.
+                </div>
+            </div>
+
+
+          </div>
+
+            <div class="field flex flex-col">
+                <label>Hora de recojo (*) :</label>
+                <p-inputMask mask="99:99" [(ngModel)]="model.horarecojo" name="horarecojo" required></p-inputMask>
+                <div *ngIf="f.controls['horarecojo']?.invalid && (f.controls['horarecojo']?.dirty || f.controls['horarecojo']?.touched)"
+                    class="alert-danger">
+                    <div *ngIf="f.controls['horarecojo']?.errors?.required">
+                        Requiere seleccionar una hora.
+                    </div>
+                </div>
+            </div>
+           <div class="field flex flex-col">
+              <label>Guía de recojo (*) :</label>
+              <div class="card p-fluid">
+                  <p-chips name="grrchip" [(ngModel)]="values" required />
+              </div>
+              <div *ngIf="!values.length && (f.controls.grrchip?.dirty || f.controls.grrchip?.touched)" class="alert-danger">
+                  <div *ngIf="!values.length">
+                      Requiere al menos una guía de recojo.
+                  </div>
+              </div>  
+          </div>
+           
+
+        </div>
+
+    </p-panel>
+      <p-panel header="Datos complementarios" class="w-full mb-3">
+
+        <div class="grid grid-cols-1 md:grid-cols-4 gap-4">
+
+          <div class="field flex flex-col">
+            <label  for="bultos">Cant. Bultos</label>
+             <p-inputNumber  name="bultos"  inputId="integeronly"  [useGrouping]="false"  [min]="0" [max]="5000" [(ngModel)]="model.bulto"  ></p-inputNumber>
+          </div>
+          <div class="field flex flex-col">
+            <label  for="peso">Peso Kg.</label>
+            <p-inputNumber  name="peso" mode="decimal" [minFractionDigits]="2" [maxFractionDigits]="5"   [min]="0" [max]="30000" [(ngModel)]="model.peso"  ></p-inputNumber>
+          </div>
+          <div class="field flex flex-col">
+            <label  for="peso">Volumen m3</label>
+            <p-inputNumber  name="volumen" mode="decimal"  [minFractionDigits]="2" [maxFractionDigits]="5"  [min]="0" [max]="1000" [(ngModel)]="model.volumen"  ></p-inputNumber>
+          </div>
+          <div class="field flex flex-col">
+            <label  for="peso">Peso Vol</label>
+            <p-inputNumber  name="volumen" mode="decimal"  [minFractionDigits]="2" [maxFractionDigits]="5"  [min]="0" [max]="1000" [(ngModel)]="model.pesovol"  ></p-inputNumber>
+          </div>
+
+          <div class="field flex flex-col">
+            <label>Fórmula :</label>
+
+            <p-dropdown name="formula"
+                [options]="formulas"  [(ngModel)]="model.idformula"
+                scrollHeight="30vh"  class="input-form-field"
+                [virtualScroll]="true" itemSize="70"
+                [style]="{'width':'100%'}" required
+                [resetFilterOnHide]="false"
+                [hideTransitionOptions]="'0ms'"
+                [showTransitionOptions]="'0ms'"
+                (onChange)="cargarConcepto()"
+                filter="false">
+                    <ng-template let-item pTemplate="selectedItem">
+                        <span style="vertical-align:left;">{{item.label}}</span>
+                    </ng-template>
+              </p-dropdown>
+
+
+          </div>
+          
+          <div class="field flex flex-col">
+            <label>Medio de transporte :</label>
+
+            <p-dropdown name="tipounidad"
+                [options]="tipounidad"  [(ngModel)]="model.idtipotransporte"
+                scrollHeight="30vh"  class="input-form-field"
+                [virtualScroll]="true" itemSize="70"
+                [style]="{'width':'100%'}" required
+                [resetFilterOnHide]="false"
+                [hideTransitionOptions]="'0ms'"
+                [showTransitionOptions]="'0ms'"
+                (onChange)="cargarConcepto()"
+                filter="false">
+                    <ng-template let-item pTemplate="selectedItem">
+                        <span style="vertical-align:left;">{{item.label}}</span>
+                    </ng-template>
+              </p-dropdown>
+
+
+          </div>
+             
+          <div class="field flex flex-col">
+            <label>Concepto de cobro :</label>
+
+            <p-dropdown name="concepto"
+                [options]="conceptos"  [(ngModel)]="model.idconceptocobro"
+                scrollHeight="30vh"  class="input-form-field"
+                [virtualScroll]="true" itemSize="70"
+                [style]="{'width':'100%'}" required
+                [resetFilterOnHide]="false"
+                [hideTransitionOptions]="'0ms'"
+                [showTransitionOptions]="'0ms'"
+                filter="false">
+                    <ng-template let-item pTemplate="selectedItem">
+                        <span style="vertical-align:left;">{{item.label}}</span>
+                    </ng-template>
+              </p-dropdown>
+
+
+          </div>
+          <div class="field flex flex-col">
+            <label>Mercadería especial :</label>
+
+            <p-dropdown name="mercaderiaEspecial"
+                [options]="mercaderiasEspeciales"  [(ngModel)]="model.idtipomercaderia"
+                scrollHeight="30vh"  class="input-form-field"
+                [virtualScroll]="true" itemSize="70"
+                [style]="{'width':'100%'}" required
+                [resetFilterOnHide]="false"
+                [hideTransitionOptions]="'0ms'"
+                [showTransitionOptions]="'0ms'"
+                filter="false">
+                    <ng-template let-item pTemplate="selectedItem">
+                        <span style="vertical-align:left;">{{item.label}}</span>
+                    </ng-template>
+              </p-dropdown>
+
+
+          </div>
+          <div class="field flex flex-col">
+            <label>Referencia :</label>
+
+            <input type="text" name="referencia" pInputText [(ngModel)]="model.referencia" />
+
+          </div>
+          <div class="field flex flex-col">
+            <label>Descripción de Mercadería :</label>
+            <input type="text" name="descripmercaderia" pInputText [(ngModel)]="model.mercaderia" />
+          </div>
+
+          <div class="field flex flex-col">
+            <label>GRRs masivas :</label>
+
+            <div class="card p-fluid">
+             <p-button severity="warning" label="Generar..." (onClick)="grr()" > </p-button>
+          
+          </div>
+
+          </div>
+
+
+
+
+          <div class="field flex flex-col">
+            <label>GRR (Guías de remitente) :</label>
+
+            <div class="card p-fluid">
+              <p-chips name="guiasremitente" [(ngModel)]="guias" />
+          </div>
+
+          </div>
+
+        </div>
+      </p-panel>
+      <p-panel header="¿Como lo almaceno?" class="w-full mb-3">
+
+        <div class="grid grid-cols-1 md:grid-cols-4 gap-4">
+          <div class="field flex flex-col">
+                     <p-button  label="Agregar etiqueta" severity="warning" (click)="dialogEtiqueta = true" ></p-button>
+          </div>
+          <div class="field flex flex-col  col-span-3">
+          <p-table [value]="etiquetas" [tableStyle]="{ 'min-width': '50rem' }">
+            <ng-template pTemplate="header">
+                <tr>
+                    <th>Acc</th>
+                    <th>Tipo</th>
+                    <th>Cantidad</th>
+                </tr>
+            </ng-template>
+            <ng-template pTemplate="body" let-product>
+                <tr>
+                   
+                    <td> 
+                     <p-button icon="fa fa-trash" > </p-button>  
+                    </td>
+                    <td>{{ product.tipo }}</td>
+                    <td>{{ product.cantidad }}</td>
+                </tr>
+            </ng-template>
+        </p-table>
+                    
+      </div>
+
+
+        </div>
+
+
+      </p-panel>
+      <p-panel header="Valorizado" class="w-full mb-3">
+
+
+
+
+        <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+
+
+           
+<p-button label="Refrescar" (onClick)="calcular()" > </p-button>
+                
+
+          <div class="field flex flex-col">
+                  
+            <div class="mb-4">
+              <div class="w-1/2 p-4 bg-gray-200 rounded-lg shadow-lg text-left">
+                  <label for="precio" class="block text-lg font-semibold text-gray-700 mb-2">Subtotal</label>
+                  <div class="text-5xl font-bold text-green-600">
+                      S/. {{ model.precio }}
+                  </div>
+              </div>
+          </div>
+          
+          
+
+          </div>
+
+              </div>
+                <div class="row pt-2 pt-sm-5 mt-1">
+                  <div class="col-sm-6 pl-0">
+                    <p class="text-right">
+                      <p-button [disabled]="!f.valid"  class="btn btn-space btn-primary" type="submit">Guardar</p-button>
+                      <p-button  [routerLink]="['/seguimiento/ordenrecojo']" routerLinkActive="router-link-active"  class="btn btn-space btn-secondary">Cancel</p-button>
+                    </p>
+                  </div>
+                </div>
+
+
+      </p-panel>
+  </form>
+
+
+</div>
+
+</div>
+
+<p-dialog header="Generador Guías de Remisión" [modal]="true" [(visible)]="dialogGrr" [style]="{ width: '25rem' }">
+  <span class="p-text-secondary block mb-5">Generación correlativa.</span>
+  <div class="flex align-items-center gap-3 mb-3">
+      <label for="cantidad" class="font-semibold w-6rem">Cantidad</label>
+      <p-inputNumber  name="cantidad" [(ngModel)]="model.cantidadguias" class="flex-auto" autocomplete="off" />
+  </div>
+  <div class="flex align-items-center gap-3 mb-5">
+      <label for="grrinicial" class="font-semibold w-6rem">GRR Inicial</label>
+      <input pInputText name="grrinicial" [(ngModel)]="model.guiaInicial" class="flex-auto" autocomplete="off" />
+  </div>
+  <div class="flex justify-content-end gap-2">
+       <p-button label="Cerrar" severity="secondary" (onClick)="dialogGrr= false" />
+      <p-button label="Generar" (onClick)="generarGrr()"   /> 
+  </div>
+</p-dialog>
+
+<p-dialog header="Generador Etiquetas" [modal]="true" [(visible)]="dialogEtiqueta" [style]="{ width: '25rem' }">
+  <span class="p-text-secondary block mb-5">Generación de Etiquetas</span>
+  <div class="flex align-items-center gap-3 mb-3">
+      <label for="Tipo" class="font-semibold w-6rem">Cantidad</label>
+      <p-dropdown 
+      name="tipo"
+      [options]="tipos" 
+      [(ngModel)]="model.idtipoetiqueta" 
+      placeholder="Selecciona un tipo">
+    </p-dropdown>
+  </div>
+  <div class="flex align-items-center gap-3 mb-5">
+      <label for="grrinicial" class="font-semibold w-6rem">Cantidad</label>
+      <p-inputNumber name="cantidadetiqueta" [(ngModel)]="model.cantidadetiqueta" class="flex-auto" autocomplete="off" />
+  </div>
+  <div class="flex justify-content-end gap-2">
+       <p-button label="Cerrar" severity="secondary" (onClick)="dialogGrr= false" />
+      <p-button label="Agregar" (onClick)="agregaretiqueta()"   /> 
+  </div>
+</p-dialog>
+
+<p-confirmDialog />

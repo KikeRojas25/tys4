@@ -1,0 +1,52 @@
+/* ----------------------------------------------------------------------------------------------------- */
+/*  @ Import/write your custom styles here.
+/*  @ Styles from this file will override 'vendors.scss' and Fuse's base styles.
+/* ----------------------------------------------------------------------------------------------------- */
+body  {
+    display: flex;
+    flex-direction: column;
+
+    top:0; 
+    left: 0;
+    margin: 0;
+    padding: 0;
+    right: 0;
+    width: 100%;
+    visibility: visible;
+}
+
+
+
+input.ng-invalid.ng-touched,
+select.ng-invalid.ng-touched {
+  border-color: red;
+}
+
+.error {
+  color: red;
+  font-size: 0.675rem;
+}
+
+.p-datatable .p-datatable-thead > tr > th {
+    background-color: #125ea3;
+    color: #ffffff;
+    font-size: 14px;
+    text-align: center;
+}
+
+.p-datatable-tbody > tr > td {
+    font-size: 14px;
+    padding: 8px;
+}
+
+.p-button.p-button-sm {
+  font-size: 0.975rem;
+    padding: 0.15625rem 0.0275rem  !important;
+  
+}
+
+
+.p-button {
+  font-size: 15px;
+    padding: 0.55625rem 0.62375rem !important;
+}
