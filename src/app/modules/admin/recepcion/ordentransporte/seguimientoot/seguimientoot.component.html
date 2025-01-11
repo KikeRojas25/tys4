@@ -198,42 +198,39 @@
     </div>
   
 </div>
-
-
 <p-dialog header="Tracking OT" [modal]="true" [(visible)]="dialoglifecycle" [style]="{ width: '105rem' }">
-  <p-timeline [value]="events"  layout="horizontal" align="top">
-    <ng-template pTemplate="content" let-event>
-        <div class="event-content" style="font-size: 0.85rem;max-width: 100px;"> <!-- Tamaño de letra reducido -->
-            <div class="mb-2">
-                <span>Registro: </span> 
-                <span class="p-text-secondary ">{{ event.dateEvent ? (event.dateRegister ? (event.dateRegister | date:'dd/MM/yyyy') : 'Sin dato') : 'Sin dato' }}</span>
-            </div>
-            <div class="mb-2">
-                <span>Evento: </span> 
-                <span class="p-text-secondary">{{ event.dateEvent ? (event.dateEvent | date:'dd/MM/yyyy') : 'Sin evento' }}</span>
-            </div>
-            <div class="mb-2">
-                <span>¿Quién?: </span> 
-                <span class="p-text-secondary">{{ event.dateEvent ? (event.user || 'Sin dato') : 'Sin dato' }}</span>
-            </div>
-        </div>
+  <p-table [value]="events" [style]="{ width: '100%' }">
+    <ng-template pTemplate="header">
+      <tr>
+        <th style="width: 20%;">Registro</th>
+        <th style="width: 20%;">Evento</th>
+        <th style="width: 20%;">¿Quién?</th>
+        <th style="width: 20%;">Estado</th>
+      </tr>
     </ng-template>
-
-    <ng-template pTemplate="opposite" let-event>
-      <div 
-      class="event-label badge-simulation" 
-      [ngStyle]="{'background-color': event.dateEvent ? '#17a2b8' : '#ffc107', 'color': event.dateEvent ? 'white' : 'black'}" 
-      style="margin: 0 auto; width: auto; max-width: 100px; font-size: 0.85rem; padding: 0.2rem 0.5rem; border-radius: 1rem; text-align: center;">
-      {{ event.status || 'Sin Estado' }}
-     </div>
-  
+    <ng-template pTemplate="body" let-event>
+      <tr>
+        <td>
+          {{ event.dateEvent ? (event.dateRegister ? (event.dateRegister | date:'dd/MM/yyyy') : 'Sin dato') : 'Sin dato' }}
+        </td>
+        <td>
+          {{ event.dateEvent ? (event.dateEvent | date:'dd/MM/yyyy') : 'Sin evento' }}
+        </td>
+        <td>
+          {{ event.dateEvent ? (event.user || 'Sin dato') : 'Sin dato' }}
+        </td>
+        <td>
+          <span 
+            class="badge-simulation"
+            [ngStyle]="{'background-color': event.dateEvent ? '#17a2b8' : '#ffc107', 'color': event.dateEvent ? 'white' : 'black'}" 
+            style="display: inline-block; padding: 0.2rem 0.5rem; border-radius: 1rem; text-align: center;">
+            {{ event.status || 'Sin Estado' }}
+          </span>
+        </td>
+      </tr>
     </ng-template>
-</p-timeline>
-
-
-
-
-
+  </p-table>
 </p-dialog>
+
 
 <p-toast />

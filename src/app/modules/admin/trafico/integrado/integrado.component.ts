@@ -55,7 +55,11 @@ export class IntegradoComponent implements OnInit {
 
     
   this.user = JSON.parse(localStorage.getItem('user'));
+
+  console.log(this.user);
+
   this.model.idusuario = this.user.usr_int_id;
+  this.model.idequipo = this.user.idEquipo;
 
     this.cols =
     [
@@ -80,6 +84,7 @@ export class IntegradoComponent implements OnInit {
 
     this.cols2 =
     [
+        {header: 'ACCIONES', field: 'acciones'  ,  width: '6px' },
         {header: 'DEPARTAMENTO', field: 'departamento'  ,  width: '100px'  },
         {header: 'PROVEEDOR', field: 'repartidor'  ,  width: '100px' },
         {header: '#OTS', field: 'cantidad' , width: '60px'  },
@@ -105,6 +110,10 @@ export class IntegradoComponent implements OnInit {
 
   }
   reload() {
+
+    console.log('antes del envio:',this.model);
+
+
     this.traficoService.VerHojasRutaTrocal(this.model).subscribe(list =>  {
 
       this.ordenes =  list;
@@ -146,7 +155,7 @@ export class IntegradoComponent implements OnInit {
   verDetalle(idhojaruta: number) {
     this.router.navigate(['/trafico/vistamanifiesto', idhojaruta]);
   }
-  verRepartidor(id: number){
-    this.router.navigate(['/trafico/vistarepartidor', id]);
+  verRepartidor(idproveedor: number , iddepartamento: number ){
+    this.router.navigate(['/trafico/vistarepartidor', idproveedor , iddepartamento]);
   }
 }

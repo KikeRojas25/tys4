@@ -13,6 +13,8 @@ import { FormsModule } from '@angular/forms';
 import { CommonModule } from '@angular/common';
 import { MatIcon } from '@angular/material/icon';
 import { PanelModule } from 'primeng/panel';
+import { VerDetalleOrdenxDepartamentoModalComponent } from './ordendetallexdepartamento';
+import { TraficoService } from '../../trafico/trafico.service';
 
 @Component({
   selector: 'app-pordepartamento',
@@ -84,7 +86,8 @@ export class PordepartamentoComponent implements OnInit {
   constructor(private planningService: PlanningService,
               public dialogService: DialogService,
               private router: Router,
-              public messageService: MessageService
+              public messageService: MessageService,
+              private traficoService: TraficoService,
               ) { }
 
   ngOnInit() {
@@ -207,18 +210,18 @@ export class PordepartamentoComponent implements OnInit {
     let iddepartamento =  this.model.iddepartamento ;
     let idestacionorigen =  this.model.idestacionorigen ;
 
-  //   const ref = this.dialogService.open(VerDetalleOrdenxDepartamentoModalComponent, {
-  //    header: 'Detalle por departamento',
-  //    width: '50%',
-  //    contentStyle: { overflow: 'auto',  },
-  //    data : { iddepartamento,  idestacionorigen}
-  //  });
-  //  ref.onClose.subscribe(() => {
+    const ref = this.dialogService.open(VerDetalleOrdenxDepartamentoModalComponent, {
+     header: 'Detalle por departamento',
+     width: '50%',
+     contentStyle: { overflow: 'auto',  },
+     data : { iddepartamento,  idestacionorigen}
+   });
+   ref.onClose.subscribe(() => {
 
 
 
 
-  //  });
+   });
    }
 
   reload() {

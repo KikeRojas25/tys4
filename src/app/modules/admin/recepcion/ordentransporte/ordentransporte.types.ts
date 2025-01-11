@@ -1,10 +1,29 @@
+import { NumberInput } from "@angular/cdk/coercion";
+import { NumericDictionary } from "lodash";
 
 
 export interface OrdenTransporte {
     idordentrabajo?: number;
     idordenrecojo?: number;
     numcp?: string;
+    
     idcliente?: number;
+    idremitente?: number;
+    iddestinatario?: number;
+    idorigen?: number;
+    puntopartida: string;
+    iddestino: number;
+    puntollegada: string;
+    idchofer: number;
+    horarecojo: string;
+    guiarecojo: string;
+    pesovol: number;
+    idformula: number;
+    idtipotransporte: number;
+    idconceptocobro: number;
+    idtipomercaderia: number;
+    descripciongeneral: string;
+    guiasremitente: string;
 
     numcarga?: string;
     idcarga?: number;

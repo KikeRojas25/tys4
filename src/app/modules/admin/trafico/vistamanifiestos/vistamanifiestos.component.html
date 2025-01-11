@@ -120,12 +120,12 @@
                 <tr [pSelectableRow]="rowData">
 
                 <td class="ui-resizable-column" style="text-align:left;" > {{ rowData.numCp    }}   </td>
-                <td class="ui-resizable-column" style="text-align:left;"> {{rowData.bulto }} </td>
                 <td class="ui-resizable-column" style="text-align:center;"> {{rowData.fechaRegistro | date: 'dd/MM/yyyy HH:mm' }}</td>
-                <td class="ui-resizable-column" style="text-align:center;"> {{rowData.peso }}</td>
                 <td class="ui-resizable-column" style="text-align:center;"> {{rowData.destino }}</td>
                 <td class="ui-resizable-column" style="text-align:center;"> {{rowData.cliente }}</td>
                 <td class="ui-resizable-column" style="text-align:center;"> {{rowData.tipoOperacion }}</td>
+                <td class="ui-resizable-column" style="text-align:left;"> {{rowData.bulto }} </td>
+                <td class="ui-resizable-column" style="text-align:center;"> {{rowData.peso }}</td>
                 <td class="ui-resizable-column" style="text-align:center;"> 
 
                     <p-button icon="pi pi-paperclip" severity="warning" (click)="verOt(rowData.idOrdenTrabajo)" size="small" ></p-button>

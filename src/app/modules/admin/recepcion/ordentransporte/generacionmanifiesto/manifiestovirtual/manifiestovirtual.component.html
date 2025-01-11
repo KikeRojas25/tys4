@@ -75,16 +75,17 @@
 
 
           </div>
-            <div class="field flex flex-col">
+            <div class="field flex flex-col" *ngIf="model.idtipoOperacion !== 112">
               <label>Destino :</label>
 
               <p-dropdown name="destino"
-              [options]="ubigeo"  [(ngModel)]="model.iddestino"
+              [options]="ubigeoDestino"  [(ngModel)]="model.iddestino"
               scrollHeight="30vh"  class="input-form-field"
               [virtualScroll]="true" itemSize="70"
               [style]="{'width':'100%'}"
               [resetFilterOnHide]="false"
               [hideTransitionOptions]="'0ms'"
+              (onChange)="cargarProveedores()"
 
               [showTransitionOptions]="'0ms'" required
               [filter]="true">
@@ -142,11 +143,14 @@
             </p-dropdown>
           </div>
       
-          <div class="field flex flex-col">
+          <div class="field flex flex-col" *ngIf="model.idtipoOperacion !== 112">
             <label class="block mb-1">Destinatario (Repartidor)</label>
-            <p-dropdown name="proveedor" [options]="proveedores" 
-            [virtualScroll]="true"
+            <p-dropdown name="proveedor" [options]="proveedoresDestino" 
+            [virtualScroll]="true" 
             [virtualScrollItemSize]="38" 
+ 
+
+            (onChange)="compararDestinos()"
               [(ngModel)]="model.IdDestinatario" scrollHeight="30vh" class="input-form-field"
               [style]="{'width':'100%'}" required [filter]="true">
               <ng-template let-item pTemplate="selectedItem">
@@ -154,6 +158,27 @@
               </ng-template>
             </p-dropdown>
           </div>
+
+          <div class="field flex flex-col" *ngIf="model.idtipoOperacion !== 112">
+            <label>Dirección :</label>
+
+            <p-dropdown name="destino"
+            [options]="direcciones"  [(ngModel)]="model.iddireccion"
+            scrollHeight="30vh"  class="input-form-field"
+            [virtualScroll]="true" itemSize="70"
+            [style]="{'width':'100%'}"
+            [resetFilterOnHide]="false"
+            [hideTransitionOptions]="'0ms'"
+           
+
+            [showTransitionOptions]="'0ms'" required
+            [filter]="true">
+            <ng-template let-item pTemplate="selectedItem">
+              <span style="vertical-align:left;">{{item.label}}</span>
+            </ng-template>
+            </p-dropdown>
+
+        </div>
         </div>
 
         <!-- Campos para distribución por agencia: Peso, Bultos, Precio, Consignado, Agencia -->

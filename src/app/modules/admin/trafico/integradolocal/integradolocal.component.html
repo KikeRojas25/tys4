@@ -1,0 +1,99 @@
+
+<div class="flex flex-col flex-auto min-w-0">
+  <div class="flex flex-col sm:flex-row flex-0 sm:items-center sm:justify-between p-6 sm:py-8 sm:px-10 border-b bg-card dark:bg-transparent">
+    <div class="flex-1 min-w-0">
+      <div class="flex flex-wrap items-center font-medium">
+        <div>
+          <a class="whitespace-nowrap text-primary-500">TMS</a>
+        </div>
+        <div class="flex items-center ml-1 whitespace-nowrap">
+          <mat-icon class="fuse-horizontal-navigation-item-icon" [svgIcon]="'heroicons_solid:chevron-right'"></mat-icon>
+          <a class="ml-1 text-primary-500">Tráfico</a>
+        </div>
+      </div>
+      <div class="mt-2">
+        <h2 class="text-3xl md:text-4xl font-extrabold tracking-tight leading-7 sm:leading-10 truncate"> Tráfico Local </h2>
+      </div>
+    </div>
+  </div>
+
+
+  <div class="flex flex-col min-w-0 w-full">
+
+
+
+    <p-tabView styleClass="tabview-custom">
+      <p-tabPanel>
+          <ng-template pTemplate="header">
+              <div class="flex align-items-center gap-2">
+                   <i class="fa fa-truck" ></i>
+                  <span class="font-bold white-space-nowrap m-0">
+                     Móviles
+                  </span>
+              </div>
+          </ng-template>
+            <p-panel header="Móviles Local" class="w-full mb-3">
+
+
+            <p-table [columns]="cols" dataKey="idhojaruta"
+            [tableStyle]="{ 'table-layout': 'fixed', 'width': '100%' , 'size': '9px' }"
+            [value]="ordenes"  selectionMode="single" scrollable="true"  [scrollHeight]="'600px'"
+            sortField="numHojaruta"  
+            [rows]="200" >
+
+
+            
+
+            <ng-template pTemplate="header" let-columns>
+              <tr>
+                <!-- Encabezado con colores y estilos -->
+                <th colspan="7" style="text-align: center; color: white; width: 60%"></th>
+              
+                <th colspan="2" style="text-align: center; color: white; background-color: rgb(251, 192, 45); width: 20%">EN RUTA</th>
+              </tr>
+            <tr>
+                <th *ngFor="let col of columns" [ngStyle]="{'width': col.width}"  [pSortableColumn]="col.field">
+                {{col.header}}
+                </th>
+            </tr>
+            </ng-template>
+
+          
+
+            <ng-template pTemplate="body" let-rowData>
+            <tr [pSelectableRow]="rowData">
+                <td class="text-center">
+                  <p-button icon="pi pi-search" severity="success" (click)="verDetalle(rowData.idhojaruta)" size="small" ></p-button>
+                  <p-button icon="pi pi-paperclip" severity="warning" (click)="verHojaRuta(rowData.iddespacho)" size="small" ></p-button>
+
+                </td>
+                <td class="text-center" style="white-space: normal; word-wrap: break-word; overflow-wrap: break-word;">{{rowData.proveedor}}</td>
+                <td class="text-center">{{rowData.placa}}</td>
+                <td class="text-center cursor-pointer" (click)="ver(rowData.idhojaruta)">
+                  {{ rowData.numcarga2 }}
+                  </td>
+                <td class="text-center">{{rowData.fecharegistro | date: 'dd/MM/yyyy'}}</td>
+                <td class="text-center">{{rowData.chofer}}</td>
+                <td class="text-center">{{rowData.destino}}</td>
+
+
+                <td class="text-center">{{rowData.totalots}}</td>
+                <td class="text-center">{{rowData.peso | number:'1.0-0'}}</td>
+
+             
+
+
+            </tr>
+            </ng-template>
+
+       
+            </p-table>
+
+            </p-panel>
+        </p-tabPanel>
+ 
+    </p-tabView>
+  
+</div>
+
+</div>

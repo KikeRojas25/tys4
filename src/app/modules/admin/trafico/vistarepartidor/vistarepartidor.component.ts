@@ -39,7 +39,9 @@ import { EntregarOtModalComponent } from './modalentregarOT';
 export class VistarepartidorComponent implements OnInit {
   modalDetalleManifiesto = false;
   repartidor: any = {};
-  id: any;
+  idproveedor: any;
+  iddepartamento: any;
+  cols1: any[];
   cols3: any[];
   cols4: any[];
   despachos: Manifiesto[] = [];
@@ -62,21 +64,22 @@ export class VistarepartidorComponent implements OnInit {
   constructor( private traficoService: TraficoService,
     private activatedRoute: ActivatedRoute,
     public dialogService: DialogService,
+    private messageService: MessageService
   ) { }
 
   ngOnInit() {
     
-//  this.cols2 = [
-//     { field: 'numcp', header: 'N° OT',  width: '20px'},
-
-//     {header: 'BULTOS', field: 'bulto'  , width: '60px'   },
-//     {header: 'FECHA', field: 'fecharegistro'  , width: '60px'   },
-//     {header: 'PESO', field: 'peso'  ,  width: '30px'  },
-//     {header: 'DESTINO', field: 'destino'  ,  width: '30px'  },
-//     {header: 'CLIENTE', field: 'razonsocial'  ,  width: '100px'  },
-//     {header: 'TIPO OP', field: 'tipooperacion'  ,  width: '100px'  },
-//     {header: 'ACCIONES', field: 'acciones'  ,  width: '30px'  },
-//   ];
+ this.cols1 = [
+    { field: 'numcp', header: 'N° OT',  width: '20px'},
+    {header: 'FECHA', field: 'fecharegistro'  , width: '60px'   },    
+    {header: 'DESTINO', field: 'destino'  ,  width: '30px'  },
+    {header: 'CLIENTE', field: 'razonsocial'  ,  width: '100px'  },
+    {header: 'ESTADO', field: 'estado'  ,  width: '100px'  },
+    {header: 'TIPO OP', field: 'tipooperacion'  ,  width: '100px'  },
+    {header: 'BULTOS', field: 'bulto'  , width: '60px'   },
+    {header: 'PESO', field: 'peso'  ,  width: '30px'  },
+    {header: 'ACCIONES', field: 'acciones'  ,  width: '30px'  },
+  ];
 
   this.cols2 = [
     { field: 'numcp', header: 'N° OT',  width: '40px'},
@@ -127,7 +130,9 @@ this.cols4 = [
 
 
 
-    this.id  = this.activatedRoute.snapshot.params['id'];
+    this.idproveedor  = this.activatedRoute.snapshot.params['id'];
+
+    this.iddepartamento  = this.activatedRoute.snapshot.params['uid'];
 
 
     this.user = JSON.parse(localStorage.getItem('user'));
@@ -146,46 +151,30 @@ this.cols4 = [
 
     
 
-    this.traficoService.getAllManifiestosForProvider(this.id, 11).subscribe(x=> {
-      
-  
+    this.traficoService.getAllManifiestosForProvider(this.idproveedor, 11,  this.iddepartamento ).subscribe(x=> {
       this.despachos1 = x; 
-
     });
 
-    this.traficoService.getAllManifiestosForProviderRecojo (this.id).subscribe(list => {
-
+    this.traficoService.getAllManifiestosForProviderRecojo (this.idproveedor, this.iddepartamento).subscribe(list => {
       this.despachos = list;
-
-      console.log('despachos', this.despachos);
-
-
     });
 
-    this.traficoService.getAllOrdersxRepartidor(this.id, 13).subscribe(x => {
+    this.traficoService.getAllOrdersxRepartidor(this.idproveedor, 13).subscribe(x => {
       this.ordenes2 = x;
-      console.log('en reparto:', this.ordenes2);
-
     });
 
-
-    this.traficoService.getAllOrdersxRepartidor(this.id, 34).subscribe(x => {
+    this.traficoService.getAllOrdersxRepartidor(this.idproveedor, 34).subscribe(x => {
       this.ordenes3 = x;
-      console.log(this.ordenes2);
-
     });
 
 
-    this.traficoService.getAllOrdersxRepartidor(this.id, 35).subscribe(x => {
+    this.traficoService.getAllOrdersxRepartidor(this.idproveedor, 35).subscribe(x => {
       this.ordenes4 = x;
-      console.log(this.ordenes2);
-
     });
 
 
 
-    this.traficoService.getProveedor(this.id).subscribe( resp => {
-      console.log(resp);
+    this.traficoService.getProveedor(this.idproveedor).subscribe( resp => {
 
       this.repartidor.nombre = resp.razonSocial;
       this.repartidor.direccion = resp.direccion;
@@ -250,16 +239,20 @@ this.cols4 = [
 
   cambiarEstado(){
 
+    console.log( 'Manifiesto Seleccionado:',this.selectedManifiesto);
+    if (!this.selectedManifiesto || Object.keys(this.selectedManifiesto).length === 0) {
+      this.messageService.add({
+          severity: 'warn',
+          summary: 'Proveedor de reparto',
+          detail: 'Debe seleccionar al menos un manifiesto'
+      });
+      return;
+  }
+  
+  
+     
 
-    console.log(this.selectedManifiesto);
-
-
-    let ids  = ',' + this.selectedManifiesto.idmanifiesto  ;
-    if(this.selectedManifiesto  === undefined )
-      {
-       
-        return ;
-      }
+      let ids  = ',' + this.selectedManifiesto.idManifiesto  ;
 
 
     this.ref = this.dialogService.open(CambiarEstadoModalComponent, {
@@ -303,6 +296,11 @@ modalEntregarOT() {
   
   
   }
+  verOt(idOrdenTrabajo) {
+
+    const url = `http://104.36.166.65/webreports/ot.aspx?idorden=${idOrdenTrabajo}`;
+    window.open(url, '_blank');
+}
   
   
 

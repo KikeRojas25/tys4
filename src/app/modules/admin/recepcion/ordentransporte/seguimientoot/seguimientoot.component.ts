@@ -253,7 +253,8 @@ export class SeguimientootComponent implements OnInit {
 
       this.model.fecinicio = this.dateInicio;
       this.model.fecfin = this.dateFin;
-      this.model.idusuario = 1;
+      this.model.idusuario =  this.user.id;
+      this.model.tipoorden = '';
       this.ordenTransporteService.getAllOrder(this.model).subscribe(list => {
 
         this.ordenes =  list;

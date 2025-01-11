@@ -6,11 +6,15 @@ import { ButtonModule } from 'primeng/button';
 import { CheckboxModule } from 'primeng/checkbox';
 import { InputTextModule } from 'primeng/inputtext';
 import { TableModule } from 'primeng/table';
-import { OrdenTransporte, User } from '../../trafico/trafico.types';
+import { Manifiesto, OrdenTransporte, User } from '../../trafico/trafico.types';
 import { DialogService, DynamicDialogRef } from 'primeng/dynamicdialog';
 import { DespachoService } from '../despacho.service';
 import { Rol } from '../despacho.types';
 import { MatIcon } from '@angular/material/icon';
+import { ConfirmDialog, ConfirmDialogModule } from 'primeng/confirmdialog';
+import { MessagesModule } from 'primeng/messages';
+import { ToastModule } from 'primeng/toast';
+import { AutorizarEstibaModalComponent } from './modalautorizarestiba';
 
 @Component({
   selector: 'app-pordespachar',
@@ -24,7 +28,10 @@ import { MatIcon } from '@angular/material/icon';
     ButtonModule,
     InputTextModule,
     CheckboxModule,
-    MatIcon
+    MatIcon,
+    ConfirmDialogModule ,
+    MessagesModule,
+    ToastModule
 
   ],
   providers: [
@@ -42,7 +49,7 @@ export class PordespacharComponent implements OnInit {
   tipotransporte: SelectItem[] = [];
   estado: string = '';
 
-  ordenes: OrdenTransporte[] = [];
+  manifiestos: Manifiesto[] = [];
   ordenes2: OrdenTransporte[] = [];
 
 
@@ -74,15 +81,11 @@ export class PordespacharComponent implements OnInit {
   ngOnInit() {
 
     this.user = JSON.parse(localStorage.getItem('user'));
-    this.roles = JSON.parse(localStorage.getItem('roles'));
 
 
-    // this.roles.forEach(x=> {
-    //   if(x.rol_int_id === 13)
-    //   {
-    //       this.esalmacen = true;
-    //   }
-    // })
+    this.esalmacen = this.user.esalmacen ;
+
+
 
     this.model.idusuario = this.user.usr_int_id;
     this.dateInicio.setDate((new Date()).getDate() - 10);
@@ -125,23 +128,17 @@ export class PordespacharComponent implements OnInit {
   ver(id: any){
 
     this.model = id.data;
-    this.loading = true;
+
 
             this.ordenTransporteService.getAllPreManifiestos(this.model).subscribe(list =>  {
-              let count = 1;
-              this.loading = false;
 
 
-              // list.forEach(item => {
-              //   item.idorden = count ++;
-              // });
+              this.manifiestos =  list;
+              this.model.numhojaruta = this.manifiestos[0].numHojaRuta;
+              this.estado =  this.manifiestos[0].estado;
 
-               this.ordenes =  list;
-
-              // this.estado = list[0].estado;
 
           });
-
   }
 
 
@@ -215,8 +212,8 @@ export class PordespacharComponent implements OnInit {
   onRowReorder() {
    let count = 1;
 
-   this.ordenes.forEach(list => {
-      list.idordentrabajo = count ++;
+   this.manifiestos.forEach(list => {
+      //list.ca = count ++;
     });
 
   }
@@ -237,40 +234,40 @@ export class PordespacharComponent implements OnInit {
   confirmarDespacho() {
 
 
-    var manifiestos = this.ordenes;
+    var manifiestos = this.manifiestos;
     let hojaruta = this.model.numhojaruta;
 
-    // this.ordenTransporteService.getEstibaAutorizada(hojaruta).subscribe(resp => {
+    this.ordenTransporteService.getEstibaAutorizada(hojaruta).subscribe(resp => {
 
 
-    //             if(!resp){
-    //               this.messageService.add({severity:'error', summary:'Confirmar Estiba', detail:'No se puede continuar, debe ser a autorizado por el supervisor de turno'});
+                if(!resp){
+                  this.messageService.add({severity:'error', summary:'Confirmar Estiba', detail:'No se puede continuar, debe ser a autorizado por el supervisor de turno'});
 
 
-    //                     this.ref = this.dialogService.open(AutorizarEstibaModalComponent, {
-    //                       data : { hojaruta, manifiestos },
-    //                       header: 'Confirmar estiba',
-    //                       width: '50%',
-    //                       contentStyle: {'max-height': '500px', overflow: 'auto'},
-    //                       baseZIndex: 10000
-    //                    });
-    //                    return ;
+                        this.ref = this.dialogService.open(AutorizarEstibaModalComponent, {
+                          data : { hojaruta, manifiestos },
+                          header: 'Confirmar estiba',
+                          width: '50%',
+                          contentStyle: {'max-height': '500px', overflow: 'auto'},
+                          baseZIndex: 10000
+                       });
+                       return ;
 
 
-    //             }
+                }
 
 
-    //             this.ref = this.dialogService.open(ConfirmarEstibaModalComponent, {
-    //               data : { hojaruta, manifiestos },
-    //               header: 'Confirmar estiba',
-    //               width: '50%',
-    //               contentStyle: {'max-height': '500px', overflow: 'auto'},
-    //               baseZIndex: 10000
-    //           });
+              //   this.ref = this.dialogService.open(ConfirmarEstibaModalComponent, {
+              //     data : { hojaruta, manifiestos },
+              //     header: 'Confirmar estiba',
+              //     width: '50%',
+              //     contentStyle: {'max-height': '500px', overflow: 'auto'},
+              //     baseZIndex: 10000
+              // });
 
 
 
-    //   });
+      });
 
 
 
@@ -283,7 +280,7 @@ export class PordespacharComponent implements OnInit {
   }
 
 asignarPrecinto() {
-  var todo = this.ordenes;
+  var todo = this.manifiestos;
 
 //   let hojaruta = this.model.numhojaruta;
 //   this.ref = this.dialogService.open(PrecintosModalComponent, {
@@ -360,7 +357,10 @@ darSalida() {
 }
 imprimirCarga (){
 
-  let idcarga = this.ordenes[0].idCarga;
+  console.log(this.manifiestos);
+  let idcarga = this.manifiestos[0].idCarga;
+
+
   var url = "http://104.36.166.65/webreports/carga.aspx?idcarga=" + String(idcarga);
   window.open(url);
 
@@ -481,28 +481,30 @@ reiniciarHojaRuta (hojaruta) {
 
 guardar() {
 
+  
 
-  let idcarga = this.ordenes[0].idCarga;
+  let idcarga = this.manifiestos[0].idCarga;
   this.model.idcarga = idcarga;
+
 
   this.confirmationService.confirm({
     message: '¿Esta seguro que desea generar la orden de carga?',
     accept: () => {
       this.loading = true;
 
-        // this.ordenTransporteService.confirmarDespacho2(this.model, this.ordenes).subscribe(list => {
+        this.ordenTransporteService.confirmarDespacho2(this.model, this.manifiestos).subscribe(list => {
 
-        // var url = "http://104.36.166.65/webreports/carga.aspx?idcarga=" + String(idcarga);
-        // window.open(url);
+        var url = "http://104.36.166.65/webreports/carga.aspx?idcarga=" + String(idcarga);
+        window.open(url);
 
-        // var url = "http://104.36.166.65/webreports/guiatransportista.aspx?idcarga=" + String(idcarga);
-        // window.open(url);
+        var url = "http://104.36.166.65/webreports/guiatransportista.aspx?idcarga=" + String(idcarga);
+        window.open(url);
 
 
 
-       // this.buscar();
+       this.buscar();
 
-     // });
+     });
     }
   });
 

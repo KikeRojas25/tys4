@@ -24,6 +24,7 @@ import { DatePipe } from '@angular/common';
 import { User } from 'app/core/user/user.types';
 import { ConfirmDialogModule } from 'primeng/confirmdialog';
 import { InputNumberModule } from 'primeng/inputnumber';
+import { thumbnailsDownIcon } from '@progress/kendo-svg-icons';
 
 @Component({
   selector: 'app-manifiestovirtual',
@@ -64,17 +65,30 @@ export class ManifiestovirtualComponent implements OnInit {
   hojasRuta: any[] = [];
   origenes: any[] = [];
   destinos: any[] = [];
+
+  direcciones: any[] = [];
+
+
+
   ids: any;
   model: any = {};
   placas: SelectItem[] = [];
   conductores: SelectItem[] = [];
   ubigeo: SelectItem[] = [];
 
+  ubigeoDestino: SelectItem[] = [];
+
   tiposoperacion: SelectItem[] = [];
   hojasruta: SelectItem[] = [];
   isNuevaHojaRuta: boolean = true;
   display: boolean = false;
+  
+  
   proveedores: SelectItem[] = [];
+
+  proveedoresDestino: SelectItem[] = [];
+
+
   agencias: SelectItem[] = [];
   user: User;
   baseUrlHRu: string = 'http://104.36.166.65/webreports/hojaruta.aspx';
@@ -157,6 +171,7 @@ export class ManifiestovirtualComponent implements OnInit {
         resp.forEach(element => {
           this.proveedores.push({ value: element.idProveedor ,  label : element.razonSocial  +   '-'   +    element.ruc});
         });
+        this.proveedoresDestino = this.proveedores;
       });
 
       
@@ -169,11 +184,7 @@ export class ManifiestovirtualComponent implements OnInit {
 
     });
 
-
-
-
-    
-
+    this.ubigeoDestino =  this.ubigeo;
 
 
   }
@@ -225,10 +236,13 @@ export class ManifiestovirtualComponent implements OnInit {
   }
 
   // Validar destino
-  if (this.model.iddestino === undefined || this.model.iddestino === null) {
-    this.messageService.add({ severity: 'info', summary: 'No puede continuar', detail: 'Seleccione un Destino' });
-    return;
+  if (this.model.idtipoOperacion !== 112){
+      if(this.model.iddestino === undefined || this.model.iddestino === null) {
+      this.messageService.add({ severity: 'info', summary: 'No puede continuar', detail: 'Seleccione un Destino' });
+      return;
+    }
   }
+  
 
     this.display = true;
   }
@@ -303,5 +317,63 @@ export class ManifiestovirtualComponent implements OnInit {
     });
 
 
+  }
+
+
+  cargarProveedores() {
+
+    this.proveedoresDestino = this.proveedores;
+
+    this.model.IdDestinatario = null;
+
+    this.traficoService.getProveedorxDireccion(this.model.iddestino ).subscribe(response =>  {
+      console.log('bd',response.proveedores);
+
+
+      this.direcciones = [];
+      this.model.iddireccion = null;
+
+      const proveedoresFiltered = this.proveedoresDestino.filter(c => 
+          response.proveedores.some(p => p.idProveedor === c.value)
+       );
+
+
+      console.log('proveedores',proveedoresFiltered);
+
+
+      if (proveedoresFiltered.length > 0) {
+        this.proveedoresDestino = proveedoresFiltered; // Asigna solo los destinos válidos
+      }
+      else {
+        this.messageService.add({ severity: 'warn', summary: 'Generación de Manifiesto', detail: 'El destino seleccionado no tiene proveedores asociados.' });
+      }
+
+    });
+  }
+  compararDestinos() {
+
+
+    this.traficoService.getDireccionesProveedor(this.model.IdDestinatario ).subscribe(response=>  {
+
+
+      this.direcciones = [];
+      this.model.iddireccion = null;
+
+      
+      console.log('respuesta' ,  response.direcciones );
+   
+           
+
+            response.direcciones.forEach(element => {
+              this.direcciones.push({ value: element.iddireccion ,  label : element.direccion });
+            });
+
+      //  this.messageService.add({ severity: 'warn', summary: 'Generación de Manifiesto', detail: 'El destino del manifiesto no le corresponde al proveedor seleccionado.' });
+
+       // this.ubigeoDestino
+
+    });
+
+     
   }
 }

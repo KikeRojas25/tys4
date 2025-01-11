@@ -18,10 +18,10 @@ import { MatIcon } from '@angular/material/icon';
 import { AsignarPlacaComponent } from './modal.asignarplaca';
 import { ModalTipoUnidadComponent } from './modaltipounidad';
 import { ConfirmDialogModule } from 'primeng/confirmdialog';
-import { ModalAsignarTipoOperacionComponent } from './modalasignartipooperacion';
 import { ModalAsignaraCargaComponent } from './modalasignaracarga';
 import { MessagesModule } from 'primeng/messages';
 import { ToastModule } from 'primeng/toast';
+import { AsignartipooperacionComponent } from './asignartipooperacion/asignartipooperacion.component';
 
 @Component({
   selector: 'app-porprovincia',
@@ -400,18 +400,25 @@ agregaracarga() {
 
 
 
-    this.ref = this.dialogService.open(ModalAsignarTipoOperacionComponent, {
+    this.ref = this.dialogService.open(AsignartipooperacionComponent, {
       header: 'Asignar Tipo de Operación',
-      width: '50%',
-      contentStyle: {'height': '350px', overflow: 'auto'},
+      width: '80%',
+      contentStyle: {'max-height': '450px', overflow: 'auto'},
       baseZIndex: 10000,
       data : {ids }
   });
 
-    this.ref.onClose.subscribe((product: any) => {
+    this.ref.onClose.subscribe((response: any) => {
+
+      console.log('respuesta',response);
 
       this.reloadDetalles();
-      return ;
+
+      if(!response.error)
+          this.messageService.add({ severity: 'success', summary: 'Planning', detail: 'Se ha asignado el tipo de operación de manera correcta.' });
+      else
+          this.messageService.add({ severity: 'error', summary: 'Planning', detail: 'Hubo un error en la asignación de tipo de operación.' });
+     
     });
 
   }

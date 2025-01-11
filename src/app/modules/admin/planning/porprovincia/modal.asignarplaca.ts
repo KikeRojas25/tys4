@@ -8,6 +8,7 @@ import { OrdenTransporte } from '../../trafico/trafico.types';
 import { OrdenTransporteService } from '../../recepcion/ordentransporte/ordentransporte.service';
 import { CalendarModule } from 'primeng/calendar';
 import { TraficoService } from '../../trafico/trafico.service';
+import { PlanningService } from '../planning.service';
 
 
 @Component({
@@ -37,7 +38,7 @@ import { TraficoService } from '../../trafico/trafico.service';
 
               <p-dropdown name="rutas"
                           [virtualScroll]="true" itemSize="30"
-                            [options]="conductores" [(ngModel)]="model.idconductor"
+                            [options]="conductores" [(ngModel)]="model.idchofer"
                             [showClear]="true" class="input-form-field"
                               placeholder="Seleccione un conductor"
                             [style]="{'width':'100%'}" [resetFilterOnHide]="false"
@@ -84,10 +85,11 @@ export class AsignarPlacaComponent implements OnInit {
     user: User ;
     loading = false;
 
-    constructor(private generalService: OrdenTransporteService,
+    constructor(private ordenTransporteService: OrdenTransporteService,
                 public ref: DynamicDialogRef,
                 private confirmationService: ConfirmationService,
                 public messageService: MessageService,
+                private planningService: PlanningService,
                 public config: DynamicDialogConfig) {
                     this.model.idcarga = config.data.idcarga;
 
@@ -98,9 +100,10 @@ export class AsignarPlacaComponent implements OnInit {
     ngOnInit(): void {
 
       this.user = JSON.parse(localStorage.getItem('user'));
-      this.model.idplanificador = this.user.usr_int_id;
+      this.model.idplanificador = this.user.id;
+      this.model.idestacionorigen = this.user.idestacionorigen;
 
-      this.generalService.getVehiculos('').subscribe({
+      this.ordenTransporteService.getVehiculos('').subscribe({
         next: resp => {
           resp.forEach(element => {
             this.vehiculos.push({ value: element.idVehiculo ,  label : element.placa});
@@ -111,7 +114,7 @@ export class AsignarPlacaComponent implements OnInit {
       });
   
   
-      this.generalService.getChoferes('').subscribe({
+      this.ordenTransporteService.getChoferes('').subscribe({
         next: resp => {
           resp.forEach(element => {
             this.conductores.push({ value: element.idChofer ,  label : `DNI: ${element.dni} NOMBRE: ${element.nombreChofer} ${element.apellidoChofer}` });
@@ -145,15 +148,16 @@ export class AsignarPlacaComponent implements OnInit {
         message: '¿Esta seguro que desea confirmar el despacho?',
         accept: () => {
 
-          // this.ordenTransporteService.confirmarDespacho(this.model).subscribe(resp => {
-          //   this.toastr.success( "Se ha confirmado el despacho con éxito." , 'Planning', { closeButton: true });
+          this.planningService.confirmarDespacho(this.model).subscribe(resp => {
 
-          //   this.ref.close();
-          //   this.loading = false;
+            this.ref.close();
+            this.loading = false;
 
-          // } , (error)=> {
-          //           this.toastr.error( error.error , 'Planning', { closeButton: true });
-          // });
+          } , (error)=> {
+
+
+
+          });
 
 
 

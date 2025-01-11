@@ -12,9 +12,11 @@ export interface User {
   lastActive: Date  ;
   nombreEstado: string;
   estadoId: number;
-  idclientes: string;
+  idscliente: string;
   usr_str_red: string;
   idestacionorigen? : number;
+  idEquipo?: number;
+  esalmacen?: boolean;
 }
 export interface Manifiesto {
   idManifiesto: number;
@@ -24,6 +26,9 @@ export interface Manifiesto {
   chofer: string;
   numHojaRuta: string;
   placa: string;
+  idordencarga: number;
+  estado: string;
+
 
 }
 export interface OrdenTransporte {
@@ -37,9 +42,13 @@ export interface OrdenTransporte {
   bulto?: number;
   peso?: number;
   subtotal?: number;
-  idCarga?: number;
+  idcarga?: number;
   cantidadprecintos?: number;
   precinto?: string;
+  idtipoentrega?: number;
+  idusuarioentrega?: number;
+  tipoentrega?: string;
+  terminado?: boolean;
 
 }
 export interface Proveedor {

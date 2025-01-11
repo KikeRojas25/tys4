@@ -254,6 +254,8 @@ export class GeneracionmanifiestoComponent implements OnInit {
 
       this.model.fecinicio = this.dateInicio;
       this.model.fecfin = this.dateFin;
+      this.model.idusuario =  this.user.id;
+      this.model.tipoorden = '';
 
       this.ordenTransporteService.getAllOrder(this.model).subscribe(list => {
 
@@ -344,6 +346,8 @@ vertracking(idordentransporte: number) {
 
     let eventos =  list;
    // this.events = [];
+
+   console.log(list);
 
 
 

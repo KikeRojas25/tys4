@@ -33,7 +33,7 @@
 
         <p-table [columns]="cols" selectionMode="single" [style]="{width:'100%'}" dataKey="idDespacho"
                  [rowsPerPageOptions]="[20,40,60,120]" [value]="ordenes2" #dt [paginator]="true" 
-                 [tableStyle]="{ 'table-layout': 'fixed', 'width': '100%' }"        (onRowSelect)="ver($event)"
+                 [tableStyle]="{ 'table-layout': 'fixed', 'width': '100%' }"   
                  (onRowSelect)="ver($event)" [rows]="10"  [responsive]="true">
           
           <ng-template pTemplate="colgroup" let-columns>
@@ -69,7 +69,7 @@
     </div>
   </div>
 
-  <div *ngIf="this.ordenes.length > 0" class="w-full mt-6">
+  <div *ngIf="this.manifiestos.length > 0" class="w-full mt-6">
     <div class="border border-primary shadow-md rounded-lg">
       <div class="bg-primary text-white p-3">
         <b>Ver detalle</b>
@@ -89,31 +89,31 @@
         <div class="bg-primary text-white p-3">
           <b>Manifiestos Generados</b>
           <div class="flex gap-4 mt-4">
-            <!-- <button *ngIf="estado !== 'Creado'" class='btn btn-primary' pButton iconPos="left" label="Generar hoja de Carga" icon="fa fa-check" (click)="guardar()" type="button"></button>
+            <p-button *ngIf="estado !== 'Creado'"   iconPos="left" label="Generar hoja de Carga" icon="fa fa-check" (click)="guardar()" ></p-button>
             <button *ngIf="estado === 'Creado'" class='btn btn-primary' pButton iconPos="left" label="Imprimir hoja de Carga" (click)="imprimirCarga()" type="button"></button>
             <button *ngIf="estado === 'Creado' && esalmacen === true" class='btn btn-primary' pButton iconPos="left" label="Imprimir GRT" (click)="imprimirGrt()" type="button"></button>
             <button *ngIf="estado === 'Creado' && esalmacen === true" class='btn btn-primary' pButton iconPos="left" label="Confirmar estiba" icon="fa fa-plus" (click)="confirmarDespacho()" type="button"></button>
             <button *ngIf="estado === 'Creado' && esalmacen === true" class='btn btn-primary' pButton iconPos="left" label="Armar Valija" icon="fa fa-plus" (click)="armadoValija()" type="button"></button>
             <button *ngIf="estado === 'Creado' && esalmacen === true" class='btn btn-primary' pButton iconPos="left" label="Asignar Precinto" icon="fa fa-plus" (click)="asignarPrecinto()" type="button"></button>
             <button *ngIf="esalmacen === true" class='btn btn-danger' pButton iconPos="left" label="Desasignar OTs" icon="fa fa-minus" (click)="desasignarOts()" type="button"></button>
- -->
 
 
-            <button  class='btn btn-primary' pButton iconPos="left" label="Generar hoja de Carga" icon="fa fa-check" (click)="guardar()" type="button"></button>
+
+            <!-- <button  class='btn btn-primary' pButton iconPos="left" label="Generar hoja de Carga" icon="fa fa-check" (click)="guardar()" type="button"></button>
             <button  class='btn btn-primary' pButton iconPos="left" label="Imprimir hoja de Carga" (click)="imprimirCarga()" type="button"></button>
             <button  class='btn btn-primary' pButton iconPos="left" label="Imprimir GRT" (click)="imprimirGrt()" type="button"></button>
             <button  class='btn btn-primary' pButton iconPos="left" label="Confirmar estiba" icon="fa fa-plus" (click)="confirmarDespacho()" type="button"></button>
             <button  class='btn btn-primary' pButton iconPos="left" label="Armar Valija" icon="fa fa-plus" (click)="armadoValija()" type="button"></button>
             <button  class='btn btn-primary' pButton iconPos="left" label="Asignar Precinto" icon="fa fa-plus" (click)="asignarPrecinto()" type="button"></button>
             <button *ngIf="esalmacen === true" class='btn btn-danger' pButton iconPos="left" label="Desasignar OTs" icon="fa fa-minus" (click)="desasignarOts()" type="button"></button>
-
+ -->
 
 
           </div>
         </div>
 
         <p-table [columns]="cols2" (onRowReorder)="onRowReorder()" [style]="{width:'100%'}" editMode="row" dataKey="idmanifiesto"
-                 [rowsPerPageOptions]="[20,40,60,120]" [value]="ordenes" #dt [paginator]="true" [rows]="10" [responsive]="true">
+                 [rowsPerPageOptions]="[20,40,60,120]" [value]="manifiestos" #dt [paginator]="true" [rows]="10" [responsive]="true">
           
           <ng-template pTemplate="colgroup" let-columns>
             <colgroup>
@@ -149,6 +149,6 @@
     </div>
   </div>
 
-<!-- 
-  <p-confirmDialog header="Confirmación" icon="pi pi-exclamation-triangle"></p-confirmDialog> -->
+
+  <p-confirmDialog header="Confirmación" icon="pi pi-exclamation-triangle"></p-confirmDialog>   
 </div>

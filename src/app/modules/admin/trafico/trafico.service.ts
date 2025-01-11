@@ -33,12 +33,19 @@ export class TraficoService {
 
 
 constructor() { }
-  VerHojasRutaTrocal(model: any){
-      return this._httpClient.get<HojaRuta[]>( `${this.baseUrl}ListarHojaRutaTroncal?idusuario${model.idusuario}}` , httpOptions);
-  }
+VerHojasRutaTrocal(model: any) {
+  const idequipo = model.idequipo ? model.idequipo : ''; // Si model.idequipo es null, usar una cadena vacía
+  return this._httpClient.get<HojaRuta[]>(`${this.baseUrl}ListarHojaRutaTroncal?idequipo=${idequipo}`, httpOptions);
+}
+
+
+VerHojasRutaTrocalLocal(model: any) {
+  return this._httpClient.get<HojaRuta[]>(`${this.baseUrl}GetAllTraficoLocal?`, httpOptions);
+}
 
   VerDespachosxDepartamentoxProveedor(model: any) {
-     return this._httpClient.get<HojaRuta[]>(`${this.baseUrl}ListarDespachosxDepartamentoxProveedor?idusuario${model.idusuario}}`  , httpOptions);
+    const idequipo = model.idequipo ? model.idequipo : ''; // Si model.idequipo es null, usar una cadena vacía
+     return this._httpClient.get<HojaRuta[]>(`${this.baseUrl}ListarDespachosxDepartamentoxProveedor?idequipo=${idequipo}`  , httpOptions);
   }
 
   VerResumenManifiesto (idhojaruta: number){
@@ -49,8 +56,8 @@ constructor() { }
     return this._httpClient.get<OrdenTransporte[]>(`${this.baseUrl}getAllOrdersForManifest?IdManifiesto=${IdManifiesto}`, httpOptions);
   }
 
-  getAllManifiestosForProvider(IdProveedor: number, IdEstado: number) : Observable<Manifiesto[]> {
-    return this._httpClient.get<Manifiesto[]>(`${this.baseUrl}getAllManifiestosForProvider?IdProveedor=${IdProveedor}&IdEstado=${IdEstado}`, httpOptions);
+  getAllManifiestosForProvider(IdProveedor: number, IdEstado: number, IdDepartamento: number) : Observable<Manifiesto[]> {
+    return this._httpClient.get<Manifiesto[]>(`${this.baseUrl}getAllManifiestosForProvider?IdProveedor=${IdProveedor}&IdEstado=${IdEstado}&IdDepartamento=${IdDepartamento}`, httpOptions);
   }
 
   getProveedor(idproveedor : number): Observable<Proveedor> {
@@ -68,13 +75,28 @@ constructor() { }
   }
 
 
-  getAllManifiestosForProviderRecojo(IdProveedor: number) : Observable<Manifiesto[]> {
-    return this._httpClient.get<Manifiesto[]>(`${this.baseUrl}getAllManifiestosForProviderRecojo?IdProveedor=${IdProveedor}`, httpOptions);
+  getAllManifiestosForProviderRecojo(IdProveedor: number  , IdDepartamento: number  ) : Observable<Manifiesto[]> {
+    return this._httpClient.get<Manifiesto[]>(`${this.baseUrl}getAllManifiestosForProviderRecojo?IdProveedor=${IdProveedor}&IdDepartamento=${IdDepartamento}`, httpOptions);
   }
 
   getAllOrdersxRepartidor(idrepartidor: number, idestado: number){
     const param = '?idrepartidor=' + idrepartidor + '&idestado=' + idestado;
     return this._httpClient.get<OrdenTransporte[]>(this.baseUrl + 'getAllOrdersxRepartidor' + param  , httpOptions);
+   }
+
+   CompararDestinos(iddestino: number, IdDestinatario: number){
+    const param = '?IdDestino=' + iddestino + '&IdProveedor=' + IdDestinatario;
+    return this._httpClient.get<any>(this.baseUrl + 'CompararDestinos' + param  , httpOptions);
+   }
+
+   getDireccionesProveedor(IdDestinatario: number) {
+    const param = '?IdProveedor=' + IdDestinatario;
+    return this._httpClient.get<any>(`${this.baseUrl}GetDistritosProveedor${param}`  , httpOptions);
+   }
+
+   getProveedorxDireccion(IdDestino: number) {
+    const param = '?IdDestino=' + IdDestino;
+    return this._httpClient.get<any>(`${this.baseUrl}GetProveedoresxDistrito${param}`  , httpOptions);
    }
   
 

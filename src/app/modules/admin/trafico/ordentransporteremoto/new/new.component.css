@@ -1,0 +1,16 @@
+.custom-header-panel ::ng-deep .p-panel-header {
+    background-color: #e8f5e9; /* Fondo verde claro */
+    border: 1px solid #4caf50; /* Borde verde */
+    color: #4caf50; /* Color de texto verde */
+    font-weight: bold;
+}
+.alert-danger {
+    color: #d9534f; /* Rojo típico de errores */
+    background-color: #f2dede;
+    border: 1px solid #ebccd1;
+    padding: 8px;
+    border-radius: 4px;
+    margin-top: 4px;
+    font-size: 0.875rem;
+  }
+  

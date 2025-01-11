@@ -1,0 +1,135 @@
+<div class="flex flex-col flex-auto min-w-0 bg-card">
+  <div class="flex flex-col sm:flex-row flex-0 sm:items-center sm:justify-between p-6 sm:py-8 sm:px-10 border-b bg-card dark:bg-transparent">
+    <div class="flex-1 min-w-0">
+      <div class="flex flex-wrap items-center font-medium">
+        <div>
+          <a class="whitespace-nowrap text-primary-500">TMS</a>
+        </div>
+        <div class="flex items-center ml-1 whitespace-nowrap">
+          <mat-icon class="fuse-horizontal-navigation-item-icon" [svgIcon]="'heroicons_solid:chevron-right'"></mat-icon>
+          <a class="ml-1 text-primary-500">Recepción</a>
+        </div>
+      </div>
+      <div class="mt-2">
+        <h2 class="text-3xl md:text-4xl font-extrabold tracking-tight leading-7 sm:leading-10 truncate">Recepción de Órdenes de transporte</h2>
+      </div>
+    </div>
+  </div>
+  <div class="container mx-auto p-4 space-y-2">
+    <!-- Filtro de búsqueda -->
+    <div class="p-panel p-component border rounded-lg shadow-sm bg-white p-2">
+      <div class="grid grid-cols-12 gap-1 items-end">
+        <!-- Número de OT -->
+        <div class="col-span-12 md:col-span-4">
+          <label class="block text-sm font-medium text-gray-700">N° OT</label>
+          <input
+            pInputText
+            type="text"
+            autocomplete="off"
+            maxlength="10"
+            class="w-full mt-1 p-2 border border-gray-300 rounded focus:ring focus:ring-blue-500"
+            [(ngModel)]="model.numcp"
+            placeholder="Número de OT"
+          />
+        </div>
+        <!-- Botón Buscar -->
+        <div class="col-span-12 md:col-span-2">
+          <button
+            pButton
+            label="Buscar"
+            icon="pi pi-search"
+            class="w-full p-2 bg-blue-600 text-white font-semibold rounded hover:bg-blue-700 focus:ring focus:ring-blue-500"
+            (click)="reloadDetalles()"
+          ></button>
+        </div>
+      </div>
+    </div>
+  
+    <!-- Resultados de la Búsqueda -->
+    <div *ngIf="ordenes2"  class="p-panel p-component border rounded-lg shadow-sm bg-white p-2">
+      <!-- Detalles en formato card -->
+      <div class="p-card p-component bg-gray-50 border border-gray-200 rounded-lg">
+        <div class="p-card-body p-2">
+          <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-1">
+            <!-- N° OT -->
+            <div>
+              <p class="text-sm text-gray-500">N° OT</p>
+              <h4 class="text-lg font-semibold text-gray-800">
+                {{ ordenes2?.numcp || 'Sin dato' }}
+              </h4>
+            </div>
+            <!-- Fecha de Recojo -->
+            <div>
+              <p class="text-sm text-gray-500">Fecha de Recojo</p>
+              <h4 class="text-lg font-semibold text-gray-800">
+                {{ ordenes2?.fecharecojo | date: 'dd/MM/yyyy HH:mm' || 'Sin dato' }}
+              </h4>
+            </div>
+            <!-- Remitente -->
+            <div>
+              <p class="text-sm text-gray-500">Remitente</p>
+              <h4 class="text-lg font-semibold text-gray-800">
+                {{ ordenes2?.remitente || 'Sin dato' }}
+              </h4>
+            </div>
+            <!-- Destinatario -->
+            <div>
+              <p class="text-sm text-gray-500">Destinatario</p>
+              <h4 class="text-lg font-semibold text-gray-800">
+                {{ ordenes2?.destinatario || 'Sin dato' }}
+              </h4>
+            </div>
+            <!-- Estación Origen -->
+            <div>
+              <p class="text-sm font-semibold text-blue-700">Estación Origen</p>
+              <h4
+                class="text-lg font-bold text-blue-800 bg-blue-100 p-2 rounded border border-blue-300"
+              >
+                {{ ordenes2?.estacionorigen || 'Sin dato' }}
+              </h4>
+            </div>
+            <!-- Peso -->
+            <div>
+              <p class="text-sm text-gray-500">Peso</p>
+              <h4 class="text-lg font-semibold text-gray-800">
+                {{ ordenes2?.peso || 'Sin dato' }}
+              </h4>
+            </div>
+            <!-- Estado -->
+            <div>
+              <p class="text-sm font-semibold text-red-700">Estado</p>
+              <h4
+                class="text-lg font-bold text-red-800 bg-red-100 p-2 rounded border border-red-300"
+              >
+                {{ ordenes2?.estado || 'Sin estado' }}
+              </h4>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div class="p-panel-footer flex justify-end p-2">
+        <button
+          pButton
+          label="Recepcionar"
+          icon="pi pi-check"
+          class="p-2 bg-red-600 text-white font-semibold rounded hover:bg-red-700 focus:ring focus:ring-red-500"
+          (click)="recepcionarOT()"
+        ></button>
+      </div>
+    </div>
+  
+    <!-- Mensaje cuando no hay resultados -->
+    <div *ngIf="mensajeError" class="p-panel p-component border rounded-lg shadow-sm bg-red-100 p-4 text-center">
+      <p class="text-lg font-semibold text-red-700">
+        {{ mensajeError }}
+      </p>
+    </div>
+  </div>
+  
+</div>
+    
+  
+  
+  
+  <p-confirmDialog  header="Confirmación" icon="pi pi-exclamation-triangle"></p-confirmDialog>
+<p-toast></p-toast>

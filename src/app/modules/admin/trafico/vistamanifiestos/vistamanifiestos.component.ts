@@ -126,13 +126,12 @@ ngOnInit() {
 
  this.cols2 = [
     { field: 'numcp', header: 'N° OT',  width: '20px'},
-
-    {header: 'BULTOS', field: 'bulto'  , width: '60px'   },
     {header: 'FECHA', field: 'fecharegistro'  , width: '60px'   },
-    {header: 'PESO', field: 'peso'  ,  width: '30px'  },
     {header: 'DESTINO', field: 'destino'  ,  width: '30px'  },
     {header: 'CLIENTE', field: 'razonsocial'  ,  width: '100px'  },
     {header: 'TIPO OP', field: 'tipooperacion'  ,  width: '100px'  },
+    {header: 'BULTOS', field: 'bulto'  , width: '60px'   },
+    {header: 'PESO', field: 'peso'  ,  width: '30px'  },
     {header: 'ACCIONES', field: 'acciones'  ,  width: '30px'  },
   ];
 

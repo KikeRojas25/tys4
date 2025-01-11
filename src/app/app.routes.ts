@@ -90,15 +90,39 @@ export const appRoutes: Route[] = [
                                           .then(m => m.IntegradoComponent)
                   },
                   {
+                    path: 'traficolocal',
+                    loadComponent: () => import('./modules/admin/trafico/integradolocal/integradolocal.component')
+                                          .then(m => m.IntegradolocalComponent)
+                  },
+                  {
                     path: 'vistamanifiesto/:id',
                     loadComponent: () => import('./modules/admin/trafico/vistamanifiestos/vistamanifiestos.component')
                                           .then(m => m.VistamanifiestosComponent)
                   },
                   {
-                    path: 'vistarepartidor/:id',
+                    path: 'vistarepartidor/:id/:uid',
                     loadComponent: () => import('./modules/admin/trafico/vistarepartidor/vistarepartidor.component')
                                           .then(m => m.VistarepartidorComponent)
+                  },
+                  {
+                    path: 'seguimientootr',
+                    loadComponent: () => import('./modules/admin/trafico/ordentransporteremoto/list/list.component')
+                                          .then(m => m.ListComponent)
+                  },
+                  {
+                    path: 'nuevaotr',
+                    loadComponent: () => import('./modules/admin/trafico/ordentransporteremoto/new/new.component')
+                                          .then(m => m.NewComponent)
+                  },
+                  {
+                    path: 'editarotr/:uid',
+                    loadComponent: () => import('./modules/admin/trafico/ordentransporteremoto/edit/edit.component')
+                                          .then(m => m.EditComponent)
                   }
+
+                  //confirmarentregas
+
+                 
                 ]
               },
               {
@@ -116,6 +140,11 @@ export const appRoutes: Route[] = [
                     loadComponent: () => import('./modules/admin/recepcion/ordentransporte/seguimientoot/seguimientoot.component')
                                           .then(m => m.SeguimientootComponent)
                   },
+                  {
+                    path: 'confirmarentregas',
+                    loadComponent: () => import('./modules/admin/trafico/confirmarentrega/confirmarentrega.component')
+                                          .then(m => m.ConfirmarentregaComponent)
+                  }
                  
                 ]
               },
@@ -133,6 +162,11 @@ export const appRoutes: Route[] = [
                     path: 'manifiestovirtual/:uid',
                     loadComponent: () => import('./modules/admin/recepcion/ordentransporte/generacionmanifiesto/manifiestovirtual/manifiestovirtual.component')
                                           .then(m => m.ManifiestovirtualComponent)
+                  },
+                  {
+                    path: 'crearotmasiva',
+                    loadComponent: () => import('./modules/admin/recepcion/ordentransporte/cargamasiva/cargamasiva.component')
+                                          .then(m => m.CargamasivaComponent)
                   },
                  
                 ]
@@ -174,6 +208,11 @@ export const appRoutes: Route[] = [
                     path: 'hojasruta',
                     loadComponent: () => import('./modules/admin/despacho/pordespachar/pordespachar.component')
                                           .then(m => m.PordespacharComponent)
+                  },
+                  {
+                    path: 'confirmarrecepcion',
+                    loadComponent: () => import('./modules/admin/despacho/recepcionar-ordentransporte/recepcionar-ordentransporte.component')
+                                          .then(m => m.RecepcionarOrdentransporteComponent)
                   },
                  
                 ]

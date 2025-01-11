@@ -1,232 +1,243 @@
-import { CommonModule } from '@angular/common';
-import {Component, OnInit} from '@angular/core';
-import { FormsModule } from '@angular/forms';
-
+import { Component, OnInit } from '@angular/core';
+import { FormBuilder, FormGroup, Validators, ReactiveFormsModule } from '@angular/forms';
+import { DropdownModule } from 'primeng/dropdown';
+import { InputTextModule } from 'primeng/inputtext';
+import { ButtonModule } from 'primeng/button';
+import { InputMaskModule } from 'primeng/inputmask';
+import { CheckboxModule } from 'primeng/checkbox';
+import { InputTextareaModule } from 'primeng/inputtextarea';
+import { CalendarModule } from 'primeng/calendar';
 import { ConfirmationService, MessageService, SelectItem } from 'primeng/api';
 import { DynamicDialogRef, DynamicDialogConfig, DialogService } from 'primeng/dynamicdialog';
-import { User } from '../trafico.types';
+import { CommonModule } from '@angular/common';
 import { OrdenTransporteService } from '../../recepcion/ordentransporte/ordentransporte.service';
-import { DropdownModule } from 'primeng/dropdown';
-import { PlanningService } from '../../planning/planning.service';
-import { MantenimientoComponent } from '../../mantenimiento/mantenimiento.component';
-import { MantenimientoService } from '../../mantenimiento/mantenimiento.service';
-
-
+import { ConfirmDialogModule } from 'primeng/confirmdialog';
+import { ToastModule } from 'primeng/toast';
+import { User } from '../trafico.types';
 
 @Component({
-    template: `
+  template: `
+    <form [formGroup]="form" class="w-full p-6 bg-white rounded-lg shadow-md">
+      <!-- Tipo Entrega -->
+      <div class="mb-4">
+        <label class="block text-sm font-medium text-gray-700 mb-1">Tipo Entrega:</label>
+        <p-dropdown
+          [options]="statuses"
+          formControlName="tipoentrega"
+          scrollHeight="40vh"
+          placeholder="Seleccione un tipo de entrega"
+          [style]="{ width: '100%' }">
+        </p-dropdown>
+        <small
+          *ngIf="form.get('tipoentrega')?.invalid && form.get('tipoentrega')?.touched"
+          class="text-red-500">
+          El tipo de entrega es obligatorio.
+        </small>
+      </div>
 
-<div class="col-md-12">
+      <!-- Fecha y Hora de Entrega -->
+      <div class="grid grid-cols-1 md:grid-cols-2 gap-4 mb-4">
+        <div>
+          <label class="block text-sm font-medium text-gray-700 mb-1">Fecha Entrega:</label>
+          <p-calendar
+            formControlName="fechaentrega"
+            appendTo="body"
+            [style]="{ width: '100%' }"
+            baseZIndex="100"
+            dateFormat="dd/mm/yy">
+          </p-calendar>
+          <small
+            *ngIf="form.get('fechaentrega')?.invalid && form.get('fechaentrega')?.touched"
+            class="text-red-500">
+            La fecha de entrega es obligatoria.
+          </small>
+        </div>
+        <div>
+          <label class="block text-sm font-medium text-gray-700 mb-1">Hora de Entrega:</label>
+          <p-inputMask
+            formControlName="horaentrega"
+            mask="99:99"
+            placeholder="hh:mm">
+          </p-inputMask>
+          <small
+            *ngIf="form.get('horaentrega')?.invalid && form.get('horaentrega')?.touched"
+            class="text-red-500">
+            Ingrese una hora válida (hh:mm).
+          </small>
+        </div>
+      </div>
 
-                <div class="row">
-                <div class="col-md-12">
-                    <label>Tipo Entrega :</label>
-                          <p-dropdown [options]="statuses" name="tipoentrega"    id="tipoentrega"
-                          scrollHeight="40vh"
-                          placeholder="seleccione un tipo de entrega"
-                          [style]="{'width':'100%'}"  [resetFilterOnHide]="true"
-                          [hideTransitionOptions]="'0ms'"
-                          [showTransitionOptions]="'0ms'"
-                          [(ngModel)]="model.tipoentrega"></p-dropdown>
-                    </div>
-                </div>
+      <!-- DNI y Persona Entrega -->
+      <div class="grid grid-cols-1 md:grid-cols-2 gap-4 mb-4">
+        <div>
+          <label class="block text-sm font-medium text-gray-700 mb-1">DNI Entrega:</label>
+          <input
+            pInputText
+            formControlName="dnientrega"
+            class="w-full border border-gray-300 rounded-md p-2 focus:ring-blue-500 focus:border-blue-500">
+          <small
+            *ngIf="form.get('dnientrega')?.invalid && form.get('dnientrega')?.touched"
+            class="text-red-500">
+            El DNI debe contener solo números y al menos 8 caracteres.
+          </small>
+        </div>
+        <div>
+          <label class="block text-sm font-medium text-gray-700 mb-1">Persona Entrega:</label>
+          <input
+            pInputText
+            formControlName="personaentrega"
+            class="w-full border border-gray-300 rounded-md p-2 focus:ring-blue-500 focus:border-blue-500">
+          <small
+            *ngIf="form.get('personaentrega')?.invalid && form.get('personaentrega')?.touched"
+            class="text-red-500">
+            El nombre de la persona es obligatorio.
+          </small>
+        </div>
+      </div>
 
-                <div class="row">
-                <div class="col-md-6">
-                      <label>Fecha Entrega  :</label>
-                      <p-calendar [(ngModel)]="model.fechaentrega"  appendTo="body"  [style]="{'width':'100%'}"  baseZIndex="100"   name="fechaentrega"   dateFormat="dd/mm/yy"></p-calendar>
-                    </div>
-                    <div class="col-md-6">
-                    <label>Hora de Entrega :</label>
-                    <input  type="text" class="form-control" [(ngModel)]="model.horaentrega" >
-                    </div>
+      <!-- Cargo Pendiente -->
+      <div class="mb-4">
+        <label class="block text-sm font-medium text-gray-700 mb-1">Cargo Pendiente:</label>
+        <p-checkbox formControlName="cargopendiente"  binary="true"></p-checkbox>
+      </div>
 
-                </div>
+      <!-- Observación -->
+      <div class="mb-4">
+        <label class="block text-sm font-medium text-gray-700 mb-1">Observación:</label>
+        <textarea
+          formControlName="observacion_enreparto"
+          rows="5"
+          cols="30"
+          autoResize="true"
+          placeholder="Escribe aquí..."
+          class="w-full border border-gray-300 rounded-md p-2 focus:ring-blue-500 focus:border-blue-500">
+        </textarea>
+      </div>
 
-                <div class="row">
-                    <div class="col-md-6">
-                    <label>DNI Entrega :</label>
-                    <input  type="text" class="form-control" [(ngModel)]="model.dnientrega" >
+      <!-- Botón Confirmar Entrega -->
+      <div class="mt-6">
+        <button
+          class="w-full md:w-auto bg-red-500 hover:bg-red-600 text-white font-bold py-2 px-4 rounded shadow"
+          pButton
+          [disabled]="form.invalid"
+          label="Confirmar Entrega"
+          (click)="entregarOT()">
+        </button>
+      </div>
+    </form>
+    <p-confirmDialog header="Confirmación" icon="pi pi-exclamation-triangle"></p-confirmDialog>
+    <p-toast />
+  `,
+  standalone: true,
+  imports: [
+    CommonModule,
+    ReactiveFormsModule,
+    DropdownModule,
+    InputTextModule,
+    ButtonModule,
+    InputMaskModule,
+    CheckboxModule,
+    InputTextareaModule,
+    CalendarModule,
+    ConfirmDialogModule,
+    ToastModule
 
-                    </div>
-                    <div class="col-md-6">
-                    <label>Persona Entrega :</label>
-                    <input  type="text" class="form-control"  [(ngModel)]="model.personaentrega">
-
-                    </div>
-                </div>
-                <div class="row mt-3">
-                    <div class="col-md-6 ">
-                    <label>Cargo Pendiente :</label>
-                       <p-checkbox [(ngModel)]="model.cargopendiente"  name="cargopendiente"  value="1" id="cargapendiente"></p-checkbox>
-                    </div>
-                </div>
-
-                <div class="col-6">
-                <h6>Observación:</h6>
-                <textarea [(ngModel)]="model.observacion_enreparto" rows="5" cols="30"  class="form-control"   type="text" textarea ></textarea>
-              </div>
-
-                <div class="row  mt-3">
-                <div class="col-md-6">
-                    <button   class='btn-danger btn ' pButton iconPos="left" label="Confirmar Entrega"   (click)="entregarOT()"  type="button"></button>
-                    </div>
-                </div>
-
-
-</div>
-    `,
-    standalone:true,
-    imports: [
-      FormsModule,
-      CommonModule,
-      DropdownModule
-
-    ],
-      providers: [ConfirmationService, DialogService, MessageService]
+  ],
+  providers: [
+    DialogService,
+    ConfirmationService,
+    MessageService
+  ]
 })
-export class EntregarOtModalComponent  implements OnInit {
+export class EntregarOtModalComponent implements OnInit {
+  form: FormGroup;
+  statuses: SelectItem[] = [];
+  user: User;
 
-    cars: any[];
-    model: any = {};
-    estadosnext: SelectItem[] = [];
-    estaciones: SelectItem[] = [];
-    agencias: SelectItem[] = [];
-    repartidores: SelectItem[] = [];
-    user: User ;
-    dateInicio: Date = new Date(Date.now()) ;
-    es: any;
-    statuses: SelectItem[];
-    idordentrabajo : any;
+  constructor(
+    private fb: FormBuilder,
+    private ordenService: OrdenTransporteService,
+    public ref: DynamicDialogRef,
+    private messageService: MessageService,
+    public config: DynamicDialogConfig,
+    private confirmationService: ConfirmationService,
+  ) {}
 
-
-    constructor(private ordenService: OrdenTransporteService
-                ,public ref: DynamicDialogRef
-                ,public planningService: PlanningService
-                ,private confirmationService: ConfirmationService
-                ,private messageService: MessageService
-                ,private mantenimientoService: MantenimientoService
-                ,public config: DynamicDialogConfig) {
-
-                 this.idordentrabajo =  this.config.data.idorden
-         }
-
-    ngOnInit() {
-
-      this.statuses = [
-
-        {label: 'Entrega Conforme', value: 5},
-        {label: 'Rechazo Parcial', value: 11},
-        {label: 'Rechazo Total', value: 12},
-       ];
+  ngOnInit() {
+    // Inicializa el formulario reactivo
+  
+    this.user = JSON.parse(localStorage.getItem('user'));
 
 
-      this.es = {
-        firstDayOfWeek: 1,
-        dayNames: [ 'domingo', 'lunes', 'martes', 'miércoles', 'jueves', 'viernes', 'sábado' ],
-        dayNamesShort: [ 'dom', 'lun', 'mar', 'mié', 'jue', 'vie', 'sáb' ],
-        dayNamesMin: [ 'D', 'L', 'M', 'X', 'J', 'V', 'S' ],
-        monthNames: [ 'enero', 'febrero', 'marzo', 'abril',
-        'mayo', 'junio', 'julio', 'agosto', 'septiembre', 'octubre', 'noviembre', 'diciembre' ],
-        monthNamesShort: [ 'ene', 'feb', 'mar', 'abr', 'may', 'jun', 'jul', 'ago', 'sep', 'oct', 'nov', 'dic' ],
-        today: 'Hoy',
-        clear: 'Borrar'
-    };
+    this.form = this.fb.group({
+      tipoentrega: ['', Validators.required],
+      fechaentrega: ['', Validators.required],
+      horaentrega: [
+        '',
+        [
+          Validators.required,
+          Validators.pattern(/^([01]\d|2[0-3]):([0-5]\d)$/),
+        ],
+      ],
+      dnientrega: [
+        '',
+        [Validators.required, Validators.minLength(8), Validators.pattern(/^\d+$/)],
+      ],
+      personaentrega: ['', Validators.required],
+      cargopendiente: [false],
+      observacion_enreparto: [''],
+    });
 
+    // Opciones para el dropdown
+    this.statuses = [
+      { label: 'Entrega Conforme', value: 5 },
+      { label: 'Rechazo Parcial', value: 11 },
+      { label: 'Rechazo Total', value: 12 },
+    ];
+  }
 
-      this.user = JSON.parse(localStorage.getItem('user'));
-      this.model.idusuariocreacion = this.user.usr_int_id;
+  entregarOT() {
 
-
-      this.estadosnext.push({ value: 10 ,  label : 'En Base (Con Precinto)'});
-      this.estadosnext.push({ value: 11 ,  label : 'En Ruta'});
-      this.estadosnext.push({ value: 25 ,  label : 'En Zona'});
-      this.estadosnext.push({ value: 13 ,  label : 'En Reparto '});
-
-
-
-      this.planningService.GetAllEstaciones().subscribe(resp => {
-        resp.forEach(element => {
-          this.estaciones.push({ value: element.idEstacion ,  label : element.estacionOrigen});
-        });
+    if (this.form.invalid) {
+      this.messageService.add({
+        severity: 'warn',
+        detail: 'Por favor completa todos los campos obligatorios.',
+        summary: 'Validación',
       });
-
-
-      this.ordenService.getValorTabla(24).subscribe(resp => {
-        resp.forEach(element => {
-          this.agencias.push({ value: element.idValorTabla ,  label : element.valor});
-        });
-      });
-
-
-      this.mantenimientoService.getProveedores("", 21514).subscribe(resp => {
-        resp.forEach(element => {
-          this.repartidores.push({ value: element.idProveedor ,  label : element.razonSocial  +   '-'   +    element.ruc});
-        });
-      });
-
-
-
-    }
-    cancelar() {
-      this.ref.close();
+      return;
     }
 
+    this.confirmationService.confirm({
+      message: '¿Esta seguro que desea confirmar la entrega?',
+    accept: () => {
+        const entregaData = this.form.value;
+        entregaData.idordentrabajo = this.config.data.idorden;
+        entregaData.idUsuarioEntrega= this.user.id;
+        entregaData.idtipoentrega = entregaData.tipoentrega;
 
-    entregarOT(){
-
-
-
-
-      if(this.model.tipoentrega === undefined)
-      {
-        this.messageService.add({severity:'warm', detail:"Debe seleccionar un tipo de entrega" ,  summary:'Monitoreo' });
-
-        return ;
+        this.ordenService.confirmar_entrega(entregaData).subscribe({
+          next: () => {
+            this.messageService.add({
+              severity: 'success',
+              detail: 'Entrega confirmada exitosamente.',
+              summary: 'Tráfico',
+            });
+            this.ref.close();
+          },
+          error: (err) => {
+            this.messageService.add({
+              severity: 'error',
+              detail: 'Error al confirmar la entrega: ' + err.message,
+              summary: 'Error',
+            });
+          },
+        });
+      },
+      reject: () => {
+        this.ref.close();
       }
-      if(this.model.fechaentrega === undefined)
-      {
-        this.messageService.add({severity:'warm', detail:"Debe seleccionar una fecha de entrega" ,  summary:'Monitoreo' });
-
-        return ;
-      }
-      if(this.model.horaentrega === undefined)
-      {
-        this.messageService.add({severity:'warm', detail:"Debe seleccionar una hora de entrega" ,  summary:'Monitoreo' });
-
-        return ;
-      }
+    });
+  }
 
 
-      console.log(this.model.tipoentrega, 'tipoentrega');
-
-      console.log(this.model.fechaentrega, 'fechaentrega');
-
-
-      this.model.fechaetapa = this.model.fechaentrega;
-      this.model.idusuarioentrega  = 2;
-      this.model.idtipoentrega = this.model.tipoentrega ;
-      this.model.idordentrabajo = this.idordentrabajo;
-
-
-      if(this.model.cargopendiente === undefined)
-      {
-            this.model.cargopendiente = false;
-      }
-      else
-      {
-         this.model.cargopendiente = Boolean(this.model.cargopendiente[0]);
-      } 
-
-
-
-          this.ordenService.confirmar_entrega(this.model).subscribe(resp => {
-            this.messageService.add( { detail: "Se ha confirmado el entrega con éxito." , summary: 'Tráfico', severity:'success' });
-
-
-              this.ref.close();
-
-     });
-    }
 }
-

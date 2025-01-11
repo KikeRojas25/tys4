@@ -15,7 +15,7 @@
         </div>
       </div>
       <div class="mt-2">
-        <h2 class="text-3xl md:text-4xl font-extrabold tracking-tight leading-7 sm:leading-10 truncate"> Vista por Manifiestos  </h2>
+        <h2 class="text-3xl md:text-4xl font-extrabold tracking-tight leading-7 sm:leading-10 truncate"> Vista por Proveedor de reparto  </h2>
       </div>
     </div>
   </div>
@@ -309,7 +309,7 @@
 
 <p-dialog header="Detalle de Manifiesto" [modal]="true" [(visible)]="modalDetalleManifiesto" [style]="{ width: '75rem' }">
         
-  <p-table   #dt2 [columns]="cols2" dataKey="idordentrabajo"
+  <p-table   #dt2 [columns]="cols1" dataKey="idordentrabajo"
   [style]="{width:'100%'}"
   [rowsPerPageOptions]="[20,40]"
   [value]="ordenes"   selectionMode="multiple"
@@ -340,12 +340,15 @@
   <tr [pSelectableRow]="rowData">
 
   <td class="ui-resizable-column" style="text-align:left;" > {{ rowData.numCp    }}   </td>
-  <td class="ui-resizable-column" style="text-align:left;"> {{rowData.bulto }} </td>
+
   <td class="ui-resizable-column" style="text-align:center;"> {{rowData.fechaRegistro | date: 'dd/MM/yyyy HH:mm' }}</td>
-  <td class="ui-resizable-column" style="text-align:center;"> {{rowData.peso }}</td>
+ 
   <td class="ui-resizable-column" style="text-align:center;"> {{rowData.destino }}</td>
   <td class="ui-resizable-column" style="text-align:center;"> {{rowData.cliente }}</td>
+  <td class="ui-resizable-column" style="text-align:center;"> {{rowData.estado }}</td>
   <td class="ui-resizable-column" style="text-align:center;"> {{rowData.tipoOperacion }}</td>
+  <td class="ui-resizable-column" style="text-align:left;"> {{rowData.bulto }} </td>
+  <td class="ui-resizable-column" style="text-align:center;"> {{rowData.peso }}</td>
   <td class="ui-resizable-column" style="text-align:center;"> 
 
       <p-button icon="pi pi-paperclip" severity="warning" (click)="verOt(rowData.idOrdenTrabajo)" size="small" ></p-button>

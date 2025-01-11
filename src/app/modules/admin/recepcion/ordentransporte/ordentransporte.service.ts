@@ -18,6 +18,16 @@ const httpOptions = {
 
 
 
+const httpOptionsUpload = {
+  headers: new HttpHeaders({
+    Authorization : 'Bearer ' + localStorage.getItem('token'),
+  })
+  // , observe: 'body', reportProgress: true };
+};
+
+
+
+
 
 @Injectable({
   providedIn: 'root'
@@ -94,7 +104,8 @@ getAllOrder(model: any) {
     .set('numcp', model.numcp.toString())
     .set('nummanifiesto', model.nummanifiesto.toString())
     .set('numhojaruta', model.numhojaruta.toString())
-    .set('idusuario', model.idusuario.toString());
+    .set('idusuario', model.idusuario.toString())
+    .set('tipoorden', model.tipoorden.toString());
 
     return this._httpClient.get<OrdenTransporte[]>(`${this.baseUrlOrden}GetAllOrder`, { params, ...httpOptions })
     .pipe(
@@ -129,17 +140,33 @@ GetAllOrdersCargasTemporal (id: number){
   )
 );
 }
+eliminar(model: any): Observable<OrdenTransporte> {
+  return this._httpClient.post<OrdenTransporte>(this.baseUrlOrden + 'DeleteOrdenTransporte', model, httpOptions);
+}
 
 
 
 
 
+GetOrdenTransporteByNumero(numcp: string) : Observable<OrdenTransporte> {
+  return this._httpClient.get<OrdenTransporte>(this.baseUrlOrden + 'GetOrdenTransporteByNumero?numcp=' + numcp   , httpOptions).pipe(
+    catchError((error) => {
+      // Verifica si el error es un 404 y extrae el mensaje del backend
+      if (error.status === 404 && error.error?.message) {
+        return throwError(() => new Error(error.error.message));
+      }
+      // Para otros errores
+      return throwError(() => new Error('Error al buscar la orden de transporte'));
+    })
+  );
 
+}
 
-
- registrarOTR(model: any, guias: any): Observable<OrdenTransporte> {
-  model.guias = guias;
+ registrarOTR(model: any): Observable<OrdenTransporte> {
   return this._httpClient.post<OrdenTransporte>(`${this.baseUrl}registerOTR`, model, httpOptions);
+}
+actualizarOTR(model: any): Observable<OrdenTransporte> {
+  return this._httpClient.post<OrdenTransporte>(`${this.baseUrl}updateOTR`, model, httpOptions);
 }
 calcularPrecio(model: any): Observable<OrdenTransporte> {
   return this._httpClient.post<OrdenTransporte>(`${this.baseUrlOrden}calcularPrecio`, model, httpOptions);
@@ -149,7 +176,45 @@ generarManifiesto(model: any): Observable<Manifiesto> {
   return this._httpClient.post<Manifiesto>(`${this.baseUrlOrden}GenerarManifiestoVirtual`, model, httpOptions);
 }
 
+getOrden(idordentrabajo: any): Observable<any>  {
+  return this._httpClient.get<any>(`${this.baseUrlOrden}GetOrden?id=${idordentrabajo}` , httpOptions);
+}
+confirmarDespacho(model: any) {
+  return this._httpClient.post(this.baseUrlOrden + 'ConfirmarDespacho', model, httpOptions);
+}
 
+uploadFile(file: File, UserId: number, ClienteId: number) : any {
+
+  ClienteId = 20789;
+
+  const formData = new FormData();
+  formData.append('file', file);
+
+  
+  return this._httpClient.post(this.baseUrlOrden + 'UploadFile?usrid=' + UserId.toString() + '&idcliente=' + ClienteId
+ , formData
+ , httpOptionsUpload
+);
+}
+
+procesarCargaMasiva(idcarga: any) {
+
+  let  model: any  = {};
+  model.cargaid = idcarga;
+  return this._httpClient.post(this.baseUrlOrden + 'procesarCargaMasiva', model , httpOptions);
+
+}
+recepcionarOT(model : any) {
+  return this._httpClient.post(this.baseUrlOrden + 'recepcionarOT', model, httpOptions);
+}
+
+getAllOrdersForDespacho(numhojaruta: string) {
+  return this._httpClient.get<OrdenTransporte[]>(this.baseUrlOrden + 'getAllOrdersForDespacho?numhojaruta='  + numhojaruta, httpOptions);
+}
+confirmarEstibaxOTs (ots: any[]) {
+  console.log(ots);
+  return this._httpClient.post<OrdenTransporte>(this.baseUrlOrden + 'confirmarEstibaxOTs' , ots ,httpOptions);
+}
 
 
 }

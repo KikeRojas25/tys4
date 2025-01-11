@@ -96,6 +96,9 @@ export class AuthService {
             })
         );
     }
+    authorization(model: any): any {
+        return this._httpClient.post(this.baseUrl + 'login', model);
+       }
 
     /**
      * Sign in using the access token

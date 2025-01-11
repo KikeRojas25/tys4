@@ -101,5 +101,11 @@ GetAllOrdersGroupDepartament(model: any){
     return this._httpClient.post<any[]>(this.baseUrl + 'DesAsignarProvinciaCarga?', model , httpOptions);
   }
 
-
+  GetAllOrdersDetailDeparment(idestacionorigen: number, iddepartamento: number) {
+    return this._httpClient.get<OrdenTransporte[]>(this.baseUrl + 'GetAllOrdersDetailDeparment?idestacionorigen=' + idestacionorigen + '&iddepartamento=' + iddepartamento , httpOptions);
+  }
+  confirmarDespacho(model: any) {
+    return this._httpClient.post(this.baseUrl + 'ConfirmarDespacho', model, httpOptions);
+  }
+  
 }
