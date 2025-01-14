@@ -162,9 +162,16 @@ GetOrdenTransporteByNumero(numcp: string) : Observable<OrdenTransporte> {
 
 }
 
- registrarOTR(model: any): Observable<OrdenTransporte> {
+registrarOTR(model: any): Observable<OrdenTransporte> {
   return this._httpClient.post<OrdenTransporte>(`${this.baseUrl}registerOTR`, model, httpOptions);
 }
+
+
+
+ registrarOT(model: any): Observable<OrdenTransporte> {
+  return this._httpClient.post<OrdenTransporte>(`${this.baseUrlOrden}registerOT`, model, httpOptions);
+}
+
 actualizarOTR(model: any): Observable<OrdenTransporte> {
   return this._httpClient.post<OrdenTransporte>(`${this.baseUrl}updateOTR`, model, httpOptions);
 }

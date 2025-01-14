@@ -19,6 +19,7 @@ import { CalendarModule } from 'primeng/calendar';
 import { DialogModule } from 'primeng/dialog';
 import { TimelineModule } from 'primeng/timeline';
 import { ToastModule } from 'primeng/toast';
+import { ConfirmDialogModule } from 'primeng/confirmdialog';
 
 interface EventItem {
   status?: string;
@@ -50,7 +51,8 @@ interface EventItem {
     CalendarModule,
     DialogModule ,
     TimelineModule,
-    ToastModule
+    ToastModule,
+    ConfirmDialogModule
     
   ],
   providers: [
@@ -214,7 +216,7 @@ export class SeguimientootComponent implements OnInit {
 //   });
 // }
   editar(id) {
-    this.router.navigate(['/trafico/editarotr', id]);
+    this.router.navigate(['/seguimientoot/editarot', id]);
   }
 
   verguias(id) {
@@ -232,23 +234,23 @@ export class SeguimientootComponent implements OnInit {
   eliminar(id) {
 
     this.confirmationService.confirm({
-      message: '¿Esta seguro que desea elminar esta OTR?',
+      message: '¿Esta seguro que desea elminar esta OT?',
       accept: () => {
-        this.loading = true;
-        this.model.responsablecomercialid = this.user.usr_int_id;
+        
+        this.model.idusuarioregistro = this.user.id;
         this.model.idordentrabajo = id;
-        // this.ordenTransporteService.eliminar(this.model).subscribe(resp => {
-        //   //this.messageService.add({severity: 'info', summary: 'Orden Recojo', detail: 'Se ha eliminado con éxito.'});
-        //   this.toastr.show('Se ha eliminado con éxito.' );
-        //   this.buscar();
-        //   this.loading = false;
-
-        // });
+  
+        this.ordenTransporteService.eliminar(this.model).subscribe(resp => {
+  
+          this.messageService.add({severity: 'success', summary: 'Orden Transporte ', detail: 'Se ha eliminado con éxito.'});
+  
+          this.buscar();
+  
+        });
       }
   });
-
+  
   }
-
   buscar() {
 
       this.model.fecinicio = this.dateInicio;

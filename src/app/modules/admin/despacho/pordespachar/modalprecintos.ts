@@ -1,8 +1,12 @@
 import {Component, OnInit} from '@angular/core';
 import { MessageService, SelectItem } from 'primeng/api';
 import { DynamicDialogRef, DynamicDialogConfig } from 'primeng/dynamicdialog';
-import { User } from 'src/app/_models/user';
-import { OrdenTransporteService } from 'src/app/_services/Seguimiento/ordentransporte.service';
+import { OrdenTransporteService } from '../../recepcion/ordentransporte/ordentransporte.service';
+import { User } from 'app/core/user/user.types';
+import { ToastModule } from 'primeng/toast';
+import { CalendarModule } from 'primeng/calendar';
+import { PickListModule } from 'primeng/picklist';
+import { FormsModule } from '@angular/forms';
 
 
 @Component({
@@ -37,7 +41,14 @@ import { OrdenTransporteService } from 'src/app/_services/Seguimiento/ordentrans
 
             <p-toast></p-toast>
 
-    `
+    `,
+    standalone: true,
+    imports: [
+      ToastModule
+      ,CalendarModule
+      ,PickListModule 
+      , FormsModule
+    ]
 })
 export class PrecintosModalComponent  implements OnInit {
 
@@ -64,11 +75,11 @@ export class PrecintosModalComponent  implements OnInit {
     ngOnInit() {
 
       this.model.idestado = 1;
-      this.ordenService.getAllPrecintosLibres().subscribe(list =>  {
+      // this.ordenService.getAllPrecintosLibres().subscribe(list =>  {
 
-           this.source =   list;
+      //      this.source =   list;
 
-        });
+      //   });
     }
 
 
@@ -81,35 +92,35 @@ export class PrecintosModalComponent  implements OnInit {
 
       this.model.numhojaruta = this.numhojaruta;
 
-      this.ordenService.asignarPrecintos(this.numhojaruta,this.target).subscribe(resp => {
+      // this.ordenService.asignarPrecintos(this.numhojaruta,this.target).subscribe(resp => {
 
-         this.ordenService.confirmarSalida(this.model).subscribe(resp => {
-
-
-        });
+      //    this.ordenService.confirmarSalida(this.model).subscribe(resp => {
 
 
-        this.ref.close();
+      //   });
 
-      });
+
+      //   this.ref.close();
+
+      // });
 
 
 
     }
     imprimirManifiesto () {
 
-      if(this.model.fechahorasalida === undefined)
-      {
-        this.messageService.add({severity:'error', summary:'Confirmar Estiba', detail:'Debe seleccionar una fecha de salida programada.'});
-        return ;
-      }
+  //     if(this.model.fechahorasalida === undefined)
+  //     {
+  //       this.messageService.add({severity:'error', summary:'Confirmar Estiba', detail:'Debe seleccionar una fecha de salida programada.'});
+  //       return ;
+  //     }
 
-      var url = "http://104.36.166.65/webreports/hojaruta.aspx?iddespacho=" + String(this.todo[0].iddespacho);
-      window.open(url);
+  //     var url = "http://104.36.166.65/webreports/hojaruta.aspx?iddespacho=" + String(this.todo[0].iddespacho);
+  //     window.open(url);
 
-  }
+  // }
 
-
+    }
 
 
 }

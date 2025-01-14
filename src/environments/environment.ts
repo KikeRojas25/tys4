@@ -4,8 +4,8 @@
 
 export const environment = {
     production: false,
-    //baseUrl: 'http://104.36.166.65/apitys4.0',
-    baseUrl: 'http://localhost:5000',
+    baseUrl: 'http://104.36.166.65/apitys4.0',
+    //baseUrl: 'http://localhost:5000',
     uploadsDocuments: 'D:\\APPS\\Toscanos\\Web\\UploadedFiles\\'
 };
 

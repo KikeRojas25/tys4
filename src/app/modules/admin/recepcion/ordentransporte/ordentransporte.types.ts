@@ -97,6 +97,8 @@ export interface OrdenTransporte {
     fechaentregareparto?: Date;
     fechahoracita?: Date;
     numcarga2?: string;
+    validado: false;
+    mensaje: string;
 
 
 }

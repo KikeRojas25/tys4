@@ -136,6 +136,11 @@ export const appRoutes: Route[] = [
                                           .then(m => m.CrearotComponent)
                   },
                   {
+                    path: 'editarot/:uid',
+                    loadComponent: () => import('./modules/admin/recepcion/ordentransporte/editarot/editarot.component')
+                                          .then(m => m.EditarotComponent)
+                  },
+                  {
                     path: 'listadoordentransporte',
                     loadComponent: () => import('./modules/admin/recepcion/ordentransporte/seguimientoot/seguimientoot.component')
                                           .then(m => m.SeguimientootComponent)

@@ -396,8 +396,6 @@ else {
     const idTransporte = this.form.get('idtipotransporte')?.value; // Obtener el valor del idcliente desde el formulario
 
 
-    console.log(idFormula);
-
 
 
     this.ordenTransporteService.getConceptos(idCliente,idOrigen, idDestino
