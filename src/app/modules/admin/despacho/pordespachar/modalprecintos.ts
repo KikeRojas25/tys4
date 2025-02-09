@@ -11,33 +11,55 @@ import { FormsModule } from '@angular/forms';
 
 @Component({
     template: `
+<div class="flex flex-col items-center p-6 space-y-6">
 
-<div class="col-md-4 mt-2 mb-4">
-
-<label for="dni">Fecha y Hora programada de Salida: </label>
-  <p-calendar  [showTime]="true" [(ngModel)]="model.fechahorasalida"  [showSeconds]="false"></p-calendar>
+    
+    <!-- Fecha y Hora programada de Salida -->
+    <div class="w-full md:w-1/2 flex flex-col gap-2">
+        <label for="dni" class="text-gray-700 font-semibold">Fecha y Hora programada de Salida:</label>
+        <p-calendar 
+            [showTime]="true" 
+            [(ngModel)]="model.fechahorasalida" 
+            [showSeconds]="false" 
+            class="w-full border border-gray-300 p-2 rounded-md shadow-sm">
+        </p-calendar>
+    </div>
+    
+    <!-- PickList -->
+    <div class="flex flex-col items-center w-full md:w-3/5 space-y-4">
+        <p-pickList 
+            [source]="source" 
+            [target]="target" 
+            sourceHeader="Disponibles" 
+            targetHeader="Asignados" 
+            [responsive]="true"
+            [showSourceControls]="false" 
+            [showTargetControls]="false"
+            [dragdrop]="true" 
+            [responsive]="true"
+            [sourceStyle]="{ height: '8rem', width: '12rem' }" 
+            [targetStyle]="{ height: '8rem', width: '12rem' }" 
+            breakpoint="1400px"
+            class="border border-gray-300 rounded-lg shadow-md text-sm p-2 w-auto">
+            <ng-template let-product pTemplate="item">
+                <div class="flex items-center justify-between p-2 bg-gray-100 rounded-md shadow-sm text-xs">
+                    <span class="text-gray-800 font-medium">{{ product.precinto }}</span>
+                </div>
+            </ng-template>
+        </p-pickList>
+    </div>
+    
+    <!-- Botón de Guardar -->
+    <div class="w-full md:w-1/2 flex justify-center">
+        <p-button 
+            severity="success" iconPos="left" label="Guardar" icon="fa fa-plus" 
+            (click)="guardar()" type="button">
+            
+        </p-button>
+    </div>
 </div>
 
-<div class=" mb-3 col-md-12">
 
-<p-pickList [source]="source" [target]="target" sourceHeader="Disponibles" targetHeader="Asignados" [dragdrop]="true" [responsive]="true"
-    [sourceStyle]="{ height: '30rem' }" [targetStyle]="{ height: '30rem' }" breakpoint="1400px">
-    <ng-template let-product pTemplate="item">
-        <div class="flex flex-wrap p-2 align-items-center gap-3">
-                    <span> {{ product.precinto }} </span>
-        </div>
-    </ng-template>
-</p-pickList>
-
-
-</div>
-
-     <div class="row mb-3 col-md-12">
-     <div class=" mb-3 col-md-4">
-          <button  class='btn-primary btn-block btn' pButton iconPos="left" label="Guardar" icon="fa fa-plus"  (click)="guardar()"  type="button"></button>
-          </div>
-
-            </div>
 
             <p-toast></p-toast>
 
@@ -75,11 +97,11 @@ export class PrecintosModalComponent  implements OnInit {
     ngOnInit() {
 
       this.model.idestado = 1;
-      // this.ordenService.getAllPrecintosLibres().subscribe(list =>  {
+      this.ordenService.getAllPrecintosLibres().subscribe(list =>  {
 
-      //      this.source =   list;
+           this.source =   list;
 
-      //   });
+        });
     }
 
 

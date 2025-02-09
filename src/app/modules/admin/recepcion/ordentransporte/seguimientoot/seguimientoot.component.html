@@ -138,6 +138,20 @@
           <tr [pSelectableRow]="rowData">
             <!-- Acción -->
             <td>
+              <p-button *ngIf="rowData?.estado === 'Entregado' && estrafico === true"  
+              icon="pi pi-book" 
+              title="Editar" 
+              size="small"
+              (click)="editarConfirm(rowData.idordentrabajo)">
+            </p-button>
+            <p-button *ngIf="rowData?.estado === 'Entregado' && estrafico === true"  
+                icon="pi pi-camera" 
+                title="Eliminar Fotos" 
+                size="small"
+                severity="danger"
+                (click)="eliminarFotos(rowData.idordentrabajo)">
+            </p-button>
+  
               <p-button icon="pi pi-pencil" 
                         title="Ver Archivos" 
                         size="small"
@@ -170,6 +184,7 @@
             </td>
             <td style="text-align: center;">{{ rowData.fecharecojo | date:'dd/MM/yyyy' }}</td>
             <td style="text-align: center;">{{ rowData.fechadespacho | date:'dd/MM/yyyy '}}</td>
+            <td style="text-align: center;">{{ rowData.fechaentrega | date:'dd/MM/yyyy '}}</td>
             <td class="word-wrap">{{ rowData.razonsocial }}</td>
             <td class="word-wrap">{{ rowData.destinatario }}</td>
             <!-- <td class="word-wrap">{{ rowData.numManifiestoTroncal }}</td>
@@ -187,8 +202,12 @@
               {{ rowData.nummanifiesto }}
               </a>
             </td>
-            <td class="word-wrap">{{ rowData.numhojaruta }}</td>
-
+            <td class="word-wrap">
+              <a style="cursor: pointer; text-decoration: underline;" (click)="verhojaruta(rowData.idDespacho)">
+              {{ rowData.numhojaruta }}
+              </a>
+            </td>
+          
             <td>{{ rowData.bulto }}</td>
             <td>{{ rowData.peso }}</td>
             <td>{{ rowData.pesovol }}</td>
@@ -230,6 +249,30 @@
       </tr>
     </ng-template>
   </p-table>
+</p-dialog>
+<p-dialog header="Editar Confirmación" [modal]="true" [(visible)]="dialogConfirm" [style]="{ width: '45rem', height: '350px' }">
+  <div class="field flex flex-col">
+      <label for="fechaentrega">Fecha de entrega :</label>
+      <p-calendar id="fechaentrega" name="fechaentrega" appendTo="body" [(ngModel)]="model.fechaentrega" required 
+          [iconDisplay]="'input'" [showIcon]="true" inputId="icondisplay"></p-calendar>
+      <div *ngIf="!model.fechaentrega" class="alert-danger">
+          <div>Requiere seleccionar una fecha de entrega.</div>
+      </div>
+  </div>
+
+  <div class="field flex flex-col">
+      <label for="horaentrega">Hora de entrega (*) :</label>
+      <p-inputMask id="horaentrega" name="horaentrega" [(ngModel)]="model.horaentrega" mask="99:99" required></p-inputMask>
+      <div *ngIf="!model.horaentrega" class="alert-danger">
+          <div>Requiere ingresar la hora de entrega.</div>
+      </div>
+  </div>
+  <div class="flex justify-end mt-4">
+    <p-button label="Guardar" icon="pi pi-check" (click)="saveConfirm()"></p-button>
+    <p-button label="Desconfirmar"  severity="danger"   icon="pi pi-times-circle" (click)="unConfirm() "></p-button>
+    <p-button label="Cancelar" icon="pi pi-times" class="p-button-secondary ml-2" (click)="dialogConfirm = false"></p-button>
+</div>
+
 </p-dialog>
 
 

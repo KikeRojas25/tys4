@@ -88,6 +88,13 @@ export class ManifiestovirtualComponent implements OnInit {
 
   proveedoresDestino: SelectItem[] = [];
 
+  estadosMap = {
+    0: [0],
+    1: [6], // "Por despachar" se mapea a "Pend. Programacion"
+    2: [11, 13], // "Por entregar" se mapea a "En Ruta", "En Reparto" y "Entregado"
+    3: [34,35], // "TODOS LOS ESTADOS" incluye todos
+};
+
 
   agencias: SelectItem[] = [];
   user: User;
@@ -114,6 +121,7 @@ export class ManifiestovirtualComponent implements OnInit {
 
 
     this.model.ots = this.ids;
+    this.model.referencia = '';
 
     
 

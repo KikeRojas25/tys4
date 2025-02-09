@@ -18,5 +18,6 @@ export interface User {
     idscliente: string;
     usr_str_red: string;
     idestacionorigen? : number;
+    estrafico?: boolean;
     
 }

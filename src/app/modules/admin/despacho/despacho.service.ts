@@ -3,7 +3,9 @@ import { inject, Injectable } from '@angular/core';
 import { JwtHelperService } from '@auth0/angular-jwt';
 import { UserService } from 'app/core/user/user.service';
 import { environment } from 'environments/environment';
-import { Manifiesto, OrdenTransporte } from '../trafico/trafico.types';
+import { Manifiesto } from '../trafico/trafico.types';
+import { OrdenTransporte } from '../recepcion/ordentransporte/ordentransporte.types';
+import { Observable } from 'rxjs';
 
 
 
@@ -38,7 +40,14 @@ getAllPreHojaRuta(model: any) {
   const param = '?idestado=' + 1
   return this._httpClient.get<OrdenTransporte[]>(this.baseUrl + 'getAllPreHojasRuta' + param  , httpOptions);
 }
+getAllOrderTransportPending(model: any) : Observable<OrdenTransporte[]> {
 
+  if (model.idcliente === 0 || model.idcliente === undefined) {
+      model.idcliente = '';
+   }
+  const param = '?idcliente=' + model.idcliente ;
+  return this._httpClient.get<OrdenTransporte[]>(this.baseUrl + 'GetAllOrderPending' + param  , httpOptions);
+}
 getAllPreHojaRutaEnBase(model: any) {
   const param = '?idestado=' + 1
   return this._httpClient.get<OrdenTransporte[]>(this.baseUrl + 'getAllPreHojasRutaEnBase' + param  , httpOptions);
@@ -63,6 +72,11 @@ getEstibaAutorizada(numhojaruta: string) {
   return this._httpClient.get<OrdenTransporte>(this.baseUrl + 'getEstibaAutorizada?numhojaruta='  + numhojaruta, httpOptions);
 
 }
+confirmarSalida(model: any) {
+
+  return this._httpClient.post<OrdenTransporte[]>(this.baseUrl + 'darSalidaVehiculo?', model , httpOptions);
+}
+
 getAllOrdersForDespacho(numhojaruta: string) {
   return this._httpClient.get<OrdenTransporte[]>(this.baseUrl + 'getAllOrdersForDespacho?numhojaruta='  + numhojaruta, httpOptions);
 }
@@ -77,5 +91,16 @@ confirmarEstibaxOTs (ots: any[]) {
   return this._httpClient.post<OrdenTransporte>(this.baseUrl + 'confirmarEstibaxOTs' , ots ,httpOptions);
 }
 
+desvincularOt (idordentrabajo: number) {
+  let  model: any  = {};
+  model.idordentrabajo = idordentrabajo ;
+  return this._httpClient.post<OrdenTransporte[]>(this.baseUrlDespacho + 'desvincularOt' , model ,httpOptions);
+}
+generarGrt (numhojaruta: string, grt: string) {
+  let  model: any  = {};
+  model.numhojaruta = numhojaruta ;
+  model.grt = grt ;
+  return this._httpClient.post<OrdenTransporte[]>(this.baseUrlDespacho + 'generarGrt' , model ,httpOptions);
+}
 
 }

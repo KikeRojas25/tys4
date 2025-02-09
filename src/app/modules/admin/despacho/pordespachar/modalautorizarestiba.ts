@@ -2,13 +2,13 @@ import {Component, OnInit} from '@angular/core';
 import { FormsModule, NgForm } from '@angular/forms';
 import { ConfirmationService, MessageService } from 'primeng/api';
 import { DynamicDialogRef, DynamicDialogConfig, DialogService } from 'primeng/dynamicdialog';
-import { OrdenTransporte } from '../../trafico/trafico.types';
 import { AuthService } from 'app/core/auth/auth.service';
 import { DespachoService } from '../despacho.service';
 import { CommonModule } from '@angular/common';
 import { ToastModule } from 'primeng/toast';
 import { InputTextModule } from 'primeng/inputtext';
 import { ButtonModule } from 'primeng/button';
+import { OrdenTransporte } from '../../recepcion/ordentransporte/ordentransporte.types';
 
 
 @Component({
@@ -39,7 +39,7 @@ import { ButtonModule } from 'primeng/button';
                <div class="col-6 login-forgot-password"><a href="pages-forgot-password.html">¿Olvidaste tu contraseña?</a></div>
             </div> -->
             <div class="form-group login-submit">
-              <button [disabled]="!loginForm.valid" class="btn btn-primary btn-xl" type="submit">Autorizar</button>
+              <p-button [disabled]="!loginForm.valid" severity="danger"  type="submit">Autorizar</p-button>
             </div>
 
 

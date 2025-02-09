@@ -16,8 +16,9 @@ import { OverlayPanelModule } from 'primeng/overlaypanel';
 import { TableModule } from 'primeng/table';
 import { TimelineModule } from 'primeng/timeline';
 import { ToastModule } from 'primeng/toast';
-import { OrdenTransporte, User } from '../../trafico.types';
+import {  User } from '../../trafico.types';
 import { ConfirmDialogModule } from 'primeng/confirmdialog';
+import { OrdenTransporte } from 'app/modules/admin/recepcion/ordentransporte/ordentransporte.types';
 
 
 interface EventItem {

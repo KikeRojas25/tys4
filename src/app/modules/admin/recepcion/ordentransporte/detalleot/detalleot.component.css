@@ -1,0 +1,5 @@
+/* Clases opcionales si Tailwind no cubre tus necesidades */
+.bg-custom {
+    background: linear-gradient(to right, #4facfe, #00f2fe);
+  }
+  

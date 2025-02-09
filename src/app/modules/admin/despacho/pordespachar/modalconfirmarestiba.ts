@@ -1,14 +1,16 @@
 import {Component, OnInit} from '@angular/core';
 import { MessageService } from 'primeng/api';
 import { DynamicDialogRef, DynamicDialogConfig } from 'primeng/dynamicdialog';
-import { OrdenTransporte } from '../../trafico/trafico.types';
+
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { CheckboxModule } from 'primeng/checkbox';
 import { TableModule } from 'primeng/table';
-import { ButtonModule } from '@progress/kendo-angular-buttons';
 import { OrdenTransporteService } from '../../recepcion/ordentransporte/ordentransporte.service';
 import { ToastModule } from 'primeng/toast';
+import { OrdenTransporte } from '../../recepcion/ordentransporte/ordentransporte.types';
+import { InputTextModule } from 'primeng/inputtext';
+import { ButtonModule } from 'primeng/button';
 
 
 
@@ -17,9 +19,9 @@ import { ToastModule } from 'primeng/toast';
 
 <div class=" mb-3 col-md-12">
   <div class=" row col-md-12 mb-2">
-            <div  *ngIf="!manifiestos" class="col-md-2">
-                   <button type='button' pButton  class="p-button-rounded p-button-text btn-primary"  title='Confirmar' icon='fa fa-check' label="Confirmar"  (click)='confirmar();' > </button>
-            </div>
+            <div  *ngIf="!manifiestos" class="col-md-2"> 
+                   <p-button  severity="success"   icon='pi pi-check' label="Confirmar"  (click)='confirmar();' > </p-button>
+             </div>
 
   </div>
               <p-table  [columns]="cols"
@@ -41,7 +43,7 @@ import { ToastModule } from 'primeng/toast';
                           <tr>
                           <th style="text-align:center;width: 4rem">
                             <p-tableHeaderCheckbox></p-tableHeaderCheckbox>
-                        </th>
+                          </th>
 
                             <th  [ngStyle]="{'width': col.width}" *ngFor="let col of columns" pResizableColumn [pSortableColumn]="col.field">
                                 {{col.header}}
@@ -49,11 +51,9 @@ import { ToastModule } from 'primeng/toast';
                             </th>
                           </tr>
                           <tr>
-                            <th>
-
-                            </th>
-                             <th>
-                                <input pInputText type="text" style="width:'60px'" (input)="dt.filter($event.target.value, 'nummanifiesto', 'contains')" placeholder="Manifiesto" class="p-column-filter">
+                      
+                             <th colspan="3">
+                                <input pInputText type="text" style="width:'60px'" (input)="dt.filter($event.target.value, 'numcp', 'contains')" placeholder="Número de OT" class="p-column-filter">
                             </th>
                           </tr>
                       </ng-template>
@@ -91,7 +91,6 @@ import { ToastModule } from 'primeng/toast';
 
 </div>
 
-<p-toast></p-toast>
 
 
 
@@ -104,7 +103,9 @@ import { ToastModule } from 'primeng/toast';
       CheckboxModule,
       TableModule,
       ButtonModule,
-      ToastModule
+      ToastModule,
+      InputTextModule
+
     ]
 })
 export class ConfirmarEstibaModalComponent  implements OnInit {
@@ -116,7 +117,7 @@ export class ConfirmarEstibaModalComponent  implements OnInit {
     numhojaruta : string ;
     cols: any[];
     selectedOTs: OrdenTransporte[] = [];
-    manifiestos: boolean;
+    manifiestos: boolean = false;
 
 
     constructor(private ordenService: OrdenTransporteService
@@ -145,11 +146,15 @@ export class ConfirmarEstibaModalComponent  implements OnInit {
       ];
 
       this.ordenService.getAllOrdersForDespacho(this.numhojaruta).subscribe(list =>  {
+
               this.ordenes2 = list;
               if(this.ordenes2.length === 0)
               {
                 this.manifiestos = true;
               }
+
+              
+        console.log('xD', this.manifiestos);
         });
     }
 

@@ -433,11 +433,11 @@
                         <th>Cantidad</th>
                     </tr>
                 </ng-template>
-                <ng-template pTemplate="body" let-product>
+                <ng-template pTemplate="body" let-product let-rowIndex="rowIndex">
                     <tr>
                        
                         <td> 
-                         <p-button icon="fa fa-trash" > </p-button>  
+                          <p-button icon="fa fa-trash" (click)="eliminaretiqueta(rowIndex)"></p-button>
                         </td>
                         <td>{{ product.tipo }}</td>
                         <td>{{ product.cantidad }}</td>

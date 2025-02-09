@@ -5,7 +5,7 @@ import { MatIcon } from '@angular/material/icon';
 import { ActivatedRoute, RouterModule } from '@angular/router';
 import { TraficoService } from '../trafico.service';
 import { TabViewModule } from 'primeng/tabview';
-import { Manifiesto, OrdenTransporte, User } from '../trafico.types';
+import { Manifiesto, User } from '../trafico.types';
 import { TableModule } from 'primeng/table';
 import { ButtonModule } from 'primeng/button';
 import { DialogModule } from 'primeng/dialog';
@@ -14,6 +14,7 @@ import { DialogService, DynamicDialogRef } from 'primeng/dynamicdialog';
 import { MessageService } from 'primeng/api';
 import { ToastModule } from 'primeng/toast';
 import { EntregarOtModalComponent } from './modalentregarOT';
+import { OrdenTransporte } from '../../recepcion/ordentransporte/ordentransporte.types';
 
 @Component({
   selector: 'app-vistarepartidor',

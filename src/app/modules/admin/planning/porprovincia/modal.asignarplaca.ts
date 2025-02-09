@@ -4,7 +4,6 @@ import { User } from 'app/core/user/user.types';
 import { ConfirmationService, MessageService, SelectItem } from 'primeng/api';
 import { DropdownModule } from 'primeng/dropdown';
 import { DynamicDialogConfig, DynamicDialogRef } from 'primeng/dynamicdialog';
-import { OrdenTransporte } from '../../trafico/trafico.types';
 import { OrdenTransporteService } from '../../recepcion/ordentransporte/ordentransporte.service';
 import { CalendarModule } from 'primeng/calendar';
 import { TraficoService } from '../../trafico/trafico.service';

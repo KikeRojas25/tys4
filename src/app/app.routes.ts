@@ -149,6 +149,16 @@ export const appRoutes: Route[] = [
                     path: 'confirmarentregas',
                     loadComponent: () => import('./modules/admin/trafico/confirmarentrega/confirmarentrega.component')
                                           .then(m => m.ConfirmarentregaComponent)
+                  },
+                  {
+                    path: 'listadoparaclientes',
+                    loadComponent: () => import('./modules/admin/recepcion/ordentransporte/seguimientoclientes/seguimientoclientes.component')
+                                          .then(m => m.SeguimientoclientesComponent)
+                  },
+                  {
+                    path: 'detalleot/:uid',
+                    loadComponent: () => import('./modules/admin/recepcion/ordentransporte/detalleot/detalleot.component')
+                                          .then(m => m.DetalleotComponent)
                   }
                  
                 ]
@@ -191,6 +201,21 @@ export const appRoutes: Route[] = [
                     loadComponent: () => import('./modules/admin/planning/porprovincia/porprovincia.component')
                                           .then(m => m.PorprovinciaComponent)
                   },
+                  {
+                    path: 'generarrutaslocal',
+                    loadComponent: () => import('./modules/admin/planning/planninglocal/planninglocal.component')
+                                          .then(m => m.PlanninglocalComponent)
+                  },
+                  {
+                    path: 'generarrutaslocaldetalle/:uid',
+                    loadComponent: () => import('./modules/admin/planning/planning-local-detalle/planning-local-detalle.component')
+                                          .then(m => m.PlanningLocalDetalleComponent)
+                  },
+
+
+                  
+
+                  
                  
                 ]
               },

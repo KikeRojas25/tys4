@@ -20,6 +20,7 @@ import { DialogModule } from 'primeng/dialog';
 import { TimelineModule } from 'primeng/timeline';
 import { ToastModule } from 'primeng/toast';
 import { ConfirmDialogModule } from 'primeng/confirmdialog';
+import { InputMaskModule } from 'primeng/inputmask';
 
 interface EventItem {
   status?: string;
@@ -52,7 +53,8 @@ interface EventItem {
     DialogModule ,
     TimelineModule,
     ToastModule,
-    ConfirmDialogModule
+    ConfirmDialogModule,
+    InputMaskModule
     
   ],
   providers: [
@@ -69,10 +71,9 @@ export class SeguimientootComponent implements OnInit {
   events: EventItem[];
 
   dialoglifecycle = false;
+  dialogConfirm = false;
 
-
-
-  ordenes: OrdenTransporte[] = [];
+    ordenes: OrdenTransporte[] = [];
   selected: OrdenTransporte[];
   loading: any;
   model: any = {};
@@ -87,7 +88,14 @@ export class SeguimientootComponent implements OnInit {
   dateFin: Date = new Date(Date.now()) ;
   imageToShow: any;
   items: MenuItem[];
+  estrafico= false;
   
+  estadosMap = {
+    0: [0],
+    1: [6], // "Por despachar" se mapea a "Pend. Programacion"
+    2: [11, 13], // "Por entregar" se mapea a "En Ruta", "En Reparto" y "Entregado"
+    3: [34,35], // "TODOS LOS ESTADOS" incluye todos
+};
 
 
   constructor(private ordenTransporteService: OrdenTransporteService,
@@ -99,7 +107,13 @@ export class SeguimientootComponent implements OnInit {
 
   ngOnInit() {
 
+
+  
+  
+
     this.user = JSON.parse(localStorage.getItem('user'));
+
+    console.log('xD', this.user);
 
         this.items = [
           {label: 'Update', icon: 'pi pi-refresh', command: () => {
@@ -114,6 +128,11 @@ export class SeguimientootComponent implements OnInit {
       ];
 
     this.model.idusuario = this.user.usr_int_id;
+    this.estrafico = this.user.estrafico;
+
+     console.log('user',this.user);
+
+
     this.dateInicio.setDate((new Date()).getDate() - 7);
     this.dateFin.setDate((new Date()).getDate() );
     this.model.numcp = '';
@@ -121,15 +140,17 @@ export class SeguimientootComponent implements OnInit {
     this.model.grr = '';
     this.model.nummanifiesto = '';
     this.model.numhojaruta = '';
+    this.model.referencia = '';
 
 
 
     this.cols =
     [
-        {header: 'ACC', field: 'numcp'  ,  width: '160px' },
+        {header: 'ACC', field: 'numcp'  ,  width: '200px' },
         {header: 'OT', field: 'numcp'  ,  width: '100px' },
         {header: 'F. RECOJO', field: 'fecharegistro' , width: '120px'  },
         {header: 'F. DESPACHO', field: 'fecharegistro' , width: '120px'  },
+        {header: 'F. ENTREGA', field: 'fecharegistro' , width: '120px'  },
         {header: 'CLIENTE', field: 'razonsocial'  ,  width: '180px'  },
         {header: 'DESTINATARIO', field: 'razonsocial'  ,  width: '180px'  },
         // {header: 'MANIFIESTO TRONCAL', field: 'razonsocial'  ,  width: '280px'  },
@@ -184,13 +205,12 @@ export class SeguimientootComponent implements OnInit {
       }, () => {
         this.buscar();
       });
-
     this.estados.push({ value: 0,  label : 'TODOS LOS ESTADOS'});
-    this.estados.push({ value: 6,  label : 'Pend. Programacion'});
-    this.estados.push({ value: 11,  label : 'En Ruta'});
-    this.estados.push({ value: 13,  label : 'En Reparto'});
-    this.estados.push({ value: 34,  label : 'Pendiente de Cargo'});
-    this.estados.push({ value: 35,  label : 'Pendiente Envio Cargo'});
+    this.estados.push({ value: 1, label: 'Por despachar' });
+    this.estados.push({ value: 2, label: 'Por entregar' });
+    this.estados.push({ value: 3, label: 'Entregado' });
+
+
 
     this.model.idestado = 0;
 
@@ -218,7 +238,10 @@ export class SeguimientootComponent implements OnInit {
   editar(id) {
     this.router.navigate(['/seguimientoot/editarot', id]);
   }
-
+editarConfirm(id) {
+  this.model.idordentrabajo = id;
+  this.dialogConfirm = true;
+}
   verguias(id) {
     this.router.navigate(['/seguimiento/verorden', id]);
   }
@@ -257,6 +280,11 @@ export class SeguimientootComponent implements OnInit {
       this.model.fecfin = this.dateFin;
       this.model.idusuario =  this.user.id;
       this.model.tipoorden = '';
+
+
+      this.model.idestado = this.getEstadosParaBusqueda(this.model.idestado);
+
+
       this.ordenTransporteService.getAllOrder(this.model).subscribe(list => {
 
         this.ordenes =  list;
@@ -285,6 +313,24 @@ export class SeguimientootComponent implements OnInit {
     //    }
     //  );
    }
+   eliminarFotos(id) {
+    this.confirmationService.confirm({
+      message: '¿Esta seguro que desea elminar las fotos de esta OT?',
+      accept: () => {
+        
+        this.model.idusuarioregistro = this.user.id;
+        this.model.idordentrabajo = id;
+  
+      //  this.ordenTransporteService.eliminar(this.model).subscribe(resp => {
+  
+          this.messageService.add({severity: 'success', summary: 'Orden Transporte ', detail: 'Se ha eliminado con éxito.'});
+  
+          this.buscar();
+  
+       // });
+      }
+  });
+   }
    createImageFromBlob(image: Blob) {
 
     const reader = new FileReader();
@@ -298,6 +344,11 @@ export class SeguimientootComponent implements OnInit {
        reader.readAsDataURL(image);
     }
  }
+ getEstadosParaBusqueda(valueSeleccionado: number): string {
+  const estadosArray = this.estadosMap[valueSeleccionado] || [valueSeleccionado];
+  return estadosArray.join(","); // Convierte el array a una cadena separada por comas
+}
+
  ver(id) {
 //   this.ref = this.dialogService.open(VerAsignacionComponent, {
 //     header: 'Ver detalle de asignación',
@@ -342,6 +393,11 @@ vermanifiesto(idmanifiesto) {
   var url = "http://104.36.166.65/webreports/manifiesto.aspx?idmanifiesto=" + String(idmanifiesto);
   window.open(url);
 }
+verhojaruta(iddespacho) {
+
+  var url = "http://104.36.166.65/webreports/hojaruta.aspx?iddespacho=" + String(iddespacho);
+  window.open(url);
+}
 vertracking(idordentransporte: number) {
 
 
@@ -360,12 +416,6 @@ vertracking(idordentransporte: number) {
       })
     })
 
-    // this.events = [
-    //         { status: 'descripcion', date: '15/10/2020 10:30', icon: 'pi pi-shopping-cart', color: '#9C27B0', image: 'game-controller.jpg' },
-    //         { status: 'Processing', date: '15/10/2020 14:00', icon: 'pi pi-cog', color: '#673AB7' },
-    //         { status: 'Shipped', date: '15/10/2020 16:15', icon: 'pi pi-shopping-cart', color: '#FF9800' },
-    //         { status: 'Delivered', date: '16/10/2020 10:00', icon: 'pi pi-check', color: '#607D8B' }
-    //     ];
 
 
 
@@ -390,4 +440,59 @@ getColor(status: string): string {
   }
 }
 
+saveConfirm(){
+
+  this.model.idestado = 3;
+  this.model.idusuarioentrega =  this.user.id;
+  this.model.idusuarioregistro =  this.user.id;
+  this.model.personaentrega =  "Sello";
+  this.model.dnientrega =  "12345678";
+  
+  this.ordenTransporteService.saveConfirm(this.model).subscribe(list => {
+
+     this.dialogConfirm =  false;
+      this.buscar();
+
+      this.messageService.add({severity: 'success', summary: 'Orden Transporte ', detail: 'Se ha actualizado la fecha de entrega con éxito.'});
+        
+
+
+
+
+  });
+
+
+}
+unConfirm(){
+
+  this.model.idestado = 3;
+  this.model.idusuarioentrega =  this.user.id;
+  this.model.idusuarioregistro =  this.user.id;
+  this.model.personaentrega =  "Sello";
+  this.model.dnientrega =  "12345678";
+
+
+  
+  this.confirmationService.confirm({
+    message: '¿Esta seguro que desea desconfirmar esta OT?',
+    accept: () => {
+      
+  
+ // this.ordenTransporteService.saveConfirm(this.model).subscribe(list => {
+
+     this.dialogConfirm =  false;
+      this.buscar();
+
+      this.messageService.add({severity: 'success', summary: 'Orden Transporte ', detail: 'Se ha desconfirmado la OT con éxito.'});
+        
+
+
+ // });
+
+}
+
+
+});
+
+}
 }

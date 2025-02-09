@@ -9,7 +9,7 @@ import { DialogService, DynamicDialogRef } from 'primeng/dynamicdialog';
 import { InputTextModule } from 'primeng/inputtext';
 import { TableModule } from 'primeng/table';
 import { OrdenTransporteService } from '../../recepcion/ordentransporte/ordentransporte.service';
-import { OrdenTransporte, Incidencia, Documento } from '../../trafico/trafico.types';
+
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { Carga } from '../planning.types';
@@ -22,6 +22,8 @@ import { ModalAsignaraCargaComponent } from './modalasignaracarga';
 import { MessagesModule } from 'primeng/messages';
 import { ToastModule } from 'primeng/toast';
 import { AsignartipooperacionComponent } from './asignartipooperacion/asignartipooperacion.component';
+import { Documento, OrdenTransporte } from '../../recepcion/ordentransporte/ordentransporte.types';
+import { Incidencia } from '../../trafico/trafico.types';
 
 @Component({
   selector: 'app-porprovincia',
@@ -49,7 +51,7 @@ import { AsignartipooperacionComponent } from './asignartipooperacion/asignartip
 export class PorprovinciaComponent implements OnInit {
 
  
-  ordenes2: OrdenTransporte[] = [];
+  ordenes2: any[] = [];
 
 
 
@@ -269,7 +271,7 @@ crearcarga( ) {
 
 
   this.ref = this.dialogService.open(ModalTipoUnidadComponent, {
-    data : { id : 1  },
+    data : { tipoperacioncarga : 1  },
     header: 'Tipo de unidad a asignar',
     width: '40%',
     contentStyle: { overflow: 'auto' },

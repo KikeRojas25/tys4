@@ -149,7 +149,7 @@ export class CrearotComponent implements OnInit {
 
    // Cargar los combos.
     this.cargarDropDows().then(() => {
-      this.realizarAsignaciones();
+     // this.realizarAsignaciones();
     });
 
 
@@ -267,18 +267,19 @@ export class CrearotComponent implements OnInit {
     
 
     if (this.form.valid) {
-      console.log(this.form.value);
+     
       // Implementa la lógica de registro aquí.
       this.model = { 
         ...this.form.value, // Asignar todos los valores del formulario al modelo
         responsablecomercialid: this.user.id,
         tipoorden: 1,
+        idestacionorigen: this.user.idestacionorigen,
         idusuarioregistro: this.user.id,
         etiquetas: [...this.etiquetas] // Agregar las etiquetas actualizadas al modelo  
     };
 
 
-
+    console.log('model',this.model);
 
  
     this.confirmationService.confirm({
@@ -304,6 +305,11 @@ export class CrearotComponent implements OnInit {
 
 
             var url =  `http://104.36.166.65/webreports/ot.aspx?idorden= ${resp.idordentrabajo}` ;
+            window.open(url);
+
+
+            
+            var url =  `http://104.36.166.65/webreports/etiquetas.aspx?idorden= ${resp.idordentrabajo}` ;
             window.open(url);
 
 
@@ -478,6 +484,11 @@ else {
     this.etiquetas.push({ idtipoetiqueta: this.model.idtipoetiqueta, tipo: this.model.etiqueta , cantidad: this.model.cantidadetiqueta  });
   }
 
-
+  eliminaretiqueta(index) {
+    // Confirma que el índice es válido antes de eliminar
+    if (index >= 0 && index < this.etiquetas.length) {
+      this.etiquetas.splice(index, 1);
+    }
+  }
 
 }

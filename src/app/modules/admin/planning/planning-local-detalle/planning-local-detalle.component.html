@@ -1,0 +1,88 @@
+<div class="w-full">
+  <div class="p-4 border border-primary rounded-lg shadow-lg">
+    <div class="p-2 font-bold text-lg border-b">Detalle de despachos</div>
+
+    <div class="p-4">
+      <div class="flex mb-4">
+        <button pButton iconPos="left" label="Volver" icon="pi pi-arrow-left" (click)="volver()" class="btn btn-primary"></button>
+        <p-button  iconPos="left" label="Vincular Tipo de Operación" icon="pi pi-save"  severity="danger" (click)="vinculartipooperacion()" ></p-button>
+      </div>
+
+      <div class="flex flex-col md:flex-row gap-4 p-4 border rounded-lg bg-gray-100">
+        <div class="text-lg font-semibold">Fecha de cita: <b>{{ ordenes11[0].fechahoracita | date : 'dd/MM/yyyy' }}</b></div>
+        <div class="text-lg font-semibold">Placa: <b>{{ ordenes11[0].numcarga2 }}</b></div>
+      </div>
+
+      <p-table #dt2 [columns]="cols2" dataKey="idordentrabajo"
+        class="w-full"
+        [rowsPerPageOptions]="[120,240,480,1200]" editMode="row"
+        [value]="ordenes11" selectionMode="multiple"
+        [(selection)]="selectedOTs" responsive="true"
+        [globalFilterFields]="['destino', 'numcp']"
+        [rows]="120" [resizableColumns]="true">
+
+        <ng-template pTemplate="caption">
+          <div class="flex justify-end">
+            <span class="p-input-icon-left">
+              <input pInputText type="text" (input)="dt2.filterGlobal($event.target.value, 'contains')" placeholder="Buscar..." class="input input-sm" />
+            </span>
+          </div>
+        </ng-template>
+
+        <ng-template pTemplate="header" let-columns>
+          <tr>
+            <th *ngFor="let col of columns" pResizableColumn [pSortableColumn]="col.field" class="text-left p-2 border-b">
+              {{ col.header }}
+            </th>
+          </tr>
+        </ng-template>
+
+        <ng-template pTemplate="body" let-rowData let-editing="editing">
+          <tr [pEditableRow]="rowData" [pSelectableRow]="rowData">
+            <td class="p-2 border">
+              <button *ngIf="!editing" pButton pRipple type="button" pInitEditableRow icon="pi pi-pencil" (click)="onRowEditInit(rowData)" class="p-button-rounded p-button-text"></button>
+              <button *ngIf="editing" pButton pRipple type="button" pSaveEditableRow icon="pi pi-check" (click)="onRowEditSave(rowData)" class="p-button-rounded p-button-text p-button-success"></button>
+              <button *ngIf="editing" pButton pRipple type="button" pCancelEditableRow icon="pi pi-times" (click)="onRowEditCancel(rowData)" class="p-button-rounded p-button-text p-button-danger"></button>
+              <button class="btn btn-secondary btn-sm" pButton icon="pi pi-trash" (click)="desasignarOT(rowData.idordentrabajo)"></button>
+            </td>
+            <td pEditableColumn>
+              <p-cellEditor>
+                <ng-template pTemplate="input">
+                  <input pInputText type="text" class="input input-sm" [(ngModel)]="rowData.horacita">
+                </ng-template>
+                <ng-template pTemplate="output">{{ rowData.horacita }}</ng-template>
+              </p-cellEditor>
+            </td>
+            <td pEditableColumn>
+              <p-cellEditor>
+                <ng-template pTemplate="input">
+                  <input pInputText type="text" class="input input-sm" [(ngModel)]="rowData.horacitafin">
+                </ng-template>
+                <ng-template pTemplate="output">{{ rowData.horacitafin }}</ng-template>
+              </p-cellEditor>
+            </td>
+            <td class="p-2 border">{{ rowData.razonsocial }}</td>
+            <td class="p-2 border">{{ rowData.sede }}</td>
+            <td class="p-2 border text-center">{{ rowData.tipooperacion }}</td>
+            <td class="p-2 border text-center">{{ rowData.distrito }}</td>
+            <td class="p-2 border text-center">{{ rowData.numcp }}</td>
+            <td class="p-2 border text-center">{{ (rowData.numcp.includes('OR') ? 'RECOJO' : 'ENTREGA') }}</td>
+            <td class="p-2 border text-center">{{ rowData.bulto }}</td>
+            <td class="p-2 border text-center">{{ rowData.peso | number:'1.0-2' }}</td>
+            <td class="p-2 border text-center">{{ rowData.secuencia }}</td>
+          </tr>
+        </ng-template>
+
+        <ng-template pTemplate="footer">
+          <tr>
+            <td colspan="8" class="text-right font-bold">Totales</td>
+            <td class="text-center">{{ bultosTotal | number:'1.0-2' }}</td>
+            <td class="text-center">{{ pesoTotal | number:'1.0-2' }}</td>
+          </tr>
+        </ng-template>
+      </p-table>
+    </div>
+  </div>
+</div>
+
+<p-confirmDialog header="Confirmación" icon="pi pi-exclamation-triangle"></p-confirmDialog>

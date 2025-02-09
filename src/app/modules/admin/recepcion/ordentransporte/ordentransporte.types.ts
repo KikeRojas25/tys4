@@ -11,19 +11,19 @@ export interface OrdenTransporte {
     idremitente?: number;
     iddestinatario?: number;
     idorigen?: number;
-    puntopartida: string;
-    iddestino: number;
-    puntollegada: string;
-    idchofer: number;
-    horarecojo: string;
-    guiarecojo: string;
-    pesovol: number;
-    idformula: number;
-    idtipotransporte: number;
-    idconceptocobro: number;
-    idtipomercaderia: number;
-    descripciongeneral: string;
-    guiasremitente: string;
+    puntopartida?: string;
+    iddestino?: number;
+    puntollegada?: string;
+    idchofer?: number;
+    horarecojo?: string;
+    guiarecojo?: string;
+    pesovol?: number;
+    idformula?: number;
+    idtipotransporte?: number;
+    idconceptocobro?: number;
+    idtipomercaderia?: number;
+    descripciongeneral?: string;
+    guiasremitente?: string;
 
     numcarga?: string;
     idcarga?: number;
@@ -61,7 +61,7 @@ export interface OrdenTransporte {
     personarecojo?: string;
     direccion?: string;
     telefonorecojo?: string;
-    numhojaruta?: string;
+    numHojaRuta?: string;
     ruta?: string;
 
     fecvisita1?: Date;
@@ -97,8 +97,8 @@ export interface OrdenTransporte {
     fechaentregareparto?: Date;
     fechahoracita?: Date;
     numcarga2?: string;
-    validado: false;
-    mensaje: string;
+    validado?: false;
+    mensaje?: string;
 
 
 }
@@ -182,4 +182,14 @@ export interface HojaRuta {
         cantidadValija: number;     // Cantidad de valijas (required)
         ruta?: string;               // Ruta (opcional)
         preManifiesto?: string;      // Pre-manifiesto (opcional)
+}
+
+export interface Documento {
+    id: number;
+    ruta: string;
+    nombre: string;
+    tipo_id: number;
+    tipo_documento: string;
+    numero_documento: string;
+    carga_id: number;
 }

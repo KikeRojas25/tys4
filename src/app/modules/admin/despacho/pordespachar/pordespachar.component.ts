@@ -6,7 +6,7 @@ import { ButtonModule } from 'primeng/button';
 import { CheckboxModule } from 'primeng/checkbox';
 import { InputTextModule } from 'primeng/inputtext';
 import { TableModule } from 'primeng/table';
-import { Manifiesto, OrdenTransporte, User } from '../../trafico/trafico.types';
+import { Manifiesto,  User } from '../../trafico/trafico.types';
 import { DialogService, DynamicDialogRef } from 'primeng/dynamicdialog';
 import { DespachoService } from '../despacho.service';
 import { Rol } from '../despacho.types';
@@ -15,6 +15,13 @@ import { ConfirmDialog, ConfirmDialogModule } from 'primeng/confirmdialog';
 import { MessagesModule } from 'primeng/messages';
 import { ToastModule } from 'primeng/toast';
 import { AutorizarEstibaModalComponent } from './modalautorizarestiba';
+import { OrdenTransporte } from '../../recepcion/ordentransporte/ordentransporte.types';
+import { ConfirmarEstibaModalComponent } from './modalconfirmarestiba';
+import { ArmadoValijaModalComponent } from './modalarmadovalija';
+import { PrecintosModalComponent } from './modalprecintos';
+import { AgregarOThrModalComponent } from './modalagregarothr';
+import { DesasignarModalComponent } from './modaldesasignar';
+import { GrtModalComponent } from './modalgrt';
 
 @Component({
   selector: 'app-pordespachar',
@@ -185,26 +192,27 @@ export class PordespacharComponent implements OnInit {
 
   agregar() {
 
-  //   this.ref = this.dialogService.open(AgregarOThrModalComponent, {
-  //     data : { },
-  //     header: 'Agregar OT a Manifiesto',
-  //     width: '50%',
-  //     contentStyle: {'height': '500px', overflow: 'auto'},
-  //     baseZIndex: 10000
-  // });
-  // this.ref.onClose.subscribe(  x => {
+    this.ref = this.dialogService.open(AgregarOThrModalComponent, {
+      data : { },
+      header: 'Agregar OT a Manifiesto',
+      width: '70%',
+      height: '90%',
+      contentStyle: {'height': '500px', overflow: 'auto'},
+      baseZIndex: 10000
+  });
+  this.ref.onClose.subscribe(  x => {
 
-  //   this.ordenTransporteService.getAllPreManifiestos(this.model).subscribe(list =>  {
-  //     let count = 1;
-  //     this.loading = false;
+    this.ordenTransporteService.getAllPreManifiestos(this.model).subscribe(list =>  {
+      let count = 1;
+      this.loading = false;
 
-  //     list.forEach(item => {
-  //       item.idorden = count ++;
-  //     });
-  //     this.ordenes =  list;
-  //     this.estado = list[0].estado;
-  //   });
-  // });
+      list.forEach(item => {
+        item.idorden = count ++;
+      });
+      //this.ordenes =  list;
+      this.estado = list[0].estado;
+    });
+  });
 
 
 
@@ -219,15 +227,15 @@ export class PordespacharComponent implements OnInit {
   }
   armadoValija() {
 
-  //   var manifiestos = this.ordenes;
-  //   let hojaruta = this.model.numhojaruta;
-  //   this.ref = this.dialogService.open(ArmadoValijaModalComponent, {
-  //     data : { hojaruta, manifiestos },
-  //     header: 'Armado Valija',
-  //     width: '50%',
-  //     contentStyle: {'max-height': '500px', overflow: 'auto'},
-  //     baseZIndex: 10000
-  //  });
+    var manifiestos = this.ordenes2;
+    let hojaruta = this.model.numhojaruta;
+    this.ref = this.dialogService.open(ArmadoValijaModalComponent, {
+      data : { hojaruta, manifiestos },
+      header: 'Armado Valija',
+      width: '80%',
+      contentStyle: {'max-height': '500px', overflow: 'auto'},
+      baseZIndex: 10000
+   });
 
   }
 
@@ -238,6 +246,8 @@ export class PordespacharComponent implements OnInit {
     let hojaruta = this.model.numhojaruta;
 
     this.ordenTransporteService.getEstibaAutorizada(hojaruta).subscribe(resp => {
+
+      console.log(resp);
 
 
                 if(!resp){
@@ -257,13 +267,13 @@ export class PordespacharComponent implements OnInit {
                 }
 
 
-              //   this.ref = this.dialogService.open(ConfirmarEstibaModalComponent, {
-              //     data : { hojaruta, manifiestos },
-              //     header: 'Confirmar estiba',
-              //     width: '50%',
-              //     contentStyle: {'max-height': '500px', overflow: 'auto'},
-              //     baseZIndex: 10000
-              // });
+                this.ref = this.dialogService.open(ConfirmarEstibaModalComponent, {
+                  data : { hojaruta, manifiestos },
+                  header: 'Confirmar estiba',
+                  width: '80%',
+                  contentStyle: {'max-height': '500px', overflow: 'auto'},
+                  baseZIndex: 10000
+              });
 
 
 
@@ -282,31 +292,31 @@ export class PordespacharComponent implements OnInit {
 asignarPrecinto() {
   var todo = this.manifiestos;
 
-//   let hojaruta = this.model.numhojaruta;
-//   this.ref = this.dialogService.open(PrecintosModalComponent, {
-//     data : { hojaruta , todo},
-//     header: 'Asignar Precintos',
-//     width: '50%',
-//     contentStyle: {'max-height': '500px', overflow: 'auto'},
-//     baseZIndex: 10000
-//  });
+  let hojaruta = this.model.numhojaruta;
+  this.ref = this.dialogService.open(PrecintosModalComponent, {
+    data : { hojaruta , todo},
+    header: 'Asignar Precintos',
+    width: '50%',
+    contentStyle: {'max-height': '500px', overflow: 'auto'},
+    baseZIndex: 10000
+ });
 
-//  this.ref.onClose.subscribe(  x => {
+ this.ref.onClose.subscribe(  x => {
 
-//   var resp =  this.ordenTransporteService.confirmarSalida(this.model.numhojaruta).subscribe(resp => {
-//     this.ref.close();
-
-
-//       var url = "http://104.36.166.65/webreports/hojaruta.aspx?iddespacho=" + String(this.ordenes[0].iddespacho);
-//       window.open(url);
+  var resp =  this.ordenTransporteService.confirmarSalida(this.model.numhojaruta).subscribe(resp => {
+    this.ref.close();
 
 
-// });
+      var url = "http://104.36.166.65/webreports/hojaruta.aspx?iddespacho=" + String(this.ordenes2[0].iddespacho);
+      window.open(url);
 
-//});
+
+});
 
 
-//});
+
+
+});
 
 
 
@@ -315,13 +325,13 @@ desasignarOts() {
 
   let hojaruta = this.model.numhojaruta;
 
-//   this.ref = this.dialogService.open(DesasignarModalComponent, {
-//     data : { hojaruta },
-//     header: 'Desasignar OT',
-//     width: '50%',
-//     contentStyle: {'max-height': '500px', overflow: 'auto'},
-//     baseZIndex: 10000
-//  });
+  this.ref = this.dialogService.open(DesasignarModalComponent, {
+    data : { hojaruta },
+    header: 'Desasignar OT',
+    width: '90%',
+    contentStyle: {'max-height': '500px', overflow: 'auto'},
+    baseZIndex: 10000
+ });
 
 }
 darSalida() {
@@ -371,29 +381,23 @@ imprimirGrt() {
 
   let hojaruta = this.model.numhojaruta;
 
-//   this.ref = this.dialogService.open(GrtModalComponent, {
-//     data : { hojaruta },
-//     header: 'Generar GRTs',
-//     width: '50%',
-//     contentStyle: {'max-height': '500px', overflow: 'auto'},
-//     baseZIndex: 10000
-//  });
+  this.ref = this.dialogService.open(GrtModalComponent, {
+    data : { hojaruta },
+    header: 'Generar GRTs',
+    width: '50%',
+    contentStyle: {'max-height': '500px', overflow: 'auto'},
+    baseZIndex: 10000
+ });
 
-//  this.ref.onClose.subscribe(  x => {
+ this.ref.onClose.subscribe(  x => {
 
-//   var resp =  this.ordenTransporteService.confirmarSalida(this.model.numhojaruta).subscribe(resp => {
-//     this.ref.close();
-
-
-//       var url = "http://104.36.166.65/webreports/hojaruta.aspx?iddespacho=" + String(this.ordenes[0].iddespacho);
-//       window.open(url);
+  var resp =  this.ordenTransporteService.confirmarSalida(this.model.numhojaruta).subscribe(resp => {
+    this.ref.close();
 
 
-// });
+});
 
-//});
-
-
+});
 
 
 
@@ -497,7 +501,7 @@ guardar() {
         var url = "http://104.36.166.65/webreports/carga.aspx?idcarga=" + String(idcarga);
         window.open(url);
 
-        var url = "http://104.36.166.65/webreports/guiatransportista.aspx?idcarga=" + String(idcarga);
+        var url = "http://104.36.166.65/webreports/hojaruta.aspx?iddespacho=" + String(this.ordenes2[0].iddespacho);
         window.open(url);
 
 

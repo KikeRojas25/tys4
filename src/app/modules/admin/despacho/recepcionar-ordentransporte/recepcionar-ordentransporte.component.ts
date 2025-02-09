@@ -4,7 +4,7 @@ import { FormsModule } from '@angular/forms';
 import { ConfirmDialogModule } from 'primeng/confirmdialog';
 import { MessagesModule } from 'primeng/messages';
 import { ToastModule } from 'primeng/toast';
-import { Documento, Incidencia, OrdenTransporte, User } from '../../trafico/trafico.types';
+
 import { Router, ActivatedRoute } from '@angular/router';
 import { ConfirmationService, MessageService } from 'primeng/api';
 import { DialogService, DynamicDialogRef } from 'primeng/dynamicdialog';
@@ -15,6 +15,8 @@ import { TableModule } from 'primeng/table';
 import { MatIcon } from '@angular/material/icon';
 import { InputTextModule } from 'primeng/inputtext';
 import { RecepcioanrOTRModalComponent } from './recepcionarotrmodal';
+import { OrdenTransporte } from '../../recepcion/ordentransporte/ordentransporte.types';
+import { User } from '../../trafico/trafico.types';
 
 @Component({
   selector: 'app-recepcionar-ordentransporte',

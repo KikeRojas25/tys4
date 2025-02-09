@@ -87,7 +87,12 @@ export class GeneracionmanifiestoComponent implements OnInit {
   items: MenuItem[];
   
 
-
+  estadosMap = {
+    0: [0],
+    1: [6], // "Por despachar" se mapea a "Pend. Programacion"
+    2: [11, 13], // "Por entregar" se mapea a "En Ruta", "En Reparto" y "Entregado"
+    3: [34,35], // "TODOS LOS ESTADOS" incluye todos
+};
   constructor(private ordenTransporteService: OrdenTransporteService,
               public dialogService: DialogService,
               private router: Router,
@@ -120,7 +125,7 @@ export class GeneracionmanifiestoComponent implements OnInit {
     this.model.grr = '';
     this.model.nummanifiesto = '';
     this.model.numhojaruta = '';
-
+    this.model.referencia = '';
 
 
     this.cols =
@@ -184,12 +189,11 @@ export class GeneracionmanifiestoComponent implements OnInit {
         this.buscar();
       });
 
-    this.estados.push({ value: 0,  label : 'TODOS LOS ESTADOS'});
-    this.estados.push({ value: 6,  label : 'Pend. Programacion'});
-    this.estados.push({ value: 11,  label : 'En Ruta'});
-    this.estados.push({ value: 13,  label : 'En Reparto'});
-    this.estados.push({ value: 34,  label : 'Pendiente de Cargo'});
-    this.estados.push({ value: 35,  label : 'Pendiente Envio Cargo'});
+      this.estados.push({ value: 0,  label : 'TODOS LOS ESTADOS'});
+      this.estados.push({ value: 1,  label : 'Por Despachar'});
+     this.estados.push({ value: 2,  label : 'Por Entregar'});
+      this.estados.push({ value: 3,  label : 'Entregado'});
+     this.model.idestado = 0;
 
     this.model.idestado = 0;
 
@@ -257,11 +261,18 @@ export class GeneracionmanifiestoComponent implements OnInit {
       this.model.idusuario =  this.user.id;
       this.model.tipoorden = '';
 
+      
+      this.model.idestado = this.getEstadosParaBusqueda(this.model.idestado);
+
       this.ordenTransporteService.getAllOrder(this.model).subscribe(list => {
 
         this.ordenes =  list;
 
       });
+  }
+  getEstadosParaBusqueda(valueSeleccionado: number): string {
+    const estadosArray = this.estadosMap[valueSeleccionado] || [valueSeleccionado];
+    return estadosArray.join(","); // Convierte el array a una cadena separada por comas
   }
   // getFiles(id, event, overlaypanel: OverlayPanel) {
   //   this.ordenTransporteService.getAllDocumentos(id).subscribe(list => {

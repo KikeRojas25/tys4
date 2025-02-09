@@ -1,5 +1,5 @@
 import { Component } from '@angular/core';
-import { Documento, HojaRuta, Incidencia, Manifiesto, OrdenTransporte, User } from '../trafico.types';
+import { Documento, HojaRuta, Incidencia, Manifiesto, User } from '../trafico.types';
 import { ActivatedRoute, Router, RouterModule } from '@angular/router';
 import { ConfirmationService, MessageService } from 'primeng/api';
 import { TraficoService } from '../trafico.service';
@@ -15,6 +15,7 @@ import { DialogModule } from 'primeng/dialog';
 import { DialogService, DynamicDialogRef } from 'primeng/dynamicdialog';
 import { CambiarEstadoModalComponent } from './modalcambiarestado';
 import { ToastModule } from 'primeng/toast';
+import { OrdenTransporte } from '../../recepcion/ordentransporte/ordentransporte.types';
 
 @Component({
   selector: 'app-vistamanifiestos',
@@ -249,24 +250,6 @@ desasignarOT(idordentrabajo: number){
 
 crearcarga( ) {
 
-//   let ids  = '';
-//   this.selectedOTs.forEach(element => {
-//     ids = ids + ',' + element.iddepartamento;
-
-//   });
-
-
-//   this.ref = this.dialogService.open(ModalTipoUnidadComponent, {
-//     data : { ids  },
-//     header: 'Tipo de unidad a asignar',
-//     width: '40%',
-//     contentStyle: { overflow: 'auto' },
-//     baseZIndex: 10000,
-
-// });
-//   this.ref.onClose.subscribe(() => {
-//     this.reloadDetalles();
-//   });
 
 
 }

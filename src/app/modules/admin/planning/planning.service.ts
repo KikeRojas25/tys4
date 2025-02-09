@@ -3,9 +3,9 @@ import { inject, Injectable } from '@angular/core';
 import { JwtHelperService } from '@auth0/angular-jwt';
 import { UserService } from 'app/core/user/user.service';
 import { environment } from 'environments/environment';
-import { OrdenTransporte } from '../trafico/trafico.types';
 import { Observable } from 'rxjs';
 import { Estaciones, RespuestaApi } from './planning.types';
+import { OrdenTransporte } from '../recepcion/ordentransporte/ordentransporte.types';
 
 
 const httpOptions = {
@@ -86,6 +86,11 @@ GetAllOrdersGroupDepartament(model: any){
   asignarTipoOperacion(model: any) {
     console.log('enviando:', model);
     return this._httpClient.post<RespuestaApi>(this.baseUrl + 'AsignarTipoOperacion?', model , httpOptions);
+  }
+
+  asignarTipoOperacionLocal(model: any) {
+    console.log('enviando:', model);
+    return this._httpClient.post<RespuestaApi>(this.baseUrl + 'asignarTipoOperacionLocal?', model , httpOptions);
   }
 
   AsignarProvinciaCarga(idprovincia: string, idcarga: number, idestacionorigen: number) {

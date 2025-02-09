@@ -31,26 +31,28 @@ export interface Manifiesto {
 
 
 }
-export interface OrdenTransporte {
+// export interface OrdenTransporte {
 
-  idordentrabajo?: number;
-  idordenrecojo?: number;
-  numcp?: string;
-  tipoorden?:string;
-  iddepartamento?: number;
-  cantidad?:number;
-  bulto?: number;
-  peso?: number;
-  subtotal?: number;
-  idcarga?: number;
-  cantidadprecintos?: number;
-  precinto?: string;
-  idtipoentrega?: number;
-  idusuarioentrega?: number;
-  tipoentrega?: string;
-  terminado?: boolean;
+//   idordentrabajo?: number;
+//   idordenrecojo?: number;
+//   numcp?: string;
+//   tipoorden?:string;
+//   iddepartamento?: number;
+//   cantidad?:number;
+//   bulto?: number;
+//   peso?: number;
+//   subtotal?: number;
+//   idcarga?: number;
+//   cantidadprecintos?: number;
+//   precinto?: string;
+//   idtipoentrega?: number;
+//   idusuarioentrega?: number;
+//   tipoentrega?: string;
+//   terminado?: boolean;
+//   fechacita?: Date;
+//   fechahoracita?: string;
 
-}
+// }
 export interface Proveedor {
   idProveedor: number;
   ruc: string;

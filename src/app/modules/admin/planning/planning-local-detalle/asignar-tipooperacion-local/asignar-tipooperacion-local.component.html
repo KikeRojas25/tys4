@@ -1,0 +1,148 @@
+<div class="modal-content card-body grid grid-cols-2 lg:grid-cols-2 gap-4">
+   
+
+  <div class="field flex flex-col">
+              <label>Tipo de Operación :</label>
+              <p-dropdown name="idtipooperacion"
+                [options]="tiposunidad" [(ngModel)]="model.idtipooperacion"
+                appendTo="body"
+                [style]="{'width':'100%'}" [resetFilterOnHide]="false"
+                  placeholder="seleccione un tipo de operacion"
+                [hideTransitionOptions]="'0ms'"
+                [showTransitionOptions]="'0ms'"
+                filter="false">
+                    <ng-template let-item pTemplate="selectedItem">
+                        <span style="vertical-align:left;">{{item.label}}</span>
+                    </ng-template>
+              </p-dropdown>
+  </div>
+  <div class="field flex flex-col" *ngIf="model.idtipooperacion === 18139">
+          <label>Destino :</label>
+
+                  <p-dropdown name="destino"
+                  [options]="ubigeoDestino"  [(ngModel)]="model.iddestino"
+                  scrollHeight="20vh"  
+                  appendTo="body"
+                  [virtualScroll]="true" itemSize="70"
+                  [style]="{'width':'100%'}"
+                  [resetFilterOnHide]="false"
+                  [hideTransitionOptions]="'0ms'"
+                  (onChange)="cargarProveedores()"
+
+                  [showTransitionOptions]="'0ms'" required
+                  [filter]="true">
+                  <ng-template let-item pTemplate="selectedItem">
+                    <span style="vertical-align:left;">{{item.label}}</span>
+                  </ng-template>
+                  </p-dropdown>
+
+           </div>
+           
+
+
+        <div class="field flex flex-col" *ngIf="model.idtipooperacion === 123">
+              <label>Agencia :</label>
+
+              <p-dropdown name="agencias"
+                [options]="agencias" [(ngModel)]="model.idagencia"
+                scrollHeight="20vh" 
+                appendTo="body"
+                [baseZIndex]="100000"
+                [virtualScroll]="true" itemSize="4"
+                [style]="{'width':'100%'}" [resetFilterOnHide]="false"
+                [hideTransitionOptions]="'0ms'"
+                [showTransitionOptions]="'0ms'"
+                placeholder="seleccione una agencia"
+                filter="false">
+                    <ng-template let-item pTemplate="selectedItem">
+                        <span style="vertical-align:left;">{{item.label}}</span>
+                    </ng-template>
+              </p-dropdown>
+
+              </div>
+
+         <div class="field flex flex-col"  *ngIf="model.idtipooperacion === 124">
+
+
+                <label>Estación :</label>
+
+                <p-dropdown name="estaciones"
+                  [options]="estaciones" [(ngModel)]="model.idestacion"
+                  scrollHeight="20vh"  class="input-form-field"
+                  appendTo="body"
+                  [baseZIndex]="100000"
+                  [virtualScroll]="true" itemSize="4"
+                  [style]="{'width':'100%'}" [resetFilterOnHide]="false"
+                  [hideTransitionOptions]="'0ms'"
+                  [showTransitionOptions]="'0ms'"
+                  placeholder="seleccione una estación"
+                  filter="false">
+                      <ng-template let-item pTemplate="selectedItem">
+                          <span style="vertical-align:left;">{{item.label}}</span>
+                      </ng-template>
+                </p-dropdown>
+
+                </div>
+
+
+              <div class="field flex flex-col" *ngIf="model.idtipooperacion === 18139">
+
+
+                  <label>Repartidor :</label>
+
+                  <p-dropdown name="repartidores"     id="repartidores"
+                    [options]="proveedoresDestino" [(ngModel)]="model.idrepartidor"
+                    scrollHeight="20vh"  
+
+                    appendTo="body"
+                    [baseZIndex]="100000"
+                    
+                    (onChange)="compararDestinos()"
+                   
+                    [style]="{'width':'100%'}" [resetFilterOnHide]="false"
+                    [hideTransitionOptions]="'0ms'"
+                    [showTransitionOptions]="'0ms'"
+                    placeholder="seleccione un repartidor"
+                    [filter]="true">
+                        <ng-template let-item pTemplate="selectedItem">
+                            <span style="vertical-align:left;">{{item.label}}</span>
+                        </ng-template>
+                  </p-dropdown>
+
+                  </div>
+
+                  <div class="field flex flex-col" *ngIf="model.idtipooperacion === 18139">
+                    <label>Dirección :</label>
+        
+                    <p-dropdown name="destino"
+                    [options]="direcciones"  [(ngModel)]="model.iddireccion"
+                    scrollHeight="30vh"  class="input-form-field"
+                    [virtualScroll]="true" itemSize="70"
+                    [style]="{'width':'100%'}"
+                    [resetFilterOnHide]="false"
+                    [hideTransitionOptions]="'0ms'"
+                   
+                    appendTo="body"
+                    [showTransitionOptions]="'0ms'" required
+                    [filter]="true">
+                    <ng-template let-item pTemplate="selectedItem">
+                      <span style="vertical-align:left;">{{item.label}}</span>
+                    </ng-template>
+                    </p-dropdown>
+        
+                </div>
+
+
+
+</div>
+
+        
+
+
+
+<div class="modal-footer  mt-4 flex justify-end gap-4">
+        <p-button   icon="pi pi-external-link" label="Nested Dialog" [outlined]="true"  iconPos="left" label="Guardar" icon="fa fa-save"   (click)="guardar()"  type="button"></p-button>
+        <p-button     label="Cancelar"   (click)="cancelar()"  type="button"></p-button>
+</div>
+
+<p-toast />

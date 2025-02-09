@@ -5,7 +5,7 @@ import { ButtonModule } from 'primeng/button';
 import { OverlayPanelModule } from 'primeng/overlaypanel';
 import { RippleModule } from 'primeng/ripple'; 
 import { MessageService, SelectItem } from 'primeng/api';
-import { OrdenTransporte, User } from '../../trafico/trafico.types';
+import {  User } from '../../trafico/trafico.types';
 import { DialogService, DynamicDialogRef } from 'primeng/dynamicdialog';
 import { PlanningService } from '../planning.service';
 import { Router } from '@angular/router';
@@ -15,6 +15,7 @@ import { MatIcon } from '@angular/material/icon';
 import { PanelModule } from 'primeng/panel';
 import { VerDetalleOrdenxDepartamentoModalComponent } from './ordendetallexdepartamento';
 import { TraficoService } from '../../trafico/trafico.service';
+import { OrdenTransporte } from '../../recepcion/ordentransporte/ordentransporte.types';
 
 @Component({
   selector: 'app-pordepartamento',

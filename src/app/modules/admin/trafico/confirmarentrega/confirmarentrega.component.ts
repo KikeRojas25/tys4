@@ -3,7 +3,6 @@ import { Router } from '@angular/router';
 import { SelectItem, MenuItem, ConfirmationService, MessageService } from 'primeng/api';
 import { DynamicDialogRef, DialogService } from 'primeng/dynamicdialog';
 import { OrdenTransporteService } from '../../recepcion/ordentransporte/ordentransporte.service';
-import { OrdenTransporte, User } from '../trafico.types';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { MatIcon } from '@angular/material/icon';
@@ -20,6 +19,10 @@ import { TimelineModule } from 'primeng/timeline';
 import { ToastModule } from 'primeng/toast';
 import { InputMaskModule } from 'primeng/inputmask';
 import moment from 'moment';
+import { UploadModalComponent } from '../../recepcion/ordentransporte/seguimientoot/modal.upload';
+import { FileModalComponent } from '../../recepcion/ordentransporte/seguimientoot/modalfiles';
+import { OrdenTransporte } from '../../recepcion/ordentransporte/ordentransporte.types';
+import { User } from '../trafico.types';
 
 @Component({
   selector: 'app-confirmarentrega',
@@ -57,6 +60,14 @@ export class ConfirmarentregaComponent implements OnInit {
   clonedOrders: { [s: string]: OrdenTransporte; } = {};
 
   dialoglifecycle = false;
+
+
+  estadosMap = {
+    0: [0],
+    1: [6], // "Por despachar" se mapea a "Pend. Programacion"
+    2: [11, 13], // "Por entregar" se mapea a "En Ruta", "En Reparto" y "Entregado"
+    3: [34,35], // "TODOS LOS ESTADOS" incluye todos
+};
 
 
 
@@ -117,7 +128,7 @@ export class ConfirmarentregaComponent implements OnInit {
     this.model.grr = '';
     this.model.nummanifiesto = '';
     this.model.numhojaruta = '';
-
+    this.model.referencia = '';
 
 
     this.cols =
@@ -177,13 +188,11 @@ export class ConfirmarentregaComponent implements OnInit {
         this.buscar();
       });
 
-    this.estados.push({ value: 0,  label : 'TODOS LOS ESTADOS'});
-    this.estados.push({ value: 6,  label : 'Pend. Programacion'});
-    this.estados.push({ value: 11,  label : 'En Ruta'});
-    this.estados.push({ value: 13,  label : 'En Reparto'});
-    this.estados.push({ value: 34,  label : 'Pendiente de Cargo'});
-    this.estados.push({ value: 35,  label : 'Pendiente Envio Cargo'});
-
+      this.estados.push({ value: 0,  label : 'TODOS LOS ESTADOS'});
+      this.estados.push({ value: 1, label: 'Por despachar' });
+      this.estados.push({ value: 2, label: 'Por entregar' });
+      this.estados.push({ value: 3, label: 'Entregado' });
+  
     this.model.idestado = 0;
 
 
@@ -222,7 +231,12 @@ export class ConfirmarentregaComponent implements OnInit {
      });
     this.router.navigate(['/seguimiento/asignarequipotransporte', resumen]);
   }
-
+  getEstadosParaBusqueda(valueSeleccionado: number): string {
+    const estadosArray = this.estadosMap[valueSeleccionado] || [valueSeleccionado];
+    return estadosArray.join(","); // Convierte el array a una cadena separada por comas
+  }
+  
+  
 
 
   buscar() {
@@ -231,6 +245,10 @@ export class ConfirmarentregaComponent implements OnInit {
       this.model.fecfin = this.dateFin;
       this.model.idusuario = this.user.id;
       this.model.tipoorden = '';
+
+      
+      this.model.idestado = this.getEstadosParaBusqueda(this.model.idestado);
+      
       this.ordenTransporteService.getAllOrder(this.model).subscribe(list => {
 
         this.ordenes =  list;
@@ -426,20 +444,28 @@ exportExcel() {
 //     data : {id }
 // });
 // }
-// cargarfiles(id) {
+cargarfiles(id) {
 
-//      const ref = this.dialogService.open(UploadModalComponent, {
-//     header: 'Cargar Fotos',
-//     width: '70%',
-//     data : {id }
-//    });
-//     ref.onClose.subscribe(() => {
+     const ref = this.dialogService.open(UploadModalComponent, {
+    header: 'Cargar Fotos',
+    width: '70%',
+    data : {id }
+   });
+    ref.onClose.subscribe(() => {
 
 
 
-// });
+});
 
-// }
+}
+verarchivos(id) {
+
+  const ref = this.dialogService.open(FileModalComponent, {
+    header: 'Visor Fotos',
+    width: '30%',
+    data : {id }
+});
+}
 verdetalles(id) {
    this.router.navigate(['/seguimiento/verorden', id]);
 }

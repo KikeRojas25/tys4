@@ -4,7 +4,7 @@ import { JwtHelperService } from '@auth0/angular-jwt';
 import { UserService } from 'app/core/user/user.service';
 import { environment } from 'environments/environment';
 import { catchError, map, Observable, throwError } from 'rxjs';
-import { Chofer, Cliente, Concepto, Formula, HojaRuta, OperacionCarga, OrdenTransporte, Ubigeo, ValorTabla, Vehiculo } from './ordentransporte.types';
+import { Chofer, Cliente, Concepto, Documento, Formula, HojaRuta, OperacionCarga, OrdenTransporte, Ubigeo, ValorTabla, Vehiculo } from './ordentransporte.types';
 import { Manifiesto } from '../../trafico/trafico.types';
 
 
@@ -45,6 +45,7 @@ export class OrdenTransporteService {
   private baseMantenimientoUrl = environment.baseUrl + '/api/Mantenimiento/';
   private baseUrlCliente = environment.baseUrl + '/api/Cliente/';
   private baseUrlOrden = environment.baseUrl + '/api/Orden/';
+  private baseUrlPlanning = environment.baseUrl + '/api/Planning/';
 
 
 
@@ -84,7 +85,9 @@ getConceptos(idCliente: number ,idOrigen: number, idDestino: number, idFormula: 
   return this._httpClient.get<Concepto[]>(`${this.baseUrlOrden}ObtenerConceptosTarifa?idcliente=${idCliente}&idorigen=${idOrigen}&iddestino=${idDestino}&idtipotransporte=${idTipoTransporte}&idformula=${idFormula}`
      , httpOptions);
 }
-
+getAllPrecintosLibres() {
+  return this._httpClient.get<OrdenTransporte[]>(this.baseUrlOrden + 'getAllPrecintosLibres'  , httpOptions);
+}
 
 getAllOrder(model: any) {
 
@@ -92,7 +95,7 @@ getAllOrder(model: any) {
     model.idcliente = '';
   }
 
-  if (model.idestado  === 0) {
+  if (model.idestado  === '0') {
     model.idestado = '';
   }
 
@@ -102,6 +105,7 @@ getAllOrder(model: any) {
     .set('fecfin', model.fecfin.toLocaleDateString())       // Misma consideración para la fecha final
     .set('idestado', model.idestado.toString())
     .set('numcp', model.numcp.toString())
+    .set('referencia', model.referencia)
     .set('nummanifiesto', model.nummanifiesto.toString())
     .set('numhojaruta', model.numhojaruta.toString())
     .set('idusuario', model.idusuario.toString())
@@ -124,12 +128,32 @@ GetAllOrdersCargasTemporal (id: number){
   return this._httpClient.get<OrdenTransporte[]>(this.baseUrlOrden + 'GetAllOrdersCargasTemporal?idcarga=' + id   , httpOptions);
  }
 
+ DesAsignarProvinciaCarga(idordentrabajo: number) {
+  let  model: any  = {};
+  model.idordentrabajo = idordentrabajo;
+  return this._httpClient.post<OrdenTransporte[]>(this.baseUrl + 'DesAsignarProvinciaCarga?', model , httpOptions);
+}s
+actualizarOrden(model: any) {
+  return this._httpClient.post(this.baseUrl + 'UpdateOrden', model, httpOptions)
+  .pipe(map((response: any) => {
+
+  })
+  );
+}
 
  getHojasRuta(idestacion: number) : Observable<HojaRuta[]> {
   return this._httpClient.get<HojaRuta[]>(this.baseUrlOrden + 'getAllPreHojasRuta?idestacion=' + idestacion   , httpOptions);
  }
 
+ saveConfirm(model: any) {
 
+  return this._httpClient.post(this.baseUrl + 'saveConfirm', model, httpOptions)
+  .pipe(
+    map((response: any) => {
+    }
+  )
+);
+}
 
  confirmar_entrega(model: any) {
 
@@ -175,6 +199,14 @@ registrarOTR(model: any): Observable<OrdenTransporte> {
 actualizarOTR(model: any): Observable<OrdenTransporte> {
   return this._httpClient.post<OrdenTransporte>(`${this.baseUrl}updateOTR`, model, httpOptions);
 }
+GetAllOrdersDetailDistrito(idestacionorigen: number, model: any) {
+  return this._httpClient.get<OrdenTransporte[]>(this.baseUrlOrden + 'GetAllOrdersDetailDistrito?idestacionorigen=' + idestacionorigen + '&iddistrito=' + model.id
+ + '&fecini=' + model.fechainicio + '&fecfin=' + model.fechafin , httpOptions);
+}
+GetAllCargasTemporalTrafico (tipo: number) {
+  return this._httpClient.get<OperacionCarga[]>(this.baseUrlOrden + 'GetAllCargasTemporalTrafico?tipooperacioncarga=' + tipo   , httpOptions);
+}
+
 calcularPrecio(model: any): Observable<OrdenTransporte> {
   return this._httpClient.post<OrdenTransporte>(`${this.baseUrlOrden}calcularPrecio`, model, httpOptions);
 }
@@ -187,7 +219,7 @@ getOrden(idordentrabajo: any): Observable<any>  {
   return this._httpClient.get<any>(`${this.baseUrlOrden}GetOrden?id=${idordentrabajo}` , httpOptions);
 }
 confirmarDespacho(model: any) {
-  return this._httpClient.post(this.baseUrlOrden + 'ConfirmarDespacho', model, httpOptions);
+  return this._httpClient.post(this.baseUrlPlanning + 'ConfirmarDespacho', model, httpOptions);
 }
 
 uploadFile(file: File, UserId: number, ClienteId: number) : any {
@@ -222,6 +254,35 @@ confirmarEstibaxOTs (ots: any[]) {
   console.log(ots);
   return this._httpClient.post<OrdenTransporte>(this.baseUrlOrden + 'confirmarEstibaxOTs' , ots ,httpOptions);
 }
+getAllOrdersForDespachoAll(numhojaruta: string) {
+  return this._httpClient.get<OrdenTransporte[]>(this.baseUrlOrden + 'getAllOrdersForDespachoAll?numhojaruta='  + numhojaruta, httpOptions);
+}
+confirmarValijaxOTs (ots: any[]) {
+
+  return this._httpClient.post<OrdenTransporte>(this.baseUrl + 'confirmarValijaxOTs' , ots ,httpOptions);
+}
+uploadFileSite(formData: FormData, orden_id: number) {
+
+  console.log(orden_id);
+
+
+  return this._httpClient.post(this.baseUrlOrden + 'UploadPhoto?idOrden=' + orden_id
+  , formData
+  , httpOptionsUpload
+   );
+ }
+ getAllDocumentos(id: number): Observable<Documento[]> {
+  const params = '?Id=' + id ;
+  return this._httpClient.get<Documento[]>(this.baseUrlOrden + 'getAllDocumentos' + params, httpOptions);
+}
+
+AsignarOtsCarga(idprovincia: string, idcarga: number) {
+  let  model: any  = {};
+  model.idsots = idprovincia;
+  model.idcarga = idcarga;
+  return this._httpClient.post<OrdenTransporte[]>(this.baseUrlOrden + 'AsignarOtCarga?', model , httpOptions);
+}
+
 
 
 }

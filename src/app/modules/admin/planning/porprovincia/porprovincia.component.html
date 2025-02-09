@@ -91,26 +91,30 @@
             <b>Despachos generados</b>
           </div>
           <div class="card-body">
-            <p-table [columns]="cols3" [value]="despachos" dataKey="idcarga" selectionMode="single" 
-            [rowsPerPageOptions]="[20, 40, 60, 120]" [rows]="10" [paginator]="true" 
-            (onRowSelect)="ver($event)"  [responsive]="true" class="w-full">
+          
+          <p-table [columns]="cols3" [value]="despachos" dataKey="idcarga" selectionMode="single"
+              [rowsPerPageOptions]="[20, 40, 60, 120]" [rows]="10" [paginator]="true"
+              (onRowSelect)="ver($event)" responsiveLayout="scroll" class="w-full">
 
-              <ng-template pTemplate="colgroup" let-columns>
-                <colgroup>
-                  <col *ngFor="let col of columns" [ngStyle]="{'width': col.width}">
-                </colgroup>
-              </ng-template>
+          <!-- Colgroup -->
+          <ng-template pTemplate="colgroup" let-cols>
+              <colgroup>
+                  <col *ngFor="let col of cols" [ngStyle]="{'width': col.width}">
+              </colgroup>
+          </ng-template>
 
-              <ng-template pTemplate="header" let-columns>
-                <tr>
-                  <th *ngFor="let col of columns" pResizableColumn [pSortableColumn]="col.field" class="text-center">
-                    {{ col.header }}
+          <!-- Header -->
+          <ng-template pTemplate="header" let-cols>
+              <tr>
+                  <th *ngFor="let col of cols" pResizableColumn [pSortableColumn]="col.field" class="text-center">
+                      {{ col.header }}
                   </th>
-                </tr>
-              </ng-template>
+              </tr>
+          </ng-template>
 
-              <ng-template pTemplate="body" let-rowData>
-                <tr [pSelectableRow]="rowData">
+          <!-- Body -->
+          <ng-template pTemplate="body" let-rowData>
+              <tr [pSelectableRow]="rowData">
                   <td class="bg-green-600 text-white text-center">{{ rowData.numcarga }}</td>
                   <td class="text-center">{{ rowData.tipounidad }}</td>
                   <td class="text-center">{{ rowData.planificador }}</td>
@@ -119,13 +123,16 @@
                   <td class="text-center">{{ rowData.peso | number:'1.0-2' }}</td>
                   <td class="text-center">{{ rowData.vol | number:'1.0-2' }}</td>
                   <td class="text-center">S/. {{ rowData.subtotal | number:'1.0-2' }}</td>
-                  <td class="text-left">
-                    <button class="btn-danger btn-xs" pButton icon="pi pi-trash" title="Eliminar" (click)="eliminarDespacho(rowData.idcarga)"></button>
-                    <button class="btn-primary btn-xs" pButton icon="pi pi-check" title="Confirmar" (click)="generar(rowData.idcarga)"></button>
+                  <td class="text-left flex space-x-2">
+                      <button pButton class="p-button-danger p-button-rounded p-button-sm" icon="pi pi-trash"
+                              title="Eliminar" (click)="eliminarDespacho(rowData.idcarga)"></button>
+                      <button pButton class="p-button-success p-button-rounded p-button-sm" icon="pi pi-check"
+                              title="Confirmar" (click)="generar(rowData.idcarga)"></button>
                   </td>
-                </tr>
-              </ng-template>
-            </p-table>
+              </tr>
+          </ng-template>
+      </p-table>
+
           </div>
         </div>
       </div>
@@ -152,55 +159,64 @@
               <button class="btn-primary btn" pButton label="Quitar NO seleccionados" icon="pi pi-arrow-up"
                 iconPos="left" (click)="quitarNoSeleccionados()"></button>
             </div>
-
-            <p-table [columns]="cols2" [value]="ordenes11" dataKey="idordentrabajo" selectionMode="multiple" 
+            <p-table #dt2 [columns]="cols2" [value]="ordenes11" dataKey="idordentrabajo" selectionMode="multiple" 
             [(selection)]="selectedOTs"
-          
-              [rowsPerPageOptions]="[120, 240, 480, 1200]" [rows]="120"  [responsive]="true"
-              >
-
-              <ng-template pTemplate="caption">
-                <div class="flex">
-                  <span class="p-input-icon-left ml-auto">
-                    <input pInputText type="text" (input)="dt2.filterGlobal($event.target.value, 'contains')" placeholder="Buscar..." />
-                  </span>
-                </div>
-              </ng-template>
-
-              <ng-template pTemplate="colgroup" let-columns>
-                <colgroup>
-                  <col *ngFor="let col of columns" [ngStyle]="{'width': col.width}">
-                </colgroup>
-              </ng-template>
-
-              <ng-template pTemplate="header" let-columns>
-                <tr>
-                  <th *ngFor="let col of columns" pResizableColumn [pSortableColumn]="col.field" class="text-center">
-                    {{ col.header }}
-                  </th>
-                </tr>
-              </ng-template>
-
-              <ng-template pTemplate="body" let-rowData>
-                <tr [pSelectableRow]="rowData">
-  
-                  <td class="text-center">{{ rowData.numcp }}</td>
-                  <td class="text-center">{{ rowData.bulto }}</td>
-                  <td class="text-center">{{ rowData.fecharegistro | date: 'dd/MM/yyyy' }}</td>
-                  <td class="text-center">{{ rowData.peso | number:'1.0-2' }}</td>
-                  <td class="text-center">{{ rowData.subtotal | number:'1.0-2' }}</td>
-                  <td class="text-center">{{ rowData.destino }}</td>
-                  <td class="text-center">{{ rowData.razonsocial }}</td>
-                  <td class="text-center">{{ rowData.tipooperacion }}</td>
-                  <td class="text-center">
-                    <p-button  icon="pi pi-trash" serverity="danger"      iconPos="left"  (click)="desasignarOT(rowData.idordentrabajo)" ></p-button>
-                </td>
-                  
-
-                  
-                </tr>
-              </ng-template>
-            </p-table>
+            [rowsPerPageOptions]="[120, 240, 480, 1200]" [rows]="120" [responsive]="true">
+   
+       <!-- Barra de búsqueda -->
+       <ng-template pTemplate="caption">
+           <div class="flex">
+               <span class="p-input-icon-left ml-auto">
+                   <i class="pi pi-search"></i>
+                   <input pInputText type="text" (input)="dt2.filterGlobal($event.target.value, 'contains')" placeholder="Buscar..." />
+               </span>
+           </div>
+       </ng-template>
+   
+       <!-- Colgroup -->
+       <ng-template pTemplate="colgroup" let-cols>
+           <colgroup>
+               <col style="width: 50px"> <!-- Ancho del checkbox -->
+               <col *ngFor="let col of cols" [ngStyle]="{'width': col.width}">
+           </colgroup>
+       </ng-template>
+   
+       <!-- Header -->
+       <ng-template pTemplate="header" let-cols>
+           <tr>
+               <th style="width: 50px">
+                   <p-tableHeaderCheckbox></p-tableHeaderCheckbox> <!-- Checkbox para seleccionar todas las filas -->
+               </th>
+               <th *ngFor="let col of cols" pResizableColumn [pSortableColumn]="col.field" class="text-center">
+                   {{ col.header }}
+               </th>
+           </tr>
+       </ng-template>
+   
+       <!-- Body -->
+       <ng-template pTemplate="body" let-rowData>
+           <tr [pSelectableRow]="rowData">
+   
+               <!-- Checkbox en cada fila -->
+               <td>
+                   <p-tableCheckbox [value]="rowData"></p-tableCheckbox>
+               </td>
+   
+               <td class="text-center">{{ rowData.numcp }}</td>
+               <td class="text-center">{{ rowData.bulto }}</td>
+               <td class="text-center">{{ rowData.fecharegistro | date: 'dd/MM/yyyy' }}</td>
+               <td class="text-center">{{ rowData.peso | number:'1.0-2' }}</td>
+               <td class="text-center">{{ rowData.subtotal | number:'1.0-2' }}</td>
+               <td class="text-center">{{ rowData.destino }}</td>
+               <td class="text-center">{{ rowData.razonsocial }}</td>
+               <td class="text-center">{{ rowData.tipooperacion }}</td>
+               <td class="text-center">
+                   <p-button icon="pi pi-trash" severity="danger" iconPos="left" (click)="desasignarOT(rowData.idordentrabajo)"></p-button>
+               </td>
+           </tr>
+       </ng-template>
+   </p-table>
+   
           </div>
         </div>
       </div>

@@ -64,7 +64,7 @@ export class ModalTipoUnidadComponent  implements OnInit {
                 ,private generalService: OrdenTransporteService
                 ,public config: DynamicDialogConfig) {
 
-                this.model.tipooperacioncarga = config.data.id ;
+                this.model.tipooperacioncarga = config.data.tipoperacioncarga ;
                 console.log(this.model);
 
          }

@@ -158,8 +158,8 @@ export class CambiarEstadoModalComponent  implements OnInit {
 
 
         this.model.ids =  this.config.data.ids;
-        this.model.fechaestado =  new Date(this.dateInicio); // moment(this.dateInicio).format("DD/MM/YYYY HH:mm:ss"); //this.dateInicio.toLocaleDateString('en-GB');
-
+       // this.model.fechaestado =  new Date(this.dateInicio); // moment(this.dateInicio).format("DD/MM/YYYY HH:mm:ss"); //this.dateInicio.toLocaleDateString('en-GB');
+        this.model.fechaestado = new Date(this.dateInicio).toISOString(); // Formato ISO 8601
 
         console.log(this.model.fechaestado, 'fecha');
 

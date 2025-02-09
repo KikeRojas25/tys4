@@ -3,8 +3,8 @@ import {Component, OnInit} from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { DynamicDialogRef, DynamicDialogConfig } from 'primeng/dynamicdialog';
 import { TableModule } from 'primeng/table';
-import { OrdenTransporte } from '../../trafico/trafico.types';
 import { PlanningService } from '../planning.service';
+import { OrdenTransporte } from '../../recepcion/ordentransporte/ordentransporte.types';
 
 
 

@@ -1,0 +1,19 @@
+.entregado {
+    color: green !important;
+    font-weight: bold;
+}
+
+.por-despachar {
+    color: rgb(255, 0, 0) !important;
+    font-weight: bold;
+}
+
+.por-entregar {
+    color: rgb(255, 98, 0) !important;
+    font-weight: bold;
+}
+
+.default-estado {
+    color: black !important;
+    font-weight: normal;
+}

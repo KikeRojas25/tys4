@@ -1,0 +1,112 @@
+<div class="p-4 bg-gray-100 min-h-screen flex flex-col justify-between">
+  <!-- Encabezado de Estados -->
+  <div class="grid grid-cols-2 md:grid-cols-4 gap-4 mb-4">
+    <div class="bg-blue-100 border-l-4 border-blue-500 p-3 rounded shadow">
+      <h4 class="text-blue-700 font-bold text-sm flex items-center">
+        <i class="pi pi-check-circle mr-2"></i> Recepcionado
+      </h4>
+      <p class="text-gray-600 text-xs">
+        {{ orden.fecharegistro | date: 'dd-MM-yyyy' }}
+      </p>
+    </div>
+    <div class="bg-yellow-100 border-l-4 border-yellow-500 p-3 rounded shadow">
+      <h4 class="text-yellow-700 font-bold text-sm flex items-center">
+        <i class="pi pi-truck mr-2"></i> En Ruta
+      </h4>
+      <p class="text-gray-600 text-xs">
+        {{ orden.fechadespacho | date: 'dd-MM-yyyy' }}
+      </p>
+    </div>
+    <div class="bg-green-100 border-l-4 border-green-500 p-3 rounded shadow">
+      <h4 class="text-green-700 font-bold text-sm flex items-center">
+        <i class="pi pi-map-marker mr-2"></i> Arribo destino
+      </h4>
+      <p class="text-gray-600 text-xs">
+        {{ orden.fechaentrega | date: 'dd-MM-yyyy' }}
+      </p>
+    </div>
+    <div class="bg-red-100 border-l-4 border-red-500 p-3 rounded shadow">
+      <h4 class="text-red-700 font-bold text-sm flex items-center">
+        <i class="pi pi-box mr-2"></i> Entregado
+      </h4>
+      <p class="text-gray-600 text-xs">
+        {{ orden.fechaentrega | date: 'dd-MM-yyyy' }}
+      </p>
+    </div>
+  </div>
+
+  <!-- Información Principal -->
+  <div class="bg-white shadow-md rounded-lg p-4 mb-4">
+    <div class="flex items-center mb-4">
+      <div class="w-16 h-16 flex items-center justify-center bg-blue-100 rounded-full border-2 border-gray-300">
+        <i class="fas fa-truck text-blue-500 text-2xl"></i>
+      </div>
+    
+      <div class="ml-4">
+        <h2 class="text-lg font-bold text-gray-800">{{ orden.razonsocial }}</h2>
+        <p class="text-gray-500 text-sm">
+          Fecha de servicio: {{ orden.fecharegistro | date: 'dd-MM-yyyy' }}
+        </p>
+      </div>
+    </div>
+
+    <div class="grid grid-cols-2 gap-4">
+      <div>
+        <h3 class="text-gray-600 font-bold text-sm">Origen</h3>
+        <p class="text-gray-800 text-sm">{{ orden.origen }}</p>
+      </div>
+      <div>
+        <h3 class="text-gray-600 font-bold text-sm">Destino</h3>
+        <p class="text-gray-800 text-sm">{{ orden.destino }}</p>
+      </div>
+      <div>
+        <h3 class="text-gray-600 font-bold text-sm">Remitente</h3>
+        <p class="text-gray-800 text-sm">{{ orden.remitente }}</p>
+      </div>
+      <div>
+        <h3 class="text-gray-600 font-bold text-sm">Destinatario</h3>
+        <p class="text-gray-800 text-sm">{{ orden.destinatario }}</p>
+      </div>
+      <div>
+        <h3 class="text-gray-600 font-bold text-sm">Número OT</h3>
+        <p class="text-gray-800 text-sm">{{ orden.numcp }}</p>
+      </div>
+      <div>
+        <h3 class="text-gray-600 font-bold text-sm">Guías</h3>
+        <ul class="text-gray-800 text-sm">
+          <li *ngFor="let guia of guias">{{ guia.nroguia }}</li>
+        </ul>
+      </div>
+      <div>
+        <h3 class="text-gray-600 font-bold text-sm">Bultos</h3>
+        <p class="text-gray-800 text-sm">{{ orden.bulto }}</p>
+      </div>
+      <div>
+        <h3 class="text-gray-600 font-bold text-sm">Peso</h3>
+        <p class="text-gray-800 text-sm">{{ orden.peso }}</p>
+      </div>
+    </div>
+  </div>
+
+  <!-- Carrusel -->
+  <div class="bg-white shadow-md rounded-lg p-4">
+    <h3 class="text-gray-800 font-bold mb-2 text-sm">Documentos</h3>
+    <p-carousel
+      [value]="documentos"
+      [numVisible]="1"
+      [numScroll]="1"
+      [circular]="true"
+      [style]="{ height: '200px', width: '100%' }"
+    >
+      <ng-template let-document pTemplate="item">
+        <div class="flex justify-center items-center">
+          <img
+            src="http://104.36.166.65/Tys2.0/uploadedfiles/{{ document.idordentrabajo }}/{{ document.nombrearchivo }}"
+            alt="Documento"
+            class="w-auto max-h-40 rounded-lg shadow-md"
+          />
+        </div>
+      </ng-template>
+    </p-carousel>
+  </div>
+</div>

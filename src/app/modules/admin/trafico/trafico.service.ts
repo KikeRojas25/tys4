@@ -4,7 +4,8 @@ import { JwtHelperService } from '@auth0/angular-jwt';
 import { UserService } from 'app/core/user/user.service';
 import { environment } from 'environments/environment';
 import { Observable } from 'rxjs';
-import { HojaRuta, Manifiesto, OrdenTransporte, Proveedor } from './trafico.types';
+import { HojaRuta, Manifiesto, Proveedor } from './trafico.types';
+import { OrdenTransporte } from '../recepcion/ordentransporte/ordentransporte.types';
 
 
 const httpOptions = {
