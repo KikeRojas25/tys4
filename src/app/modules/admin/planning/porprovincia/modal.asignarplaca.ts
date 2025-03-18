@@ -147,20 +147,25 @@ export class AsignarPlacaComponent implements OnInit {
         message: '¿Esta seguro que desea confirmar el despacho?',
         accept: () => {
 
-          this.planningService.confirmarDespacho(this.model).subscribe(resp => {
+          this.planningService.confirmarDespacho(this.model).subscribe({
+            next: (respuesta) => {
+              this.messageService.add({ severity: 'success', summary: 'Planning', detail: 'Se ha planificado de manera exitosa.' });
 
-            this.ref.close();
-            this.loading = false;
+              this.ref.close();
+              // Aquí lógica de éxito, mostrar mensaje al usuario, etc.
+            },
+            error: (err) => {
 
-          } , (error)=> {
+              this.messageService.add({ severity: 'warn', summary: 'Planning', detail: 'Debe asignar el tipo de operación a todos las OTs.' });
 
 
 
+           //   console.error('Error al confirmar despacho:', err);
+             // this.mostrarError(err); // Aquí puedes mostrar el error al usuario.
+            }
           });
 
-
-
-
+        
         },
         reject: () => {
             this.ref.close();

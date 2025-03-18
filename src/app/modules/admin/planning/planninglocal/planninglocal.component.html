@@ -1,4 +1,4 @@
-<div class="flex flex-col flex-auto min-w-0 bg-white dark:bg-gray-800">
+<div class="flex flex-col flex-auto min-w-0 bg-card">
   <!-- Cabecera -->
   <div class="flex flex-col sm:flex-row items-start sm:items-center justify-between p-6 sm:py-8 sm:px-10 border-b border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-800">
     <div class="flex-1 min-w-0">
@@ -17,7 +17,7 @@
     <div class="col-span-12">
       <div class="flex justify-end space-x-3">
         <button
-          class="px-4 py-2 bg-yellow-500 text-white rounded shadow hover:bg-yellow-600 transition"
+          class=" px-4 py-2 bg-yellow-500 text-white rounded shadow hover:bg-yellow-600 transition"
           pButton
           icon="pi pi-file"
           label="Crear Bolsa"
@@ -34,6 +34,8 @@
         ></button>
       </div>
     </div>
+
+  </div>
 
     <!-- Tabla de Móviles Generadas -->
     <div class="col-span-12">
@@ -67,7 +69,7 @@
                   [ngStyle]="{ width: col.width }"
                   pResizableColumn
                   [pSortableColumn]="col.field"
-                  class="text-left px-4 py-2"
+                  class="   px-4 py-2"
                 >
                   {{ col.header }}
                 </th>
@@ -77,15 +79,15 @@
             <!-- Cuerpo -->
             <ng-template pTemplate="body" let-rowData>
               <tr [pSelectableRow]="rowData" class="hover:bg-gray-50 dark:hover:bg-gray-700">
-                <td class="text-center bg-green-600 text-white px-4 py-2">{{ rowData.numcarga2 }}</td>
-                <td class="text-center px-4 py-2">{{ rowData.tipounidad }}</td>
-                <td class="text-center px-4 py-2">{{ rowData.planificador }}</td>
-                <td class="text-center bg-yellow-500 text-black px-4 py-2">{{ rowData.estado }}</td>
-                <td class="text-center px-4 py-2">{{ rowData.fecharegistro | date: 'dd/MM/yyyy' }}</td>
-                <td class="text-center px-4 py-2">{{ rowData.peso | number: '1.0-2' }}</td>
-                <td class="text-center px-4 py-2">{{ rowData.vol | number: '1.0-2' }}</td>
-                <td class="text-center px-4 py-2">S/. {{ rowData.subtotal | number: '1.0-2' }}</td>
-                <td class="text-left px-4 py-2 space-x-2">
+                <td class="   bg-green-600 text-white px-4 py-2">{{ rowData.numcarga2 }}</td>
+                <td class="   px-4 py-2">{{ rowData.tipounidad }}</td>
+                <td class="   px-4 py-2">{{ rowData.planificador }}</td>
+                <td class="   bg-yellow-500 text-black px-4 py-2">{{ rowData.estado }}</td>
+                <td class="   px-4 py-2">{{ rowData.fecharegistro | date: 'dd/MM/yyyy' }}</td>
+                <td class="   px-4 py-2">{{ rowData.peso | number: '1.0-2' }}</td>
+                <td class="   px-4 py-2">{{ rowData.vol | number: '1.0-2' }}</td>
+                <td class="   px-4 py-2">S/. {{ rowData.subtotal | number: '1.0-2' }}</td>
+                <td class="   px-4 py-2 space-x-2">
                   <!-- <button
                     type="button"
                     class="px-2 py-1 bg-info-500 text-white rounded hover:bg-info-600 transition"
@@ -134,9 +136,9 @@
             <ng-template pTemplate="footer">
               <tr class="bg-gray-100 dark:bg-gray-700">
                 <td colspan="6" class="text-right font-semibold px-4 py-2">Totales</td>
-                <td class="text-center font-semibold px-4 py-2">{{ bultosTotal | number: '1.0-2' }}</td>
-                <td class="text-center font-semibold px-4 py-2">{{ pesoTotal | number: '1.0-2' }}</td>
-                <!-- <td class="text-center font-semibold px-4 py-2">{{ volumenTotal | number: '1.0-2' }}</td> -->
+                <td class="   font-semibold px-4 py-2">{{ bultosTotal | number: '1.0-2' }}</td>
+                <td class="   font-semibold px-4 py-2">{{ pesoTotal | number: '1.0-2' }}</td>
+                <!-- <td class="   font-semibold px-4 py-2">{{ volumenTotal | number: '1.0-2' }}</td> -->
               </tr>
             </ng-template>
           </p-table>
@@ -164,14 +166,15 @@
     </div>
     
 
-    <!-- Tabla de Ordenes -->
-    <div class="col-span-12">
-      <div class="card shadow-sm rounded-lg overflow-hidden">
-        <div class="bg-secondary-600 text-white px-6 py-3 font-semibold">Ordenes</div>
-        <div class="card-body p-4">
+    <div class="main-content container-fluid p-6">
 
           <p-table #dt2  [columns]="cols"  [value]="ordenes2" [(selection)]="selectedRows"  dataKey="idordentrabajo"
-          selectionMode="multiple" paginator="true" [rows]="20" class="w-full">
+          selectionMode="multiple" 
+          [resizableColumns]="true" 
+          responsive="false" 
+          [rowsPerPageOptions]="[20,40,60,120]" 
+          [scrollable]="true"
+          paginator="true" [rows]="20" >
             
             <ng-template pTemplate="caption">
               <div class="flex">
@@ -182,45 +185,50 @@
               </div>
           </ng-template>
 
-          <ng-template pTemplate="colgroup" let-cols>
+          <ng-template pTemplate="colgroup" let-columns>
             <colgroup>
-                <col style="width: 50px"> <!-- Ancho del checkbox -->
-                <col *ngFor="let col of cols" [ngStyle]="{'width': col.width}">
+              <col *ngFor="let col of columns" [style.width]="col.width">
             </colgroup>
-        </ng-template>
+          </ng-template>
         <ng-template pTemplate="header" let-cols>
           <tr>
-              <th style="width: 50px">
-                  <p-tableHeaderCheckbox></p-tableHeaderCheckbox> <!-- Checkbox para seleccionar todas las filas -->
-              </th>
-              <th *ngFor="let col of cols" pResizableColumn [pSortableColumn]="col.field" class="text-center">
+              <!-- <th style="width: 50px">
+                  <p-tableHeaderCheckbox></p-tableHeaderCheckbox>
+              </th> -->
+              <th *ngFor="let col of cols"  [style]="col.width" [pSortableColumn]="col.field" >
                   {{ col.header }}
               </th>
           </tr>
       </ng-template>
             <ng-template pTemplate="body" let-rowData>
-              <tr [pSelectableRow]="rowData" class="hover:bg-gray-50 dark:hover:bg-gray-700">
-                <td class="text-center px-4 py-2">
+              <tr [pSelectableRow]="rowData">
+                <!-- <td class="   px-4 py-2">
                   <p-tableCheckbox [value]="rowData"></p-tableCheckbox>
-                </td>
-                <td class="text-left px-4 py-2">{{ rowData.remitente }}</td>
-                <td class="text-left px-4 py-2">{{ rowData.distritoOrigen }}</td>
-                <td class="text-left px-4 py-2">{{ rowData.distritoDestino }}</td>
-                <td class="text-center px-4 py-2">{{ rowData.numcp }}</td>
-                <td class="text-center px-4 py-2">{{ rowData.fechahoracita | date: 'dd/MM/yyyy' }}</td>
-                <td class="text-center px-4 py-2">{{ rowData.horacita }}</td>
-                <td class="text-center px-4 py-2">{{ rowData.bulto }}</td>
-                <td class="text-center px-4 py-2">{{ rowData.peso | number: '1.0-2' }}</td>
-                <td class="text-center px-4 py-2">{{ rowData.volumen | number: '1.0-2' }}</td>
+                </td> -->
+                <td class="bg-blue-100">{{ rowData.numcp }}</td>
+                <td class="    ">{{ rowData.fechahoracita | date: 'dd/MM/yyyy' }}</td>
+                <td class="    ">{{ rowData.horacita }}</td>
+                <td class="word-wrap">{{ rowData.remitente }}</td>
+                <td class="    ">{{ rowData.distritoOrigen }}</td>
+                <td class="   word-wrap" >{{ rowData.origen }}</td>
+
+                <td class="    ">{{ rowData.distritoDestino }}</td>
+                <td class="   word-wrap">{{ rowData.centroacopio }}</td>
+
+                
+                <td class="   word-wrap">{{ rowData.personarecojo }}</td>
+                
+                <td class="   word-wrap">{{ rowData.observaciones }}</td>
+                <td class="    ">{{ rowData.bulto }}</td>
+                <td class="    ">{{ rowData.peso | number: '1.0-2' }}</td>
               </tr>
             </ng-template>
           </p-table>
         </div>
       </div>
-    </div>
-  </div>
+
+   
 
   <!-- Diálogos y Toasts -->
   <p-confirmDialog header="Confirmación" icon="pi pi-exclamation-triangle"></p-confirmDialog>
   <p-toast [baseZIndex]="10000" position="top-right"></p-toast>
-</div>

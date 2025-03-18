@@ -143,16 +143,22 @@ ngOnInit() {
 
   this.cols =
   [
-      // {header: 'ACCIONES', field: 'id'  ,  width: '40px'  },
-      {header: 'CLIENTE', field: 'remitente'  ,   width: '160px'  },
-      {header: 'ORIGEN', field: 'distritoOrigen'  ,  width: '70px'  },
-      {header: 'DESTINO', field: 'distritoDestino'  ,  width: '70px'  },
-      {header: 'ORDEN', field: 'numcp'  ,  width: '120px' },
+      {header: 'OT', field: 'numcp'  ,  width: '80px' },
       {header: 'F. CITA', field: 'fechahoracita'  ,  width: '60px' },
       {header: 'H. CITA', field: 'horacita'  ,  width: '60px' },
+      {header: 'CLIENTE', field: 'remitente'  ,   width: '160px'  },
+      {header: 'ORIGEN', field: 'distritoOrigen'  ,  width: '70px'  },
+      {header: 'PUNTO DE PARTIDA', field: 'origen'  ,  width: '20px' },
+      {header: 'DESTINO', field: 'distritoDestino'  ,  width: '70px'  },
+      {header: 'CENTRO DE ACOPIO', field: 'centroacopio'  ,  width: '20px' },
+
+  
+  
+      {header: 'CONTACTO', field: 'personarecojo'  ,  width: '20px' },
+  
+      {header: 'OBSERVACIONES', field: 'observaciones'  ,  width: '20px' },
       {header: 'BULTOS', field: 'bulto'  , width: '30px'   },
       {header: 'PESO', field: 'peso'  ,  width: '30px'  },
-      {header: 'VOL', field: 'volumen'  ,  width: '30px'  },
 
 
   ];
@@ -245,17 +251,14 @@ onRowEditSave(order: OrdenTransporte) {
   order.idusuarioentrega =  this.user.usr_int_id;
 
   this.ordenService.actualizarOTR(order).subscribe (resp => {
-    // this.toastr.success('Se actualizó correctamente'
-    // , 'Orden de Transporte', {
-    //   closeButton: true
-    // });
-    this.ordenService.GetAllOrdersDetailDistrito(0,this.id).subscribe(list =>  {
 
-      this.ordenes2 =   list;
-      console.log(this.ordenes2, 'pop')
+    // this.ordenService.GetAllOrdersDetailDistrito(this.user.idestacionorigen,this.id).subscribe(list =>  {
+
+    //   this.ordenes2 =   list;
+    //   console.log(this.ordenes2, 'pop')
       this.reloadDetalles();
 
-   });
+   //});
 
 
 
@@ -365,7 +368,7 @@ agregaracarga() {
 
   
 
-   let  ids = this.selectedRows;
+   let ids = this.selectedRows;
 
 
   this.ref = this.dialogService.open(ModalAsignaraCargaLocalComponent, {
@@ -382,6 +385,8 @@ agregaracarga() {
    }
 
    reloadDetalles() {
+
+    this.selectedRows  = [];
 
     this.loading = true;
     this.selectedOTs = [];

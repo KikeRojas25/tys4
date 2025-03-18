@@ -18,6 +18,7 @@ import { User } from '../../trafico/trafico.types';
 import { AsignarPlacalocalComponent } from '../planninglocal/modal.asignarplacalocal';
 import { AsignarTipooperacionLocalComponent } from './asignar-tipooperacion-local/asignar-tipooperacion-local.component';
 import { InputTextModule } from 'primeng/inputtext';
+import { PlanningService } from '../planning.service';
 
 @Component({
   selector: 'app-planning-local-detalle',
@@ -67,6 +68,7 @@ export class PlanningLocalDetalleComponent implements OnInit {
     private messageService: MessageService,
     private confirmationService: ConfirmationService ,
     public dialogService: DialogService,
+    private planningService: PlanningService,
     private ordenService: OrdenTransporteService) { }
 
   ngOnInit(): void {
@@ -115,7 +117,7 @@ export class PlanningLocalDetalleComponent implements OnInit {
       message: '¿Está seguro que desea devincular esta Orden?. Se enviará a un reporte de falso flete.',
       accept: () => {
 
-        this.ordenService.DesAsignarProvinciaCarga(idordentrabajo).subscribe(resp=>  {
+        this.planningService.DesAsignarProvinciaCarga(idordentrabajo).subscribe(resp=>  {
 
           this.reloadDetalles();
         //  this.toastr.success( "Se ha eliminado la Orden con éxito." , 'Almacén', { closeButton: true });
@@ -140,6 +142,9 @@ export class PlanningLocalDetalleComponent implements OnInit {
 
     this.ordenService.GetAllOrdersCargasTemporal(this.id).subscribe(resp=>  {
       this.ordenes11 = resp;
+
+
+      
       this.ordenes11.forEach(x=> {
         this.bultosTotal = this.bultosTotal + x.bulto;
         this.pesoTotal = this.pesoTotal + x.peso;

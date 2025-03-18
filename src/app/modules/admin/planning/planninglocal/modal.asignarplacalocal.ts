@@ -28,7 +28,7 @@ import { ConfirmDialogModule } from 'primeng/confirmdialog';
                             [style]="{'width':'100%'}" [resetFilterOnHide]="false"
                             [hideTransitionOptions]="'0ms'" required
                             [showTransitionOptions]="'0ms'"
-                            filter="false">
+                            filter="true">
                                 <ng-template let-item pTemplate="selectedItem">
                                     <span style="vertical-align:left;">{{item.label}}</span>
                                 </ng-template>

@@ -76,6 +76,7 @@ export class PordespacharComponent implements OnInit {
   imageToShow: any;
   esalmacen = false;
 
+
   statuses: SelectItem[];
   clonedOrders: { [s: string]: OrdenTransporte; } = {};
 
@@ -334,37 +335,7 @@ desasignarOts() {
  });
 
 }
-darSalida() {
-  this.confirmationService.confirm({
-    message: '¿Esta seguro que desea darle salida al vehículo?',
-    accept: () => {
 
-      // var resp =  this.ordenTransporteService.confirmarSalida(this.model.numhojaruta).subscribe(resp => {
-      //     this.ref.close();
-
-
-      //     this.ordenes.forEach ( list => {
-      //       var url = "http://104.36.166.65/webreports/manifiesto.aspx?idmanifiesto=" + String(list.idmanifiesto);
-      //       window.open(url);
-      //     })
-
-
-      //       var url = "http://104.36.166.65/webreports/hojaruta.aspx?iddespacho=" + String(this.ordenes[0].iddespacho);
-      //       window.open(url);
-
-
-      // });
-
-
-
-
-    },
-    reject: () => {
-        this.ref.close();
-    }
-
- });
-}
 imprimirCarga (){
 
   console.log(this.manifiestos);
@@ -402,13 +373,33 @@ imprimirGrt() {
 
 
 }
+desasignarPrecinto(hojaruta){
+  
 
+  this.confirmationService.confirm({
+    message: '¿Esta seguro que desea quitar el precinto del camión?',
+    accept: () => {
+
+        this.ordenTransporteService.desasignarPrecintos(hojaruta).subscribe(Response => {
+
+
+          this.messageService.add({severity:'success', summary:'Despacho', detail:'Se ha retirado el precinto de manera exitosa.'});
+
+
+
+        } );
+
+
+    },
+    reject: () => {}
+  });
+}
 
 imprimirManifiesto (hojaruta) {
 
   let permitir = true;
-  //validar que todos las ots esten subidas al camion.
-  // this.ordenTransporteService.getOrdenTransportexHojaRuta(hojaruta).subscribe(list => {
+ // validar que todos las ots esten subidas al camion.
+ // this.ordenTransporteService.getOrdenTransportexHojaRuta(hojaruta).subscribe(list => {
 
   //   list.forEach(ot => {
 
@@ -422,33 +413,33 @@ imprimirManifiesto (hojaruta) {
 
   // }, ()=>{
 
-  //     if(permitir === true)
-  //     {
-  //           this.ordenTransporteService.getAllPreManifiestos(hojaruta).subscribe(list =>  {
-  //             let count = 1;
-  //             this.loading = false;
+      if(permitir === true)
+      {
+            this.ordenTransporteService.getAllPreManifiestos(hojaruta).subscribe(list =>  {
+              let count = 1;
+              this.loading = false;
 
 
 
 
-  //           list.forEach ( item => {
-  //             var url = "http://104.36.166.65/webreports/manifiesto.aspx?idmanifiesto=" + String(item.idmanifiesto);
-  //             window.open(url);
-  //           })
+            list.forEach ( item => {
+              var url = "http://104.36.166.65/webreports/manifiesto.aspx?idmanifiesto=" + String(item.idmanifiesto);
+              window.open(url);
+            })
 
 
-  //             var url = "http://104.36.166.65/webreports/hojaruta.aspx?iddespacho=" + String(list[0].iddespacho);
-  //             window.open(url);
+              var url = "http://104.36.166.65/webreports/hojaruta.aspx?iddespacho=" + String(list[0].iddespacho);
+              window.open(url);
 
-  //         });
-  //   }
-  //   else
-  //   {
-  //     this.messageService.add({severity:'error', summary:'No puede continuar', detail:'Existen Ots que no han sido cargadas al camión.'});
-  //   }
+          });
+    }
+    else
+    {
+      this.messageService.add({severity:'error', summary:'No puede continuar', detail:'Existen Ots que no han sido cargadas al camión.'});
+    }
 
 
-  // });
+//  });
 
 
 
@@ -501,8 +492,8 @@ guardar() {
         var url = "http://104.36.166.65/webreports/carga.aspx?idcarga=" + String(idcarga);
         window.open(url);
 
-        var url = "http://104.36.166.65/webreports/hojaruta.aspx?iddespacho=" + String(this.ordenes2[0].iddespacho);
-        window.open(url);
+        // var url = "http://104.36.166.65/webreports/hojaruta.aspx?iddespacho=" + String(this.ordenes2[0].iddespacho);
+        // window.open(url);
 
 
 

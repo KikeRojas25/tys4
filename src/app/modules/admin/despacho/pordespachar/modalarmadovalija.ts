@@ -9,81 +9,87 @@ import { ToastModule } from 'primeng/toast';
 import { TableModule } from 'primeng/table';
 import { ButtonModule } from 'primeng/button';
 import { InputTextModule } from 'primeng/inputtext';
+import { DespachoService } from '../despacho.service';
 
 @Component({
     template: `
-        <div class="mb-3 col-md-12">
+            <div class="w-full p-4 bg-white shadow-lg rounded-2xl">
             <!-- Botón de Confirmación -->
-            <div class="row col-md-12 mb-2">
-                <div class="col-md-2">
-                    <button type="button" pButton class="p-button-rounded p-button-text btn-primary" 
-                        title="Confirmar" icon="fa fa-check" label="Confirmar" (click)="confirmar()">
-                    </button>
-                </div>
+            <div class="flex justify-start mb-4">
+            <p-button severity="primary"
+                title="Confirmar" 
+                icon="pi pi-check" 
+                label="Confirmar" 
+                (click)="confirmar()">
+            </p-button>
             </div>
 
             <!-- Tabla -->
             <p-table 
-                #dt 
-                [value]="ordenes2" 
-                [columns]="cols" 
-                [style]="{width: '100%'}"
-                editMode="row"
-                dataKey="idordentrabajo"
-                selectionMode="multiple"
-                [(selection)]="selectedOTs"
-                [paginator]="true" 
-                [rows]="10"
-                [rowsPerPageOptions]="[20,40,60,120]"
-                [resizableColumns]="true" 
-                [responsive]="true">
+            #dt 
+            [value]="ordenes2" 
+            [columns]="cols"
+            class="rounded-lg overflow-hidden shadow-md"
+            editMode="row"
+            dataKey="idordentrabajo"
+            selectionMode="multiple"
+            [(selection)]="selectedOTs"
+            [paginator]="true" 
+            [rows]="10"
+            [rowsPerPageOptions]="[20,40,60,120]"
+            [resizableColumns]="true" 
+            [responsive]="true"
+            paginatorPosition="bottom"
+            tableStyle="min-width: 100%">
 
-                <!-- Definición de columnas -->
-                <ng-template pTemplate="colgroup" let-cols>
-                    <colgroup>
-                        <col *ngFor="let col of cols" [ngStyle]="{'width': col.width}">
-                    </colgroup>
-                </ng-template>
+            <!-- Definición de columnas -->
+            <ng-template pTemplate="colgroup" let-cols>
+                <colgroup>
+                    <col *ngFor="let col of cols" [ngStyle]="{'width': col.width}">
+                </colgroup>
+            </ng-template>
 
-                <!-- Cabecera -->
-                <ng-template pTemplate="header" let-cols>
-                    <tr>
-                        <th style="text-align:center;width: 4rem">
-                            <p-tableHeaderCheckbox></p-tableHeaderCheckbox>
-                        </th>
-                        <th *ngFor="let col of cols" [ngStyle]="{'width': col.width}" pResizableColumn>
-                            {{ col.header }}
-                        </th>
-                    </tr>
-                    <tr>
-                        <th colspan="4">
-                            <input pInputText type="text" (input)="dt.filter($event.target.value, 'numcp', 'contains')" 
-                                placeholder="Número de OT" class="p-column-filter">
-                        </th>
-                    </tr>
-                </ng-template>
+            <!-- Cabecera -->
+            <ng-template pTemplate="header" let-cols>
+                <tr class="bg-gray-100 text-gray-700">
+                    <th class="p-2 text-center">
+                        <p-tableHeaderCheckbox></p-tableHeaderCheckbox>
+                    </th>
+                    <th *ngFor="let col of cols" class="p-2 text-center">
+                        {{ col.header }}
+                    </th>
+                </tr>
+                <tr>
+                    <th colspan="4" class="p-2">
+                        <input pInputText 
+                            type="text" 
+                            (input)="dt.filter($event.target.value, 'numcp', 'contains')" 
+                            placeholder="Buscar Número de OT" 
+                            class="w-full p-2 border rounded-lg focus:ring focus:ring-blue-300">
+                    </th>
+                </tr>
+            </ng-template>
 
-                <!-- Cuerpo de la tabla -->
-                <ng-template pTemplate="body" let-rowData>
-                    <tr>
-                        <td class="ui-resizable-column" style="text-align:center;">
-                            <p-tableCheckbox [value]="rowData"></p-tableCheckbox>
-                        </td>
-                        <td class="ui-resizable-column" style="text-align:center;">{{ rowData.nummanifiesto }}</td>
-                        <td class="ui-resizable-column" style="text-align:center;">{{ rowData.numcp }}</td>
-                        <td class="ui-resizable-column" style="text-align:left;">{{ rowData.provinciaDestino }}</td>
-                        <td class="ui-resizable-column" style="text-align:left;">{{ rowData.remitente }}</td>
-                        <td class="ui-resizable-column" style="text-align:center;">{{ rowData.tipooperacion }}</td>
-                        <td class="ui-resizable-column" style="text-align:left;">{{ rowData.destinatario }}</td>
-                        <td class="ui-resizable-column" style="text-align:left;">{{ rowData.peso }}</td>
-                        <td class="ui-resizable-column" style="text-align:left;">{{ rowData.bulto }}</td>
-                    </tr>
-                </ng-template>
+            <!-- Cuerpo de la tabla -->
+            <ng-template pTemplate="body" let-rowData>
+                <tr class="border-b hover:bg-gray-100 transition-all">
+                    <td class="p-2 text-center">
+                        <p-tableCheckbox [value]="rowData"></p-tableCheckbox>
+                    </td>
+                    <td class="p-2 text-center font-semibold">{{ rowData.nummanifiesto }}</td>
+                    <td class="p-2 text-center">{{ rowData.numcp }}</td>
+                    <td class="p-2 text-left">{{ rowData.provinciaDestino }}</td>
+                    <td class="p-2 text-left">{{ rowData.remitente }}</td>
+                    <td class="p-2 text-center">{{ rowData.tipooperacion }}</td>
+                    <td class="p-2 text-left">{{ rowData.destinatario }}</td>
+                    <td class="p-2 text-left">{{ rowData.peso }}</td>
+                    <td class="p-2 text-left">{{ rowData.bulto }}</td>
+                </tr>
+            </ng-template>
             </p-table>
-        </div>
+            </div>
 
-        <!-- Mensajes Toast -->
-        <p-toast></p-toast>
+   
     `,
     standalone: true,
     imports: [
@@ -106,6 +112,7 @@ export class ArmadoValijaModalComponent implements OnInit {
 
     constructor(
         private ordenService: OrdenTransporteService,
+        private DespachoService: DespachoService,
         public messageService: MessageService,
         public ref: DynamicDialogRef,
         public config: DynamicDialogConfig
@@ -126,8 +133,8 @@ export class ArmadoValijaModalComponent implements OnInit {
             { header: 'BULTO', field: 'bulto', width: '180px' }
         ];
 
-        this.ordenService.getAllOrdersForDespachoAll(this.numhojaruta).subscribe(list => {
-            this.ordenes2 = list.filter(x => x.valija === false || x.valija === null);
+        this.ordenService.getAllOrdersForDespachoAll(this.numhojaruta, 2).subscribe(list => {
+            this.ordenes2 = list ;  //.filter(x => x.valija === false || x.valija === null);
 
             if (this.ordenes2.length === 0) {
                 this.manifiestos = true;
@@ -141,13 +148,17 @@ export class ArmadoValijaModalComponent implements OnInit {
             return;
         }
 
-        this.ordenService.confirmarValijaxOTs(this.selectedOTs).subscribe(x => {
+        this.DespachoService.confirmarValijaxOTs(this.selectedOTs).subscribe(x => {
             if (x.terminado) {
                 this.messageService.add({ severity: 'success', summary: 'Confirmar Estiba', detail: 'Se ha culminado con la carga del camión, ya puede imprimir los MANIFIESTOS' });
             }
 
-            this.ordenService.getAllOrdersForDespacho(this.numhojaruta).subscribe(list => {
-                this.ordenes2 = list;
+            this.ordenService.getAllOrdersForDespachoAll(this.numhojaruta, 2).subscribe(list => {
+                this.ordenes2 = list ;  //.filter(x => x.valija === false || x.valija === null);
+    
+                if (this.ordenes2.length === 0) {
+                    this.manifiestos = true;
+                }
             });
         });
     }

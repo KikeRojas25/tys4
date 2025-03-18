@@ -14,17 +14,17 @@ import { NewproveedorComponent } from '../newproveedor/newproveedor.component';
   selector: 'app-listproveedor',
   templateUrl: './listproveedor.component.html',
   styleUrls: ['./listproveedor.component.css'],
-  standalone: true,
-  imports:[
-    MatIcon,
-    RouterModule,
-    TableModule,
-    FormsModule,
-    CommonModule,
-    ButtonModule,
-    DynamicDialogModule
-  ],
-  providers: [DialogService]
+    standalone: true,
+    imports:[
+      MatIcon,
+      RouterModule,
+      TableModule,
+      FormsModule,
+      CommonModule,
+      ButtonModule,
+      DynamicDialogModule
+    ],
+    providers: [DialogService]
 })
 export class ListproveedorComponent implements OnInit {
   provedores: any[];

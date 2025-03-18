@@ -27,8 +27,8 @@
       <div class="p-4">
 
         <div class="flex gap-4 mb-4 mt-2">
-          <button class='btn btn-primary' pButton iconPos="left" label="Agregar OT" icon="pi pi-plus" (click)="agregar()"></button>
-          <button class='btn btn-secondary' pButton iconPos="left" label="Refrescar" icon="pi pi-refresh" (click)="actualizar()"></button>
+          <p-button severity="danger" iconPos="left" label="Agregar OT" icon="pi pi-plus" (click)="agregar()"></p-button>
+          <p-button  iconPos="left" label="Refrescar" icon="pi pi-refresh" (click)="actualizar()"></p-button>
         </div>
 
         <p-table [columns]="cols" selectionMode="single" [style]="{width:'100%'}" dataKey="idDespacho"
@@ -57,8 +57,10 @@
               <td class="text-center">{{ rowData.numHojaRuta }}</td>
               <td class="text-center">{{ rowData.proveedor }}</td>
               <td class="text-center">{{ rowData.precinto }}</td>
-              <td class="text-left">
-                <p-button *ngIf="rowData.precinto === 'SI'"  sererity="danger"  label="Gen. Manifiestos" title='Imprimir HR' (click)='imprimirManifiesto(rowData)'></p-button>
+              <td >
+                <p-button *ngIf="rowData.precinto === 'SI'"   severity="success" icon="fa fa-file-pdf-o"  (click)='imprimirManifiesto(rowData)'></p-button>
+                <p-button *ngIf="rowData.precinto === 'SI'"  severity="danger"   icon="fa fa-chain-broken" (click)='desasignarPrecinto(rowData.numHojaRuta)'></p-button>
+                
               </td>
             </tr>
           </ng-template>
@@ -91,12 +93,13 @@
           <div class="flex gap-4 mt-4">
             <p-button *ngIf="estado !== 'Creado'"   iconPos="left" label="Generar hoja de Carga" icon="fa fa-check" (click)="guardar()" ></p-button>
             <button *ngIf="estado === 'Creado'" class='btn btn-primary' pButton iconPos="left" label="Imprimir hoja de Carga" (click)="imprimirCarga()" type="button"></button>
+            <button *ngIf="esalmacen === true" class='btn btn-danger' pButton iconPos="left" label="Desasignar OTs" icon="fa fa-minus" (click)="desasignarOts()" type="button"></button>
+
+
             <button *ngIf="estado === 'Creado' && esalmacen === true" class='btn btn-primary' pButton iconPos="left" label="Imprimir GRT" (click)="imprimirGrt()" type="button"></button>
             <button *ngIf="estado === 'Creado' && esalmacen === true" class='btn btn-primary' pButton iconPos="left" label="Confirmar estiba" icon="fa fa-plus" (click)="confirmarDespacho()" type="button"></button>
             <button *ngIf="estado === 'Creado' && esalmacen === true" class='btn btn-primary' pButton iconPos="left" label="Armar Valija" icon="fa fa-plus" (click)="armadoValija()" type="button"></button>
             <button *ngIf="estado === 'Creado' && esalmacen === true" class='btn btn-primary' pButton iconPos="left" label="Asignar Precinto" icon="fa fa-plus" (click)="asignarPrecinto()" type="button"></button>
-            <button *ngIf="esalmacen === true" class='btn btn-danger' pButton iconPos="left" label="Desasignar OTs" icon="fa fa-minus" (click)="desasignarOts()" type="button"></button>
-
 
 
             <!-- <button  class='btn btn-primary' pButton iconPos="left" label="Generar hoja de Carga" icon="fa fa-check" (click)="guardar()" type="button"></button>

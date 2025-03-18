@@ -65,6 +65,21 @@ confirmarDespacho2(model: any, manifiestos: any[]) {
   return this._httpClient.post(this.baseUrlDespacho + 'ConfirmarDespacho2', model, httpOptions);
 
 }
+getOrdenTransporteByNumcp(numcp: string) {
+  return this._httpClient.get<OrdenTransporte>(this.baseUrl + 'GetOrdenTransporteByNumero?numcp='  + numcp, httpOptions);
+}
+
+GenerarOTsPendientes(model) {
+  return this._httpClient.post<OrdenTransporte[]>(this.baseUrl + 'GenerarOTsPendientes?', model , httpOptions);
+}
+
+agregarOtManifiesto(model: any) {
+  return this._httpClient.post<OrdenTransporte[]>(this.baseUrl + 'agregarOtManifiesto' , model  , httpOptions);
+}
+
+asignarTipoOperacionAlmacen(model) {
+  return this._httpClient.post<any[]>(this.baseUrl + 'AsignarTipoOperacionAlmacen?', model , httpOptions);
+}
 
 
 getEstibaAutorizada(numhojaruta: string) {
@@ -74,7 +89,7 @@ getEstibaAutorizada(numhojaruta: string) {
 }
 confirmarSalida(model: any) {
 
-  return this._httpClient.post<OrdenTransporte[]>(this.baseUrl + 'darSalidaVehiculo?', model , httpOptions);
+  return this._httpClient.post<OrdenTransporte[]>(this.baseUrlDespacho + 'darSalidaVehiculo?', model , httpOptions);
 }
 
 getAllOrdersForDespacho(numhojaruta: string) {
@@ -102,5 +117,27 @@ generarGrt (numhojaruta: string, grt: string) {
   model.grt = grt ;
   return this._httpClient.post<OrdenTransporte[]>(this.baseUrlDespacho + 'generarGrt' , model ,httpOptions);
 }
+confirmarValijaxOTs (ots: any[]) {
 
+  return this._httpClient.post<OrdenTransporte>(this.baseUrlDespacho + 'confirmarValijaxOTs' , ots ,httpOptions);
+}
+getAllPrecintosLibres(): Observable<any[]> {
+  return this._httpClient.get<any[]>(this.baseUrlDespacho + 'getAllPrecintosLibres'  , httpOptions);
+}
+
+asignarPrecintos(numhojaruta: string, precintos: any[]) {
+
+  let  model: any  = {};
+  model.numhojaruta = numhojaruta ;
+  model.precintos = precintos;
+  return this._httpClient.post<any[]>(this.baseUrlDespacho + 'asignarPrecintos' ,model   , httpOptions);
+
+}
+desasignarPrecintos(numhojaruta: string) {
+
+  let  model: any  = {};
+  model.numhojaruta = numhojaruta ;
+  return this._httpClient.post<any[]>(this.baseUrlDespacho + 'desasignarPrecintos' ,model   , httpOptions);
+
+}
 }

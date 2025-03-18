@@ -157,6 +157,7 @@ ngOnInit() {
     {header: 'DESTINO', field: 'destino'  ,  width: '30px'  },
     {header: 'CLIENTE', field: 'razonsocial'  ,  width: '100px'  },
     {header: 'TIPO', field: 'tipooperacion'  ,  width: '100px'  },
+    {header: 'REPARTIDOR', field: 'proveedor'  ,  width: '100px'  },
     {header: 'ACCIONES', field: 'acciones'  ,  width: '30px'  },
   ];
 

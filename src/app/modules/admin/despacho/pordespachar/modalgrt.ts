@@ -70,7 +70,7 @@ export class GrtModalComponent  implements OnInit {
 
       ];
 
-      this.ordenService.getAllOrdersForDespachoAll(this.numhojaruta).subscribe(list =>  {
+      this.ordenService.getAllOrdersForDespachoAll(this.numhojaruta, 0).subscribe(list =>  {
 
            this.ordenes2 =   list;
 

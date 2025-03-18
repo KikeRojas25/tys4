@@ -219,6 +219,29 @@ export const appRoutes: Route[] = [
                  
                 ]
               },
+
+              {
+                 path : 'reportes', 
+                 loadComponent: () => import('./modules/admin/reportes/reportes.component')
+                 .then(m => m.ReportesComponent),
+                 children: [
+                  {
+                    path: 'reportegeneral',
+                    loadComponent: () => import('./modules/admin/reportes/reportegeneral/reportegeneral.component')
+                                          .then(m => m.ReportegeneralComponent)
+                  },
+                  {
+                    path: 'reportependientedespacho',
+                    loadComponent: () => import('./modules/admin/reportes/pendientedespacho/pendientedespacho.component')
+                                          .then(m => m.PendientedespachoComponent)
+                  },
+                  {
+                    path: 'reportependienteentrega',
+                    loadComponent: () => import('./modules/admin/reportes/pendienteentrega/pendienteentrega.component')
+                                          .then(m => m.PendienteentregaComponent)
+                  },
+                 ]
+              } ,
               {
                 path: 'planning',
                 loadComponent: () => import('./modules/admin/planning/planning.component')

@@ -113,7 +113,7 @@ export class DesasignarModalComponent  implements OnInit {
 
       ];
 
-      this.ordenService.getAllOrdersForDespachoAll(this.numhojaruta).subscribe(list =>  {
+      this.ordenService.getAllOrdersForDespacho(this.numhojaruta).subscribe(list =>  {
 
            this.ordenes2 =   list;
 

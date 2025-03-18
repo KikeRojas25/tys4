@@ -85,9 +85,7 @@ getConceptos(idCliente: number ,idOrigen: number, idDestino: number, idFormula: 
   return this._httpClient.get<Concepto[]>(`${this.baseUrlOrden}ObtenerConceptosTarifa?idcliente=${idCliente}&idorigen=${idOrigen}&iddestino=${idDestino}&idtipotransporte=${idTipoTransporte}&idformula=${idFormula}`
      , httpOptions);
 }
-getAllPrecintosLibres() {
-  return this._httpClient.get<OrdenTransporte[]>(this.baseUrlOrden + 'getAllPrecintosLibres'  , httpOptions);
-}
+
 
 getAllOrder(model: any) {
 
@@ -254,13 +252,11 @@ confirmarEstibaxOTs (ots: any[]) {
   console.log(ots);
   return this._httpClient.post<OrdenTransporte>(this.baseUrlOrden + 'confirmarEstibaxOTs' , ots ,httpOptions);
 }
-getAllOrdersForDespachoAll(numhojaruta: string) {
-  return this._httpClient.get<OrdenTransporte[]>(this.baseUrlOrden + 'getAllOrdersForDespachoAll?numhojaruta='  + numhojaruta, httpOptions);
+getAllOrdersForDespachoAll(numhojaruta: string , IdTipo: number) {
+  return this._httpClient.get<OrdenTransporte[]>(this.baseUrlOrden + 'getAllOrdersForDespachoAll?numhojaruta='  + numhojaruta
+    + '&IdTipo=' + IdTipo, httpOptions);
 }
-confirmarValijaxOTs (ots: any[]) {
 
-  return this._httpClient.post<OrdenTransporte>(this.baseUrl + 'confirmarValijaxOTs' , ots ,httpOptions);
-}
 uploadFileSite(formData: FormData, orden_id: number) {
 
   console.log(orden_id);

@@ -1,9 +1,9 @@
-import { HttpClient, HttpHeaders } from '@angular/common/http';
+import { HttpClient, HttpErrorResponse, HttpHeaders } from '@angular/common/http';
 import { inject, Injectable } from '@angular/core';
 import { JwtHelperService } from '@auth0/angular-jwt';
 import { UserService } from 'app/core/user/user.service';
 import { environment } from 'environments/environment';
-import { Observable } from 'rxjs';
+import { catchError, Observable, throwError } from 'rxjs';
 import { Estaciones, RespuestaApi } from './planning.types';
 import { OrdenTransporte } from '../recepcion/ordentransporte/ordentransporte.types';
 
@@ -109,8 +109,40 @@ GetAllOrdersGroupDepartament(model: any){
   GetAllOrdersDetailDeparment(idestacionorigen: number, iddepartamento: number) {
     return this._httpClient.get<OrdenTransporte[]>(this.baseUrl + 'GetAllOrdersDetailDeparment?idestacionorigen=' + idestacionorigen + '&iddepartamento=' + iddepartamento , httpOptions);
   }
-  confirmarDespacho(model: any) {
-    return this._httpClient.post(this.baseUrl + 'ConfirmarDespacho', model, httpOptions);
+  // confirmarDespacho(model: any) {
+  //   return this._httpClient.post(this.baseUrl + 'ConfirmarDespacho', model, httpOptions);
+  // }
+
+
+  confirmarDespacho(model: any): Observable<any> {
+    return this._httpClient.post(this.baseUrl + 'ConfirmarDespacho', model, httpOptions)
+        .pipe(
+            catchError(this.handleError)
+        );
+}
+
+
+  AsignarOtsaLocal(model: any) {
+    return this._httpClient.post(this.baseUrl + 'AsignarOtsaLocal', model, httpOptions);
   }
+  
+private handleError(error: HttpErrorResponse) {
+  let errorMessage = 'Ocurrió un error desconocido';
+
+  if (error.error instanceof ErrorEvent) {
+      // Error de cliente (navegador, red)
+      errorMessage = `Error: ${error.error.message}`;
+  } else {
+      // Error devuelto por el backend (500, 400, etc.)
+      if (error.status === 400) {
+          errorMessage = error.error?.message || 'Solicitud inválida';
+      } else if (error.status === 500) {
+          errorMessage = error.error?.message || 'Error interno del servidor';
+      }
+  }
+
+  console.error(errorMessage);
+  return throwError(() => new Error(errorMessage));
+}
   
 }

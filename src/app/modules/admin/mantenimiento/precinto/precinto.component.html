@@ -1,0 +1,76 @@
+<div class="flex flex-col flex-auto min-w-0 bg-card">
+  <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between p-6 sm:py-8 sm:px-10 border-b bg-card dark:bg-transparent">
+    <div class="flex-1 min-w-0">
+      <div class="flex flex-wrap items-center font-medium">
+        <div>
+          <a class="whitespace-nowrap text-primary-500">TMS</a>
+        </div>
+        <div class="flex items-center ml-1 whitespace-nowrap">
+          <mat-icon class="fuse-horizontal-navigation-item-icon" [svgIcon]="'heroicons_solid:chevron-right'"></mat-icon>
+          <a class="ml-1 text-primary-500">Precintos</a>
+        </div>
+      </div>
+      <div class="mt-2">
+        <h2 class="text-3xl md:text-4xl font-extrabold tracking-tight leading-7 sm:leading-10 truncate">
+          Gestión de Precintos
+        </h2>
+      </div>
+    </div>
+  </div>
+
+  <div class="main-content container mx-auto p-6">
+    <div class="card p-6 shadow-md rounded-lg bg-white dark:bg-gray-800">
+      <h3 class="text-lg font-semibold mb-4">Generación</h3>
+      <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
+        <div class="flex flex-col">
+          <label class="font-semibold mb-1">Precinto:</label>
+          <input pInputText [(ngModel)]="model.precinto" class="w-full" placeholder="Ingrese Precinto" />
+        </div>
+        <div class="flex flex-col">
+          <label class="font-semibold mb-1">Cantidad:</label>
+          <input pInputText [(ngModel)]="model.cantidad" class="w-full" placeholder="Ingrese Cantidad" type="number" />
+        </div>
+        <div class="flex items-end">
+          <button class="btn btn-primary flex items-center px-4 py-2 text-white bg-red-600 rounded-lg shadow-md hover:bg-red-700"
+                  pButton iconPos="left" label="Generar" icon="pi pi-plus" (click)="generar()">
+          </button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="main-content container mx-auto p-6">
+    <div class="card p-6 shadow-md rounded-lg bg-white dark:bg-gray-800">
+      <h3 class="text-lg font-semibold mb-4">Precintos</h3>
+     
+
+      <div class="overflow-x-auto overflow-y-auto max-h-[500px]">
+        <p-table [value]="precintos" [paginator]="true" [rows]="10" [rowsPerPageOptions]="[10,20,50,100]"
+                 [tableStyle]="{ 'table-layout': 'fixed', 'width': '100%' }" selectionMode="multiple" >
+          <ng-template pTemplate="header">
+            <tr>
+              <th>
+                <p-tableHeaderCheckbox></p-tableHeaderCheckbox>
+              </th>
+              <th class="text-center">Precinto</th>
+              <th class="text-center">Acciones</th>
+            </tr>
+          </ng-template>
+          <ng-template pTemplate="body" let-rowData>
+            <tr [pSelectableRow]="rowData">
+              <td class="text-center">
+                <p-tableCheckbox [value]="rowData"></p-tableCheckbox>
+              </td>
+              <td class="text-center">
+                <span class="px-2 py-1 text-white bg-green-600 rounded-lg">{{ rowData.precinto }}</span>
+              </td>
+              <td class="text-center">
+                <button pButton label="Eliminar" icon="pi pi-trash" class="p-button-danger" (click)="eliminar(rowData)"></button>
+              </td>
+            </tr>
+          </ng-template>
+        </p-table>
+      </div>
+    </div>
+  </div>
+</div>

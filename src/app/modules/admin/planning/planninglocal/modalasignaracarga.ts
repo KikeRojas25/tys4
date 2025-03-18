@@ -87,10 +87,8 @@ export class ModalAsignaraCargaLocalComponent  implements OnInit {
 
       this.user = JSON.parse(localStorage.getItem('user'));
 
-console.log('entre'); 
       this.ordenService.GetAllCargasTemporal(2).subscribe(resp => {
 
-        console.log( resp, 'aca' );
         resp.forEach(element => {
           this.tiposunidad.push({ value: element.idcarga ,  label : element.numcarga});
         });
@@ -98,9 +96,7 @@ console.log('entre');
 
     });
 
-      // this.generalService.getValorTabla(8).subscribe(resp => {
-
-      // });
+    
 
     }
     cancelar() {
@@ -109,13 +105,11 @@ console.log('entre');
     }
     guardar() {
 
+
+      this.model.idprovincia  = '';
       this.loading = true;
-      if(this.model.idtipounidad === undefined)
-      {
-      //  this.toastr.error('Debe seleccionar una carga'
-      //  , 'Planning', {
-      //    closeButton: true
-      //  });
+
+      if(this.model.idtipounidad === undefined)   {
        return;
       }
 

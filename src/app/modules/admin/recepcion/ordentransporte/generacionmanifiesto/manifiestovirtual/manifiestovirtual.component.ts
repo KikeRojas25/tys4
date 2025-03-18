@@ -25,6 +25,7 @@ import { User } from 'app/core/user/user.types';
 import { ConfirmDialogModule } from 'primeng/confirmdialog';
 import { InputNumberModule } from 'primeng/inputnumber';
 import { thumbnailsDownIcon } from '@progress/kendo-svg-icons';
+import { PlanningService } from 'app/modules/admin/planning/planning.service';
 
 @Component({
   selector: 'app-manifiestovirtual',
@@ -65,6 +66,7 @@ export class ManifiestovirtualComponent implements OnInit {
   hojasRuta: any[] = [];
   origenes: any[] = [];
   destinos: any[] = [];
+  estaciones: SelectItem[] = [];
 
   direcciones: any[] = [];
 
@@ -106,6 +108,7 @@ export class ManifiestovirtualComponent implements OnInit {
     private traficoService: TraficoService,
     private datePipe: DatePipe,
     private messageService: MessageService,
+    private planningService: PlanningService,
     private confirmationService: ConfirmationService ,
     private router: Router,
   ) { }
@@ -127,6 +130,14 @@ export class ManifiestovirtualComponent implements OnInit {
 
     this.user = JSON.parse(localStorage.getItem('user'));
     this.model.IdUsuarioRegistro = this.user.id;
+
+
+    
+    this.planningService.GetAllEstaciones().subscribe(resp => {
+      resp.forEach(element => {
+        this.estaciones.push({ value: element.idEstacion ,  label : element.estacionOrigen});
+      });
+    });
 
 
 
@@ -302,7 +313,6 @@ export class ManifiestovirtualComponent implements OnInit {
         
         this.ordenService.generarManifiesto(this.model).subscribe(resp => {
 
-              console.log('generado',resp);
 
               this.messageService.add({ severity: 'success', summary: 'Generación de Manifiesto', detail: 'Se ha generado el manifiesto de manera correcta.' });
               

@@ -1,0 +1,23 @@
+.word-wrap {
+    white-space: normal; /* Permitir saltos de línea */
+    word-wrap: break-word; /* Romper palabras largas */
+  }
+  
+  .text-wrap {
+    overflow-wrap: break-word; /* Romper palabras largas */
+  }
+
+  .custom-timeline .p-timeline-event-opposite,
+  .custom-timeline .p-timeline-event-content {
+      margin-bottom: 0.5rem; /* Ajusta la separación vertical */
+  }
+  
+  .custom-timeline .p-timeline-event {
+      margin-left: 1rem; /* Reduce la separación horizontal si es necesario */
+      margin-right: 1rem; /* Reduce la separación horizontal si es necesario */
+  }
+  
+  .custom-timeline .p-timeline-event-connector {
+      height: 120px; /* Reduce la altura de los conectores entre eventos */
+  }
+  

@@ -12,6 +12,9 @@ import { DropdownModule } from 'primeng/dropdown';
 import { CommonModule } from '@angular/common';
 import { InputTextModule } from 'primeng/inputtext';
 import { OrdenTransporteService } from '../../recepcion/ordentransporte/ordentransporte.service';
+import { MantenimientoService } from '../../mantenimiento/mantenimiento.service';
+import { PlanningService } from '../../planning/planning.service';
+import { TraficoService } from '../../trafico/trafico.service';
 
 
 
@@ -21,7 +24,7 @@ import { OrdenTransporteService } from '../../recepcion/ordentransporte/ordentra
 <div class=" mb-3 col-md-12">
 
      <p-dropdown name="hojasruta"
-                      [options]="hojasruta" [(ngModel)]="model.idmanifiesto"
+                      [options]="hojasruta" [(ngModel)]="model.numhojaruta"
                       scrollHeight="30vh"  class="input-form-field"
                       [virtualScroll]="true" itemSize="30"  (onChange)="cargarManifiestos($event)"
                       [style]="{'width':'100%'}" [resetFilterOnHide]="false"
@@ -229,10 +232,15 @@ export class AgregarOThrModalComponent  implements OnInit {
     selectedOTs: OrdenTransporte[]= [];
 
     constructor(private despachoService: DespachoService
-             ,  private ordenTransporteService:  OrdenTransporteService
-            ,    public messageService: MessageService
-            ,    public ref: DynamicDialogRef, public config: DynamicDialogConfig) {
+             ,private ordenTransporteService:  OrdenTransporteService
+            ,public messageService: MessageService
+            ,private planningService: PlanningService
+            ,private traficoService: TraficoService
+            ,private  generalService: MantenimientoService
+            ,public ref: DynamicDialogRef, public config: DynamicDialogConfig) {
 
+
+             
 
          }
 
@@ -275,25 +283,31 @@ export class AgregarOThrModalComponent  implements OnInit {
         });
 
 
-        // this.generalService.GetAllEstaciones().subscribe(resp => {
+        this.planningService.GetAllEstaciones().subscribe(resp => {
+          resp.forEach(element => {
+            this.estaciones.push({ value: element.idEstacion ,  label : element.estacionOrigen});
+          });
+        });
+    
+    
+        // this.ordenService.getValorTabla(24).subscribe(resp => {
         //   resp.forEach(element => {
-        //     this.estaciones.push({ value: element.idestacion ,  label : element.estacionorigen});
+        //     this.agencias.push({ value: element.idValorTabla ,  label : element.valor});
         //   });
         // });
+    
+        
+        this.traficoService.getProveedores("", 24669).subscribe(resp => {
+          resp.forEach(element => {
+            this.agencias.push({ value: element.idProveedor ,  label : element.razonSocial.toUpperCase() });
+          });
+        });
 
-
-        // this.generalService.getValorTabla(24).subscribe(resp => {
-        //   resp.forEach(element => {
-        //     this.agencias.push({ value: element.idvalortabla ,  label : element.valor});
-        //   });
-        // });
-
-
-        // this.generalService.getProveedores("", 21514).subscribe(resp => {
-        //   resp.forEach(element => {
-        //     this.repartidores.push({ value: element.idproveedor ,  label : element.razonSocial  +   '-'   +    element.ruc});
-        //   });
-        // });
+        this.generalService.getProveedores("", 21514).subscribe(resp => {
+          resp.forEach(element => {
+            this.repartidores.push({ value: element.idProveedor ,  label : element.razonSocial  +   '-'   +    element.ruc});
+          });
+        });
 
 
 
@@ -317,6 +331,8 @@ export class AgregarOThrModalComponent  implements OnInit {
     }
     agregar() {
       this.model.ids = '';
+
+     
 
 
       if(this.selectedOTs.length === 0){
@@ -347,51 +363,54 @@ export class AgregarOThrModalComponent  implements OnInit {
 
       this.model.idusuariocreacion = 2;
 
-      // this.selectedOTs.forEach(item => {
+      this.selectedOTs.forEach(item => {
 
+        console.log( 'es', item );
+        //  this.despachoService.getOrdenTransporteByNumcp(item.numcp).subscribe(resp => {
+           this.model.idordentrabajo =   item.idordentrabajo;
 
-      //    this.ordenService.getOrdenTransporteByNumcp(item.numcp).subscribe(resp => {
-      //      this.model.idordentrabajo =   resp.idordentrabajo;
+           this.model.ids = ',' +   item.idordentrabajo ;
 
-      //      this.model.ids = ',' +   resp.idordentrabajo ;
+           this.despachoService.asignarTipoOperacionAlmacen(this.model ).subscribe( x=> {
 
-      //      this.ordenService.asignarTipoOperacionAlmacen(this.model ).subscribe( x=> {
+            // this.despachoService.GenerarOTsPendientes(this.model).subscribe(x => {
 
+                // this.despachoService.agregarOtManifiesto(this.model).subscribe(resp => {
+                   
+                  this.messageService.add({severity:'success', summary:'Agregar OTs', detail:'Se han agregado las OTs de manera correcta'});
 
-      //       this.messageService.add({severity:'success', summary:'Agregar OTs', detail:'Se han agregado las OTs de manera correcta'});
-
-      //       this.ref.close();
-
-      //     })
-      //   })
-      // });
-
-      // this.ordenService.getOrdenTransporteByNumcp(this.model.numcp).subscribe(resp => {
-      //      this.model.idordentrabajo =   resp.idordentrabajo;
-
-      //      this.model.ids = ',' +   resp.idordentrabajo ;
-
-      //      this.ordenService.asignarTipoOperacionAlmacen(this.model ).subscribe( x=> {
-
-      //       this.ordenService.GenerarOTsPendientes(this.model).subscribe(x => {
-      //         this.ref.close();
-
-      //       })
+                  this.ref.close();
+                  })
+           //  });
 
 
 
+          
+
+          // })
+       // })
+      });
+
+    //  this.despachoService.getOrdenTransporteByNumcp(this.model.numcp).subscribe(resp => {
+          //  this.model.idordentrabajo =   item.idordentrabajo;
+
+          //  this.model.ids = ',' +   item.idordentrabajo ;
+
+          //  this.despachoService.asignarTipoOperacionAlmacen(this.model ).subscribe( x=> {
+          
 
 
-      //     })
-
-
-      // })
 
 
 
-      // this.ordenService.agregarOtManifiesto(this.model).subscribe(resp => {
-      //     this.ref.close();
-      // });
+         // })
+
+
+      //})
+
+
+
+    
 
     }
 

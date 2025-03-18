@@ -97,6 +97,32 @@
           </div>
         </div>
 
+
+
+        <div *ngIf="model.idtipoOperacion === 124" class="grid grid-cols-1 lg:grid-cols-3 gap-4 col-span-1 lg:col-span-3 w-full">
+          <div class="field flex flex-col">
+            <label>Estación:</label>
+            <p-dropdown name="estaciones"
+            [options]="estaciones" [(ngModel)]="model.idestacion"
+            scrollHeight="20vh"  class="input-form-field"
+            appendTo="body"
+            [baseZIndex]="100000"
+            [virtualScroll]="true" itemSize="4"
+            [style]="{'width':'100%'}" [resetFilterOnHide]="false"
+            [hideTransitionOptions]="'0ms'"
+            [showTransitionOptions]="'0ms'"
+            placeholder="seleccione una estación"
+
+            filter="false">
+                <ng-template let-item pTemplate="selectedItem">
+                    <span style="vertical-align:left;">{{item.label}}</span>
+                </ng-template>
+          </p-dropdown>
+          </div>
+
+         
+        </div>
+
         <!-- Placa y Conductor: Solo si Hoja de Ruta es nueva y no hay hoja seleccionada -->
         <div *ngIf="isNuevaHojaRuta && model.idtipoOperacion !== 123" class="grid grid-cols-1 lg:grid-cols-3 gap-4 col-span-1 lg:col-span-3 w-full">
           <div class="field flex flex-col">
