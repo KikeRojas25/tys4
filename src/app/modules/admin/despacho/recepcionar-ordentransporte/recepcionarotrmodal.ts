@@ -24,6 +24,7 @@ import { InputNumberModule } from 'primeng/inputnumber';
           <th class="text-left text-sm font-semibold text-gray-600 px-4 py-2 border-b">Peso</th>
           <th class="text-left text-sm font-semibold text-gray-600 px-4 py-2 border-b">Bultos</th>
           <th class="text-left text-sm font-semibold text-gray-600 px-4 py-2 border-b">Volumen</th>
+          <th class="text-left text-sm font-semibold text-gray-600 px-4 py-2 border-b">PesoVol</th>
         </tr>
       </thead>
       <tbody>
@@ -31,6 +32,7 @@ import { InputNumberModule } from 'primeng/inputnumber';
           <td class="text-sm text-gray-800 px-4 py-2 border-b">{{ model.peso }}</td>
           <td class="text-sm text-gray-800 px-4 py-2 border-b">{{ model.bulto }}</td>
           <td class="text-sm text-gray-800 px-4 py-2 border-b">{{ model.volumen }}</td>
+          <td class="text-sm text-gray-800 px-4 py-2 border-b">{{ model.pesovol }}</td>
         </tr>
       </tbody>
     </table>
@@ -45,6 +47,9 @@ import { InputNumberModule } from 'primeng/inputnumber';
         [(ngModel)]="model.pesonuevo"
         inputId="pesonuevo"
         mode="decimal"
+          locale="es-PE"
+           [minFractionDigits]="1"
+  [maxFractionDigits]="2"
       ></p-inputNumber>
     </div>
     <!-- Bultos -->
@@ -53,7 +58,8 @@ import { InputNumberModule } from 'primeng/inputnumber';
       <p-inputNumber
         [(ngModel)]="model.bultonuevo"
         inputId="bultonuevo"
-        mode="decimal"
+        locale="es-PE"
+        
       ></p-inputNumber>
     </div>
     <!-- Volumen -->
@@ -63,6 +69,21 @@ import { InputNumberModule } from 'primeng/inputnumber';
         [(ngModel)]="model.volumennuevo"
         inputId="volumennuevo"
         mode="decimal"
+          locale="es-PE"
+           [minFractionDigits]="1"
+  [maxFractionDigits]="2"
+      ></p-inputNumber>
+    </div>
+     <!-- Peso Volumen -->
+     <div>
+      <h6 class="text-sm font-medium text-gray-600 mb-1">Peso Vol</h6>
+      <p-inputNumber
+        [(ngModel)]="model.pesovolnuevo"
+        inputId="pesovolnuevo"
+        mode="decimal"
+          locale="es-PE"
+           [minFractionDigits]="1"
+  [maxFractionDigits]="2"
       ></p-inputNumber>
     </div>
   </div>
@@ -121,11 +142,14 @@ export class RecepcioanrOTRModalComponent  implements OnInit {
 
 
       this.user = JSON.parse(localStorage.getItem('user'));
-      this.model.idusuariocreacion = this.user.usr_int_id;
+     
+
+      console.log(  'model' ,this.model);
 
 
       this.ordenService.getOrden( this.model.idordentrabajo).subscribe( resp => {
             this.model = resp.ordenTransporte;
+            this.model.idusuariocreacion = this.user.id;
             console.log(this.model,'popup');
       });
 

@@ -272,7 +272,7 @@
             <div class="field flex flex-col">
                 <label for="peso">Peso Kg.</label>
                 <p-inputNumber name="peso" mode="decimal" [minFractionDigits]="2" [maxFractionDigits]="5" 
-                               [min]="0" [max]="30000" formControlName="peso" required></p-inputNumber>
+                               [min]="0" [max]="100000" formControlName="peso" required></p-inputNumber>
                 <div *ngIf="form.get('peso')?.invalid && form.get('peso')?.touched" class="alert-danger">
                     <div *ngIf="form.get('peso')?.errors?.required">Requiere ingresar el peso.</div>
                 </div>
@@ -281,7 +281,7 @@
             <div class="field flex flex-col">
                 <label for="volumen">Volumen m3</label>
                 <p-inputNumber name="volumen" mode="decimal" [minFractionDigits]="2" [maxFractionDigits]="5" 
-                               [min]="0" [max]="1000" formControlName="volumen" required></p-inputNumber>
+                               [min]="0" [max]="100000" formControlName="volumen" required></p-inputNumber>
                 <div *ngIf="form.get('volumen')?.invalid && form.get('volumen')?.touched" class="alert-danger">
                     <div *ngIf="form.get('volumen')?.errors?.required">Requiere ingresar el volumen.</div>
                 </div>
@@ -290,7 +290,7 @@
             <div class="field flex flex-col">
                 <label for="pesovol">Peso Vol</label>
                 <p-inputNumber name="pesovol" mode="decimal" [minFractionDigits]="2" [maxFractionDigits]="5" 
-                               [min]="0" [max]="1000" formControlName="pesovol" required></p-inputNumber>
+                               [min]="0" [max]="100000" formControlName="pesovol" required></p-inputNumber>
                 <div *ngIf="form.get('pesovol')?.invalid && form.get('pesovol')?.touched" class="alert-danger">
                     <div *ngIf="form.get('pesovol')?.errors?.required">Requiere ingresar el peso vol.</div>
                 </div>

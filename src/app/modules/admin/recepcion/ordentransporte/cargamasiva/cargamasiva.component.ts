@@ -2,7 +2,7 @@ import { CommonModule } from '@angular/common';
 import { Component, OnInit, ViewChild } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { MatIcon } from '@angular/material/icon';
-import { ConfirmationService, MessageService, PrimeNGConfig } from 'primeng/api';
+import { ConfirmationService, MessageService, PrimeNGConfig, SelectItem } from 'primeng/api';
 import { ButtonModule } from 'primeng/button';
 import { CalendarModule } from 'primeng/calendar';
 import { DropdownModule } from 'primeng/dropdown';
@@ -15,6 +15,7 @@ import { FileUpload, FileUploadModule } from 'primeng/fileupload';
 import { OrdenTransporteService } from '../ordentransporte.service';
 import { User } from 'app/core/user/user.types';
 import { ConfirmDialogModule } from 'primeng/confirmdialog';
+import { Router } from '@angular/router';
 
 @Component({
   selector: 'app-cargamasiva',
@@ -50,7 +51,7 @@ export class CargamasivaComponent implements OnInit {
   files = [];
   totalSize : number = 0;
   totalSizePercent : number = 0;
-
+  clientes: SelectItem[] = [];
 
 
   public errors = 0;
@@ -92,6 +93,7 @@ export class CargamasivaComponent implements OnInit {
   constructor(private ordenTransporteService: OrdenTransporteService,
     private messageService: MessageService,
     private confirmationService: ConfirmationService ,
+    private router: Router,
     private config: PrimeNGConfig
   ) { }
 
@@ -115,6 +117,22 @@ export class CargamasivaComponent implements OnInit {
         {header: 'NRO GUIA', field: 'personarecojo' , width: '220px'  },
         {header: 'PESO', field: 'centroacopio' , width: '120px'  },
      ];
+
+     console.log('user:', this.user);
+
+     
+
+    this.ordenTransporteService.getClientes(this.user.idclientes).subscribe(resp => {
+
+        const mappedClients = resp.map((item: any) => ({
+          value: item.idCliente,
+          label: item.razonSocial
+        }));
+
+        this.clientes.push(...mappedClients);
+
+
+    });
 
 
   }
@@ -241,8 +259,13 @@ uploadSelectedFiles() {
 
         this.ordenTransporteService.procesarCargaMasiva(this.idcarga ).subscribe(resp => {
 
-       
-       //   this.router.navigate(['seguimientoot/listadoordentransporte']);
+          this.messageService.add({
+            severity: 'info',
+            summary: 'Exitoso',
+            detail: 'Archivo Procesado exitosamente.',
+            life: 3000
+          });
+          this.router.navigate(['seguimientoot/listadoordentransporte']);
 
 
 

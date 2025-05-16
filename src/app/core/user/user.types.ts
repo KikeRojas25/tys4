@@ -19,5 +19,6 @@ export interface User {
     usr_str_red: string;
     idestacionorigen? : number;
     estrafico?: boolean;
+    idclientes: string;
     
 }

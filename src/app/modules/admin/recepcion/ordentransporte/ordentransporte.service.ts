@@ -61,6 +61,9 @@ getUbigeo(criterio): Observable<Ubigeo[]> {
   return this._httpClient.get<Ubigeo[]>(`${this.baseMantenimientoUrl}GetListUbigeo?criterio=${criterio}`  , httpOptions);
 }
 getClientes(criterio: any): Observable<Cliente[]> {
+  if (criterio === undefined) {
+    criterio = '';
+  }
   return this._httpClient.get<Cliente[]>(`${this.baseUrlCliente}GetAllClients?idscliente=${criterio}`   , httpOptions);
 }
 getValorTabla(TablaId: number): Observable<ValorTabla[]> {
@@ -153,6 +156,20 @@ actualizarOrden(model: any) {
 );
 }
 
+
+
+unConfirm(model: any) {
+
+  return this._httpClient.post(this.baseUrl + 'DesconfirmarEntrega', model, httpOptions)
+  .pipe(
+    map((response: any) => {
+    }
+  )
+);
+}
+
+
+
  confirmar_entrega(model: any) {
 
   return this._httpClient.post(this.baseUrl + 'ConfirmarEntregav2', model, httpOptions)
@@ -222,7 +239,7 @@ confirmarDespacho(model: any) {
 
 uploadFile(file: File, UserId: number, ClienteId: number) : any {
 
-  ClienteId = 20789;
+  ClienteId = 11200;
 
   const formData = new FormData();
   formData.append('file', file);

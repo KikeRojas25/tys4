@@ -65,8 +65,7 @@ export class IntegradolocalComponent implements OnInit {
         {header: 'HR', field: 'numHojaRuta'  ,  width: '80px' },
         {header: 'F. DESPACHO', field: 'fechaDespacho'  ,  width: '20px' },
         {header: 'ORIGEN', field: 'origen' , width: '90px'  },
-        {header: 'DESTINO', field: 'destino' , width: '90px'  },
-        
+      
         {header: '#OTS', field: 'cantidad' , width: '50px'  },
         {header: 'PESO', field: 'peso'  ,  width: '80px'  },
 

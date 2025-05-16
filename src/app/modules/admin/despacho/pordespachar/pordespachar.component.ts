@@ -121,6 +121,7 @@ export class PordespacharComponent implements OnInit {
         {header: 'CONDUCTOR', field: 'nombrechofer' , width: '180px'  },
         {header: 'HOJA DE RUTA', field: 'numhojaruta' , width: '90px'  },
         {header: 'PROVEEDOR', field: 'proveedor'  , width: '190px'   },
+        {header: 'FECHA DESPACHO PLANNING', field: 'fechahoraplanning' , width: '90px'  },
         {header: 'PRECINTOS', field: 'precinto' , width: '90px'  },
         {header: 'ACCIÓN', field: 'idordentrabajo'  ,  width: '120px' },
 
@@ -167,6 +168,9 @@ export class PordespacharComponent implements OnInit {
 
               this.loading = false;
               this.ordenes2 = list;
+
+
+              console.log(this.ordenes2);
 
 
               this.ordenes2.forEach(item => {

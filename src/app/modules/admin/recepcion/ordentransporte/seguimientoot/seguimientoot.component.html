@@ -137,7 +137,11 @@
         <ng-template pTemplate="body" let-rowData let-columns="columns">
           <tr [pSelectableRow]="rowData">
             <!-- Acción -->
+
+            
             <td>
+              <p-button  label=""        size="small" title='Ver Fotos' icon='fa fa-download'  (click)='verarchivos(rowData.idordentrabajo);' > </p-button>
+              
               <p-button *ngIf="rowData?.estado === 'Entregado' && estrafico === true"  
               icon="pi pi-book" 
               title="Editar" 
@@ -217,23 +221,23 @@
     </div>
   
 </div>
-<p-dialog header="Tracking OT" [modal]="true" [(visible)]="dialoglifecycle" [style]="{ width: '105rem' }">
+<p-dialog header="Tracking OT" [modal]="true" [(visible)]="dialoglifecycle" [style]="{ width: '60rem' }">
   <p-table [value]="events" [style]="{ width: '100%' }">
     <ng-template pTemplate="header">
       <tr>
-        <th style="width: 20%;">Registro</th>
+        <th style="width: 20%;">Fecha registro</th>
+        <th style="width: 20%;">Fecha evento</th>
+        <th style="width: 20%;">Usuario registro</th>
         <th style="width: 20%;">Evento</th>
-        <th style="width: 20%;">¿Quién?</th>
-        <th style="width: 20%;">Estado</th>
       </tr>
     </ng-template>
     <ng-template pTemplate="body" let-event>
       <tr>
         <td>
-          {{ event.dateEvent ? (event.dateRegister ? (event.dateRegister | date:'dd/MM/yyyy') : 'Sin dato') : 'Sin dato' }}
+          {{ event.dateEvent ? (event.dateRegister ? (event.dateRegister | date:'dd/MM/yyyy HH:mm') : 'Sin dato') : 'Sin dato' }}
         </td>
         <td>
-          {{ event.dateEvent ? (event.dateEvent | date:'dd/MM/yyyy') : 'Sin evento' }}
+          {{ event.dateEvent ? (event.dateEvent | date:'dd/MM/yyyy HH:mm' ) : 'Sin evento' }}
         </td>
         <td>
           {{ event.dateEvent ? (event.user || 'Sin dato') : 'Sin dato' }}

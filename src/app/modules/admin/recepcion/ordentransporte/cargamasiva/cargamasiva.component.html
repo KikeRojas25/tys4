@@ -1,176 +1,489 @@
-<div class="flex flex-col flex-auto min-w-0 bg-card">
-    <!-- Cabecera -->
-    <div class="flex flex-col sm:flex-row flex-0 sm:items-center sm:justify-between p-6 sm:py-8 sm:px-10 border-b bg-card dark:bg-transparent">
-      <div class="flex-1 min-w-0">
-        <div class="flex flex-wrap items-center font-medium">
-          <div>
-            <a class="whitespace-nowrap text-primary-500">TMS</a>
+<div class="flex flex-col flex-auto min-w-0">
+
+  <!-- Sección: Cliente -->
+  <div class="p-6 sm:py-8 sm:px-10 border-b bg-card dark:bg-transparent">
+    <p-toast />
+    <div class="flex flex-col md:flex-row gap-6">
+      
+      <!-- Combo Cliente -->
+      <!-- <div class="w-full md:w-1/2">
+        <h2 class="text-lg font-semibold mb-2">Cliente:</h2>
+        <p-dropdown
+          name="clientes"
+          [options]="clientes"
+          [(ngModel)]="model.idcliente"
+          scrollHeight="30vh"
+          class="w-full"
+          [virtualScroll]="true"
+          itemSize="30"
+          [style]="{ 'width': '100%' }"
+          [resetFilterOnHide]="false"
+          [hideTransitionOptions]="'0ms'"
+          [showTransitionOptions]="'0ms'"
+          placeholder="Seleccione un cliente"
+          filter="true"
+        >
+          <ng-template let-item pTemplate="selectedItem">
+            <span class="align-middle">{{ item.label }}</span>
+          </ng-template>
+        </p-dropdown>
+      </div> -->
+
+      <!-- Subida de Archivos -->
+      <div class="w-full md:w-1/2">
+        <p-fileUpload
+        name="myfile[]"
+        #fileUpload
+        [multiple]="true"
+        accept=".xlsx, .xls, application/vnd.openxmlformats-officedocument.spreadsheetml.sheet, application/vnd.ms-excel"
+        maxFileSize="1000000"
+        customUpload="true"
+        (onUpload)="onTemplatedUpload($event)"
+        (onSelect)="onSelectedFiles($event)"
+      >
+        <!-- Header -->
+        <ng-template
+          pTemplate="header"
+          let-files
+          let-chooseCallback="chooseCallback"
+          let-clearCallback="clearCallback"
+          let-uploadCallback="uploadCallback"
+        >
+          <div class="flex flex-wrap justify-between items-center gap-3">
+            <div class="flex gap-2">
+              <p-button (onClick)="choose($event, chooseCallback)" icon="pi pi-file-excel" [rounded]="true" [outlined]="true" />
+              <p-button
+                (onClick)="uploadSelectedFiles()"
+                icon="pi pi-cloud-upload"
+                [rounded]="true"
+                [outlined]="true"
+                severity="success"
+                [disabled]="!files || files.length === 0"
+              />
+              <p-button
+                (onClick)="clearCallback()"
+                icon="pi pi-times"
+                [rounded]="true"
+                [outlined]="true"
+                severity="danger"
+                [disabled]="!files || files.length === 0"
+              />
+            </div>
+            <p-progressBar
+              [value]="totalSizePercent"
+              [showValue]="false"
+              styleClass="md:w-20rem h-1rem w-full md:ml-auto"
+              [ngClass]="{ 'exceeded-progress-bar': totalSizePercent > 100 }"
+            >
+              <span>{{ totalSize }}B / 1Mb</span>
+            </p-progressBar>
           </div>
-          <div class="flex items-center ml-1 whitespace-nowrap">
-            <mat-icon class="fuse-horizontal-navigation-item-icon" [svgIcon]="'heroicons_solid:chevron-right'"></mat-icon>
-            <a class="ml-1 text-primary-500">Seguimiento</a>
+        </ng-template>
+      
+        <!-- Contenido de archivos -->
+        <ng-template
+          pTemplate="content"
+          let-files
+          let-uploadedFiles="uploadedFiles"
+          let-removeFileCallback="removeFileCallback"
+          let-removeUploadedFileCallback="removeUploadedFileCallback"
+        >
+          <!-- Archivos pendientes -->
+          <div *ngIf="files?.length > 0">
+            <h5 class="mt-4 mb-2 text-lg font-semibold text-gray-700">Pendientes</h5>
+            <div class="flex flex-wrap gap-3">
+              <div
+                *ngFor="let file of files; let i = index"
+                class="flex items-center gap-4 border p-3 rounded-md w-full md:w-[48%] shadow-sm bg-white"
+              >
+                <i class="pi pi-file-excel text-2xl text-green-600"></i>
+                <div class="flex-1">
+                  <div class="font-medium text-gray-800">{{ file.name }}</div>
+                  <div class="text-sm text-gray-500">{{ formatSize(file.size) }}</div>
+                </div>
+                <p-badge value="Pending" severity="warning" class="mr-2" />
+                <p-button
+                  icon="pi pi-times"
+                  (onClick)="onRemoveTemplatingFile($event, file, removeFileCallback, i)"
+                  [outlined]="true"
+                  [rounded]="true"
+                  severity="danger"
+                />
+              </div>
+            </div>
           </div>
-        </div>
-        <div class="mt-2">
-          <h2 class="text-3xl md:text-4xl font-extrabold tracking-tight leading-7 sm:leading-10 truncate">Generación Masiva de OTs</h2>
-        </div>
+      
+          <!-- Archivos completados -->
+          <div *ngIf="uploadedFiles?.length > 0">
+            <h5 class="mt-6 mb-2 text-lg font-semibold text-gray-700">Completados</h5>
+            <div class="flex flex-wrap gap-3">
+              <div
+                *ngFor="let file of uploadedFiles; let i = index"
+                class="flex items-center gap-4 border p-3 rounded-md w-full md:w-[48%] shadow-sm bg-white"
+              >
+                <i class="pi pi-file-excel text-2xl text-blue-600"></i>
+                <div class="flex-1">
+                  <div class="font-medium text-gray-800">{{ file.name }}</div>
+                  <div class="text-sm text-gray-500">{{ formatSize(file.size) }}</div>
+                </div>
+                <p-badge value="Completed" severity="success" class="mr-2" />
+                <p-button
+                  icon="pi pi-times"
+                  (onClick)="removeUploadedFileCallback(i)"
+                  [outlined]="true"
+                  [rounded]="true"
+                  severity="danger"
+                />
+              </div>
+            </div>
+          </div>
+        </ng-template>
+      
+        <!-- Vista vacía -->
+        <ng-template pTemplate="empty">
+          <div class="flex flex-col items-center justify-center text-center p-5">
+            <i class="pi pi-cloud-upload border-2 border-circle p-5 text-6xl text-gray-400 border-gray-300"></i>
+            <p class="mt-4 mb-0 text-gray-500">Arrastra y suelta archivos aquí para subirlos.</p>
+          </div>
+        </ng-template>
+      </p-fileUpload>
+       
       </div>
     </div>
-  
+  </div>
 
-            <div class="flex flex-col flex-auto min-w-0">
+  <!-- Procesar sección -->
+  <div class="p-6">
+    <div *ngIf="btnprocesar" class="bg-yellow-500 text-black font-semibold p-4 rounded-lg shadow-lg hover:bg-yellow-600 hover:shadow-2xl transition-all">
+      <p>Procesa la carga para generar las órdenes de transporte en el sistema.</p>
+      <p-button severity="danger" (click)="procesar()">Procesar</p-button>
+    </div>
+  </div>
 
-            <div #appendTo class="flex flex-col sm:flex-row flex-0 sm:items-center  p-6 sm:py-8 sm:px-10 border-b bg-card dark:bg-transparent">
+  <!-- Tabla de resultados -->
+  <div class="p-6">
+    <div class="overflow-x-auto bg-white shadow-md rounded-lg">
+      <p-table
+        [columns]="cols"
+        [scrollable]="false"
+        [style]="{ width: '100%' }"
+        [value]="ordenes"
+        #dt
+        [paginator]="true"
+        selectionMode="multiple"
+        [rows]="10"
+        [rowsPerPageOptions]="[20, 40, 60, 120]"
+        [responsive]="true"
+      >
+        <ng-template pTemplate="colgroup" let-columns>
+          <colgroup>
+            <col *ngFor="let col of columns" [ngStyle]="{ width: col.width }" />
+          </colgroup>
+        </ng-template>
 
+        <ng-template pTemplate="header" let-columns>
+          <tr>
+            <th *ngFor="let col of columns" pResizableColumn [pSortableColumn]="col.field">
+              {{ col.header }}
+            </th>
+          </tr>
+        </ng-template>
 
-                <p-toast />
-                <p-fileUpload name="myfile[]"   #fileUpload 
-                [multiple]="true" 
-                accept=".xlsx, .xls, application/vnd.openxmlformats-officedocument.spreadsheetml.sheet, application/vnd.ms-excel"  
-                maxFileSize="1000000"
-                customUpload="true"
-                (onUpload)="onTemplatedUpload($event)" 
-                (onSelect)="onSelectedFiles($event)">
-                    <ng-template pTemplate="header" let-files let-chooseCallback="chooseCallback" let-clearCallback="clearCallback" let-uploadCallback="uploadCallback">
-                        <div class="flex flex-wrap justify-content-between align-items-center flex-1 gap-2">
-                            <div class="flex gap-2">
-                                <p-button (onClick)="choose($event, chooseCallback)" icon="pi pi-images" [rounded]="true" [outlined]="true" />
-                                <p-button (onClick)="uploadSelectedFiles()" icon="pi pi-cloud-upload" [rounded]="true" [outlined]="true" severity="success" [disabled]="!files || files.length === 0" />
-                                <p-button (onClick)="clearCallback()" icon="pi pi-times" [rounded]="true" [outlined]="true" severity="danger" [disabled]="!files || files.length === 0" />
-                            </div>
-                            <p-progressBar [value]="totalSizePercent" [showValue]="false" styleClass="md:w-20rem h-1rem w-full md:ml-auto" [ngClass]="{ 'exceeded-progress-bar': totalSizePercent > 100 }">
-                                <span class="white-space-nowrap">{{ totalSize }}B / 1Mb</span>
-                            </p-progressBar>
-                        </div>
-                    </ng-template>
-                    <ng-template pTemplate="content" let-files let-uploadedFiles="uploadedFiles" let-removeFileCallback="removeFileCallback" let-removeUploadedFileCallback="removeUploadedFileCallback">
-                        <div *ngIf="files?.length > 0">
-                            <h5>Pending</h5>
-                            <div class="flex flex-wrap p-0 sm:p-5 gap-5">
-                                <div *ngFor="let file of files; let i = index" class="card m-0 px-6 flex flex-column border-1 surface-border align-items-center gap-3">
-                                    <div>
-                                        <img role="presentation" [alt]="file.name" [src]="file.objectURL" width="100" height="50" />
-                                    </div>
-                                    <span class="font-semibold">{{ file.name }}</span>
-                                    <div>{{ formatSize(file.size) }}</div>
-                                    <p-badge value="Pending" severity="warning" />
-                                    <p-button icon="pi pi-times" (onClick)="onRemoveTemplatingFile($event, file, removeFileCallback, index)" [outlined]="true" [rounded]="true" severity="danger" />
-                                </div>
-                            </div>
-                        </div>
-                        <div *ngIf="uploadedFiles?.length > 0">
-                            <h5>Completed</h5>
-                            <div class="flex flex-wrap p-0 sm:p-5 gap-5">
-                                <div *ngFor="let file of uploadedFiles; let i = index" class="card m-0 px-6 flex flex-column border-1 surface-border align-items-center gap-3">
-                                    <div>
-                                        <img role="presentation" [alt]="file.name" [src]="file.objectURL" width="100" height="50" />
-                                    </div>
-                                    <span class="font-semibold">{{ file.name }}</span>
-                                    <div>{{ formatSize(file.size) }}</div>
-                                    <p-badge value="Completed" class="mt-3" severity="success" />
-                                    <p-button icon="pi pi-times" (onClick)="removeUploadedFileCallback(index)" [outlined]="true" [rounded]="true" severity="danger" />
-                                </div>
-                            </div>
-                        </div>
-                    </ng-template>
-                    <ng-template pTemplate="file"> </ng-template>
-                    <ng-template pTemplate="empty">
-                        <div class="flex align-items-center justify-content-center flex-column">
-                            <i class="pi pi-cloud-upload border-2 border-circle p-5 text-8xl text-400 border-400"></i>
-                            <p class="mt-4 mb-0">Drag and drop files here to upload.</p>
-                        </div>
-                    </ng-template>
-                </p-fileUpload>
-                
+        <ng-template pTemplate="body" let-rowData let-columns="columns">
+          <tr [pSelectableRow]="rowData" class="hover:bg-gray-100">
+            <td>{{ rowData.error }}</td>
+            <td class="text-center">{{ rowData.clientnum }}</td>
+            <td>{{ rowData.lastname }}</td>
+            <td>{{ rowData.addr1 }}</td>
+            <td>{{ rowData.addr2 }}</td>
+            <td>{{ rowData.addr3 }}</td>
+            <td>{{ rowData.addr4 }}</td>
+            <td>{{ rowData.addr5 }}</td>
+            <td>{{ rowData.homephone }}</td>
+            <td>{{ rowData.numguia }}</td>
+            <td>{{ rowData.peso }}</td>
+          </tr>
+        </ng-template>
+        <div class="flex flex-col flex-auto min-w-0 bg-gray-50 dark:bg-gray-900 text-gray-800 dark:text-gray-200">
 
-
-
+          <!-- Header -->
+          <div class="p-6 border-b bg-white dark:bg-gray-800 shadow-sm">
+            <div class="flex items-center text-sm text-gray-600 dark:text-gray-400 mb-2">
+              <a class="text-primary-500 font-medium">TMS</a>
+              <mat-icon class="mx-2 text-xs" [svgIcon]="'heroicons_solid:chevron-right'"></mat-icon>
+              <a class="text-primary-500 font-medium">Seguimiento</a>
             </div>
-          
-
-            <div class="flex flex-col flex-auto min-w-0">
-
-           
-                <div class="p-6">
-                  <div class="mb-4">
-                  
-
-                    <div *ngIf="btnprocesar" class="bg-yellow-500 text-black font-semibold p-4 rounded-lg shadow-lg transition-all hover:bg-yellow-600 hover:shadow-2xl">
-                        <p>Procesa la carga para generar las órdenes de transporte en el sistema.</p>
-                        <p-button severity="danger"  *ngIf="btnprocesar" (click)="procesar()">
-                            Procesar
-                          </p-button>
-                      </div>
-                  </div>
-
-
-                  <div class="overflow-x-auto bg-white shadow-md rounded-lg">
-                    <p-table
-                      [columns]="cols"
-                      [scrollable]="false"
-                      [style]="{ width: '100%' }"
-                      [rowsPerPageOptions]="[20, 40, 60, 120]"
-                      [value]="ordenes"
-                      #dt
-                      [paginator]="true"
-                      selectionMode="multiple"
-                      [rows]="10"
-                     
-                      [responsive]="true"
-                    >
-                      <ng-template pTemplate="colgroup" let-columns>
-                        <colgroup>
-                          <col *ngFor="let col of columns" [ngStyle]="{ width: col.width }" />
-                        </colgroup>
-                      </ng-template>
+            <h1 class="text-2xl sm:text-3xl font-bold">Generación Masiva de OTs</h1>
+          </div>
+        
+          <!-- Formulario Principal -->
+          <div class="p-6 sm:py-10 sm:px-12 space-y-8">
+        
+            <!-- Sección Cliente y Carga -->
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
               
-                      <ng-template pTemplate="header" let-columns>
-                        <tr>
-                          <th
-                            *ngFor="let col of columns"
-                            pResizableColumn
-                            [pSortableColumn]="col.field"
-                           
-                          >
-                            {{ col.header }}
-                          </th>
-                        </tr>
-                      </ng-template>
-              
-                      <ng-template pTemplate="body" let-rowData let-columns="columns">
-                        <tr [pSelectableRow]="rowData" class="hover:bg-gray-100">
-                          <td >
-                            {{ rowData.error }}
-                          </td>
-                          <td class="border px-4 py-2 text-center">{{ rowData.clientnum }}</td>
-                          <td class="border px-4 py-2 text-left">{{ rowData.lastname }}</td>
-                          <td class="border px-4 py-2 text-left">{{ rowData.addr1 }}</td>
-                          <td class="border px-4 py-2 text-left">{{ rowData.addr2 }}</td>
-                          <td class="border px-4 py-2 text-left">{{ rowData.addr3 }}</td>
-                          <td class="border px-4 py-2 text-left">{{ rowData.addr4 }}</td>
-                          <td class="border px-4 py-2 text-left">{{ rowData.addr5 }}</td>
-                          <td class="border px-4 py-2 text-left">{{ rowData.homephone }}</td>
-                          <td class="border px-4 py-2 text-left">{{ rowData.numguia }}</td>
-                          <td class="border px-4 py-2 text-left">{{ rowData.peso }}</td>
-                        </tr>
-                      </ng-template>
-              
-                      <ng-template pTemplate="summary">
-                        <div class="flex items-center justify-between p-4 bg-gray-100">
-                          Son {{ ordenes ? ordenes.length : 0 }} registros cargados con errores.
-                        </div>
-                      </ng-template>
-                    </p-table>
-                  </div>
-                </div>
+              <!-- Cliente -->
+              <div>
+                <label class="block font-semibold mb-2">Cliente:</label>
+                <p-dropdown
+                  name="clientes"
+                  [options]="clientes"
+                  [(ngModel)]="model.idcliente"
+                  scrollHeight="30vh"
+                  class="w-full"
+                  [virtualScroll]="true"
+                  itemSize="30"
+                  placeholder="Seleccione un cliente"
+                  filter="true"
+                  [style]="{ width: '100%' }"
+                  [resetFilterOnHide]="false"
+                  [hideTransitionOptions]="'0ms'"
+                  [showTransitionOptions]="'0ms'"
+                >
+                  <ng-template let-item pTemplate="selectedItem">
+                    <span>{{ item.label }}</span>
+                  </ng-template>
+                </p-dropdown>
               </div>
-              
+        
+              <!-- Subida de archivos -->
+              <div>
+                <label class="block font-semibold mb-2">Carga de archivos:</label>
+                <p-fileUpload
+                  name="myfile[]"
+                  #fileUpload
+                  [multiple]="true"
+                  customUpload="true"
+                  maxFileSize="1000000"
+                  accept=".xlsx, .xls, application/vnd.openxmlformats-officedocument.spreadsheetml.sheet, application/vnd.ms-excel"
+                  (onUpload)="onTemplatedUpload($event)"
+                  (onSelect)="onSelectedFiles($event)"
+                >
+                  <ng-template pTemplate="header" let-files let-chooseCallback="chooseCallback" let-clearCallback="clearCallback">
+                    <div class="flex justify-between items-center w-full">
+                      <div class="flex gap-2">
+                        <p-button (onClick)="choose($event, chooseCallback)" icon="pi pi-images" [rounded]="true" [outlined]="true" />
+                        <p-button (onClick)="uploadSelectedFiles()" icon="pi pi-cloud-upload" [rounded]="true" [outlined]="true" severity="success" [disabled]="!files || files.length === 0" />
+                        <p-button (onClick)="clearCallback()" icon="pi pi-times" [rounded]="true" [outlined]="true" severity="danger" [disabled]="!files || files.length === 0" />
+                      </div>
+                      <p-progressBar [value]="totalSizePercent" [showValue]="false" styleClass="h-1 w-40" />
+                    </div>
+                  </ng-template>
+        
+                  <ng-template pTemplate="empty">
+                    <div class="text-center text-gray-500 p-4">
+                      <i class="pi pi-cloud-upload text-4xl mb-2"></i>
+                      <p>Arrastra y suelta archivos para subirlos</p>
+                    </div>
+                  </ng-template>
+                </p-fileUpload>
+              </div>
             </div>
+        
+            <!-- Procesar -->
+            <div *ngIf="btnprocesar" class="bg-yellow-100 p-4 rounded-md border border-yellow-300 shadow-sm">
+              <p class="font-semibold mb-2">Procesa la carga para generar las órdenes de transporte en el sistema.</p>
+              <p-button severity="danger" (click)="procesar()">Procesar</p-button>
+            </div>
+        
+            <!-- Tabla -->
+            <div class="bg-white dark:bg-gray-800 p-4 rounded-md shadow-md">
+              <p-table
+                [columns]="cols"
+                [value]="ordenes"
+                [paginator]="true"
+                [rows]="10"
+                [rowsPerPageOptions]="[20, 40, 60, 120]"
+                responsiveLayout="scroll"
+                selectionMode="multiple"
+                #dt
+              >
+                <ng-template pTemplate="colgroup" let-columns>
+                  <colgroup>
+                    <col *ngFor="let col of columns" [ngStyle]="{ width: col.width }" />
+                  </colgroup>
+                </ng-template>
+        
+                <ng-template pTemplate="header" let-columns>
+                  <tr>
+                    <th *ngFor="let col of columns" [pSortableColumn]="col.field">{{ col.header }}</th>
+                  </tr>
+                </ng-template>
+        
+                <ng-template pTemplate="body" let-rowData let-columns="columns">
+                  <tr>
+                    <td>{{ rowData.error }}</td>
+                    <td class="text-center">{{ rowData.clientnum }}</td>
+                    <td>{{ rowData.lastname }}</td>
+                    <td>{{ rowData.addr1 }}</td>
+                    <td>{{ rowData.addr2 }}</td>
+                    <td>{{ rowData.addr3 }}</td>
+                    <td>{{ rowData.addr4 }}</td>
+                    <td>{{ rowData.addr5 }}</td>
+                    <td>{{ rowData.homephone }}</td>
+                    <td>{{ rowData.numguia }}</td>
+                    <td>{{ rowData.peso }}</td>
+                  </tr>
+                </ng-template>
+        
+                <ng-template pTemplate="summary">
+                  <div class="text-sm text-gray-700 p-2">
+                    Son {{ ordenes?.length || 0 }} registros cargados con errores.
+                  </div><div class="flex flex-col flex-auto min-w-0 bg-gray-50 dark:bg-gray-900 text-gray-800 dark:text-gray-200">
 
-
-      
+                    <!-- Header -->
+                    <div class="p-6 border-b bg-white dark:bg-gray-800 shadow-sm">
+                      <div class="flex items-center text-sm text-gray-600 dark:text-gray-400 mb-2">
+                        <a class="text-primary-500 font-medium">TMS</a>
+                        <mat-icon class="mx-2 text-xs" [svgIcon]="'heroicons_solid:chevron-right'"></mat-icon>
+                        <a class="text-primary-500 font-medium">Seguimiento</a>
+                      </div>
+                      <h1 class="text-2xl sm:text-3xl font-bold">Generación Masiva de OTs</h1>
+                    </div>
+                  
+                    <!-- Formulario Principal -->
+                    <div class="p-6 sm:py-10 sm:px-12 space-y-8">
+                  
+                      <!-- Sección Cliente y Carga -->
+                      <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                        
+                        <!-- Cliente -->
+                        <div>
+                          <label class="block font-semibold mb-2">Cliente:</label>
+                          <p-dropdown
+                            name="clientes"
+                            [options]="clientes"
+                            [(ngModel)]="model.idcliente"
+                            scrollHeight="30vh"
+                            class="w-full"
+                            [virtualScroll]="true"
+                            itemSize="30"
+                            placeholder="Seleccione un cliente"
+                            filter="true"
+                            [style]="{ width: '100%' }"
+                            [resetFilterOnHide]="false"
+                            [hideTransitionOptions]="'0ms'"
+                            [showTransitionOptions]="'0ms'"
+                          >
+                            <ng-template let-item pTemplate="selectedItem">
+                              <span>{{ item.label }}</span>
+                            </ng-template>
+                          </p-dropdown>
+                        </div>
+                  
+                        <!-- Subida de archivos -->
+                        <div>
+                          <label class="block font-semibold mb-2">Carga de archivos:</label>
+                          <p-fileUpload
+                            name="myfile[]"
+                            #fileUpload
+                            [multiple]="true"
+                            customUpload="true"
+                            maxFileSize="1000000"
+                            accept=".xlsx, .xls, application/vnd.openxmlformats-officedocument.spreadsheetml.sheet, application/vnd.ms-excel"
+                            (onUpload)="onTemplatedUpload($event)"
+                            (onSelect)="onSelectedFiles($event)"
+                          >
+                            <ng-template pTemplate="header" let-files let-chooseCallback="chooseCallback" let-clearCallback="clearCallback">
+                              <div class="flex justify-between items-center w-full">
+                                <div class="flex gap-2">
+                                  <p-button (onClick)="choose($event, chooseCallback)" icon="pi pi-images" [rounded]="true" [outlined]="true" />
+                                  <p-button (onClick)="uploadSelectedFiles()" icon="pi pi-cloud-upload" [rounded]="true" [outlined]="true" severity="success" [disabled]="!files || files.length === 0" />
+                                  <p-button (onClick)="clearCallback()" icon="pi pi-times" [rounded]="true" [outlined]="true" severity="danger" [disabled]="!files || files.length === 0" />
+                                </div>
+                                <p-progressBar [value]="totalSizePercent" [showValue]="false" styleClass="h-1 w-40" />
+                              </div>
+                            </ng-template>
+                  
+                            <ng-template pTemplate="empty">
+                              <div class="text-center text-gray-500 p-4">
+                                <i class="pi pi-cloud-upload text-4xl mb-2"></i>
+                                <p>Arrastra y suelta archivos para subirlos</p>
+                              </div>
+                            </ng-template>
+                          </p-fileUpload>
+                        </div>
+                      </div>
+                  
+                      <!-- Procesar -->
+                      <div *ngIf="btnprocesar" class="bg-yellow-100 p-4 rounded-md border border-yellow-300 shadow-sm">
+                        <p class="font-semibold mb-2">Procesa la carga para generar las órdenes de transporte en el sistema.</p>
+                        <p-button severity="danger" (click)="procesar()">Procesar</p-button>
+                      </div>
+                  
+                      <!-- Tabla -->
+                      <div class="bg-white dark:bg-gray-800 p-4 rounded-md shadow-md">
+                        <p-table
+                          [columns]="cols"
+                          [value]="ordenes"
+                          [paginator]="true"
+                          [rows]="10"
+                          [rowsPerPageOptions]="[20, 40, 60, 120]"
+                          responsiveLayout="scroll"
+                          selectionMode="multiple"
+                          #dt
+                        >
+                          <ng-template pTemplate="colgroup" let-columns>
+                            <colgroup>
+                              <col *ngFor="let col of columns" [ngStyle]="{ width: col.width }" />
+                            </colgroup>
+                          </ng-template>
+                  
+                          <ng-template pTemplate="header" let-columns>
+                            <tr>
+                              <th *ngFor="let col of columns" [pSortableColumn]="col.field">{{ col.header }}</th>
+                            </tr>
+                          </ng-template>
+                  
+                          <ng-template pTemplate="body" let-rowData let-columns="columns">
+                            <tr>
+                              <td>{{ rowData.error }}</td>
+                              <td class="text-center">{{ rowData.clientnum }}</td>
+                              <td>{{ rowData.lastname }}</td>
+                              <td>{{ rowData.addr1 }}</td>
+                              <td>{{ rowData.addr2 }}</td>
+                              <td>{{ rowData.addr3 }}</td>
+                              <td>{{ rowData.addr4 }}</td>
+                              <td>{{ rowData.addr5 }}</td>
+                              <td>{{ rowData.homephone }}</td>
+                              <td>{{ rowData.numguia }}</td>
+                              <td>{{ rowData.peso }}</td>
+                            </tr>
+                          </ng-template>
+                  
+                          <ng-template pTemplate="summary">
+                            <div class="text-sm text-gray-700 p-2">
+                              Son {{ ordenes?.length || 0 }} registros cargados con errores.
+                            </div>
+                          </ng-template>
+                        </p-table>
+                      </div>
+                    </div>
+                  
+                    <!-- Toast y confirm dialog -->
+                    <p-confirmDialog />
+                    <p-toast />
+                  </div>
+                  
+                </ng-template>
+              </p-table>
+            </div>
+          </div>
+        
+          <!-- Toast y confirm dialog -->
+       
+        </div>
+        
+        <ng-template pTemplate="summary">
+          <div class="flex justify-between p-4 bg-gray-100">
+            Son {{ ordenes?.length || 0 }} registros cargados con errores.
+          </div>
+        </ng-template>
+      </p-table>
+    </div>
+  </div>
 </div>
 
-<p-confirmDialog />
 
+<p-confirmDialog />
 <p-toast />

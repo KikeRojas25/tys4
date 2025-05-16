@@ -1,0 +1,86 @@
+<div class="container mx-auto py-8 px-6 bg-white shadow-lg rounded-lg">
+
+
+  <form [formGroup]="form" (ngSubmit)="onSubmit()">
+    <!-- Razón Social -->
+    <div class="field mb-5">
+      <label for="razon_social" class="block text-sm font-medium text-gray-700 mb-2">
+        Razón Social <span class="text-red-500">*</span>
+      </label>
+      <input
+        formControlName="razon_social"
+        id="razon_social"
+        type="text"
+        pInputText
+        class="w-full p-inputtext-lg"
+        placeholder="Ingrese la razón social"
+      />
+      <div *ngIf="form.get('razon_social')?.invalid && form.get('razon_social')?.touched" class="text-red-500 text-xs mt-1">
+        <div *ngIf="form.get('razon_social')?.errors?.required">Este campo es obligatorio.</div>
+        <div *ngIf="form.get('razon_social')?.errors?.minlength">Debe tener al menos 3 caracteres.</div>
+        <div *ngIf="form.get('razon_social')?.errors?.maxlength">Debe tener máximo 50 caracteres.</div>
+      </div>
+    </div>
+
+    <!-- RUC -->
+    <div class="field mb-5">
+      <label for="ruc" class="block text-sm font-medium text-gray-700 mb-2">
+        RUC <span class="text-red-500">*</span>
+      </label>
+          <p-inputNumber 
+          formControlName="ruc"
+          id="ruc"
+          [minFractionDigits]="0" 
+          [maxFractionDigits]="0" 
+          [min]="0" 
+          [max]="99999999999"
+          [useGrouping]="false"
+          maxlength="11"
+          class="w-full p-inputtext-lg"
+          placeholder="Ingrese el RUC"
+        ></p-inputNumber>
+    
+      <div *ngIf="form.get('ruc')?.invalid && form.get('ruc')?.touched" class="text-red-500 text-xs mt-1">
+        <div *ngIf="form.get('ruc')?.errors?.required">Este campo es obligatorio.</div>
+        <div *ngIf="form.get('ruc')?.errors?.minlength">Debe tener 11 caracteres.</div>
+      </div>
+    </div>
+
+    <!-- Mail Notificaciones -->
+    <!-- <div class="field mb-5">
+      <label for="mail_notificacion" class="block text-sm font-medium text-gray-700 mb-2">
+        Mail de Notificaciones <span class="text-red-500">*</span>
+      </label>
+      <input
+        formControlName="mail_notificacion"
+        id="mail_notificacion"
+        type="email"
+        pInputText
+        class="w-full p-inputtext-lg"
+        placeholder="Ingrese el correo electrónico"
+      />
+      <div *ngIf="form.get('mail_notificacion')?.invalid && form.get('mail_notificacion')?.touched" class="text-red-500 text-xs mt-1">
+        <div *ngIf="form.get('mail_notificacion')?.errors?.required">Este campo es obligatorio.</div>
+        <div *ngIf="form.get('mail_notificacion')?.errors?.email">Debe ingresar un correo válido.</div>
+      </div>
+    </div> -->
+
+    <!-- Botones -->
+    <div class="flex justify-end space-x-4">
+      <p-button
+        type="submit"
+        label="Guardar"
+        class="p-button-rounded p-button-success p-button-lg"
+        [disabled]="form.invalid"
+        icon="pi pi-check"
+      ></p-button>
+      <p-button
+        type="button"
+        label="Cancelar"
+        class="p-button-rounded p-button-secondary p-button-lg"
+        icon="pi pi-times"
+        (click)="onCancel()"
+      ></p-button>
+    </div>
+  </form>
+</div>

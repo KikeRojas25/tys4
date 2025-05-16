@@ -21,6 +21,10 @@ import { TableModule } from 'primeng/table';
 import { ConfirmDialogModule } from 'primeng/confirmdialog';
 import { InputMaskModule } from 'primeng/inputmask';
 import { forkJoin } from 'rxjs';
+import { DialogService, DynamicDialogRef } from 'primeng/dynamicdialog';
+import { NewComponent } from 'app/modules/admin/mantenimiento/cliente/new/new.component';
+import { ChangeDetectorRef } from '@angular/core';
+
 
 
 @Component({
@@ -49,15 +53,23 @@ import { forkJoin } from 'rxjs';
     InputMaskModule 
   
   ],
-  providers: [MessageService,ConfirmationService]
+  providers: [MessageService,ConfirmationService, DialogService]
 })
 export class CrearotComponent implements OnInit {
 
   dialogGrr = false;
   dialogEtiqueta = false;
   es: any;
+  
+ ref: DynamicDialogRef | undefined;
+  
+
   public loading = false;
-  guias: string[] = [];
+
+
+  guias: any[] = [];
+
+
   etiquetas: any[] = [];
   tipos = [
     { label: 'Paleta', value: 1 },
@@ -98,12 +110,19 @@ export class CrearotComponent implements OnInit {
   constructor(private ordenTransporteService: OrdenTransporteService
             , private confirmationService: ConfirmationService
             , private router: Router
-            ,private fb: FormBuilder
-            ,private messageService: MessageService
+            , private fb: FormBuilder
+            , private messageService: MessageService
+            , public dialogService: DialogService
+            ,  private cdr: ChangeDetectorRef
             , private activatedRoute: ActivatedRoute) { }
 
 
   ngOnInit() {
+
+
+    
+    this.guias = [];
+
 
     this.form = this.fb.group({
       idcliente: [null, Validators.required],
@@ -119,9 +138,9 @@ export class CrearotComponent implements OnInit {
       horarecojo: [null,Validators.required],
       guiarecojo: [null,Validators.required],
       bulto: [null, [Validators.min(0), Validators.max(5000)]],
-      peso: [null, [Validators.min(0), Validators.max(30000)]],
-      volumen: [null, [Validators.min(0), Validators.max(1000)]],
-      pesovol: [null, [Validators.min(0), Validators.max(1000)]],
+      peso: [null, [Validators.min(0), Validators.max(100000)]],
+      volumen: [null, [Validators.min(0), Validators.max(100000)]],
+      pesovol: [null, [Validators.min(0), Validators.max(100000)]],
       idformula: [null, Validators.required],
       idtipotransporte: [null, Validators.required],
       idconceptocobro: [null, Validators.required],
@@ -149,7 +168,7 @@ export class CrearotComponent implements OnInit {
 
    // Cargar los combos.
     this.cargarDropDows().then(() => {
-    //  this.realizarAsignaciones();
+    //   this.realizarAsignaciones();
     });
 
 
@@ -456,20 +475,65 @@ else {
       } 
     });
   }
+
+
   grr() {
     this.dialogGrr = true;
   }
+
+
   generarGrr(){
 
+   
     
     const [prefix, initialNumber] = this.model.guiaInicial.split('-');
     const start = parseInt(initialNumber, 10);
 
-    this.guias = [];
+    this.guias = [...this.guias];
+
+
     for (let i = 0; i < this.model.cantidadguias; i++) {
       this.guias.push(`${prefix}-${start + i}`);
     }
+
+    console.log(this.guias, 'xD');
+
+
+
   }
+  nuevoremitente () {
+     this.ref = this.dialogService.open(NewComponent, {
+          header: 'Nuevo Destinatario',
+          width: '50%', // Tamaño opcional del diálogo
+          closable: true, // Habilitar cierre
+          modal: true, // Modalidad
+          dismissableMask: true, // Permitir cierre al hacer clic fuera
+          data: {}, // Puedes pasar datos iniciales si los necesitas
+        });
+      
+        // Manejar el evento de cierre del diálogo
+        this.ref.onClose.subscribe((result) => {
+          if (result) {
+            console.log('Datos del formulario recibidos:', result);
+            this.messageService.add({ severity: 'success', summary: 'Mantenimiento de clientes', detail: 'Se ha registrado al cliente de manera correcta.' });
+           // this.load();
+
+           this.clientes = [];
+
+           this.ordenTransporteService.getClientes(this.user.idscliente || '')
+                .subscribe((clientes) => {
+                  this.clientes = [...clientes.map((c: any) => ({
+                    value: c.idCliente,
+                    label: c.razonSocial
+                  }))];
+                });
+            
+                this.cdr.detectChanges(); // 👈 Forzar refresco
+
+          }
+        }); 
+  }
+
 
   agregaretiqueta() {
 

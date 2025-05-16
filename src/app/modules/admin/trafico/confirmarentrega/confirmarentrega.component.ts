@@ -375,7 +375,7 @@ onRowEditSave(order: OrdenTransporte) {
 
 
   order.idtipoentrega = this.getIdTipoEntrega(order.tipoentrega)
-  order.idusuarioentrega =  this.user.usr_int_id;
+  order.idusuarioentrega =  this.user.id;
 
 
   if (order.idordentrabajo > 0) {

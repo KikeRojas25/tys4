@@ -1,0 +1,127 @@
+
+<!-- Pantalla Principal -->
+<div class="flex flex-col min-h-screen flex-auto ">
+  <!-- Encabezado -->
+  <div class="flex flex-col sm:flex-row items-center justify-between p-3 border-b dark:bg-transparent bg-card">
+    <div class="flex-1 min-w-0">
+      <div class="flex items-center font-medium">
+        <a class="whitespace-nowrap text-primary-500">TTrack</a>
+        <div class="flex items-center ml-1 whitespace-nowrap">
+          <mat-icon class="fuse-horizontal-navigation-item-icon" [svgIcon]="'heroicons_solid:chevron-right'"></mat-icon>
+          <a class="ml-1 text-primary-500">Mantenimiento</a>
+        </div>
+      </div>
+      <div class="mt-2">
+        <h2 class="text-3xl md:text-4xl font-extrabold leading-7 sm:leading-10 truncate">Listado de clientes</h2>
+      </div>
+    </div>
+  </div>
+
+  <div class="flex flex-col p-2">
+
+  </div>
+  
+<div class="flex flex-col p-6 bg-card ">
+
+
+
+
+      <!-- Encabezado de la Tarjeta -->
+      <div class="card-header flex items-center justify-between border-b px-4 py-3">
+
+        <button
+          pButton
+          type="button"
+          label="Nuevo Cliente"
+          icon="pi pi-plus"
+          class="p-button-rounded p-button-primary"
+          (click)="nuevo()"
+        ></button>
+      </div>
+
+      <!-- Cuerpo de la Tarjeta -->
+      <div class="card-body p-4">
+        <p-table
+          #dt
+          [value]="clientes"
+          [paginator]="true"
+          [rows]="10"
+          [columns]="cols"
+          [responsiveLayout]="'scroll'"
+
+        >
+          <!-- Encabezado de Tabla -->
+          <ng-template pTemplate="header" let-columns>
+            <tr>
+              <th [ngStyle]="{'width': col.width}" *ngFor="let col of columns" pResizableColumn [pSortableColumn]="col.field">
+                {{col.header}}
+                <p-sortIcon [field]="col.field"></p-sortIcon>
+              </th>
+            </tr>
+            <!-- Filtros -->
+            <tr>
+              <th *ngFor="let col of columns">
+                <ng-container [ngSwitch]="col.field">
+                  <input
+                    *ngSwitchCase="'razonSocial'"
+                    pInputText
+                    type="text"
+                    placeholder="Buscar por {{ col.header }}"
+                    (input)="dt.filter($event.target.value, col.field, 'contains')"
+                    class="p-inputtext-sm w-full border rounded-lg text-white" 
+                  />
+                  <input
+                    *ngSwitchCase="'ruc'"
+                    pInputText
+                    type="text"
+                    placeholder="Buscar por {{ col.header }}"
+                    (input)="dt.filter($event.target.value, col.field, 'contains')"
+                    class="p-inputtext-sm w-full border rounded-lg text-white"
+                  />
+                </ng-container>
+              </th>
+            </tr>
+          </ng-template>
+
+          <!-- Cuerpo de Tabla -->
+          <ng-template pTemplate="body" let-rowData let-columns="columns">
+            <tr class="hover:bg-gray-100 dark:hover:bg-gray-700">
+              <td class="py-2 px-4 text-sm text-gray-800 dark:text-gray-300">{{ rowData.idCliente }}</td>
+              <td class="py-2 px-4 text-sm text-gray-800 dark:text-gray-300">{{ rowData.razonSocial }}</td>
+              <td class="py-2 px-4 text-sm text-gray-800 dark:text-gray-300">{{ rowData.ruc }}</td>
+              <td class="py-2 px-4 flex space-x-2">
+                <button
+                  pButton
+                  type="button"
+                  icon="pi pi-trash"
+                  class="p-button-rounded p-button-danger"
+                  (click)="confirm(rowData.idCliente)"
+                  title="Eliminar"
+                ></button>
+                <button
+                  pButton
+                  type="button"
+                  icon="pi pi-pencil"
+                  class="p-button-rounded p-button-primary"
+                  (click)="edit(rowData.id)"
+                  title="Editar"
+                ></button>
+              </td>
+            </tr>
+          </ng-template>
+        </p-table>
+      </div>
+
+
+  <!-- Diálogo de Confirmación -->
+  <p-confirmDialog
+    header="Confirmación"
+    icon="pi pi-exclamation-triangle"
+    [style]="{ width: '30vw' }"
+    acceptLabel="Sí"
+    rejectLabel="No"
+  ></p-confirmDialog>
+
+  <!-- Notificaciones -->
+  <p-toast class="p-toast-custom"></p-toast>
+</div>

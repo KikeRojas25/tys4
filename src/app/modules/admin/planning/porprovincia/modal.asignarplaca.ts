@@ -141,7 +141,13 @@ export class AsignarPlacaComponent implements OnInit {
     }
     agregar() {
 
-      this.loading = true;
+   
+
+
+      if ( this.model.idchofer === undefined || this.model.idvehiculo === undefined || this.model.fechahorasalidaplanning === undefined) {
+        this.messageService.add({ severity: 'warn', summary: 'Planning', detail: 'Debe completar todos los campos.' });
+        return;
+      }
 
       this.confirmationService.confirm({
         message: '¿Esta seguro que desea confirmar el despacho?',

@@ -56,6 +56,7 @@
               <td class="text-center">{{ rowData.nombrechofer }}</td>
               <td class="text-center">{{ rowData.numHojaRuta }}</td>
               <td class="text-center">{{ rowData.proveedor }}</td>
+              <td class="text-center">{{ rowData.fechahoraplanning | date:'dd/MM/yyyy' }}</td>
               <td class="text-center">{{ rowData.precinto }}</td>
               <td >
                 <p-button *ngIf="rowData.precinto === 'SI'"   severity="success" icon="fa fa-file-pdf-o"  (click)='imprimirManifiesto(rowData)'></p-button>

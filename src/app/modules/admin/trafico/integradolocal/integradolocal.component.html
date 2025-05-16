@@ -47,7 +47,7 @@
             <ng-template pTemplate="header" let-columns>
               <tr>
                 <!-- Encabezado con colores y estilos -->
-                <th colspan="7" style="text-align: center; color: white; width: 60%"></th>
+                <th colspan="6" style="text-align: center; color: white; width: 60%"></th>
               
                 <th colspan="2" style="text-align: center; color: white; background-color: rgb(251, 192, 45); width: 20%">EN RUTA</th>
               </tr>
@@ -73,8 +73,8 @@
                   {{ rowData.numcarga2 }}
                   </td>
                 <td class="text-center">{{rowData.fecharegistro | date: 'dd/MM/yyyy'}}</td>
-                <td class="text-center">{{rowData.chofer}}</td>
-                <td class="text-center">{{rowData.destino}}</td>
+                <td class="text-center">{{rowData.origen}}</td>
+               
 
 
                 <td class="text-center">{{rowData.totalots}}</td>

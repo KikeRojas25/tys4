@@ -276,6 +276,40 @@ export const appRoutes: Route[] = [
                                       .then(m => m.MantenimientoComponent),
                 children: [
                   {
+                    path: 'cliente',
+                    loadComponent: () => import('./modules/admin/mantenimiento/cliente/cliente.component')
+                                          .then(m => m.ClienteComponent),
+                    children: [
+                      {  path: 'list',
+                        loadComponent: () => import('./modules/admin/mantenimiento/cliente/list/list.component')
+                                              .then(m => m.ListComponent),}
+                    ]
+                  },  
+                  {
+                    path: 'vehiculo',
+                    loadComponent: () => import('./modules/admin/mantenimiento/vehiculo/vehiculo.component')
+                                          .then(m => m.VehiculoComponent),
+                    children: [
+                      {  
+                        path: 'list',
+                        loadComponent: () => import('./modules/admin/mantenimiento/vehiculo/list/list.component')
+                                              .then(m => m.ListComponent),}
+                    ]
+                  },
+                  {
+                    path: 'conductor',
+                    loadComponent: () => import('./modules/admin/mantenimiento/conductor/conductor.component')
+                                          .then(m => m.ConductorComponent),
+                    children: [
+                      {  
+                        path: 'list',
+                        loadComponent: () => import('./modules/admin/mantenimiento/conductor/list/list.component')
+                                              .then(m => m.ListComponent),}
+                    ]
+                  },
+
+
+                  {
                     path: 'listadoproveedores',
                     loadComponent: () => import('./modules/admin/mantenimiento/proveedor/listproveedor/listproveedor.component')
                                           .then(m => m.ListproveedorComponent)
@@ -284,6 +318,12 @@ export const appRoutes: Route[] = [
                     path: 'nuevoproveedor',
                     loadComponent: () => import('./modules/admin/mantenimiento/proveedor/newproveedor/newproveedor.component')
                                           .then(m => m.NewproveedorComponent)
+                  },
+                  
+                  {
+                    path: 'precinto',
+                    loadComponent: () => import('./modules/admin/mantenimiento/precinto/precinto.component')
+                                          .then(m => m.PrecintoComponent)
                   },
                  
                 ]

@@ -15,7 +15,7 @@
         </div>
       </div>
       <div class="mt-2">
-        <h2 class="text-3xl md:text-4xl font-extrabold tracking-tight leading-7 sm:leading-10 truncate"> Crear OTR  </h2>
+        <h2 class="text-3xl md:text-4xl font-extrabold tracking-tight leading-7 sm:leading-10 truncate"> Crear OT </h2>
       </div>
     </div>
   </div>
@@ -56,6 +56,7 @@
                         <a href="#" class="text-sm text-blue-500 underline ml-2" (click)="mismoremitente = false">
                           Elegir otro
                         </a> 
+                       
                     </label>
                     <p-dropdown name="remitente"
                     [virtualScroll]="true" itemSize="30"
@@ -80,30 +81,63 @@
                     
 
 
-                    <div class="field flex flex-col">
-                    <label>Destinatario (*) :
-                      <a href="#" class="text-sm text-blue-500 underline ml-2" (click)="mismodestinatario = false">
-                        Elegir otro
-                      </a> 
-
-                    </label>
-                    <p-dropdown name="destinatario"
-                      [virtualScroll]="true" itemSize="30"  [disabled]="mismodestinatario"
-                      [options]="clientes" formControlName="iddestinatario"
-                      [showClear]="true" class="input-form-field"
-                      placeholder="Seleccione un destinatario"
-                      [style]="{'width':'100%'}" [resetFilterOnHide]="false"
-                      [hideTransitionOptions]="'0ms'" required
-                      [showTransitionOptions]="'0ms'"
-                      [filter]="true">
-                      <ng-template let-item pTemplate="selectedItem">
-                      <span style="vertical-align:left;">{{item.label}}</span>
-                      </ng-template>
-                    </p-dropdown>
-                    <div *ngIf="form.get('iddestinatario')?.invalid && form.get('iddestinatario')?.touched" class="alert-danger">
-                      <div *ngIf="form.get('iddestinatario')?.errors?.required">Requiere seleccionar un destinatario.</div>
+                    <div class="field flex flex-col gap-2">
+                      <!-- Label y acciones -->
+                      <div class="flex items-center gap-4 text-sm">
+                        <label class="m-0 font-medium">Destinatario (*) :</label>
+                    
+                        <!-- Enlace: "Elegir otro" -->
+                        <a 
+                          href="#" 
+                          class="text-blue-500 underline" 
+                          (click)="mismodestinatario = false; $event.preventDefault()">
+                          Elegir otro
+                        </a>
+                    
+                        <!-- Botón: "Nuevo" como link -->
+                        <p-button 
+                          severity="success"
+                          size="small"
+                          variant="outlined"
+                          [link]="true"
+                          (click)="nuevoremitente()"
+                          label="Nuevo Destinatario"
+                          styleClass="p-0 text-blue-500 text-sm underline">
+                        </p-button>
+                      </div>
+                    
+                      <!-- Dropdown de destinatarios -->
+                      <p-dropdown
+                        name="destinatario"
+                        [virtualScroll]="true"
+                        itemSize="30"
+                        [disabled]="mismodestinatario"
+                        [options]="clientes"
+                        formControlName="iddestinatario"
+                        [showClear]="true"
+                        class="input-form-field"
+                        placeholder="Seleccione un destinatario"
+                        [style]="{ 'width': '100%' }"
+                        [resetFilterOnHide]="false"
+                        [hideTransitionOptions]="'0ms'"
+                        [showTransitionOptions]="'0ms'"
+                        [filter]="true"
+                        required>
+                        
+                        <ng-template let-item pTemplate="selectedItem">
+                          <span>{{ item.label }}</span>
+                        </ng-template>
+                      </p-dropdown>
+                    
+                      <!-- Mensaje de error -->
+                      <div *ngIf="form.get('iddestinatario')?.invalid && form.get('iddestinatario')?.touched" class="alert-danger">
+                        <div *ngIf="form.get('iddestinatario')?.errors?.required">
+                          Requiere seleccionar un destinatario.
+                        </div>
+                      </div>
                     </div>
-                    </div> 
+                    
+                    
 
                     <div class="field flex flex-col">
                     <label>Origen (*) :</label>
@@ -272,7 +306,7 @@
             <div class="field flex flex-col">
                 <label for="peso">Peso Kg.</label>
                 <p-inputNumber name="peso" mode="decimal" [minFractionDigits]="2" [maxFractionDigits]="5" 
-                               [min]="0" [max]="30000" formControlName="peso" required></p-inputNumber>
+                               [min]="0" [max]="100000" formControlName="peso" required></p-inputNumber>
                 <div *ngIf="form.get('peso')?.invalid && form.get('peso')?.touched" class="alert-danger">
                     <div *ngIf="form.get('peso')?.errors?.required">Requiere ingresar el peso.</div>
                 </div>
@@ -281,7 +315,7 @@
             <div class="field flex flex-col">
                 <label for="volumen">Volumen m3</label>
                 <p-inputNumber name="volumen" mode="decimal" [minFractionDigits]="2" [maxFractionDigits]="5" 
-                               [min]="0" [max]="1000" formControlName="volumen" required></p-inputNumber>
+                               [min]="0" [max]="100000" formControlName="volumen" required></p-inputNumber>
                 <div *ngIf="form.get('volumen')?.invalid && form.get('volumen')?.touched" class="alert-danger">
                     <div *ngIf="form.get('volumen')?.errors?.required">Requiere ingresar el volumen.</div>
                 </div>
@@ -290,7 +324,7 @@
             <div class="field flex flex-col">
                 <label for="pesovol">Peso Vol</label>
                 <p-inputNumber name="pesovol" mode="decimal" [minFractionDigits]="2" [maxFractionDigits]="5" 
-                               [min]="0" [max]="1000" formControlName="pesovol" required></p-inputNumber>
+                               [min]="0" [max]="100000" formControlName="pesovol" required></p-inputNumber>
                 <div *ngIf="form.get('pesovol')?.invalid && form.get('pesovol')?.touched" class="alert-danger">
                     <div *ngIf="form.get('pesovol')?.errors?.required">Requiere ingresar el peso vol.</div>
                 </div>

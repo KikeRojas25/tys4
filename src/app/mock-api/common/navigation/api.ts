@@ -43,18 +43,18 @@ export class NavigationMockApi {
             const menu = JSON.parse(localStorage.getItem('menu'));
 
 
-            menu.forEach((resp) => {
-                this._compactNavigation.push({
-                    id: resp.pag_str_codmenu,
-                    title: resp.pag_str_nombre,
-                    type: 'aside',
-                    icon: resp.icono,
-                    idpadre : resp.pag_str_codmenu_padre,
-                    visible: true,
-                    children: []
+                menu.forEach((resp) => {
+                    this._compactNavigation.push({
+                        id: resp.pag_str_codmenu,
+                        title: resp.pag_str_nombre,
+                        type: 'aside',
+                        icon: resp.icono,
+                        idpadre : resp.pag_str_codmenu_padre,
+                        visible: true,
+                        children: []
 
+                    });
                 });
-            });
 
 
             // Fill compact navigation children using the default navigation
@@ -71,7 +71,7 @@ export class NavigationMockApi {
                                 id: el.pag_str_codmenu,
                                 title: el.pag_str_nombre,
                                 type: 'basic',
-                                icon: el.icono,
+                                icon: el.pag_str_icono,
                                 idpadre : el.pag_str_codmenu_padre,
                                 link: el.pag_str_url
                             });

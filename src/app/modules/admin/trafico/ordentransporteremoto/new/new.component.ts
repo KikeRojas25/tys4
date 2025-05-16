@@ -265,13 +265,14 @@ export class NewComponent implements OnInit {
         ...this.form.value, // Asignar todos los valores del formulario al modelo
         responsablecomercialid: this.user.id,
         tipoorden: 3,
-        idusuarioregistro: this.user.id
+        idusuarioregistro: this.user.id,
+    
     };
 
 
 
     this.confirmationService.confirm({
-      message: '¿Esta seguro que desea registrar esta OT?',
+      message: '¿Esta seguro que desea registrar esta OTR?',
       header: '',
       accept: () => {
       

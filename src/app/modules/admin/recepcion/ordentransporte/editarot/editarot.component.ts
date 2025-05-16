@@ -125,9 +125,9 @@ dialogGrr = false;
                 horarecojo: [null, Validators.required],
                 guiarecojo: [[]],
                 bulto: [null, [Validators.min(0), Validators.max(5000)]],
-                peso: [null, [Validators.min(0), Validators.max(30000)]],
-                volumen: [null, [Validators.min(0), Validators.max(1000)]],
-                pesovol: [null, [Validators.min(0), Validators.max(1000)]],
+                peso: [null, [Validators.min(0), Validators.max(100000)]],
+                volumen: [null, [Validators.min(0), Validators.max(100000)]],
+                pesovol: [null, [Validators.min(0), Validators.max(100000)]],
                 idformula: [null, Validators.required],
                 idtipotransporte: [null, Validators.required],
                 idconceptocobro: [null, Validators.required],
@@ -149,6 +149,16 @@ dialogGrr = false;
               this.form.get('idcliente')?.valueChanges.subscribe(() => this.cargarFormula());
                 this.form.get('idorigen')?.valueChanges.subscribe(() => this.cargarFormula());
                 this.form.get('iddestino')?.valueChanges.subscribe(() => this.cargarFormula());
+
+
+
+                this.form.get('idcliente')?.valueChanges.subscribe(() => this.cargarConcepto());
+                this.form.get('idorigen')?.valueChanges.subscribe(() => this.cargarConcepto());
+                this.form.get('iddestino')?.valueChanges.subscribe(() => this.cargarConcepto());
+                this.form.get('idformula')?.valueChanges.subscribe(() => this.cargarConcepto());
+                this.form.get('idtipotransporte')?.valueChanges.subscribe(() => this.cargarConcepto());
+
+
             
               loadDropdowns$.subscribe({
                 next: ({ tipoUnidad, mercaderiasEspeciales, clientes, vehiculos, choferes, ubigeo }) => {
@@ -196,9 +206,9 @@ dialogGrr = false;
 
                           guiarecojo: ordenTransporte.guiarecojo ? [ordenTransporte.guiarecojo] : [],
                           bulto: ordenTransporte.bulto || null,
-                          peso: ordenTransporte.peso || null,
-                          volumen: ordenTransporte.volumen || null,
-                          pesovol: ordenTransporte.pesovol || null,
+                          peso: ordenTransporte.peso || 0.00,
+                          volumen: ordenTransporte.volumen || 0.00,
+                          pesovol: ordenTransporte.pesovol || 0.00,
                           idformula: ordenTransporte.idformula || null,
                           idtipotransporte: ordenTransporte.idtipotransporte || null,
                           idconceptocobro: ordenTransporte.idconceptocobro || null,
@@ -348,7 +358,7 @@ dialogGrr = false;
           this.messageService.add({ severity: 'success', summary: 'Actualización exitosa', detail: `Se ha actualizado correctamente la orden de transporte` });
 
     
-          this.router.navigate(['/trafico/seguimientootr']);
+          this.router.navigate(['/seguimientoot/listadoordentransporte']);
 
 
      });
@@ -473,8 +483,7 @@ else {
     const idTransporte = this.form.get('idtipotransporte')?.value; // Obtener el valor del idcliente desde el formulario
 
 
-    console.log(idFormula);
-
+  
 
 
     this.ordenTransporteService.getConceptos(idCliente,idOrigen, idDestino
@@ -486,6 +495,15 @@ else {
         response.forEach(element => {
           this.conceptos.push({ value: element.idConceptoCobro ,  label : element.concepto  });
         });
+
+        const idConceptoSeleccionada = this.form.get('idconceptocobro')?.value;
+        if (idConceptoSeleccionada) {
+          this.form.patchValue({ idconceptocobro: idConceptoSeleccionada });
+        }
+        else {
+          this.form.patchValue({ idconceptocobro: 0 });
+        }
+        console.log('entre',idConceptoSeleccionada);
 
       } 
     });
@@ -499,7 +517,9 @@ else {
     const [prefix, initialNumber] = this.model.guiaInicial.split('-');
     const start = parseInt(initialNumber, 10);
 
-    this.guias = [];
+    this.guias = [...this.guias];
+
+    
     for (let i = 0; i < this.model.cantidadguias; i++) {
       this.guias.push(`${prefix}-${start + i}`);
     }

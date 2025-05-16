@@ -21,6 +21,7 @@ import { TimelineModule } from 'primeng/timeline';
 import { ToastModule } from 'primeng/toast';
 import { ConfirmDialogModule } from 'primeng/confirmdialog';
 import { InputMaskModule } from 'primeng/inputmask';
+import { FileModalComponent } from './modalfiles';
 
 interface EventItem {
   status?: string;
@@ -146,7 +147,7 @@ export class SeguimientootComponent implements OnInit {
 
     this.cols =
     [
-        {header: 'ACC', field: 'numcp'  ,  width: '200px' },
+        {header: 'ACC', field: 'numcp'  ,  width: '350px' },
         {header: 'OT', field: 'numcp'  ,  width: '100px' },
         {header: 'F. RECOJO', field: 'fecharegistro' , width: '120px'  },
         {header: 'F. DESPACHO', field: 'fecharegistro' , width: '120px'  },
@@ -350,38 +351,9 @@ editarConfirm(id) {
 }
 
  ver(id) {
-//   this.ref = this.dialogService.open(VerAsignacionComponent, {
-//     header: 'Ver detalle de asignación',
-//     width: '40%',
-//     contentStyle: {'max-height': '400px', overflow: 'auto'},
-//     baseZIndex: 10000,
-//     data : {id }
-// });
-
-//   this.ref.onClose.subscribe((product: any) => {
-//     if (product === undefined) { return; }
-//     else{
-
-//       this.messageService.add({severity: 'info', summary: 'Vehículo seleccionado', detail: product.placa});
-//     }
-// });
 
  }
  asignar (id) {
-  // this.ref = this.dialogService.open(AsignarEstibaComponent, {
-  //   header: 'Asignar Estiba',
-  //   width: '40%',
-  //   contentStyle: {'max-height': '400px', overflow: 'auto'},
-  //   baseZIndex: 10000,
-  //   data : {id }
-// });
-
-//   this.ref.onClose.subscribe((product: any) => {
-//     if (product === undefined) { return; }
-//     else{
-//       this.messageService.add({severity: 'info', summary: 'Vehículo seleccionado', detail: product.placa});
-//     }
-// });
 
 }
 verot(idOrdenTrabajo) {
@@ -406,13 +378,15 @@ vertracking(idordentransporte: number) {
     let eventos =  list;
     this.events = [];
 
+    console.log('xD',list);
+
 
 
     this.dialoglifecycle = true;
 
     eventos.forEach(x=> {
       this.events.push({ 
-        status: x.descripcion, dateRegister: x.fechaRegistro , dateEvent: x.fechaEvento , user: x.usuario, icon:'pi pi-shopping-cart', color: '#9C27B0'
+        status: x.evento, dateRegister: x.fechaRegistro , dateEvent: x.fechaEvento , user: x.usuario, icon:'pi pi-shopping-cart', color: '#9C27B0'
       })
     })
 
@@ -477,22 +451,31 @@ unConfirm(){
     message: '¿Esta seguro que desea desconfirmar esta OT?',
     accept: () => {
       
-  
- // this.ordenTransporteService.saveConfirm(this.model).subscribe(list => {
+      
+      this.ordenTransporteService.unConfirm(this.model).subscribe(list => {
 
-     this.dialogConfirm =  false;
-      this.buscar();
+        this.dialogConfirm =  false;
+          this.buscar();
 
-      this.messageService.add({severity: 'success', summary: 'Orden Transporte ', detail: 'Se ha desconfirmado la OT con éxito.'});
-        
+          this.messageService.add({severity: 'success', summary: 'Orden Transporte ', detail: 'Se ha desconfirmado la OT con éxito.'});
+            
 
 
- // });
+      });
+
+  }
+
+
+  });
 
 }
 
+  verarchivos(id) {
 
-});
-
-}
+        const ref = this.dialogService.open(FileModalComponent, {
+          header: 'Visor Fotos',
+          width: '30%',
+          data : {id }
+      });
+  }
 }

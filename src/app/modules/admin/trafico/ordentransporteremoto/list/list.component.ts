@@ -239,6 +239,11 @@ export class ListComponent implements OnInit {
       this.model.fecfin = this.dateFin;
       this.model.idusuario = this.user.id;
       this.model.tipoorden = 3;
+       
+      if ( this.model.referencia === undefined )  { 
+        this.model.referencia = '';
+       }
+
       this.ordenTransporteService.getAllOrder(this.model).subscribe(list => {
 
         this.ordenes =  list;
