@@ -25,16 +25,19 @@ import { CarouselModule } from 'primeng/carousel';
 
 @Component({
     template: `
-    <p-carousel [value]="documentos" [numVisible]="1" [numScroll]="1" [circular]="true" >
-    <ng-template let-product pTemplate="item">
-        <div class="product-item">
-            <div class="product-item-content">
-                <div class="p-mb-3">
-                    <img src="http://104.36.166.65/Tys2.0/uploadedfiles/{{product.idordentrabajo}}/{{product.nombrearchivo}}"  />
-                </div>
-            </div>
+   <p-carousel [value]="documentos" [numVisible]="1" [numScroll]="1" [circular]="true">
+  <ng-template let-product pTemplate="item">
+    <div class="product-item">
+      <div class="product-item-content">
+        <div class="p-mb-3">
+          <img
+            [src]="'http://104.36.166.65/Tys2.0/uploadedfiles/' + product.idordentrabajo + '/' + product.nombrearchivo"
+            (error)="cambiarImagen($event, product)"
+          />
         </div>
-    </ng-template>
+      </div>
+    </div>
+  </ng-template>
 </p-carousel>
     `
      ,standalone: true,
@@ -83,6 +86,11 @@ export class FileModalComponent  implements OnInit {
 
     ngOnInit() {
 
+    }
+
+    cambiarImagen(event: Event, product: any) {
+        const imgElement = event.target as HTMLImageElement;
+        imgElement.src = 'http://199.89.55.49/tysfiles/' + product.idordentrabajo + '/' + product.nombrearchivo;
     }
 
     // downloadFile(documentoId: number) {

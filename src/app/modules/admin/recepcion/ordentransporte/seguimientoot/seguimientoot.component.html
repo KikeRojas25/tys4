@@ -140,11 +140,11 @@
 
             
             <td>
-              <p-button  label=""        size="small" title='Ver Fotos' icon='fa fa-download'  (click)='verarchivos(rowData.idordentrabajo);' > </p-button>
+              <p-button  label=""   size="small" title='Ver Fotos' icon='fa fa-download'  (click)='verarchivos(rowData.idordentrabajo);' > </p-button>
               
               <p-button *ngIf="rowData?.estado === 'Entregado' && estrafico === true"  
               icon="pi pi-book" 
-              title="Editar" 
+              title="Editar Confirmación" 
               size="small"
               (click)="editarConfirm(rowData.idordentrabajo)">
             </p-button>
@@ -157,7 +157,7 @@
             </p-button>
   
               <p-button icon="pi pi-pencil" 
-                        title="Ver Archivos" 
+                        title="Editar OT" 
                         size="small"
                         (click)="editar(rowData.idordentrabajo)">
               </p-button>

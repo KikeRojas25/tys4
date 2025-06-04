@@ -91,7 +91,27 @@
   <!-- Carrusel -->
   <div class="bg-white shadow-md rounded-lg p-4">
     <h3 class="text-gray-800 font-bold mb-2 text-sm">Documentos</h3>
-    <p-carousel
+
+     <p-carousel [value]="documentos"
+      [numVisible]="1" 
+      [numScroll]="1"
+       [circular]="true"    
+        [style]="{ height: '200px', width: '100%' }">
+  <ng-template let-product pTemplate="item">
+    <div class="product-item">
+      <div class="product-item-content">
+        <div class="p-mb-3">
+          <img
+            [src]="'http://104.36.166.65/Tys2.0/uploadedfiles/' + product.idordentrabajo + '/' + product.nombrearchivo"
+            (error)="cambiarImagen($event, product)"
+                class="w-auto max-h-40 rounded-lg shadow-md"
+          />
+        </div>
+      </div>
+    </div>
+  </ng-template>
+</p-carousel>
+    <!-- <p-carousel
       [value]="documentos"
       [numVisible]="1"
       [numScroll]="1"
@@ -107,6 +127,6 @@
           />
         </div>
       </ng-template>
-    </p-carousel>
+    </p-carousel> -->
   </div>
 </div>

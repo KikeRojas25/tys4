@@ -102,6 +102,9 @@ export class IntegradoComponent implements OnInit {
         {header: '#OTS', field: 'cantidad' , width: '60px'  },
         {header: '#OTS', field: 'cantidad' , width: '60px'  },
 
+
+        { header: 'OBSERVADAS', field: 'observadas', width: '80px' } // 👈 Nueva columna
+
     ];
 
 

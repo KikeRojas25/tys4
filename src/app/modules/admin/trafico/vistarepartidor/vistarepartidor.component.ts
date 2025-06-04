@@ -57,6 +57,7 @@ export class VistarepartidorComponent implements OnInit {
   ordenes2: OrdenTransporte[] = [];
   ordenes3: OrdenTransporte[] = [];
   ordenes4: OrdenTransporte[] = [];
+  ordenes5: OrdenTransporte[] = [];
 
   selectedManifiesto: any = {};
   selectedManifiestoRecojo: any = {};
@@ -164,15 +165,17 @@ this.cols4 = [
       this.ordenes2 = x;
     });
 
-    this.traficoService.getAllOrdersxRepartidor(this.idproveedor, 34).subscribe(x => {
+      this.traficoService.getAllOrdersxRepartidor(this.idproveedor, 34).subscribe(x => {
       this.ordenes3 = x;
+      const conTipoEntrega = x.filter(o => o.tipoentrega !== null);
+      this.ordenes5 = [...(this.ordenes5 || []), ...conTipoEntrega];
     });
-
 
     this.traficoService.getAllOrdersxRepartidor(this.idproveedor, 35).subscribe(x => {
       this.ordenes4 = x;
+      const conTipoEntrega = x.filter(o => o.tipoentrega !== null);
+      this.ordenes5 = [...(this.ordenes5 || []), ...conTipoEntrega];
     });
-
 
 
     this.traficoService.getProveedor(this.idproveedor).subscribe( resp => {

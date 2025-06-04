@@ -305,6 +305,58 @@
     </p-table>
 
   </p-tabPanel>
+
+
+   <p-tabPanel header="Observadas">
+    <div class="row mb-2">
+      <button   class='btn-danger btn mr-2' pButton iconPos="left" label="Actualizar Estado"   (click)="modalEntregarOT()"  type="button"></button>
+      <!-- <button   class='btn-secondary btn mr-2' pButton iconPos="left" label="Actualizar ETA"   (click)="modalActualizarETA()"  type="button"></button> -->
+    </div>
+    
+    <p-table  [columns]="cols2" selectionMode="single"
+    [style]="{width:'100%'}"  dataKey="idordentrabajo"
+    [rowsPerPageOptions]="[50,100,200,400]"
+    [value]="ordenes5" #dt [paginator]="true"
+    [(selection)]="SelectedOrdenTransporte"
+    [rows]="50" [responsive]="true" >
+
+
+      <ng-template pTemplate="colgroup" let-columns>
+        <colgroup>
+            <col *ngFor="let col of columns"   [ngStyle]="{'width': col.width}" >
+        </colgroup>
+    </ng-template>
+
+
+      <ng-template pTemplate="header" let-columns>
+        <tr>
+
+            <th  [ngStyle]="{'width': col.width}" *ngFor="let col of columns" pResizableColumn [pSortableColumn]="col.field">
+                {{col.header}}
+
+            </th>
+        </tr>
+    </ng-template>
+
+    <ng-template pTemplate="body" let-rowData  let-index="rowIndex">
+    <tr [pSelectableRow]="rowData">
+      <td class="ui-resizable-column" style="background-color: #2ba512; color: aliceblue; text-align:center;" > {{ rowData.numcp    }}   </td>
+      <td class="ui-resizable-column" style="text-align:center;" > {{ rowData.fecharegistro  | date:'dd/MM/yyyy'   }}   </td>
+      <td class="ui-resizable-column" style="text-align:center;">  {{rowData.razonsocial   }}   </td>
+      <td class="ui-resizable-column" style="text-align:center;">  {{rowData.destinatario   }}   </td>
+      <td class="ui-resizable-column" style="text-align:center;"> {{ rowData.fechaentregareparto  | date:'dd/MM/yyyy HH:mm'   }}   </td>
+      <td class="ui-resizable-column" style="text-align:center;"> {{rowData.fechaetaentrega  | date: 'dd/MM/yyyy HH:mm' }}</td>
+      <td class="ui-resizable-column" style="text-align:center;"> {{ rowData.diferencia_fechas   }}</td>
+      <td class="ui-resizable-column" style="text-align:center;" > {{ rowData.bulto    }}   </td>
+      <td class="ui-resizable-column" style="text-align:center;" > {{ rowData.peso    }}   </td>
+      <td class="ui-resizable-column" style="background-color: #FFA000; color:black; text-align:center;">  {{rowData.tipoentrega   }}   </td>
+    </tr>
+    </ng-template>
+    </p-table>
+
+  </p-tabPanel>
+
+
 </p-tabView>
 
 <p-dialog header="Detalle de Manifiesto" [modal]="true" [(visible)]="modalDetalleManifiesto" [style]="{ width: '75rem' }">

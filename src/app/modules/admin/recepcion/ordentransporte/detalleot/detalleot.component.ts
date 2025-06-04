@@ -168,5 +168,9 @@ this.router.navigate(['/seguimiento/listadoordentransporte']);
 
 
 
+    cambiarImagen(event: Event, product: any) {
+        const imgElement = event.target as HTMLImageElement;
+        imgElement.src = 'http://199.89.55.49/tysfiles/' + product.idordentrabajo + '/' + product.nombrearchivo;
+    }
 
 }

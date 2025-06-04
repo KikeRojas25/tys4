@@ -240,6 +240,11 @@ export const appRoutes: Route[] = [
                     loadComponent: () => import('./modules/admin/reportes/pendienteentrega/pendienteentrega.component')
                                           .then(m => m.PendienteentregaComponent)
                   },
+                    {
+                    path: 'generaltrafico',
+                    loadComponent: () => import('./modules/admin/reportes/generaltrafico/generaltrafico.component')
+                                          .then(m => m.GeneraltraficoComponent)
+                  },
                  ]
               } ,
               {
