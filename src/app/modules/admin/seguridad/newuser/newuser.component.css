@@ -1,0 +1,13 @@
+p-card {
+    width: 100%;
+    max-width: 600px;
+    margin: 0 auto;
+  }
+  
+  .p-mt-3 {
+    margin-top: 1.5rem;
+  }
+  
+  .p-ml-2 {
+    margin-left: 0.5rem;
+  }

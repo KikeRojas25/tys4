@@ -1,0 +1,120 @@
+<div class="flex flex-col flex-auto min-w-0 p-8 bg-card sm:py-10 sm:px-12">
+  <!-- Encabezado con íconos de navegación y título -->
+  <div class="flex flex-col sm:flex-row flex-0 sm:items-center sm:justify-between border-b bg-card dark:bg-transparent">
+    <div class="flex-1 min-w-0">
+      <div class="flex flex-wrap items-center font-medium">
+        <div>
+          <a [routerLink]="['/comercio']">
+            <i class="fa fa-home" style="font-size: 34px; color: #6c6a6b;"></i>
+          </a>
+        </div>
+        <div class="flex items-center ml-2 whitespace-nowrap">
+          <mat-icon class="fuse-horizontal-navigation-item-icon" [svgIcon]="'heroicons_solid:chevron-right'"></mat-icon>
+          <a class="ml-2 subtitulo">Seguridad</a>
+        </div>
+      </div>
+      <div class="mt-4">
+        <h2 class="text-3xl md:text-4xl font-extrabold tracking-tight leading-7 sm:leading-10 truncate">
+          Gestión de Usuarios
+        </h2>
+      </div>
+    </div>
+  </div>
+
+  <!-- Formulario -->
+  <div class="p-grid p-justify-between p-align-center bg-card p-mb-6 p-ml-6 p-mr-6">
+    <form [formGroup]="userForm" (ngSubmit)="onSubmit()" novalidate>
+      <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+
+         <!-- User Name -->
+         <div class="field flex flex-col">
+          <label for="username">Usuario</label>
+          <input id="username" maxlength="12" pInputText formControlName="username" class="w-full md:w-3/4" />
+          <p-message *ngIf="userForm.get('username').invalid && userForm.get('username').touched"
+                     severity="error" text="Usuario es requerido"></p-message>
+        </div>
+
+        <!-- Nombre Completo -->
+        <div class="field flex flex-col">
+          <label for="nombrecompleto">Nombre Completo</label>
+          <input id="nombrecompleto" maxlength="30" pInputText formControlName="nombrecompleto" class="w-full md:w-3/4" />
+          <p-message *ngIf="userForm.get('nombrecompleto').invalid && userForm.get('nombrecompleto').touched"
+                     severity="error" text="Nombre es requerido"></p-message>
+        </div>
+
+        <!-- Documento de Identidad -->
+        <div class="field flex flex-col">
+          <label for="dni">Documento de Identidad</label>
+          <input maxlength="12" id="dni" pInputText formControlName="dni" class="w-full md:w-3/4" />
+          <p-message *ngIf="userForm.get('dni').invalid && userForm.get('dni').touched"
+                     severity="error" text="Documento es requerido"></p-message>
+        </div>
+
+        <!-- Email -->
+        <div class="field flex flex-col">
+          <label for="email">Email</label>
+          <input id="email" pInputText formControlName="email" type="email" class="w-full md:w-3/4" />
+          <p-message *ngIf="userForm.get('email').invalid && userForm.get('email').touched"
+                     severity="error" text="Email no es válido"></p-message>
+        </div>
+
+        <!-- Teléfono -->
+        <div class="field flex flex-col">
+          <label for="telefono">Teléfono</label>
+          <input id="telefono" pInputText formControlName="telefono" type="tel" class="w-full md:w-3/4" />
+          <p-message *ngIf="userForm.get('telefono').invalid && userForm.get('telefono').touched"
+                     severity="error" text="Teléfono no es válido"></p-message>
+        </div>
+
+        <!-- Permisos a Clientes -->
+        <div class="field flex flex-col">
+          <label for="clientesids">Permisos a clientes:</label>
+          <p-multiSelect 
+          [options]="listClientes" 
+          formControlName="clientesids" 
+          optionLabel="label" 
+          id="listClientes"
+          appendTo="body" 
+          style="width: 230px;"
+          [filter]="true" 
+          placeholder="Selección de clientes" />
+          <p-message *ngIf="userForm.get('clientesids').invalid && userForm.get('clientesids').touched"
+                     severity="error" text="Seleccione uno o más clientes"></p-message>
+        </div>
+
+        <!-- Contraseña -->
+        <div class="field flex flex-col">
+          <label for="password">Contraseña</label>
+          <p-password id="password" class="w-full md:w-3/4" formControlName="password" [toggleMask]="true" />
+          <p-message *ngIf="userForm.get('password').invalid && userForm.get('password').touched"
+                     severity="error" text="Contraseña es requerida"></p-message>
+
+          <!-- Indicador de fuerza de la contraseña -->
+          <!-- <div *ngIf="userForm.get('password').touched">
+            <p [ngClass]="passwordStrengthClass">{{ passwordStrengthMessage }}</p>
+          </div> -->
+        </div>
+
+        <!-- Confirmar Contraseña
+        <div class="field flex flex-col">
+          <label for="confirmPassword">Confirmar Contraseña</label>
+          <p-password id="confirmPassword" class="w-full md:w-3/4" formControlName="confirmPassword" [toggleMask]="true" />
+          <p-message *ngIf="userForm.hasError('mismatch') &&  userForm.get('confirmPassword').invalid && userForm.get('confirmPassword').touched"
+                     severity="error" text="Las contraseñas no coinciden"></p-message>
+        </div> -->
+
+
+      
+      </div>
+
+      <!-- Botones de acción -->
+      <div class="p-d-flex p-jc-end p-mt-3">
+        <button pButton type="submit" label="Guardar" [disabled]="userForm.invalid"></button>
+        <button pButton type="button" label="Regresar" class="p-ml-2" (click)="onCancel()"></button>
+      </div>
+    </form>
+  </div>
+</div>
+<p-confirmDialog />
+
+<p-toast />

@@ -99,7 +99,9 @@
       </div> -->
 
       <!-- Tabla -->
-      <p-table [value]="ordenes" [paginator]="true" [rows]="10" 
+      <p-table 
+        class="tabla-pequena"
+      [value]="ordenes" [paginator]="true" [rows]="10" 
                [rowsPerPageOptions]="[20,40,60,120]" 
                [columns]="cols" [resizableColumns]="true" 
                [tableStyle]="{ 'table-layout': 'fixed', 'width': '100%' }"
@@ -119,7 +121,7 @@
         <!-- Table Header -->
         <ng-template pTemplate="header" let-columns>
           <tr>
-            <th *ngFor="let col of columns" [style]="col.width" [pSortableColumn]="col.field">
+            <th style="white-space: normal; word-wrap: break-word;" *ngFor="let col of columns" [style]="col.width" [pSortableColumn]="col.field">
               {{ col.header }}
             </th>
           </tr>
@@ -159,8 +161,10 @@
             <td style="text-align: center;">{{ rowData.fecharecojo | date:'dd/MM/yyyy' }}</td>
             <td style="text-align: center;">{{ rowData.fechadespacho | date:'dd/MM/yyyy '}}</td>
             <td style="text-align: center;">{{ rowData.fechaentrega | date:'dd/MM/yyyy '}}</td>
-            <td class="word-wrap">{{ rowData.razonsocial }}</td>
-            <td class="word-wrap">{{ rowData.destinatario }}</td>
+            <td style="white-space: normal; word-wrap: break-word;">{{ rowData.razonsocial }}</td>
+        
+
+               <td class="word-wrap">{{ rowData.estacionorigen }}</td>
             <!-- <td class="word-wrap">{{ rowData.numManifiestoTroncal }}</td>
             <td class="word-wrap">{{ rowData.numhojarutatroncal }}</td> -->
 
@@ -173,23 +177,22 @@
             }">
             {{ rowData.estado }}
         </td>
+
+        
+            <td style="white-space: normal; word-wrap: break-word;"
+           >
+            {{ rowData.tipoentrega }}
+        </td>
         
         
         
+         
             <td class="word-wrap"> {{ rowData.origen }}</td>
-            <td class="word-wrap"> {{ rowData.destino }}</td>
+                <td style="white-space: normal; word-wrap: break-word;">{{ rowData.destinatario }}</td>
+            <td style="white-space: normal; word-wrap: break-word;"> {{ rowData.destino }}</td>
+            
 
 
-            <!-- <td class="word-wrap">
-              <a style="cursor: pointer; text-decoration: underline;" (click)="vermanifiesto(rowData.idManifiesto)">
-              {{ rowData.nummanifiesto }}
-              </a>
-            </td>
-            <td class="word-wrap">
-              <a style="cursor: pointer; text-decoration: underline;" (click)="verhojaruta(rowData.idDespacho)">
-              {{ rowData.numhojaruta }}
-              </a>
-            </td> -->
           
             <td>{{ rowData.bulto }}</td>
             <td>{{ rowData.peso }}</td>

@@ -17,8 +17,6 @@ body  {
 
 
 
-
-
 input.ng-invalid.ng-touched,
 select.ng-invalid.ng-touched {
   border-color: red;
@@ -28,28 +26,36 @@ select.ng-invalid.ng-touched {
   color: red;
   font-size: 0.675rem;
 }
-
+// .p-datatable {
+//   border: 1px solid #ece6e6;
+// }
 .p-datatable .p-datatable-thead > tr > th {
-    background-color: #125ea3;
-    color: #ffffff;
-    font-size: 14px;
+    background-color: #1340a0;
+    font-size: 12px;
     text-align: center;
+    color: #ffffff;
 }
 
-.p-datatable-tbody > tr > td {
-    font-size: 14px;
-    padding: 8px;
-}
 
-.p-button.p-button-sm {
-  font-size: 0.975rem;
-    padding: 0.15625rem 0.0275rem  !important;
-  
-}
 
+.p-datatable-tbody > tr:not(.p-highlight) > td {
+  background-color: #ffffff;
+  color: #333;
+  text-align: center;
+  padding: 2px;
+  font-size: 12px;
+  border-bottom: 2px solid #cccccc53;
+
+}
+ .p-datatable-tbody > tr.p-highlight > td {
+  padding: 2px;
+  font-size: 12px;
+  text-align: center;
+  border-bottom: 2px solid #cccccc53;
+}
 
 .p-button {
-  font-size: 15px;
+  font-size: 12px;
     padding: 0.55625rem 0.62375rem !important;
 }
-
+    

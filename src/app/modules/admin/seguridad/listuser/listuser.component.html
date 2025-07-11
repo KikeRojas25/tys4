@@ -1,0 +1,113 @@
+<div class="flex flex-col flex-auto min-w-0 p-8 bg-card sm:py-10 sm:px-12">
+  <!-- Encabezado con íconos de navegación y título -->
+  <div class="flex flex-col sm:flex-row flex-0 sm:items-center sm:justify-between border-b bg-card dark:bg-transparent">
+    <div class="flex-1 min-w-0">
+      <div class="flex flex-wrap items-center font-medium">
+        <div>
+          <a [routerLink]="['/comercio']">
+            <i class="fa fa-home" style="font-size: 34px; color: #6c6a6b;"></i>
+          </a>
+        </div>
+        <div class="flex items-center ml-2 whitespace-nowrap">
+          <mat-icon class="fuse-horizontal-navigation-item-icon" [svgIcon]="'heroicons_solid:chevron-right'"></mat-icon>
+          <a class="ml-2 subtitulo">Seguridad</a>
+        </div>
+      </div>
+      <div class="mt-4">
+        <h2 class="text-3xl md:text-4xl font-extrabold tracking-tight leading-7 sm:leading-10 truncate">
+          Gestión de Usuarios
+        </h2>
+      </div>
+    </div>
+  </div>
+
+  <!-- Barra de búsqueda con más margen y padding -->
+  <div class="p-grid p-justify-start p-align-center bg-card p-mb-6 p-mt-6 p-ml-6">
+    <div class="p-col-12 flex items-center gap-6 p-4">
+      <!-- Campo de búsqueda con más margen -->
+      <span class="p-input-icon-left">
+        <input type="text" pInputText placeholder="Buscar por nombre o DNI" [(ngModel)]="model.param" class="p-2"/>
+      </span>
+
+      <!-- Botón de Buscar -->
+      <p-button label="Buscar" severity="primary" (onClick)="buscar()" class="p-button-sm p-2"></p-button>
+
+      <!-- Nuevo Botón -->
+      <p-button label="Nuevo Usuario" severity="secondary" (onClick)="nuevo()" class="p-button-sm p-ml-4 p-2"></p-button>
+    </div>
+  </div>
+
+  <!-- Tabla de usuarios -->
+  <div class="p-grid p-justify-between p-align-center bg-card p-mb-6 p-ml-6 p-mr-6">
+    <p-table [value]="filteredUsers" [scrollable]="true" scrollHeight="400px"
+     selectionMode="single" dataKey="id" 
+     [paginator]="true"
+     [rows]="5"
+     [rowsPerPageOptions]="[5, 10, 20]"
+      [tableStyle]="{ 'min-width': '50rem' }" >
+      <!-- Cabecera de la tabla -->
+      <ng-template pTemplate="header">
+        <tr>
+          <th style="text-align: center; width: 80px;">ID</th>
+          <th style="text-align: center; width: 100px;">DNI</th>
+          <th style="text-align: center; width: 280px;">Usuario</th>
+          <th style="text-align: center; width: 280px;">Nombre completo</th>
+          <th style="text-align: center; width: 180px;">Última conexión</th>
+          <th>Email</th>
+          <th>Estado</th>
+          <th style="text-align: center; width: 280px;">Acciones</th>
+        </tr>
+      </ng-template>
+      
+      <!-- Cuerpo de la tabla -->
+      <ng-template pTemplate="body" let-usuario>
+        <tr [pSelectableRow]="usuario">
+          <td style="text-align: center">{{ usuario.id }}</td>
+          <td style="text-align: center">{{ usuario.dni }}</td>
+          <td>{{ usuario.username }}</td>
+          <td>{{ usuario.nombreCompleto }}</td>
+          <td>{{ usuario.lastActive | date: 'dd-MM-YYYY' }}</td>
+          <td>{{ usuario.email }}</td>
+          <td>
+            <p-chip *ngIf="usuario.estadoId === 1" label="Activo" class="p-chip-success"></p-chip>
+            <p-chip *ngIf="usuario.estadoId !== 1" label="Inactivo" class="p-chip-danger"></p-chip>
+          </td>
+          <td>
+            <p-button size="small" severity="secondary" icon="fa fa-pencil" (click)="editarUsuario(usuario.id)"></p-button>
+            <p-button size="small" icon="fa fa-trash" (click)="eliminarUsuario(usuario.id)"></p-button>
+            <p-button size="small" icon="fa fa-user-o" (click)="verRolesUsuario(usuario.id)"></p-button>
+          </td>
+        </tr>
+      </ng-template>
+    </p-table>
+  </div>
+</div>
+<p-confirmDialog />
+
+<p-toast />
+
+<p-dialog [(visible)]="displayDialog" header="Asignar Roles" [modal]="true" [closable]="false">
+  <div class="p-fluid">
+      <p-pickList 
+          [source]="selectedRoles" 
+          [target]="roles" 
+          [responsive]="true" 
+          filter="true" 
+          dragDrop="true"
+          style="width: 100%; max-width: 400px;">
+          <ng-template let-role pTemplate="header">
+              <div>{{ role.descripcion }}</div>
+          </ng-template>
+          <ng-template let-role pTemplate="item">
+              <div>{{ role.descripcion }}</div>
+          </ng-template>
+      </p-pickList>
+      
+      <!-- Fila para los botones alineados uno al lado del otro -->
+          <div class="button-container">
+            <button (click)="saveRoles()" pButton label="Guardar" icon="pi pi-check"></button>
+            <button (click)="displayDialog = false" pButton label="Cancelar" icon="pi pi-times" class="p-button-secondary"></button>
+        </div>
+  </div>
+</p-dialog>
+

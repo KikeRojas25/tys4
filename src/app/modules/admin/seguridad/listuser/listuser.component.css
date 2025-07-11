@@ -1,0 +1,27 @@
+.custom-button {
+    background-color: #ffeb3b !important; /* El !important asegura que sobrescriba otros estilos */
+    border-color: #ffeb3b !important; /* Asegura que el borde también cambie de color */
+  }
+  
+  .p-datatable-thead {
+    background-color: yellow !important;
+  }
+
+  .custom-header-table th {
+    background-color: #ffeb3b; /* Cambia esto al color que desees */
+    color: #000; /* Cambia el color del texto */
+    text-align: center;
+  }
+
+  .subtitulo {
+    color: #ff005c;
+  }
+  .button-container {
+    display: flex;
+    justify-content: flex-end;
+    margin-top: 20px;
+}
+
+.button-container button {
+    margin-left: 10px; /* Espacio entre los botones */
+}

@@ -62,6 +62,10 @@ export class ConfirmarentregaComponent implements OnInit {
   dialoglifecycle = false;
 
 
+  subestadosPorTipo: { [key: string]: any[] } = {}
+
+  
+
   estadosMap = {
     0: [0],
     1: [6], // "Por despachar" se mapea a "Pend. Programacion"
@@ -90,6 +94,8 @@ export class ConfirmarentregaComponent implements OnInit {
   statuses: SelectItem[];
   
 
+  
+
 
   constructor(private ordenTransporteService: OrdenTransporteService,
               public dialogService: DialogService,
@@ -102,9 +108,10 @@ export class ConfirmarentregaComponent implements OnInit {
 
     this.statuses = [
       {label: 'Ninguna', value: ''},
-      {label: 'Entrega Conforme', value: 'Entrega Conforme'},
+      {label: 'Entrega Perfecta', value: 'Entrega Perfecta'},
+      {label: 'Entrega Sin Cargo', value: 'Entrega Sin Cargo'},
       {label: 'Rechazo Parcial', value: 'Rechazo Parcial'},
-      {label: 'Rechazo Total', value: 'Rechazo Total'},
+      {label: 'No Entrega', value: 'No Entrega'},
      ]
     this.user = JSON.parse(localStorage.getItem('user'));
 
@@ -138,11 +145,9 @@ export class ConfirmarentregaComponent implements OnInit {
       {header: 'DÍAS', field: 'diasDesdeDespacho' , width: '50px'  },
       {header: 'REF', field: 'docgeneral' , width: '90px'  },
       {header: 'TIPO ENTREGA' , field: 'tipoentrega'  , width: '210px'   },
+      {header: 'SUB ESTADO' , field: 'tipoentrega'  , width: '210px'   },
       {header: 'F. ENTREGA', field: 'fechaentrega' , width: '200px'  },
       {header: 'HR ENTREGA' , field: 'horaentrega'  , width: '260px'   },
-      // {header: 'DNI ENTREGA', field: 'dnientrega' , width: '180px'  },
-      // {header: 'PERSONA ENTREGA', field: 'personaentrega' , width: '180px'  },
-      // {header: 'OBS.', field: 'descripcion' , width: '220px'  },
       {header: 'DIR DEST' , field: 'direccion'  , width: '280px'   },
       {header: 'DESTINO', field: 'destino'  ,  width: '90px'  },
       {header: 'DESTINATARIO', field: 'destinatario' , width: '180px'  },
@@ -195,27 +200,26 @@ export class ConfirmarentregaComponent implements OnInit {
   
     this.model.idestado = 0;
 
+    
+this.subestadosPorTipo = {
+  'Entrega Perfecta': [{ label: 'Entrega Perfecta', value: 'Entrega Perfecta' }],
+  'Entrega Sin Cargo': [{ label: 'Entrega Perfecta', value: 'Entrega Perfecta' }],
+  'Rechazo Parcial': [
+    { label: 'Mercadería parcial faltante', value: 'Parcial_Faltante' },
+    { label: 'Mercadería parcial dañada', value: 'Parcial_Danada' },
+    { label: 'Cliente no quiere recibir total pedido', value: 'Cliente_No_Recibe_Total' }
+  ],
+  'No Entrega': [
+    { label: 'Dirección no existente', value: 'Direccion_No_Existe' },
+    { label: 'Local cerrado', value: 'Local_Cerrado' },
+    { label: 'Cliente rechazó total del pedido', value: 'Cliente_Rechazo_Total' }
+  ]
+};
+
 
 
   }
-//  exportExcel() {
-//     import('xlsx').then(xlsx => {
-//         const worksheet = xlsx.utils.json_to_sheet( this.ordenes );
-//         const workbook = { Sheets: { 'data': worksheet }, SheetNames: ['data'] };
-//         const excelBuffer: any = xlsx.write(workbook, { bookType: 'xlsx', type: 'array' });
-//         this.saveAsExcelFile(excelBuffer, 'ListaOT');
-//     });
-// }
-// saveAsExcelFile(buffer: any, fileName: string): void {
-//   import('file-saver').then(FileSaver => {
-//       const EXCEL_TYPE = 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet;charset=UTF-8';
-//       const EXCEL_EXTENSION = '.xlsx';
-//       const data: Blob = new Blob([buffer], {
-//           type: EXCEL_TYPE
-//       });
-//       FileSaver.saveAs(data, fileName + '_export_' + new Date().getTime() + EXCEL_EXTENSION);
-//   });
-// }
+
   editar(id) {
     this.router.navigate(['/trafico/editarotr', id]);
   }
@@ -258,25 +262,8 @@ export class ConfirmarentregaComponent implements OnInit {
 
       });
   }
-  // getFiles(id, event, overlaypanel: OverlayPanel) {
-  //   this.ordenTransporteService.getAllDocumentos(id).subscribe(list => {
-  //       this.downloadFile(list[2].id);
-  //       overlaypanel.toggle(event);
-  //  });
-  // }
-  downloadFile(documentoId: number) {
 
-    // this.ordenTransporteService.downloadDocumento(documentoId).subscribe(
-    //    (response: any) => {
-    //        const dataType = response.type;
-    //        const binaryData = [];
-    //        binaryData.push(response);
-    //        const downloadLink = document.createElement('a');
-    //        downloadLink.href = window.URL.createObjectURL(new Blob(binaryData, {type: dataType}));
-    //        this.createImageFromBlob(new Blob(binaryData, {type: dataType}));
-    //    }
-    //  );
-   }
+
    createImageFromBlob(image: Blob) {
 
     const reader = new FileReader();
@@ -290,41 +277,8 @@ export class ConfirmarentregaComponent implements OnInit {
        reader.readAsDataURL(image);
     }
  }
- ver(id) {
-//   this.ref = this.dialogService.open(VerAsignacionComponent, {
-//     header: 'Ver detalle de asignación',
-//     width: '40%',
-//     contentStyle: {'max-height': '400px', overflow: 'auto'},
-//     baseZIndex: 10000,
-//     data : {id }
-// });
 
-//   this.ref.onClose.subscribe((product: any) => {
-//     if (product === undefined) { return; }
-//     else{
 
-//       this.messageService.add({severity: 'info', summary: 'Vehículo seleccionado', detail: product.placa});
-//     }
-// });
-
- }
- asignar (id) {
-  // this.ref = this.dialogService.open(AsignarEstibaComponent, {
-  //   header: 'Asignar Estiba',
-  //   width: '40%',
-  //   contentStyle: {'max-height': '400px', overflow: 'auto'},
-  //   baseZIndex: 10000,
-  //   data : {id }
-// });
-
-//   this.ref.onClose.subscribe((product: any) => {
-//     if (product === undefined) { return; }
-//     else{
-//       this.messageService.add({severity: 'info', summary: 'Vehículo seleccionado', detail: product.placa});
-//     }
-// });
-
-}
 eliminar(id) {
 
   this.confirmationService.confirm({
@@ -373,8 +327,24 @@ onRowEditInit(order: OrdenTransporte) {
 }
 onRowEditSave(order: OrdenTransporte) {
 
+  const tiposQueRequierenSubestado = ['Rechazo Parcial', 'No Entrega'];
 
-  order.idtipoentrega = this.getIdTipoEntrega(order.tipoentrega)
+  if (tiposQueRequierenSubestado.includes(order.tipoentrega) && !order.subestado) {
+    this.messageService.add({
+      severity: 'warn',
+      summary: 'Validación',
+      detail: `Debe seleccionar un subestado para "${order.tipoentrega}".`
+    });
+    return;
+  }
+
+
+
+
+  order.idtipoentrega = this.getIdTipoEntrega(order.tipoentrega);
+  order.IncidenciaEntregaId = this.getIdSubestado(order.subestado);
+
+
   order.idusuarioentrega =  this.user.id;
 
 
@@ -385,17 +355,26 @@ onRowEditSave(order: OrdenTransporte) {
       this.ordenTransporteService.confirmar_entrega(order).subscribe( resp => {
 
 
-        // this.toastr.success('Se actualizó correctamente'
-        // , 'Orden de Transporte', {
-        //   closeButton: true
-        // });
+        if (tiposQueRequierenSubestado.includes(order.tipoentrega)) {
+
+          this.ordenTransporteService.agregarVisitaDespacho(order).subscribe(resp => {
+         
+          });
+        }
+
+        this.messageService.add({
+                severity: 'success',
+                summary: 'Orden actualizada',
+                detail: `OT ${order.numcp} confirmada correctamente`
+              });
 
 
       }, (error)=> {
-        // this.toastr.error(error.error
-        // , 'Orden de Transporte', {
-        //   closeButton: true
-        // });
+        this.messageService.add({
+          severity: 'error',
+          summary: 'Error',
+          detail: error?.error || 'No se pudo confirmar la entrega.'
+        });
       }, ()=> {
 
       });
@@ -405,10 +384,11 @@ onRowEditSave(order: OrdenTransporte) {
 
   }
   else {
-    // this.toastr.error('No se actualizó correctamente'
-    // , 'Orden de Transporte', {
-    //   closeButton: true
-    // });
+    this.messageService.add({
+          severity: 'error',
+          summary: 'Error',
+          detail:  'No se pudo confirmar la entrega.'
+        });
   }
 }
 
@@ -470,42 +450,58 @@ verdetalles(id) {
    this.router.navigate(['/seguimiento/verorden', id]);
 }
 
+// Método para obtener subestados según el tipo de entrega seleccionado
+getSubestados(tipoEntrega: string): any[] {
+  return this.subestadosPorTipo[tipoEntrega] || [];
+}
 
 
+
+getIdSubestado(subestado: string): number {
+  switch (subestado) {
+    case 'Parcial_Faltante':
+      return 1;
+    case 'Parcial_Danada':
+      return 2;
+    case 'Cliente_No_Recibe_Total':
+      return 3;
+    case 'Direccion_No_Existe':
+      return 1;
+    case 'Local_Cerrado':
+      return 2;
+    case 'Cliente_Rechazo_Total':
+      return 3;
+    default:
+      return 0; // o null si prefieres manejarlo así
+  }
+}
 
 
 getIdTipoEntrega(tipoentrega: string) : number {
 
   console.log(tipoentrega);
 
-  if("Entrega Conforme" == tipoentrega)
+  if("Entrega Perfecta" == tipoentrega)
   {
         return 5;
   }
-  // else if("Entrega: Con Mercaderia Dañada" == tipoentrega)
-  // {
-  //     return 8;
-  // }
-  // else if("Entrega: Con Mercaderia Faltante" == tipoentrega)
-  // {
-  //     return 9;
-  // }
-  else if("Rechazo Total" == tipoentrega)
+  else if("No Entrega" == tipoentrega)
   {
      return 10;
   }
-  else if("Rechazo Parcial " == tipoentrega)
+  else if("Entrega Sin Cargo" == tipoentrega)
+  {
+     return 5;
+  }
+  else if("No Entrega" == tipoentrega)
+  {
+     return 10;
+  }
+  else if("Rechazo Parcial" == tipoentrega)
   {
     return 11;
   }
-  // else if("No Entrega: Local Cerrado" == tipoentrega)
-  // {
-  //   return 12;
-  // }
-  // else if("No Entrega: No existe la dirección de entrega" == tipoentrega)
-  // {
-  //    return 13;
-  // }
+
 }
 
 }

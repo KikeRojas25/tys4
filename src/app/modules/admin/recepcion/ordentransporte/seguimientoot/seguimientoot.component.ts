@@ -90,6 +90,9 @@ export class SeguimientootComponent implements OnInit {
   imageToShow: any;
   items: MenuItem[];
   estrafico= false;
+
+  ordenTransporte: any = {};
+  guias : any[] = [];
   
   estadosMap = {
     0: [0],
@@ -147,7 +150,7 @@ export class SeguimientootComponent implements OnInit {
 
     this.cols =
     [
-        {header: 'ACC', field: 'numcp'  ,  width: '350px' },
+        {header: 'ACC', field: 'numcp'  ,  width: '300px' },
         {header: 'OT', field: 'numcp'  ,  width: '100px' },
         {header: 'F. RECOJO', field: 'fecharegistro' , width: '120px'  },
         {header: 'F. DESPACHO', field: 'fecharegistro' , width: '120px'  },
@@ -156,8 +159,10 @@ export class SeguimientootComponent implements OnInit {
         {header: 'DESTINATARIO', field: 'razonsocial'  ,  width: '180px'  },
         // {header: 'MANIFIESTO TRONCAL', field: 'razonsocial'  ,  width: '280px'  },
         // {header: 'HOJA DE RUTA TRONCAL ', field: 'razonsocial'  ,  width: '280px'  },
-     
+        {header: 'ESTACIÓN ACTUAL', field: 'razonsocial'  ,  width: '180px'  },
         {header: 'ESTADO', field: 'estado'  , width: '120px'   },
+        {header: 'SUB-ESTADO', field: 'subestado'  , width: '120px'   },
+        {header: 'INCIDENCIA ENTREGA', field: 'tipoentrega'  , width: '120px'   },
         {header: 'ORIGEN', field: 'estado'  , width: '120px'   },
         {header: 'DESTINO', field: 'estado'  , width: '120px'   },
         {header: 'SUB TOTAL', field: 'subtotal' , width: '80px'  },
@@ -218,24 +223,7 @@ export class SeguimientootComponent implements OnInit {
 
 
   }
-//  exportExcel() {
-//     import('xlsx').then(xlsx => {
-//         const worksheet = xlsx.utils.json_to_sheet( this.ordenes );
-//         const workbook = { Sheets: { 'data': worksheet }, SheetNames: ['data'] };
-//         const excelBuffer: any = xlsx.write(workbook, { bookType: 'xlsx', type: 'array' });
-//         this.saveAsExcelFile(excelBuffer, 'ListaOT');
-//     });
-// }
-// saveAsExcelFile(buffer: any, fileName: string): void {
-//   import('file-saver').then(FileSaver => {
-//       const EXCEL_TYPE = 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet;charset=UTF-8';
-//       const EXCEL_EXTENSION = '.xlsx';
-//       const data: Blob = new Blob([buffer], {
-//           type: EXCEL_TYPE
-//       });
-//       FileSaver.saveAs(data, fileName + '_export_' + new Date().getTime() + EXCEL_EXTENSION);
-//   });
-// }
+
   editar(id) {
     this.router.navigate(['/seguimientoot/editarot', id]);
   }
@@ -295,25 +283,8 @@ editarConfirm(id) {
 
       });
   }
-  // getFiles(id, event, overlaypanel: OverlayPanel) {
-  //   this.ordenTransporteService.getAllDocumentos(id).subscribe(list => {
-  //       this.downloadFile(list[2].id);
-  //       overlaypanel.toggle(event);
-  //  });
-  // }
-  downloadFile(documentoId: number) {
 
-    // this.ordenTransporteService.downloadDocumento(documentoId).subscribe(
-    //    (response: any) => {
-    //        const dataType = response.type;
-    //        const binaryData = [];
-    //        binaryData.push(response);
-    //        const downloadLink = document.createElement('a');
-    //        downloadLink.href = window.URL.createObjectURL(new Blob(binaryData, {type: dataType}));
-    //        this.createImageFromBlob(new Blob(binaryData, {type: dataType}));
-    //    }
-    //  );
-   }
+
    eliminarFotos(id) {
     this.confirmationService.confirm({
       message: '¿Esta seguro que desea elminar las fotos de esta OT?',
@@ -322,7 +293,6 @@ editarConfirm(id) {
         this.model.idusuarioregistro = this.user.id;
         this.model.idordentrabajo = id;
   
-      //  this.ordenTransporteService.eliminar(this.model).subscribe(resp => {
   
           this.messageService.add({severity: 'success', summary: 'Orden Transporte ', detail: 'Se ha eliminado con éxito.'});
   
@@ -350,12 +320,7 @@ editarConfirm(id) {
   return estadosArray.join(","); // Convierte el array a una cadena separada por comas
 }
 
- ver(id) {
 
- }
- asignar (id) {
-
-}
 verot(idOrdenTrabajo) {
 
     const url = `http://104.36.166.65/webreports/ot.aspx?idorden=${idOrdenTrabajo}`;
@@ -378,21 +343,30 @@ vertracking(idordentransporte: number) {
     let eventos =  list;
     this.events = [];
 
-    console.log('xD',list);
+    this.ordenTransporteService.getOrden(idordentransporte).subscribe(ot => {
 
+      console.log('ot', ot);
+
+      this.ordenTransporte  = ot.ordenTransporte;
+      this.guias = ot.guias;
 
 
     this.dialoglifecycle = true;
 
-    eventos.forEach(x=> {
-      this.events.push({ 
-        status: x.evento, dateRegister: x.fechaRegistro , dateEvent: x.fechaEvento , user: x.usuario, icon:'pi pi-shopping-cart', color: '#9C27B0'
-      })
-    })
+   eventos.forEach(x => {
+  this.events.push({ 
+    status: x.evento,
+    dateRegister: x.fechaRegistro,
+    dateEvent: x.fechaEvento,
+    user: x.usuario === 'ADMIN ADMIN' ? 'CHATBOT' : x.usuario,
+    icon: 'pi pi-shopping-cart',
+    color: '#9C27B0'
+  });
+});
 
 
 
-
+  });
 
 
   });
@@ -428,10 +402,6 @@ saveConfirm(){
       this.buscar();
 
       this.messageService.add({severity: 'success', summary: 'Orden Transporte ', detail: 'Se ha actualizado la fecha de entrega con éxito.'});
-        
-
-
-
 
   });
 

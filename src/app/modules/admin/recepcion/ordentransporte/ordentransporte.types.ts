@@ -71,6 +71,7 @@ export interface OrdenTransporte {
 
     tipoentrega?: string;
     idtipoentrega?: number;
+    IncidenciaEntregaId?: number;
     idusuarioentrega?: number;
 
     subtotal?: number;
@@ -99,6 +100,7 @@ export interface OrdenTransporte {
     numcarga2?: string;
     validado?: false;
     mensaje?: string;
+    subestado?: string;
 
 
 }
@@ -193,3 +195,11 @@ export interface Documento {
     numero_documento: string;
     carga_id: number;
 }
+export interface OrdenTrabajoResumen {
+    idOrdenTrabajo: number;
+    numcp: string;
+    origen: string;
+    destino: string;
+    guias: string;
+  }
+  

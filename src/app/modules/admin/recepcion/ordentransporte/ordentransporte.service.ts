@@ -4,7 +4,7 @@ import { JwtHelperService } from '@auth0/angular-jwt';
 import { UserService } from 'app/core/user/user.service';
 import { environment } from 'environments/environment';
 import { catchError, map, Observable, throwError } from 'rxjs';
-import { Chofer, Cliente, Concepto, Documento, Formula, HojaRuta, OperacionCarga, OrdenTransporte, Ubigeo, ValorTabla, Vehiculo } from './ordentransporte.types';
+import { Chofer, Cliente, Concepto, Documento, Formula, HojaRuta, OperacionCarga, OrdenTrabajoResumen, OrdenTransporte, Ubigeo, ValorTabla, Vehiculo } from './ordentransporte.types';
 import { Manifiesto } from '../../trafico/trafico.types';
 
 
@@ -179,6 +179,14 @@ unConfirm(model: any) {
   )
 );
 }
+
+
+agregarVisitaDespacho(command: any): Observable<any> {
+  return this._httpClient.post(`${this.baseUrl}AgregarVisitaDespacho`, command);
+}
+
+
+
 eliminar(model: any): Observable<OrdenTransporte> {
   return this._httpClient.post<OrdenTransporte>(this.baseUrlOrden + 'DeleteOrdenTransporte', model, httpOptions);
 }
@@ -297,5 +305,13 @@ AsignarOtsCarga(idprovincia: string, idcarga: number) {
 }
 
 
+  obtenerResumenPorClienteYOrigen(clienteId: number, origenId: number): Observable<OrdenTrabajoResumen[]> {
+    return this._httpClient.get<OrdenTrabajoResumen[]>(`${this.baseUrlOrden}por-cliente-origen`, {
+      params: {
+        clienteId: clienteId.toString(),
+        origenId: origenId.toString()
+      }
+    });
+  }
 
 }

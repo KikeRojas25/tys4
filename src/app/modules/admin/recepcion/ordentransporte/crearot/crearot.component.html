@@ -146,7 +146,7 @@
                         [options]="ubigeo"    formControlName="idorigen"
                         scrollHeight="30vh"  class="input-form-field"
                         [virtualScroll]="true" itemSize="70"
-                        [style]="{'width':'100%'}" required (onChange)="cargarFormula()"
+                        [style]="{'width':'100%'}" required (onChange)="onOrigenChange($event.value)"
                         [resetFilterOnHide]="false"
                         [hideTransitionOptions]="'0ms'"
                         [showTransitionOptions]="'0ms'"

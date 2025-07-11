@@ -21,3 +21,14 @@
       height: 120px; /* Reduce la altura de los conectores entre eventos */
   }
   
+
+  .td-alert
+    {
+        background-color: #f8d7da; /* Color de fondo para alertas */
+        color: #721c24; /* Color de texto para alertas */
+        border-color: #f5c6cb; /* Color del borde para alertas */
+    }
+
+     ::ng-deep .tabla-pequena .p-datatable {
+        font-size: 6px !important;
+} 

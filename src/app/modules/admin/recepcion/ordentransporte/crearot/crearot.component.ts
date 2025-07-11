@@ -24,6 +24,7 @@ import { forkJoin } from 'rxjs';
 import { DialogService, DynamicDialogRef } from 'primeng/dynamicdialog';
 import { NewComponent } from 'app/modules/admin/mantenimiento/cliente/new/new.component';
 import { ChangeDetectorRef } from '@angular/core';
+import { DialogOrdenResumenComponent } from '../dialog-orden-resumen/dialog-orden-resumen.component';
 
 
 
@@ -428,8 +429,36 @@ else {
 
 
     }
+    onOrigenChange(idOrigen: number) {
+      this.cargarFormula(); // sigue ejecutando tu lógica actual
+    
+       const distritosConDialog = [1, 42, 44];
+
+     
+       if (distritosConDialog.includes(idOrigen)) return; // 🔒 bloquea
+      
+      const idCliente = this.form.get('idcliente')?.value; // Obtener el valor del idcliente desde el formulario
+      const idDestino = this.form.get('iddestino')?.value; // Obtener el valor del idcliente desde el formulario
+    
+      if (idCliente && idOrigen) {
+        this.ordenTransporteService.obtenerResumenPorClienteYOrigen(idCliente, idOrigen)
+          .subscribe(ordenes => {
+            if (ordenes.length > 0) {
+              this.dialogService.open(DialogOrdenResumenComponent, {
+                header: 'OTRs con origen similar',
+                width: '70%',
+                data: { ordenes }
+              });
+            }
+          });
+      }
+    }
+    
 
     cargarFormula() {
+
+
+
 
       const idCliente = this.form.get('idcliente')?.value; // Obtener el valor del idcliente desde el formulario
       const idDestino = this.form.get('iddestino')?.value; // Obtener el valor del idcliente desde el formulario
@@ -552,6 +581,27 @@ else {
     // Confirma que el índice es válido antes de eliminar
     if (index >= 0 && index < this.etiquetas.length) {
       this.etiquetas.splice(index, 1);
+    }
+  }
+  mostrarOrdenesRelacionadas() {
+
+    const idCliente = this.form.get('idcliente')?.value; // Obtener el valor del idcliente desde el formulario
+    const idDestino = this.form.get('iddestino')?.value; // Obtener el valor del idcliente desde el formulario
+    const idOrigen = this.form.get('idorigen')?.value;
+
+
+
+    if (idCliente && idDestino) {
+      this.ordenTransporteService.obtenerResumenPorClienteYOrigen(idCliente, idDestino)
+        .subscribe(ordenes => {
+          this.dialogService.open(DialogOrdenResumenComponent, {
+            header: 'Órdenes relacionadas',
+            width: '70%',
+            data: {
+              ordenes: ordenes
+            }
+          });
+        });
     }
   }
 

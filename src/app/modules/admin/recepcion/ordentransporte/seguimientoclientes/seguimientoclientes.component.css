@@ -17,3 +17,17 @@
     color: black !important;
     font-weight: normal;
 }
+
+
+
+ ::ng-deep .tabla-pequena .p-datatable {
+  font-size: 6px !important;
+} 
+
+/* ::ng-deep .tabla-pequena .p-datatable-thead th,
+::ng-deep .tabla-pequena .p-datatable-tbody td {
+  padding: 6px 10px;
+  white-space: nowrap; 
+  overflow: hidden;
+  text-overflow: ellipsis;
+} */

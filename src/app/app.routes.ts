@@ -333,6 +333,29 @@ export const appRoutes: Route[] = [
                  
                 ]
               },
+               {
+              path: 'seguridad',
+              loadComponent: () => import('./modules/admin/seguridad/seguridad.component')
+                                    .then(m => m.SeguridadComponent),
+              children: [
+                {
+                  path: 'listausuarios',
+                  loadComponent: () => import('./modules/admin/seguridad/listuser/listuser.component')
+                                        .then(m => m.ListuserComponent)
+                },
+                {
+                  path: 'newusuario',
+                  loadComponent: () => import('./modules/admin/seguridad/newuser/newuser.component')
+                                        .then(m => m.NewuserComponent)
+                },
+                {
+                  path: 'editusuario/:uid',
+                  loadComponent: () => import('./modules/admin/seguridad/edituser/edituser.component')
+                                        .then(m => m.EdituserComponent)
+                }
+             
+              ]
+            },
         ]
     }
 ];

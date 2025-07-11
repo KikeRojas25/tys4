@@ -110,7 +110,7 @@
       </div> -->
 
       <!-- Tabla -->
-      <p-table [value]="ordenes" [paginator]="true" [rows]="10" 
+      <p-table     class="tabla-pequena" [value]="ordenes" [paginator]="true" [rows]="10" 
                [rowsPerPageOptions]="[20,40,60,120]" 
                [columns]="cols" [resizableColumns]="true" 
                [tableStyle]="{ 'table-layout': 'fixed', 'width': '100%' }"
@@ -127,7 +127,7 @@
         <!-- Table Header -->
         <ng-template pTemplate="header" let-columns>
           <tr>
-            <th *ngFor="let col of columns" [style]="col.width" [pSortableColumn]="col.field">
+            <th style="white-space: normal; word-wrap: break-word;" *ngFor="let col of columns" [style]="col.width" [pSortableColumn]="col.field">
               {{ col.header }}
             </th>
           </tr>
@@ -139,8 +139,8 @@
             <!-- Acción -->
 
             
-            <td>
-              <p-button  label=""   size="small" title='Ver Fotos' icon='fa fa-download'  (click)='verarchivos(rowData.idordentrabajo);' > </p-button>
+            <td style="text-align: left;">
+              <p-button  label=""   size="small" title='Ver Fotos' icon='pi pi-download'  (click)='verarchivos(rowData.idordentrabajo);' > </p-button>
               
               <p-button *ngIf="rowData?.estado === 'Entregado' && estrafico === true"  
               icon="pi pi-book" 
@@ -193,10 +193,18 @@
             <td class="word-wrap">{{ rowData.destinatario }}</td>
             <!-- <td class="word-wrap">{{ rowData.numManifiestoTroncal }}</td>
             <td class="word-wrap">{{ rowData.numhojarutatroncal }}</td> -->
+            <td class="word-wrap">{{ rowData.estacionorigen }}</td>
+            
        
             <td class="word-wrap" [ngClass]="rowData.estado == 'Registrado' ? 'very-old-car' : (rowData.estado == 'Programado' ? 'old-car' : '')">
               {{ rowData.estado }}
             </td>
+            <td class="word-wrap" [ngClass]="rowData.subestado === 'Pendiente de Cargo'? 'td-alert': ''" > {{ rowData.subestado }}</td>
+               <td style="white-space: normal; word-wrap: break-word;"
+           >
+            {{ rowData.tipoentrega }}
+        </td>
+        
             <td class="word-wrap"> {{ rowData.origen }}</td>
             <td class="word-wrap"> {{ rowData.destino }}</td>
 
@@ -221,39 +229,131 @@
     </div>
   
 </div>
-<p-dialog header="Tracking OT" [modal]="true" [(visible)]="dialoglifecycle" [style]="{ width: '60rem' }">
-  <p-table [value]="events" [style]="{ width: '100%' }">
-    <ng-template pTemplate="header">
-      <tr>
-        <th style="width: 20%;">Fecha registro</th>
-        <th style="width: 20%;">Fecha evento</th>
-        <th style="width: 20%;">Usuario registro</th>
-        <th style="width: 20%;">Evento</th>
-      </tr>
-    </ng-template>
-    <ng-template pTemplate="body" let-event>
-      <tr>
-        <td>
-          {{ event.dateEvent ? (event.dateRegister ? (event.dateRegister | date:'dd/MM/yyyy HH:mm') : 'Sin dato') : 'Sin dato' }}
-        </td>
-        <td>
-          {{ event.dateEvent ? (event.dateEvent | date:'dd/MM/yyyy HH:mm' ) : 'Sin evento' }}
-        </td>
-        <td>
-          {{ event.dateEvent ? (event.user || 'Sin dato') : 'Sin dato' }}
-        </td>
-        <td>
-          <span 
-            class="badge-simulation"
-            [ngStyle]="{'background-color': event.dateEvent ? '#17a2b8' : '#ffc107', 'color': event.dateEvent ? 'white' : 'black'}" 
-            style="display: inline-block; padding: 0.2rem 0.5rem; border-radius: 1rem; text-align: center;">
-            {{ event.status || 'Sin Estado' }}
-          </span>
-        </td>
-      </tr>
-    </ng-template>
-  </p-table>
+<p-dialog header="Tracking OTs" [modal]="true" [(visible)]="dialoglifecycle" [style]="{ width: '80rem' }">
+
+  <!-- Contenedor común para cabecera y tabla -->
+  <div class="p-4">
+
+    <!-- 🟦 Encabezado informativo -->
+    <div class="bg-gray-50 rounded-md shadow mb-5 text-sm text-gray-800">
+      <div class="grid grid-cols-2 md:grid-cols-4 gap-4 p-4">
+
+        <div>
+          <span class="font-semibold">🆔 Nº Orden:</span> {{ ordenTransporte.numcp }}
+        </div>
+        <div>
+          <span class="font-semibold">📍 Origen:</span> {{ ordenTransporte.origen }}
+        </div>
+        <div>
+          <span class="font-semibold">🎯 Destino:</span> {{ ordenTransporte.destino }}
+        </div>
+        <div>
+          <span class="font-semibold">📌 Estado:</span> {{ ordenTransporte.estado }}
+        </div>
+        <div>
+          <span class="font-semibold">📨 Cliente:</span> {{ ordenTransporte.razonsocial }}
+        </div>
+        <div>
+          <span class="font-semibold">📨 Remitente:</span> {{ ordenTransporte.remitente }}
+        </div>
+        <div>
+          <span class="font-semibold">📬 Destinatario:</span> {{ ordenTransporte.destinatario }}
+        </div>
+
+        <!-- <div>
+          <span class="font-semibold">🚛 Placa:</span> {{ ordenTransporte.placa }}
+        </div>
+        <div>
+          <span class="font-semibold">🧍 Chofer:</span> {{ ordenTransporte.chofer }}
+        </div> -->
+
+        <div>
+          <span class="font-semibold">⚖️ Peso:</span> {{ ordenTransporte.peso }} kg
+        </div>
+        <div>
+          <span class="font-semibold">📦 Bultos:</span> {{ ordenTransporte.bulto }}
+        </div>
+
+        <div>
+          <span class="font-semibold">📅 Fec Recojo:</span> {{ ordenTransporte.fecharecojo | date:'dd/MM/yyyy HH:mm' }}
+        </div>
+        <div>
+          <span class="font-semibold">📦 Fec Despacho:</span> {{ ordenTransporte.fechadespacho | date:'dd/MM/yyyy HH:mm' }}
+        </div>
+
+        <div>
+          <span class="font-semibold">🗺️ Fec en Zona:</span> {{ ordenTransporte.fechaenzona | date:'dd/MM/yyyy HH:mm' }}
+        </div>
+        <div>
+          <span class="font-semibold">📤 Fec en Reparto:</span> {{ ordenTransporte.fechaentregareparto | date:'dd/MM/yyyy HH:mm' }}
+        </div>
+
+        <div>
+          <span class="font-semibold">📬 Fec de Entrega:</span> {{ ordenTransporte.fechaentrega | date:'dd/MM/yyyy HH:mm' }}
+        </div>
+        <div>
+          <span class="font-semibold">📄 Manifiesto:</span> {{ ordenTransporte.nummanifiesto || 'Sin dato' }}
+        </div>
+
+        <div>
+          <span class="font-semibold">🧾 Hoja Ruta:</span> {{ ordenTransporte.numhojaruta || 'Sin dato' }}
+        </div>
+
+        <div class="md:col-span-3 col-span-2">
+          <span class="font-semibold">📑 Guías:</span>
+          <div class="ml-4 mt-1" *ngIf="guias?.length > 0; else sinGuias">
+            <ul class="list-disc pl-4">
+              <li *ngFor="let guia of guias">{{ guia.nroguia }}</li>
+            </ul>
+          </div>
+          <ng-template #sinGuias>
+            <span class="text-gray-500">Sin guías</span>
+          </ng-template>
+        </div>
+
+      </div>
+    </div>
+
+    <!-- 🟨 Tabla de eventos -->
+    <p-table [value]="events" class="text-sm w-full">
+      <ng-template pTemplate="header">
+        <tr>
+          <th>Fecha registro</th>
+          <th>Fecha evento</th>
+          <th>Usuario registro</th>
+          <th>Evento</th>
+        </tr>
+      </ng-template>
+      <ng-template pTemplate="body" let-event>
+        <tr>
+          <td>
+            {{ event.dateEvent ? (event.dateRegister ? (event.dateRegister | date:'dd/MM/yyyy HH:mm') : 'Sin dato') : 'Sin dato' }}
+          </td>
+          <td>
+            {{ event.dateEvent ? (event.dateEvent | date:'dd/MM/yyyy HH:mm' ) : 'Sin evento' }}
+          </td>
+          <td>
+            {{ event.dateEvent ? (event.user || 'Sin dato') : 'Sin dato' }}
+          </td>
+          <td>
+            <span 
+              class="badge-simulation"
+              [ngStyle]="{
+                'background-color': event.dateEvent ? '#17a2b8' : '#ffc107',
+                'color': event.dateEvent ? 'white' : 'black'
+              }"
+              style="display: inline-block; padding: 0.2rem 0.5rem; border-radius: 1rem; text-align: center;">
+              {{ event.status || 'Sin Estado' }}
+            </span>
+          </td>
+        </tr>
+      </ng-template>
+    </p-table>
+
+  </div>
 </p-dialog>
+
+
 <p-dialog header="Editar Confirmación" [modal]="true" [(visible)]="dialogConfirm" [style]="{ width: '45rem', height: '350px' }">
   <div class="field flex flex-col">
       <label for="fechaentrega">Fecha de entrega :</label>

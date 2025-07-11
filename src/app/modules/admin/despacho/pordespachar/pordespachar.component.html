@@ -59,9 +59,20 @@
               <td class="text-center">{{ rowData.fechahoraplanning | date:'dd/MM/yyyy' }}</td>
               <td class="text-center">{{ rowData.precinto }}</td>
               <td >
-                <p-button *ngIf="rowData.precinto === 'SI'"   severity="success" icon="fa fa-file-pdf-o"  (click)='imprimirManifiesto(rowData)'></p-button>
-                <p-button *ngIf="rowData.precinto === 'SI'"  severity="danger"   icon="fa fa-chain-broken" (click)='desasignarPrecinto(rowData.numHojaRuta)'></p-button>
-                
+                <p-button 
+                severity="success"
+                icon="fa fa-file-pdf-o"
+                (click)="imprimirManifiesto(rowData)"
+                [disabled]="rowData.precinto !== 'SI'">
+              </p-button>
+              
+              <p-button 
+                severity="danger"
+                icon="fa fa-chain-broken"
+                (click)="desasignarPrecinto(rowData.numHojaRuta)"
+                [disabled]="rowData.precinto !== 'SI'">
+              </p-button>
+              
               </td>
             </tr>
           </ng-template>
