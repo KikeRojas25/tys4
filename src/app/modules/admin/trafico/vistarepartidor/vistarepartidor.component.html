@@ -30,16 +30,23 @@
   </div>
 </div>
   
+  <div class="text-white p-4 rounded-t-lg">
 
+<p-tabView class="mt-4">
 
-<p-tabView>
+  <p-tabPanel>
 
-  <p-tabPanel header="Pendiente de recepción">
+      <ng-template pTemplate="header">
+      Pend. Recepción 
+      <p-badge [value]="totalRecepcion" severity="info" class="ml-1"></p-badge>
+      </ng-template>
 
     <div class="row mb-2">
       <button   class='btn-danger btn mr-2' pButton iconPos="left" label="Actualizar Estado"   (click)="cambiarEstado()"  type="button"></button>
       <!-- <button   class='btn-primary btn mr-2' pButton iconPos="left" label="Reprogramar Arribos"    (click)="reprogramarArribos()"  type="button"></button>
       <button   class='btn-primary btn mr-2' pButton iconPos="left" label="Cambio de Recursos"    (click)="cambiarTipoOperacion()"  type="button"></button> -->
+       <button class="btn-danger btn" pButton label="Reasignar " icon="pi pi-exchange"
+                iconPos="left" (click)="asignarTipoOperacion()"></button>
       <button   class='btn-primary btn mr-2' pButton iconPos="left" label="Refrescar"    (click)="reloadDetalles()"  type="button"></button>
     </div>
 
@@ -93,7 +100,12 @@
 
 
   </p-tabPanel>
-  <p-tabPanel header="Pendiente de recojo">
+  <p-tabPanel>
+
+     <ng-template pTemplate="header">
+        Pend. Recojo
+        <p-badge [value]="totalRecojo" severity="info" class="ml-1"></p-badge>
+    </ng-template>
 
     <div class="row mb-2">
       <button   class='btn-danger btn mr-2' pButton iconPos="left" label="Actualizar Estado"   (click)="cambiarEstadoRecojo()"  type="button"></button>
@@ -104,7 +116,7 @@
 
 
         <p-table  [columns]="cols3" selectionMode="single"
-        [style]="{width:'100%'}"  dataKey="idmanifiesto"
+        [style]="{width:'100%'}"  dataKey="idManifiesto"
         [rowsPerPageOptions]="[50,100,200,400]"
         [value]="despachos" #dt [paginator]="true"
         [(selection)]="selectedManifiestoRecojo"
@@ -155,8 +167,11 @@
   </p-tabPanel>
 
 
-  <p-tabPanel header="Ordenes en Reparto">
-
+  <p-tabPanel>
+      <ng-template pTemplate="header">
+     Ordenes en Reparto
+      <p-badge [value]="totalReparto" severity="info" class="ml-1"></p-badge>
+    </ng-template>
 
     <div class="row mb-2">
       <button   class='btn-danger btn mr-2' pButton iconPos="left" label="Actualizar Estado"   (click)="modalEntregarOT()"  type="button"></button>
@@ -196,11 +211,15 @@
       <td class="ui-resizable-column" style="text-align:center;">  {{rowData.razonsocial   }}   </td>
       <td class="ui-resizable-column" style="text-align:center;">  {{rowData.destinatario   }}   </td>
       <td class="ui-resizable-column" style="text-align:center;"> {{ rowData.fechaentregareparto  | date:'dd/MM/yyyy HH:mm'   }}   </td>
-      <td class="ui-resizable-column" style="text-align:center;"> {{rowData.fechaetaentrega  | date: 'dd/MM/yyyy HH:mm' }}</td>
-      <td class="ui-resizable-column" style="text-align:center;"> {{ rowData.diferencia_fechas   }}</td>
+      <!-- <td class="ui-resizable-column" style="text-align:center;"> {{rowData.fechaetaentrega  | date: 'dd/MM/yyyy HH:mm' }}</td>
+      <td class="ui-resizable-column" style="text-align:center;"> {{ rowData.diferencia_fechas   }}</td> -->
       <td class="ui-resizable-column" style="text-align:center;" > {{ rowData.bulto    }}   </td>
       <td class="ui-resizable-column" style="text-align:center;" > {{ rowData.peso    }}   </td>
       <td class="ui-resizable-column" style="background-color: #FFA000; color:black; text-align:center;">  {{rowData.estado   }}   </td>
+      <td class="ui-resizable-column" style="text-align:center;"> 
+        <p-button icon="pi pi-paperclip" severity="warning" (click)="verOt(rowData.idordentrabajo)" size="small" ></p-button>
+      </td>
+
     </tr>
     </ng-template>
     </p-table>
@@ -208,12 +227,12 @@
 
   </p-tabPanel>
 
-  <p-tabPanel header="Pendiente de recabar cargo">
-
-    <div class="row mb-2">
-      <button   class='btn-danger btn mr-2' pButton iconPos="left" label="Actualizar Estado"   (click)="modalEntregarOT()"  type="button"></button>
-      <!-- <button   class='btn-secondary btn mr-2' pButton iconPos="left" label="Actualizar ETA"   (click)="modalActualizarETA()"  type="button"></button> -->
-    </div>
+  <p-tabPanel>
+   <ng-template pTemplate="header">
+     Pend. Recabar Cargo
+      <p-badge [value]="totalRecabarCargo" severity="info" class="ml-1"></p-badge>
+    </ng-template>
+   
     <p-table  [columns]="cols2" selectionMode="single"
     [style]="{width:'100%'}"  dataKey="idordentrabajo"
     [rowsPerPageOptions]="[50,100,200,400]"
@@ -246,22 +265,25 @@
       <td class="ui-resizable-column" style="text-align:center;">  {{rowData.razonsocial   }}   </td>
       <td class="ui-resizable-column" style="text-align:center;">  {{rowData.destinatario   }}   </td>
       <td class="ui-resizable-column" style="text-align:center;"> {{ rowData.fechaentregareparto  | date:'dd/MM/yyyy HH:mm'   }}   </td>
-      <td class="ui-resizable-column" style="text-align:center;"> {{rowData.fechaetaentrega  | date: 'dd/MM/yyyy HH:mm' }}</td>
-      <td class="ui-resizable-column" style="text-align:center;"> {{ rowData.diferencia_fechas   }}</td>
+      <!-- <td class="ui-resizable-column" style="text-align:center;"> {{rowData.fechaetaentrega  | date: 'dd/MM/yyyy HH:mm' }}</td>
+      <td class="ui-resizable-column" style="text-align:center;"> {{ rowData.diferencia_fechas   }}</td> -->
       <td class="ui-resizable-column" style="text-align:center;" > {{ rowData.bulto    }}   </td>
       <td class="ui-resizable-column" style="text-align:center;" > {{ rowData.peso    }}   </td>
       <td class="ui-resizable-column" style="background-color: #FFA000; color:black; text-align:center;">  {{rowData.estado   }}   </td>
+         <td class="ui-resizable-column" style="text-align:center;"> 
+        <p-button icon="pi pi-paperclip" severity="warning" (click)="verOt(rowData.idordentrabajo)" size="small" ></p-button>
+      </td>
     </tr>
     </ng-template>
     </p-table>
 
   </p-tabPanel>
 
-  <p-tabPanel header="Pendiente de envio de cargo">
-    <div class="row mb-2">
-      <button   class='btn-danger btn mr-2' pButton iconPos="left" label="Actualizar Estado"   (click)="modalEntregarOT()"  type="button"></button>
-      <!-- <button   class='btn-secondary btn mr-2' pButton iconPos="left" label="Actualizar ETA"   (click)="modalActualizarETA()"  type="button"></button> -->
-    </div>
+  <p-tabPanel>
+   <ng-template pTemplate="header">
+     Pend. Envio Cargo
+      <p-badge [value]="totalEnviarCargo" severity="info" class="ml-1"></p-badge>
+    </ng-template>
     
     <p-table  [columns]="cols2" selectionMode="single"
     [style]="{width:'100%'}"  dataKey="idordentrabajo"
@@ -295,11 +317,14 @@
       <td class="ui-resizable-column" style="text-align:center;">  {{rowData.razonsocial   }}   </td>
       <td class="ui-resizable-column" style="text-align:center;">  {{rowData.destinatario   }}   </td>
       <td class="ui-resizable-column" style="text-align:center;"> {{ rowData.fechaentregareparto  | date:'dd/MM/yyyy HH:mm'   }}   </td>
-      <td class="ui-resizable-column" style="text-align:center;"> {{rowData.fechaetaentrega  | date: 'dd/MM/yyyy HH:mm' }}</td>
-      <td class="ui-resizable-column" style="text-align:center;"> {{ rowData.diferencia_fechas   }}</td>
+      <!-- <td class="ui-resizable-column" style="text-align:center;"> {{rowData.fechaetaentrega  | date: 'dd/MM/yyyy HH:mm' }}</td>
+      <td class="ui-resizable-column" style="text-align:center;"> {{ rowData.diferencia_fechas   }}</td> -->
       <td class="ui-resizable-column" style="text-align:center;" > {{ rowData.bulto    }}   </td>
       <td class="ui-resizable-column" style="text-align:center;" > {{ rowData.peso    }}   </td>
       <td class="ui-resizable-column" style="background-color: #FFA000; color:black; text-align:center;">  {{rowData.estado   }}   </td>
+       <td class="ui-resizable-column" style="text-align:center;"> 
+        <p-button icon="pi pi-paperclip" severity="warning" (click)="verOt(rowData.idordentrabajo)" size="small" ></p-button>
+      </td>
     </tr>
     </ng-template>
     </p-table>
@@ -307,12 +332,14 @@
   </p-tabPanel>
 
 
-   <p-tabPanel header="Observadas">
-    <div class="row mb-2">
-      <button   class='btn-danger btn mr-2' pButton iconPos="left" label="Actualizar Estado"   (click)="modalEntregarOT()"  type="button"></button>
-      <!-- <button   class='btn-secondary btn mr-2' pButton iconPos="left" label="Actualizar ETA"   (click)="modalActualizarETA()"  type="button"></button> -->
-    </div>
-    
+   <p-tabPanel>
+  
+      <ng-template pTemplate="header">
+     Observadas
+      <p-badge [value]="totalObservadas" severity="info" class="ml-1"></p-badge>
+    </ng-template>
+
+
     <p-table  [columns]="cols2" selectionMode="single"
     [style]="{width:'100%'}"  dataKey="idordentrabajo"
     [rowsPerPageOptions]="[50,100,200,400]"
@@ -345,11 +372,13 @@
       <td class="ui-resizable-column" style="text-align:center;">  {{rowData.razonsocial   }}   </td>
       <td class="ui-resizable-column" style="text-align:center;">  {{rowData.destinatario   }}   </td>
       <td class="ui-resizable-column" style="text-align:center;"> {{ rowData.fechaentregareparto  | date:'dd/MM/yyyy HH:mm'   }}   </td>
-      <td class="ui-resizable-column" style="text-align:center;"> {{rowData.fechaetaentrega  | date: 'dd/MM/yyyy HH:mm' }}</td>
-      <td class="ui-resizable-column" style="text-align:center;"> {{ rowData.diferencia_fechas   }}</td>
+ 
       <td class="ui-resizable-column" style="text-align:center;" > {{ rowData.bulto    }}   </td>
       <td class="ui-resizable-column" style="text-align:center;" > {{ rowData.peso    }}   </td>
       <td class="ui-resizable-column" style="background-color: #FFA000; color:black; text-align:center;">  {{rowData.tipoentrega   }}   </td>
+         <td class="ui-resizable-column" style="text-align:center;"> 
+        <p-button icon="pi pi-paperclip" severity="warning" (click)="verOt(rowData.idordentrabajo)" size="small" ></p-button>
+      </td>
     </tr>
     </ng-template>
     </p-table>
@@ -359,13 +388,19 @@
 
 </p-tabView>
 
+</div>
+
 <p-dialog header="Detalle de Manifiesto" [modal]="true" [(visible)]="modalDetalleManifiesto" [style]="{ width: '75rem' }">
         
-  <p-table   #dt2 [columns]="cols1" dataKey="idordentrabajo"
+
+      <button class="btn-danger btn" pButton label="Reasignar " icon="pi pi-exchange"
+                iconPos="left" (click)="asignarTipoOperacionxOt()"></button>
+
+  <p-table   #dt2 [columns]="cols1" dataKey="idOrdenTrabajo"
   [style]="{width:'100%'}"
   [rowsPerPageOptions]="[20,40]"
   [value]="ordenes"   selectionMode="multiple"
- 
+  [(selection)]="selectedOrdenes"
   responsive="true"
   [rows]="20"  >
 
@@ -417,4 +452,4 @@
 </p-dialog>
 
 
-<p-toast />
+<p-toast />

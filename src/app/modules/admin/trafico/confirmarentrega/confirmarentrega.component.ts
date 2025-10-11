@@ -139,19 +139,28 @@ export class ConfirmarentregaComponent implements OnInit {
 
 
     this.cols =
-    [ {header: 'ACC', field: 'idordentrabajo'  ,  width: '260px' },
+    [ {header: 'ACC', field: 'idordentrabajo'  ,  width: '160px' },
       {header: 'OT', field: 'numcp'  ,  width: '120px' },
-      {header: 'F. DESPACHO', field: 'fechadespacho' , width: '100px'  },
-      {header: 'DÍAS', field: 'diasDesdeDespacho' , width: '50px'  },
-      {header: 'REF', field: 'docgeneral' , width: '90px'  },
+      
+     
       {header: 'TIPO ENTREGA' , field: 'tipoentrega'  , width: '210px'   },
       {header: 'SUB ESTADO' , field: 'tipoentrega'  , width: '210px'   },
-      {header: 'F. ENTREGA', field: 'fechaentrega' , width: '200px'  },
-      {header: 'HR ENTREGA' , field: 'horaentrega'  , width: '260px'   },
-      {header: 'DIR DEST' , field: 'direccion'  , width: '280px'   },
-      {header: 'DESTINO', field: 'destino'  ,  width: '90px'  },
+      {header: 'FECHA ENTREGA', field: 'fechaentrega' , width: '200px'  },
+      {header: 'HORA ENTREGA ( 24 hrs )' , field: 'horaentrega'  , width: '60px'   },
+
       {header: 'DESTINATARIO', field: 'destinatario' , width: '180px'  },
-      {header: 'REPARTIDOR ', field: 'destinatario' , width: '180px'  },
+      {header: 'DESTINO', field: 'destino'  ,  width: '120px'  },
+
+      {header: 'F. DESPACHO', field: 'fechadespacho' , width: '100px'  },
+      {header: 'DÍAS', field: 'diasDesdeDespacho' , width: '50px'  },
+      {header: 'REF', field: 'docgeneral' , width: '120px'  },
+
+
+      {header: 'DIR DEST' , field: 'direccion'  , width: '280px'   },
+
+
+      
+     
 
      ];
 
@@ -355,12 +364,12 @@ onRowEditSave(order: OrdenTransporte) {
       this.ordenTransporteService.confirmar_entrega(order).subscribe( resp => {
 
 
-        if (tiposQueRequierenSubestado.includes(order.tipoentrega)) {
+        // if (tiposQueRequierenSubestado.includes(order.tipoentrega)) {
 
-          this.ordenTransporteService.agregarVisitaDespacho(order).subscribe(resp => {
+        //   // this.ordenTransporteService.agregarVisitaDespacho(order).subscribe(resp => {
          
-          });
-        }
+        //   // });
+        // }
 
         this.messageService.add({
                 severity: 'success',
@@ -397,24 +406,122 @@ onRowEditCancel(order: OrdenTransporte, index: number) {
   delete this.ordenes[order.idordentrabajo];
 }
 exportExcel() {
+  import('xlsx').then(xlsx => {
+
+    const exportData = this.ordenes.map(orden => ({
+      OT: orden.numcp,
+      Cliente: orden.razonsocial,
+      Remitente: orden.remitente,
+      Destinatario: orden.destinatario,
+      Estado: orden.estado,
+      "Fecha Registro":  orden.fecharegistro ? new Date(orden.fecharegistro).toLocaleString('es-PE', {
+      day: '2-digit',
+      month: '2-digit',
+      year: 'numeric',
+      hour: '2-digit',
+      minute: '2-digit',
+      second: '2-digit',
+      hour12: false
+    }) : '',
+    "Fecha Recojo": orden.fecharecojo ? new Date(orden.fecharecojo).toLocaleString('es-PE', {
+      day: '2-digit',
+      month: '2-digit',
+      year: 'numeric',
+      hour: '2-digit',
+      minute: '2-digit',
+      second: '2-digit',
+      hour12: false
+    }) : '',
+    "Fecha Despacho": orden.fechadespacho ? new Date(orden.fechadespacho).toLocaleString('es-PE', {
+      day: '2-digit',
+      month: '2-digit',
+      year: 'numeric',
+      hour: '2-digit',
+      minute: '2-digit',
+      second: '2-digit',
+      hour12: false
+    }) : '',
+    "Fecha Entrega": orden.fechaentrega ? new Date(orden.fechaentrega).toLocaleString('es-PE', {
+      day: '2-digit',
+      month: '2-digit',
+      year: 'numeric',
+      hour: '2-digit',
+      minute: '2-digit',
+      second: '2-digit',
+      hour12: false
+    }) : '' ,
+      Origen: orden.origen,
+      Destino: orden.destino,
+      Subtotal: orden.subtotal,
+      Manifiesto: orden.nummanifiesto,
+      HojaRuta: orden.numhojaruta,
+      Cantidad: orden.bulto,
+      Peso: orden.peso,
+      Volumen: orden.volumen,
+      "Tipo de Transporte": orden.tipotransporte,
+      "Concepto de Cobro": orden.conceptocobro,
+
+    }));
+
+    
+
+      const worksheet = xlsx.utils.json_to_sheet( exportData );
+
+      // 👇 Establecer ancho de columnas (medido en número de caracteres)
+      worksheet['!cols'] = [
+        { wch: 13 }, // ancho de columna "Nombre"
+        { wch: 40 }, // ancho de columna "Estado"
+        { wch: 20 },  // ancho de columna "Cliente"
+        { wch: 20 },  // ancho de columna "Cliente"
+        { wch: 20 },  // ancho de columna "Cliente"
+        { wch: 20 }, // ancho de columna "Cliente"
+        { wch: 20 }, // ancho de columna "Cliente"
+        { wch: 20 }, // ancho de columna "Cliente"
+        { wch: 20 }, // ancho de columna "Cliente"
+        { wch: 20 }, // ancho de columna "Cliente"
+        { wch: 20 }, // ancho de columna "Cliente"
+        { wch: 20 }, // ancho de columna "Cliente"
+        { wch: 20 }, // ancho de columna "Cliente"
+        { wch: 20 }, // ancho de columna "Cliente"
+      ];
 
 
-  this.model.fec_ini =  moment(this.dateInicio).format('DD/MM/YYYY');
-  this.model.fec_fin = moment(this.dateFin).format('DD/MM/YYYY');
-  let iddestino = '';
-  if (this.model.iddestino === undefined){
-    iddestino = '';
-  }
-  else {
-    iddestino = String(this.model.iddestino);
-  }
+      const headerKeys = Object.keys(exportData[0]);
+      headerKeys.forEach((key, index) => {
+        const cellRef = xlsx.utils.encode_cell({ r: 0, c: index });
+        if (worksheet[cellRef]) {
+          worksheet[cellRef].s = {
+            font: { bold: true, color: { rgb: "FFFFFF" } },
+            fill: { fgColor: { rgb: "4F81BD" } }, // azul
+            alignment: { horizontal: "center" }
+          };
+        }
+      });
 
-  const url = 'http://104.36.166.65/webreports/consultaots.aspx?idcliente=' + String(this.model.idcliente) +
-  '&fecinicio=' + this.model.fec_ini +  '&fecfin=' + this.model.fec_fin +   '&numcp=' + this.model.numcp +
-  '&docreferencia=' + this.model.docreferencia +  '&grr=' + this.model.grr +   '&iddestino=' + iddestino +
-  '&idestado=' + String(this.model.idestado)  + '&idusuario=' + this.model.idusuario;
+      const workbook = {
+        Sheets: { 'data': worksheet },
+        SheetNames: ['data']
+      };
+  
+      const excelBuffer: any = xlsx.write(workbook, {
+        bookType: 'xlsx',
+        type: 'array',
+        cellStyles: true 
+      });
+  
+      this.saveAsExcelFile(excelBuffer, 'ListaOT');
 
-  window.open(url);
+  });
+}
+saveAsExcelFile(buffer: any, fileName: string): void {
+import('file-saver').then(FileSaver => {
+    const EXCEL_TYPE = 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet;charset=UTF-8';
+    const EXCEL_EXTENSION = '.xlsx';
+    const data: Blob = new Blob([buffer], {
+        type: EXCEL_TYPE
+    });
+    FileSaver.saveAs(data, fileName + '_export_' + new Date().getTime() + EXCEL_EXTENSION);
+});
 }
 // verarchivos(id) {
 

@@ -1,11 +1,12 @@
 import {Component, OnInit} from '@angular/core';
-import { NgForm } from '@angular/forms';
-import { ToastrService } from 'ngx-toastr';
+import { FormsModule, NgForm } from '@angular/forms';
+
 import { MessageService } from 'primeng/api';
 import { DynamicDialogRef, DynamicDialogConfig } from 'primeng/dynamicdialog';
-import { OrdenTransporte } from 'src/app/_models/Seguimiento/ordentransporte';
-import { OrdenTransporteService } from 'src/app/_services/Seguimiento/ordentransporte.service';
-import { AuthService } from 'src/app/_services/auth.service';
+import { OrdenTransporte } from '../../recepcion/ordentransporte/ordentransporte.types';
+import { OrdenTransporteService } from '../../recepcion/ordentransporte/ordentransporte.service';
+import { AuthService } from 'app/core/auth/auth.service';
+
 
 
 @Component({
@@ -45,12 +46,16 @@ import { AuthService } from 'src/app/_services/auth.service';
 
 </div>
 
-<p-toast></p-toast>
 
 
 
 
-    `
+
+    `,
+    standalone: true,
+    imports: [FormsModule ],
+    providers: [MessageService],  
+
 })
 export class AutorizarReinicioModalComponent  implements OnInit {
 
@@ -67,7 +72,7 @@ export class AutorizarReinicioModalComponent  implements OnInit {
     constructor(private ordenService: OrdenTransporteService
         , public messageService: MessageService
         ,  private authService: AuthService
-        , private toastr: ToastrService
+        , private toastr: MessageService
         ,  public ref: DynamicDialogRef, public config: DynamicDialogConfig) {
 
                this.numhojaruta =   config.data.hojaruta.numhojaruta;
@@ -143,18 +148,18 @@ export class AutorizarReinicioModalComponent  implements OnInit {
 
             if(found === undefined )
             {
-              this.toastr.error('No se ha autorizado con éxito, Ud. no tiene los permisos necesarios para esta acción.', 'TYS');
+             // this.toastr.error('No se ha autorizado con éxito, Ud. no tiene los permisos necesarios para esta acción.', 'TYS');
             }
             else
             {
-               this.toastr.success('Se ha autorizado con éxito.', 'TYS');
+              //  this.toastr.success('Se ha autorizado con éxito.', 'TYS');
 
-               this.ordenService.reinicioHojaRuta(this.numhojaruta).subscribe(resp => {
+              //  this.ordenService.reinicioHojaRuta(this.numhojaruta).subscribe(resp => {
 
-                  this.ref.close();
+              //     this.ref.close();
 
 
-               });
+              //  });
 
             }
 
@@ -171,7 +176,7 @@ export class AutorizarReinicioModalComponent  implements OnInit {
       }, error => {
 
           if ('Unauthorized' === error.statusText) {
-             this.toastr.error('usuario y/o contraseña incorrecta, o ud no cuenta con los permisos para autorizar esta operación', 'TYS');
+            // this.toastr.error('usuario y/o contraseña incorrecta, o ud no cuenta con los permisos para autorizar esta operación', 'TYS');
           }
       }, () => {
 

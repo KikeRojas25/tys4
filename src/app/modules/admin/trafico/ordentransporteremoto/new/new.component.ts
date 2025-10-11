@@ -283,7 +283,27 @@ export class NewComponent implements OnInit {
        this.ordenTransporteService.registrarOTR(this.model).subscribe(resp => {
 
           this.messageService.add({ severity: 'success', summary: 'Registro exitoso', detail: `Se ha registrado correctamente la orden de transporte 100-763633` });
-          this.router.navigate(['/seguimientoot/listadoordentransporte']);
+         // this.router.navigate(['/seguimientoot/listadoordentransporte']);
+
+          var url =  `http://104.36.166.65/webreports/ot.aspx?idorden= ${resp.idordentrabajo}` ;
+          window.open(url);
+
+
+          this.form.enable();
+          
+          this.model.precio = 0;
+          this.form.patchValue({ 
+          
+            guiasremitente: []
+            , bulto : 0
+            , peso : 0
+            , pesovol: 0
+            , volumen: 0
+ 
+     
+         });
+
+
 
 
      });

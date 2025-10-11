@@ -73,7 +73,7 @@
           <!-- Nro Manifiesto -->
           <div>
             <label>Nro Manifiesto:</label>
-            <input pInputText [(ngModel)]="model.numanifiesto" 
+            <input pInputText [(ngModel)]="model.nummanifiesto" 
                    [style]="{'width':'100%'}" placeholder="Ingrese Manifiesto" />
           </div>
 
@@ -230,112 +230,25 @@
   
 </div>
 <p-dialog header="Tracking OTs" [modal]="true" [(visible)]="dialoglifecycle" [style]="{ width: '80rem' }">
-
-  <!-- Contenedor común para cabecera y tabla -->
   <div class="p-4">
-
-    <!-- 🟦 Encabezado informativo -->
-    <div class="bg-gray-50 rounded-md shadow mb-5 text-sm text-gray-800">
-      <div class="grid grid-cols-2 md:grid-cols-4 gap-4 p-4">
-
-        <div>
-          <span class="font-semibold">🆔 Nº Orden:</span> {{ ordenTransporte.numcp }}
-        </div>
-        <div>
-          <span class="font-semibold">📍 Origen:</span> {{ ordenTransporte.origen }}
-        </div>
-        <div>
-          <span class="font-semibold">🎯 Destino:</span> {{ ordenTransporte.destino }}
-        </div>
-        <div>
-          <span class="font-semibold">📌 Estado:</span> {{ ordenTransporte.estado }}
-        </div>
-        <div>
-          <span class="font-semibold">📨 Cliente:</span> {{ ordenTransporte.razonsocial }}
-        </div>
-        <div>
-          <span class="font-semibold">📨 Remitente:</span> {{ ordenTransporte.remitente }}
-        </div>
-        <div>
-          <span class="font-semibold">📬 Destinatario:</span> {{ ordenTransporte.destinatario }}
-        </div>
-
-        <!-- <div>
-          <span class="font-semibold">🚛 Placa:</span> {{ ordenTransporte.placa }}
-        </div>
-        <div>
-          <span class="font-semibold">🧍 Chofer:</span> {{ ordenTransporte.chofer }}
-        </div> -->
-
-        <div>
-          <span class="font-semibold">⚖️ Peso:</span> {{ ordenTransporte.peso }} kg
-        </div>
-        <div>
-          <span class="font-semibold">📦 Bultos:</span> {{ ordenTransporte.bulto }}
-        </div>
-
-        <div>
-          <span class="font-semibold">📅 Fec Recojo:</span> {{ ordenTransporte.fecharecojo | date:'dd/MM/yyyy HH:mm' }}
-        </div>
-        <div>
-          <span class="font-semibold">📦 Fec Despacho:</span> {{ ordenTransporte.fechadespacho | date:'dd/MM/yyyy HH:mm' }}
-        </div>
-
-        <div>
-          <span class="font-semibold">🗺️ Fec en Zona:</span> {{ ordenTransporte.fechaenzona | date:'dd/MM/yyyy HH:mm' }}
-        </div>
-        <div>
-          <span class="font-semibold">📤 Fec en Reparto:</span> {{ ordenTransporte.fechaentregareparto | date:'dd/MM/yyyy HH:mm' }}
-        </div>
-
-        <div>
-          <span class="font-semibold">📬 Fec de Entrega:</span> {{ ordenTransporte.fechaentrega | date:'dd/MM/yyyy HH:mm' }}
-        </div>
-        <div>
-          <span class="font-semibold">📄 Manifiesto:</span> {{ ordenTransporte.nummanifiesto || 'Sin dato' }}
-        </div>
-
-        <div>
-          <span class="font-semibold">🧾 Hoja Ruta:</span> {{ ordenTransporte.numhojaruta || 'Sin dato' }}
-        </div>
-
-        <div class="md:col-span-3 col-span-2">
-          <span class="font-semibold">📑 Guías:</span>
-          <div class="ml-4 mt-1" *ngIf="guias?.length > 0; else sinGuias">
-            <ul class="list-disc pl-4">
-              <li *ngFor="let guia of guias">{{ guia.nroguia }}</li>
-            </ul>
-          </div>
-          <ng-template #sinGuias>
-            <span class="text-gray-500">Sin guías</span>
-          </ng-template>
-        </div>
-
-      </div>
-    </div>
+    <!-- ... tu encabezado informativo tal cual ... -->
 
     <!-- 🟨 Tabla de eventos -->
     <p-table [value]="events" class="text-sm w-full">
       <ng-template pTemplate="header">
         <tr>
+          <th>Evento</th>
           <th>Fecha registro</th>
           <th>Fecha evento</th>
           <th>Usuario registro</th>
-          <th>Evento</th>
+         
+          <th style="width: 120px;">Acción</th>  <!-- ✅ nueva columna -->
         </tr>
       </ng-template>
+
       <ng-template pTemplate="body" let-event>
         <tr>
-          <td>
-            {{ event.dateEvent ? (event.dateRegister ? (event.dateRegister | date:'dd/MM/yyyy HH:mm') : 'Sin dato') : 'Sin dato' }}
-          </td>
-          <td>
-            {{ event.dateEvent ? (event.dateEvent | date:'dd/MM/yyyy HH:mm' ) : 'Sin evento' }}
-          </td>
-          <td>
-            {{ event.dateEvent ? (event.user || 'Sin dato') : 'Sin dato' }}
-          </td>
-          <td>
+            <td>
             <span 
               class="badge-simulation"
               [ngStyle]="{
@@ -346,12 +259,113 @@
               {{ event.status || 'Sin Estado' }}
             </span>
           </td>
+          <td>
+            {{ event.dateEvent ? (event.dateRegister ? (event.dateRegister | date:'dd/MM/yyyy HH:mm') : 'Sin dato') : 'Sin dato' }}
+          </td>
+          <td>
+            {{ event.dateEvent ? (event.dateEvent | date:'dd/MM/yyyy HH:mm' ) : 'Sin evento' }}
+          </td>
+          <td>
+            {{ event.dateEvent ? (event.user || 'Sin dato') : 'Sin dato' }}
+          </td>
+       
+          <!-- ✅ botón que abre el diálogo contextual -->
+          <td class="text-center">
+            <button pButton type="button"
+                    icon="pi pi-cog"
+                    label="Ver"
+                    class="p-button-sm"
+                    (click)="openEventAction(event)">
+            </button>
+          </td>
         </tr>
       </ng-template>
     </p-table>
 
+    <!-- ✅ Diálogo de acciones por evento -->
+    <p-dialog
+      [(visible)]="actionDialogVisible"
+      [modal]="true"
+      [closable]="true"
+      [dismissableMask]="true"
+      [style]="{ width: '40rem' }"
+      [header]="currentAction?.title || 'Acción'">
+
+      <ng-container [ngSwitch]="currentAction?.type">
+
+        <!-- OT creada -->
+        <div *ngSwitchCase="'ot-creada'" class="space-y-2">
+          <p class="text-sm text-gray-700">Se creó la OT {{ ordenTransporte?.numcp }}.</p>
+          <button pButton label="Ver datos básicos" icon="pi pi-search" (click)="verot(ordenTransporte.idordentrabajo)" class="p-button-text"></button>
+        </div>
+
+        <!-- OT planificada -->
+        <div *ngSwitchCase="'ot-planificada'" class="space-y-2">
+          <p class="text-sm text-gray-700">La OT fue planificada. Puedes revisar asignaciones.</p>
+          <button pButton label="Ver planificación" icon="pi pi-calendar" (click)="executeAction('view-plan')" class="p-button-text"></button>
+        </div>
+
+        <!-- Manifiesto / HR Generado -->
+        <div *ngSwitchCase="'manifiesto-hr'" class="space-y-2">
+          <p class="text-sm">Manifiesto: <b>{{ ordenTransporte?.nummanifiesto || '—' }}</b></p>
+          <p class="text-sm">Hoja de Ruta: <b>{{ ordenTransporte?.numhojaruta || '—' }}</b></p>
+          <div class="flex gap-2">
+            <!-- ✅ Botón que llama directo a tu método -->
+            <button 
+              pButton 
+              label="Ver Manifiesto" 
+              icon="pi pi-external-link" 
+              class="p-button-sm" 
+              (click)="vernummanifiesto(currentAction?.payload?.row?.nummanifiesto || ordenTransporte?.nummanifiesto)">
+            </button>
+         
+
+
+          </div>
+        </div>
+
+        <!-- OT Despachada -->
+        <div *ngSwitchCase="'ot-despachada'" class="space-y-2">
+          <p class="text-sm">La OT fue despachada el <b>{{ ordenTransporte?.fechadespacho | date:'dd/MM/yyyy HH:mm' }}</b>.</p>
+          <button pButton label="Ver tracking de despacho" icon="pi pi-truck" (click)="executeAction('view-despacho')" class="p-button-text"></button>
+        </div>
+
+        <!-- En Zona -->
+        <div *ngSwitchCase="'en-zona'" class="space-y-2">
+          <p class="text-sm">Ingreso a zona el <b>{{ ordenTransporte?.fechaenzona | date:'dd/MM/yyyy HH:mm' }}</b>.</p>
+          <button pButton label="Ver mapa" icon="pi pi-map" (click)="executeAction('open-map')" class="p-button-text"></button>
+        </div>
+
+        <!-- En Reparto -->
+        <div *ngSwitchCase="'en-reparto'" class="space-y-2">
+          <p class="text-sm">La OT está en reparto desde <b>{{ ordenTransporte?.fechaentregareparto | date:'dd/MM/yyyy HH:mm' }}</b>.</p>
+          <button pButton label="Contactar repartidor" icon="pi pi-phone" (click)="executeAction('contact-driver')" class="p-button-text"></button>
+        </div>
+
+        <!-- Entrega conforme -->
+        <div *ngSwitchCase="'entrega-ok'" class="space-y-2">
+          <p class="text-sm">Entregada el <b>{{ ordenTransporte?.fechaentrega | date:'dd/MM/yyyy HH:mm' }}</b>.</p>
+          <div class="flex gap-2">
+            <p-button  label=""   size="small" title='Ver Fotos' icon='pi pi-download'  (click)='verarchivos(ordenTransporte?.idordentrabajo);' > </p-button>
+              
+            <button pButton label="Ver constancia" icon="pi pi-file" (click)="executeAction('open-pod')" class="p-button-sm"></button>
+            <button pButton label="Descargar evidencia" icon="pi pi-download" (click)="executeAction('download-evidence')" class="p-button-sm p-button-secondary"></button>
+          </div>
+        </div>
+
+        <!-- Sin mapeo -->
+        <div *ngSwitchDefault class="text-sm text-gray-600">
+          No hay una acción configurada para este estado.
+        </div>
+      </ng-container>
+
+      <ng-template pTemplate="footer">
+        <button pButton label="Cerrar" class="p-button-text" (click)="actionDialogVisible=false"></button>
+      </ng-template>
+    </p-dialog>
   </div>
 </p-dialog>
+
 
 
 <p-dialog header="Editar Confirmación" [modal]="true" [(visible)]="dialogConfirm" [style]="{ width: '45rem', height: '350px' }">

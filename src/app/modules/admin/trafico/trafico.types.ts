@@ -1,3 +1,5 @@
+import { Provincia } from "../mantenimiento/mantenimiento.types";
+
 export interface User {
   id: number;
   usr_int_id: number;
@@ -31,6 +33,17 @@ export interface Manifiesto {
 
 
 }
+export interface ActualizarEtaManifiesto {
+  idManifiesto: number;
+  fecEtaEnZona?: Date | null;
+  etaEnZonaObs?: string;
+  fecEtaEnReparto?: Date | null;
+  etaEnRepartoObs?: string;
+  fecEtaEntregado?: Date | null;
+  etaEntregadoObs?: string;
+}
+
+
 // export interface OrdenTransporte {
 
 //   idordentrabajo?: number;
@@ -154,4 +167,24 @@ export interface Documento {
   tipo_documento: string;
   numero_documento: string;
   carga_id: number;
+}
+
+export interface ManifiestoReporte {
+  idManifiesto: number;
+  numHojaRuta: string;
+  idVehiculo: number;
+  placa: string;
+  fechaRegistro: string;
+  tipo: number;
+  totalOTs: number;
+  totalBultos: number;
+  totalPeso: number;
+  destino: string;
+}
+
+
+export interface EquipoProvincia {
+  idEquipo: number;
+  equipo?: string;
+  provincias: Provincia[];
 }

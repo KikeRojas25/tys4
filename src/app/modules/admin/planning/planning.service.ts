@@ -82,7 +82,10 @@ GetAllOrdersGroupDepartament(model: any){
 
     return this._httpClient.post<any[]>(this.baseUrl + 'darSalidaVehiculo?', model , httpOptions);
   }
-  
+  asignarTipoOperacionRuta(model: any) {
+    
+    return this._httpClient.post<RespuestaApi>(this.baseUrl + 'AsignarTipoOperacionEnRutaOT?', model , httpOptions);
+  }
   asignarTipoOperacion(model: any) {
     console.log('enviando:', model);
     return this._httpClient.post<RespuestaApi>(this.baseUrl + 'AsignarTipoOperacion?', model , httpOptions);
@@ -126,6 +129,23 @@ GetAllOrdersGroupDepartament(model: any){
     return this._httpClient.post(this.baseUrl + 'AsignarOtsaLocal', model, httpOptions);
   }
   
+
+
+
+actualizarHoraProgramada(idOrdenTrabajo: number, hora: string) {
+  // Asegurar formato hh:mm:ss
+  const dto = {
+    idOrdenTrabajo: idOrdenTrabajo,
+    horaProgramada: hora.length === 5 ? `${hora}:00` : hora
+  };
+
+  return this._httpClient.put(`${this.baseUrl}actualizar-hora-programada`, dto);
+}
+
+
+
+
+
 private handleError(error: HttpErrorResponse) {
   let errorMessage = 'Ocurrió un error desconocido';
 

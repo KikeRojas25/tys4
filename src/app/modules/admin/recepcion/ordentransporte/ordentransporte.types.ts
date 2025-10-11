@@ -3,6 +3,7 @@ import { NumericDictionary } from "lodash";
 
 
 export interface OrdenTransporte {
+    
     idordentrabajo?: number;
     idordenrecojo?: number;
     numcp?: string;
@@ -61,6 +62,7 @@ export interface OrdenTransporte {
     personarecojo?: string;
     direccion?: string;
     telefonorecojo?: string;
+    numhojaruta?: string;
     numHojaRuta?: string;
     ruta?: string;
 
@@ -101,6 +103,7 @@ export interface OrdenTransporte {
     validado?: false;
     mensaje?: string;
     subestado?: string;
+    horaProgramada?: any; 
 
 
 }

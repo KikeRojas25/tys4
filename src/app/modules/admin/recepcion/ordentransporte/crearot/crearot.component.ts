@@ -169,7 +169,7 @@ export class CrearotComponent implements OnInit {
 
    // Cargar los combos.
     this.cargarDropDows().then(() => {
-    //   this.realizarAsignaciones();
+      // this.realizarAsignaciones();
     });
 
 

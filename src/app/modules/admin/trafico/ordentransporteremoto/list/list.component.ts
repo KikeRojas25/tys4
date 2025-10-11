@@ -128,6 +128,7 @@ export class ListComponent implements OnInit {
     [
         {header: 'ACC', field: 'numcp'  ,  width: '160px' },
         {header: 'OT', field: 'numcp'  ,  width: '100px' },
+        {header: 'USUARIO REGISTRO', field: 'usuarioregistro'  ,  width: '120px'  },
         {header: 'F. RECOJO', field: 'fecharegistro' , width: '120px'  },
         {header: 'F. DESPACHO', field: 'fecharegistro' , width: '120px'  },
         {header: 'CLIENTE', field: 'razonsocial'  ,  width: '180px'  },
@@ -185,36 +186,134 @@ export class ListComponent implements OnInit {
         this.buscar();
       });
 
-    this.estados.push({ value: 0,  label : 'TODOS LOS ESTADOS'});
-    this.estados.push({ value: 6,  label : 'Pend. Programacion'});
-    this.estados.push({ value: 11,  label : 'En Ruta'});
-    this.estados.push({ value: 13,  label : 'En Reparto'});
-    this.estados.push({ value: 34,  label : 'Pendiente de Cargo'});
-    this.estados.push({ value: 35,  label : 'Pendiente Envio Cargo'});
+      this.estados.push({ value: 0,  label : 'TODOS LOS ESTADOS'});
+      this.estados.push({ value: 1, label: 'Por despachar' });
+      this.estados.push({ value: 2, label: 'Por entregar' });
+      this.estados.push({ value: 3, label: 'Entregado' });
 
     this.model.idestado = 0;
 
 
 
   }
-//  exportExcel() {
-//     import('xlsx').then(xlsx => {
-//         const worksheet = xlsx.utils.json_to_sheet( this.ordenes );
-//         const workbook = { Sheets: { 'data': worksheet }, SheetNames: ['data'] };
-//         const excelBuffer: any = xlsx.write(workbook, { bookType: 'xlsx', type: 'array' });
-//         this.saveAsExcelFile(excelBuffer, 'ListaOT');
-//     });
-// }
-// saveAsExcelFile(buffer: any, fileName: string): void {
-//   import('file-saver').then(FileSaver => {
-//       const EXCEL_TYPE = 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet;charset=UTF-8';
-//       const EXCEL_EXTENSION = '.xlsx';
-//       const data: Blob = new Blob([buffer], {
-//           type: EXCEL_TYPE
-//       });
-//       FileSaver.saveAs(data, fileName + '_export_' + new Date().getTime() + EXCEL_EXTENSION);
-//   });
-// }
+ exportExcel() {
+    import('xlsx').then(xlsx => {
+
+      const exportData = this.ordenes.map(orden => ({
+        OT: orden.numcp,
+        Cliente: orden.razonsocial,
+        Remitente: orden.remitente,
+        Destinatario: orden.destinatario,
+        Estado: orden.estado,
+        "Fecha Registro":  orden.fecharegistro ? new Date(orden.fecharegistro).toLocaleString('es-PE', {
+        day: '2-digit',
+        month: '2-digit',
+        year: 'numeric',
+        hour: '2-digit',
+        minute: '2-digit',
+        second: '2-digit',
+        hour12: false
+      }) : '',
+      "Fecha Recojo": orden.fecharecojo ? new Date(orden.fecharecojo).toLocaleString('es-PE', {
+        day: '2-digit',
+        month: '2-digit',
+        year: 'numeric',
+        hour: '2-digit',
+        minute: '2-digit',
+        second: '2-digit',
+        hour12: false
+      }) : '',
+      "Fecha Despacho": orden.fechadespacho ? new Date(orden.fechadespacho).toLocaleString('es-PE', {
+        day: '2-digit',
+        month: '2-digit',
+        year: 'numeric',
+        hour: '2-digit',
+        minute: '2-digit',
+        second: '2-digit',
+        hour12: false
+      }) : '',
+      "Fecha Entrega": orden.fechaentrega ? new Date(orden.fechaentrega).toLocaleString('es-PE', {
+        day: '2-digit',
+        month: '2-digit',
+        year: 'numeric',
+        hour: '2-digit',
+        minute: '2-digit',
+        second: '2-digit',
+        hour12: false
+      }) : '' ,
+        Origen: orden.origen,
+        Destino: orden.destino,
+        Subtotal: orden.subtotal,
+        Manifiesto: orden.nummanifiesto,
+        HojaRuta: orden.numhojaruta,
+        Cantidad: orden.bulto,
+        Peso: orden.peso,
+        Volumen: orden.volumen,
+        "Tipo de Transporte": orden.tipotransporte,
+        "Concepto de Cobro": orden.conceptocobro,
+
+      }));
+
+      
+
+        const worksheet = xlsx.utils.json_to_sheet( exportData );
+
+        // 👇 Establecer ancho de columnas (medido en número de caracteres)
+        worksheet['!cols'] = [
+          { wch: 13 }, // ancho de columna "Nombre"
+          { wch: 40 }, // ancho de columna "Estado"
+          { wch: 20 },  // ancho de columna "Cliente"
+          { wch: 20 },  // ancho de columna "Cliente"
+          { wch: 20 },  // ancho de columna "Cliente"
+          { wch: 20 }, // ancho de columna "Cliente"
+          { wch: 20 }, // ancho de columna "Cliente"
+          { wch: 20 }, // ancho de columna "Cliente"
+          { wch: 20 }, // ancho de columna "Cliente"
+          { wch: 20 }, // ancho de columna "Cliente"
+          { wch: 20 }, // ancho de columna "Cliente"
+          { wch: 20 }, // ancho de columna "Cliente"
+          { wch: 20 }, // ancho de columna "Cliente"
+          { wch: 20 }, // ancho de columna "Cliente"
+        ];
+
+
+        const headerKeys = Object.keys(exportData[0]);
+        headerKeys.forEach((key, index) => {
+          const cellRef = xlsx.utils.encode_cell({ r: 0, c: index });
+          if (worksheet[cellRef]) {
+            worksheet[cellRef].s = {
+              font: { bold: true, color: { rgb: "FFFFFF" } },
+              fill: { fgColor: { rgb: "4F81BD" } }, // azul
+              alignment: { horizontal: "center" }
+            };
+          }
+        });
+
+        const workbook = {
+          Sheets: { 'data': worksheet },
+          SheetNames: ['data']
+        };
+    
+        const excelBuffer: any = xlsx.write(workbook, {
+          bookType: 'xlsx',
+          type: 'array',
+          cellStyles: true 
+        });
+    
+        this.saveAsExcelFile(excelBuffer, 'ListaOT');
+
+    });
+}
+saveAsExcelFile(buffer: any, fileName: string): void {
+  import('file-saver').then(FileSaver => {
+      const EXCEL_TYPE = 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet;charset=UTF-8';
+      const EXCEL_EXTENSION = '.xlsx';
+      const data: Blob = new Blob([buffer], {
+          type: EXCEL_TYPE
+      });
+      FileSaver.saveAs(data, fileName + '_export_' + new Date().getTime() + EXCEL_EXTENSION);
+  });
+}
   editar(id) {
     this.router.navigate(['/trafico/editarotr', id]);
   }

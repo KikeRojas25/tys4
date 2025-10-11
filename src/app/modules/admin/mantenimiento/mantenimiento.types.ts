@@ -27,3 +27,7 @@ export interface Chofer {
   brevete: string ;
   telefono: string;
 }
+export interface Provincia {
+  idProvincia: number;
+  provincia: string;
+}

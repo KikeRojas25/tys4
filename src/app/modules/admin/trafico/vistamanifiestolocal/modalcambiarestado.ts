@@ -10,6 +10,7 @@ import { User } from '../trafico.types';
 import { PlanningService } from '../../planning/planning.service';
 import { TraficoService } from '../trafico.service';
 import { ToastModule } from 'primeng/toast';
+import { InputTextModule } from 'primeng/inputtext';
 
 
 @Component({
@@ -17,7 +18,7 @@ import { ToastModule } from 'primeng/toast';
 
 <div class="col-12 row">
       <div class="col-6">
-                  <h6>Estado  :</h6>
+                  <h6>Estadox :</h6>
                   <p-dropdown name="estadosnext"
                     [options]="estadosnext" [(ngModel)]="model.idestado"
                      class="input-form-field"
@@ -33,20 +34,48 @@ import { ToastModule } from 'primeng/toast';
                         </ng-template>
                   </p-dropdown>
               </div>
-              <div class="col-6">
-                <h6>Fecha de Estado:</h6>
-                <p-calendar [(ngModel)]="dateInicio"    appendTo="body"   [showTime]="true"  baseZIndex="10000" [locale]="es" dateFormat="dd/mm/yy"></p-calendar>
-              </div>
-              <div class="col-6">
-                <h6>Observación:</h6>
-                <textarea [(ngModel)]="model.observacion" rows="5" cols="30"  class="form-control"   type="text" textarea ></textarea>
-              </div>
+              <!-- Hora de llegada -->
+                    <!-- Hora de llegada -->
+            <div class="col-6">
+              <label for="horaLlegada" class="block text-sm font-medium text-gray-700">Hora de Llegada</label>
+              <input id="horaLlegada" type="time" pInputText [(ngModel)]="model.horaLlegada"
+                    class="w-full" [disabled]="model.idestado === 11"/>
+            </div>
+
+            <!-- Hora de atención -->
+            <div class="col-6">
+              <label for="horaAtencion" class="block text-sm font-medium text-gray-700">Hora de Atención</label>
+              <input id="horaAtencion" type="time" pInputText [(ngModel)]="model.horaAtencion"
+                    class="w-full" [disabled]="model.idestado === 11"/>
+            </div>
+
+            <!-- Hora de salida -->
+            <div class="col-6">
+              <label for="horaSalida" class="block text-sm font-medium text-gray-700">Hora de Salida</label>
+              <input id="horaSalida" type="time" pInputText [(ngModel)]="model.horaSalida"
+                    class="w-full" [disabled]="model.idestado === 11"/>
+            </div>
+
+            <!-- Kilos recogidos -->
+            <div class="col-6">
+              <label for="kilos" class="block text-sm font-medium text-gray-700">Kilos Recogidos</label>
+              <input id="kilos" type="number" pInputText [(ngModel)]="model.kilosRecojidos"
+                    class="w-full" [disabled]="model.idestado === 11"/>
+            </div>
+
+            <!-- Bultos recogidos -->
+            <div class="col-6">
+              <label for="bultos" class="block text-sm font-medium text-gray-700">Bultos Recogidos</label>
+              <input id="bultos" type="number" pInputText [(ngModel)]="model.bultosRecojidos"
+                    class="w-full" [disabled]="model.idestado === 11"/>
+            </div>
+
 
               <div class="col-md-4 mt-4 offset-3">
                       <button   class='btn-danger btn btn-xs' pButton iconPos="left" label="Guardar" icon="fa fa-save"   (click)="guardar()"  type="button"></button>
                       <button   class='btn-primary btn btn-xs' pButton  label="Cancelar"   (click)="cancelar()"  type="button"></button>
               </div>
-</div>
+
     `,
     standalone: true,
     imports: [
@@ -54,10 +83,11 @@ import { ToastModule } from 'primeng/toast';
       FormsModule,
       DropdownModule,
       CalendarModule,
-      ToastModule 
+      ToastModule ,
+      InputTextModule
     ]
 })
-export class CambiarEstadoModalComponent  implements OnInit {
+export class CambiarEstadoModalLocalComponent  implements OnInit {
 
     cars: any[];
     model: any = {};
@@ -105,10 +135,10 @@ export class CambiarEstadoModalComponent  implements OnInit {
       console.log( 'modal popup:' , this.model);
 
 
-      this.estadosnext.push({ value: 10 ,  label : 'En Base (Con Precinto)'});
-      this.estadosnext.push({ value: 11 ,  label : 'En Ruta'});
-      this.estadosnext.push({ value: 25 ,  label : 'En Zona'});
-      this.estadosnext.push({ value: 13 ,  label : 'En Reparto '});
+      this.estadosnext.push({ value: 1 ,  label : 'Confirmar Entrega a Tercero'});
+      this.estadosnext.push({ value: 2 ,  label : 'Confirmar Recojo'});
+      this.estadosnext.push({ value: 3 ,  label : 'Recojo cancelado'});
+      
 
 
 
@@ -171,3 +201,4 @@ export class CambiarEstadoModalComponent  implements OnInit {
         });
     }
 }
+

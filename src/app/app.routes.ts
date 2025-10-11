@@ -94,10 +94,20 @@ export const appRoutes: Route[] = [
                     loadComponent: () => import('./modules/admin/trafico/integradolocal/integradolocal.component')
                                           .then(m => m.IntegradolocalComponent)
                   },
+                  // {
+                  //   path: 'equipos',
+                  //   loadComponent: () => import('./modules/admin/trafico/ equipos/equipos.component')
+                  //                         .then(m => m.EquiposComponent)
+                  // },
                   {
                     path: 'vistamanifiesto/:id',
                     loadComponent: () => import('./modules/admin/trafico/vistamanifiestos/vistamanifiestos.component')
                                           .then(m => m.VistamanifiestosComponent)
+                  },
+                  {
+                    path: 'vistamanifiestolocal/:id',
+                    loadComponent: () => import('./modules/admin/trafico/vistamanifiestolocal/vistamanifiestolocal.component')
+                                          .then(m => m.VistamanifiestoLocalComponent)
                   },
                   {
                     path: 'vistarepartidor/:id/:uid',
@@ -118,7 +128,13 @@ export const appRoutes: Route[] = [
                     path: 'editarotr/:uid',
                     loadComponent: () => import('./modules/admin/trafico/ordentransporteremoto/edit/edit.component')
                                           .then(m => m.EditComponent)
+                  },
+                   {
+                    path: 'equipos',
+                    loadComponent: () => import('./modules/admin/trafico/equipos/equipos.component')
+                                          .then(m => m.EquiposComponent)
                   }
+
 
                   //confirmarentregas
 

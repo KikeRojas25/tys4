@@ -1,0 +1,21 @@
+::ng-deep .p-datatable thead th,
+::ng-deep .p-datatable tbody td {
+  padding: 2px 6px !important;   /* reduce espacios internos */
+  font-size: 11px !important;    /* texto más pequeño */
+}
+
+::ng-deep .p-datatable thead tr th {
+  height: 24px !important;       /* reduce altura header */
+}
+
+::ng-deep .p-datatable tbody tr {
+  height: 26px !important;       /* reduce altura filas */
+}
+
+::ng-deep .p-datatable .text-center {
+  text-align: center;
+}
+
+::ng-deep .p-datatable .text-right {
+  text-align: right;
+}

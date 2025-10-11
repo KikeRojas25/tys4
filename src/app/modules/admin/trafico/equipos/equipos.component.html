@@ -1,0 +1,101 @@
+<div class="p-8 bg-slate-50 min-h-screen">
+  <!-- Título principal -->
+  <h2 class="text-2xl font-bold text-blue-900 mb-8 flex items-center gap-3">
+    <i class="pi pi-sitemap text-blue-500 text-xl"></i>
+    <span>Provincias por Equipo</span>
+  </h2>
+
+  <div class="grid grid-cols-5 gap-6">
+    <!-- Lista de Departamentos -->
+    <!-- Lista de Provincias con Buscador -->
+    <div class="bg-white border border-gray-200 rounded-xl shadow-md p-6">
+      <h3 class="text-base font-semibold text-gray-700 mb-4">📋 Provincias</h3>
+
+      <!-- Buscador -->
+      <input
+        type="text"
+        pInputText
+        [(ngModel)]="filtroProvincia"
+        placeholder="Buscar provincia..."
+        class="w-full mb-4 p-2 text-sm border border-gray-300 rounded-lg"
+      />
+
+      <!-- Lista filtrada -->
+      <div class="flex flex-col gap-3 max-h-[500px] overflow-auto">
+        <div
+          *ngFor="let prov of provinciasDisponibles | filterProvincia:filtroProvincia"
+          pDraggable
+          (onDragStart)="onDragStart(prov)"
+          (onDragEnd)="onDragEnd()"
+          class="p-3 bg-slate-100 rounded-lg text-sm text-gray-800 text-center cursor-move hover:bg-slate-200 transition-all shadow-sm"
+        >
+          {{ prov.provincia }}
+        </div>
+      </div>
+    </div>
+
+    <!-- Equipos -->
+    <div
+      *ngFor="let equipo of equipos"
+      class="bg-white border border-gray-200 rounded-xl shadow-md p-6 flex flex-col"
+      style="height: 500px;"
+    >
+      <div class="flex justify-between items-center mb-4">
+    <h3 class="text-base font-semibold text-gray-700 mb-4">
+          👥  {{ equipo.nombreEquipo }} 
+          <span class="text-sm text-gray-500 ml-2">
+          {{ getCantidadProvincias(equipo) }} provincia{{ getCantidadProvincias(equipo) === 1 ? '' : 's' }}
+        </span>
+        </h3>
+        <!-- <span class="text-xs text-gray-500 font-medium">
+          {{ equipo.provincias.length }} provincia{{ equipo.provincias.length === 1 ? '' : 's' }}
+        </span> -->
+      </div>  
+
+    <div
+      pDroppable
+      (onDrop)="onDrop(equipo)"
+      (onDragEnter)="isDragging = true"
+      (onDragLeave)="isDragging = false"
+      class="flex-1 transition-all duration-300 p-2 border-2 border-dashed rounded-lg overflow-y-auto"
+      [ngClass]="{ 'border-blue-400 bg-blue-50': isDragging, 'border-gray-300': !isDragging }"
+      style="min-height: 400px;"
+    >
+      <div class="flex flex-col gap-3">
+      <ng-container *ngFor="let prov of equipo.provincias || []">
+          <div
+            *ngIf="prov && prov.provincia"
+            pDraggable
+            (onDragStart)="onDragStart(prov, equipo)"
+            (onDragEnd)="onDragEnd()"
+            class="flex items-center justify-between p-3 bg-orange-50 rounded-lg shadow-sm hover:bg-orange-100 transition-all"
+          >
+            <span class="text-sm font-medium text-gray-800">{{ prov.provincia }}</span>
+            <p-button
+              
+              icon="pi pi-trash"
+              class="p-button-rounded p-button-danger p-button-sm"
+              (click)="removerProvincia(equipo.idEquipo, prov.idProvincia)" 
+  
+            ></p-button>
+          </div>
+        </ng-container>
+      </div>
+    </div>
+    </div>
+  </div>
+
+  <!-- Botón Guardar Cambios -->
+  <div class="mt-10 flex justify-end">
+    <p-button
+      
+      label="Guardar Cambios"
+      icon="pi pi-save"
+      class="p-button-primary p-button-rounded"
+      (click)="confirmarAsignacion()"
+    ></p-button>
+  </div>
+</div>
+
+<p-confirmDialog></p-confirmDialog>
+<p-toast></p-toast>

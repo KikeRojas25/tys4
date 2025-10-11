@@ -15,6 +15,41 @@ body  {
     visibility: visible;
 }
 
+/* Ajuste general del calendario emergente */
+.p-datepicker {
+  font-size: 12px !important;
+  min-width: 250px !important; /* no uses % */
+  max-width: 350px;
+}
+
+/* Reduce tamaño de los días */
+.p-datepicker table td {
+  font-size: 12px !important;
+  padding: 2px !important;
+  height: 2rem !important;
+  width: 2rem !important;
+}
+
+/* Botones de hora abajo */
+.p-timepicker {
+  font-size: 12px !important;
+}
+
+/* Input general más compacto */
+.calendar-sm .p-inputtext {
+  font-size: 13px !important;
+  padding: 6px 8px !important;
+  height: 32px !important;
+}
+
+/* Íconos más pequeños si usas showIcon */
+.p-inputtext + .p-datepicker-trigger {
+  font-size: 14px;
+  height: 30px;
+  width: 30px;
+}
+
+
 
 
 input.ng-invalid.ng-touched,

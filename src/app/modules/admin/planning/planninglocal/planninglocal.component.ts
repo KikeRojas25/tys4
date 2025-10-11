@@ -163,20 +163,6 @@ ngOnInit() {
 
   ];
 
-//  this.cols2 = [
-//     { field: 'numcp', header: 'N° OT',  width: '20px'},
-
-//     {header: 'BULTOS', field: 'bulto'  , width: '60px'   },
-//     {header: 'FECHA', field: 'fecharegistro'  , width: '60px'   },
-//     {header: 'PESO', field: 'peso'  ,  width: '30px'  },
-//     {header: 'SUBTOTAL', field: 'subtotal'  ,  width: '30px'  },
-//     {header: 'DESTINO', field: 'destino'  ,  width: '30px'  },
-//     {header: 'CLIENTE', field: 'razonsocial'  ,  width: '100px'  },
-//     {header: 'TIPO', field: 'tipooperacion'  ,  width: '100px'  },
-//     {header: 'ACCIONES', field: 'acciones'  ,  width: '30px'  },
-//   ];
-
-
 
  this.cols2 = [
   { field: 'numcarga', header: 'N° MOVIL',  width: '60px'},
@@ -400,14 +386,12 @@ agregaracarga() {
     this.model.id = this.id;
 
 
-    console.log(this.id);
-
     this.ordenService.GetAllOrdersDetailDistrito(this.user.idestacionorigen,this.model).subscribe(list =>  {
       this.ordenes2 =   list;
       this.otsTotal = this.ordenes2.length;
 
 
-     console.log(this.ordenes2);
+
 
       this.ordenes2.forEach(x=> {
 
@@ -425,7 +409,6 @@ agregaracarga() {
     this.ordenService.GetAllCargasTemporalTrafico(2).subscribe(list1 => {
          this.despachos = list1;
 
-         console.log('bolsas', this.despachos);
      });
    }
    modificarDestino() {

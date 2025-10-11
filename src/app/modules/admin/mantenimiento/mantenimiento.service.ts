@@ -3,7 +3,7 @@ import { inject, Injectable } from '@angular/core';
 import { JwtHelperService } from '@auth0/angular-jwt';
 import { environment } from 'environments/environment';
 import { catchError, map, Observable, throwError } from 'rxjs';
-import { Chofer, InsertarPrecintoRequest, InsertarPrecintoResponse, Precinto, Proveedor } from './mantenimiento.types';
+import { Chofer, InsertarPrecintoRequest, InsertarPrecintoResponse, Precinto, Proveedor, Provincia } from './mantenimiento.types';
 import { Cliente, ValorTabla } from '../recepcion/ordentransporte/ordentransporte.types';
 
 
@@ -135,5 +135,7 @@ editar_chofer(model: any) {
   return this._httpClient.put(`${this.baseUrl}ActualizarChofer/${model.idchofer}`, model, httpOptions);
 }
 
-
+  getProvincias(): Observable<Provincia[]> {
+    return this._httpClient.get<Provincia[]>(`${this.baseUrl}GetProvincias`, httpOptions);
+  }
 }

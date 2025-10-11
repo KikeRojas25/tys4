@@ -22,6 +22,8 @@ import { ToastModule } from 'primeng/toast';
 import { ConfirmDialogModule } from 'primeng/confirmdialog';
 import { InputMaskModule } from 'primeng/inputmask';
 import { FileModalComponent } from './modalfiles';
+import { Clipboard } from '@angular/cdk/clipboard'; // opcional para copiar
+
 
 interface EventItem {
   status?: string;
@@ -33,6 +35,31 @@ interface EventItem {
   user?: string;
 }
 
+
+
+type EventActionType =
+  | 'ot-creada'
+  | 'ot-planificada'
+  | 'manifiesto-hr'
+  | 'ot-despachada'
+  | 'en-zona'
+  | 'en-reparto'
+  | 'entrega-ok'
+  | 'none';
+
+interface EventRow {
+  dateRegister?: string | Date;
+  dateEvent?: string | Date;
+  user?: string;
+  status?: string; // etiqueta visible (p.ej. "OT creada", "En Reparto", etc)
+}
+
+
+interface ActionConfig {
+  type: EventActionType;
+  title: string;
+  payload?: any;
+}
 
 
 @Component({
@@ -102,11 +129,17 @@ export class SeguimientootComponent implements OnInit {
 };
 
 
+
+  actionDialogVisible = false;
+  currentAction: ActionConfig | null = null;
+
+
   constructor(private ordenTransporteService: OrdenTransporteService,
               public dialogService: DialogService,
               private router: Router,
               private confirmationService: ConfirmationService,
-              public messageService: MessageService
+              public messageService: MessageService,
+              private clipboard: Clipboard
               ) { }
 
   ngOnInit() {
@@ -330,6 +363,16 @@ vermanifiesto(idmanifiesto) {
   var url = "http://104.36.166.65/webreports/manifiesto.aspx?idmanifiesto=" + String(idmanifiesto);
   window.open(url);
 }
+
+vernummanifiesto(nummanifiesto) {
+
+   var idmanifiesto = nummanifiesto.split('-')[1];
+
+  var url = "http://104.36.166.65/webreports/manifiesto.aspx?idmanifiesto=" + String(idmanifiesto);
+  window.open(url);
+}
+
+
 verhojaruta(iddespacho) {
 
   var url = "http://104.36.166.65/webreports/hojaruta.aspx?iddespacho=" + String(iddespacho);
@@ -448,4 +491,131 @@ unConfirm(){
           data : {id }
       });
   }
+
+  
+  /** Normaliza el texto del estado para rutear acciones */
+  private normalizeStatus(s?: string): EventActionType {
+    const txt = (s || '').toLowerCase();
+
+    if (txt.includes('ot creada')) return 'ot-creada';
+    if (txt.includes('planificada')) return 'ot-planificada';
+    if (txt.includes('manifiesto') || txt.includes('hoja ruta') || txt.includes('hr generado')) return 'manifiesto-hr';
+    if (txt.includes('despachada')) return 'ot-despachada';
+    if (txt.includes('en zona')) return 'en-zona';
+    if (txt.includes('en reparto')) return 'en-reparto';
+    if (txt.includes('entrega') && (txt.includes('conforme') || txt.includes('(ok)'))) return 'entrega-ok';
+
+    return 'none';
+  }
+   /** Abre el diálogo con la acción acorde al evento */
+  openEventAction(row: EventRow) {
+    const type = this.normalizeStatus(row.status);
+
+
+    console.log('Tipo de evento:', this.ordenTransporte, row);
+
+    if(type === 'ot-creada') {
+
+
+       const url = `http://104.36.166.65/webreports/ot.aspx?idorden=${this.ordenTransporte.idordentrabajo}`;
+       window.open(url, '_blank');
+       return;
+
+
+    }
+    else if(type === 'manifiesto-hr') {
+      
+        var url = "http://104.36.166.65/webreports/manifiesto.aspx?idmanifiesto=" + String(this.ordenTransporte.idManifiesto);
+       window.open(url, '_blank');
+       return;
+    }
+     else if(type === 'entrega-ok') {
+      
+         const ref = this.dialogService.open(FileModalComponent, {
+          header: 'Visor Fotos',
+          width: '30%',
+          data : {id: this.ordenTransporte.idordentrabajo }
+      });
+      return;
+    }
+
+    const baseTitle = row.status || 'Acción';
+
+    this.currentAction = {
+      type,
+      title: this.buildTitle(baseTitle, type),
+      payload: { row, ot: this.ordenTransporte }
+    };
+
+    this.actionDialogVisible = true;
+  }
+
+  private buildTitle(base: string, type: EventActionType) {
+    const map: Record<EventActionType, string> = {
+      'ot-creada': 'Detalles de creación',
+      'ot-planificada': 'Planificación',
+      'manifiesto-hr': 'Manifiesto / Hoja de Ruta',
+      'ot-despachada': 'Despacho',
+      'en-zona': 'En Zona',
+      'en-reparto': 'En Reparto',
+      'entrega-ok': 'Entrega conforme',
+      'none': base
+    };
+    return map[type] || base;
+  }
+
+  /** Ejecuta la acción específica dentro del diálogo */
+  executeAction(action: string) {
+    switch (action) {
+      case 'view-basic':
+        // Ejemplo: podrías abrir otro diálogo/sidepanel o navegar
+        // this.router.navigate(['/ots', this.ordenTransporte.numcp]);
+        console.log('Ver datos básicos de la OT', this.ordenTransporte);
+        break;
+
+      case 'view-plan':
+        // Llamar servicio para traer asignaciones, mostrar otro dialog, etc.
+        console.log('Ver planificación de la OT');
+        break;
+
+      case 'copy-manifiesto':
+        if (this.ordenTransporte?.nummanifiesto) {
+          this.clipboard.copy(this.ordenTransporte.nummanifiesto);
+        }
+        break;
+
+      case 'open-hr':
+        // Si tienes una URL/ID para la HR, ábrela:
+        // window.open(this.getHojaRutaUrl(this.ordenTransporte.numhojaruta), '_blank');
+        console.log('Abrir HR', this.ordenTransporte?.numhojaruta);
+        break;
+
+      case 'view-despacho':
+        console.log('Mostrar tracking de despacho / eventos asociados');
+        break;
+
+      case 'open-map':
+        // Abrir mapa (puedes lanzar un dialog con iframe de Google Maps)
+        console.log('Abrir mapa: en zona');
+        break;
+
+      case 'contact-driver':
+        console.log('Lógica para contactar repartidor');
+        break;
+
+      case 'open-pod':
+        console.log('Abrir constancia (POD) si existe');
+        break;
+
+      case 'download-evidence':
+        console.log('Descargar evidencias (fotos/firma) si existen');
+        break;
+
+      default:
+        console.warn('Acción no implementada:', action);
+        break;
+    }
+  }
+
+
 }

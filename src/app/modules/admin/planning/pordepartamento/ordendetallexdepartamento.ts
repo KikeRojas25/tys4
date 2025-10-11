@@ -167,10 +167,13 @@ export class VerDetalleOrdenxDepartamentoModalComponent implements OnInit {
         // Concatenar los idordentrabajo en una cadena separada por comas
         const idsConcatenados = this.selectedOrdenes.map(orden => orden.idordentrabajo).join(',');
     
+      
+
         // Crear objeto para enviar
         const payload = {
             ids: ',' + idsConcatenados, // Se agrega la coma inicial para cumplir con el formato esperado
-            idagencia: this.selectedAgencia
+            idagencia: this.selectedAgencia,
+            idusuariocreacion: JSON.parse(localStorage.getItem('user')).id
         };
     
         console.log("Payload a enviar:", payload);

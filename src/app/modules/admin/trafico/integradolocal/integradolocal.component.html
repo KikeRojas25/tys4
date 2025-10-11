@@ -1,99 +1,113 @@
-
 <div class="flex flex-col flex-auto min-w-0">
+
+  <!-- Encabezado -->
   <div class="flex flex-col sm:flex-row flex-0 sm:items-center sm:justify-between p-6 sm:py-8 sm:px-10 border-b bg-card dark:bg-transparent">
     <div class="flex-1 min-w-0">
       <div class="flex flex-wrap items-center font-medium">
         <div>
           <a class="whitespace-nowrap text-primary-500">TMS</a>
         </div>
-        <div class="flex items-center ml-1 whitespace-nowrap">
+        <!-- <div class="flex items-center ml-1 whitespace-nowrap">
           <mat-icon class="fuse-horizontal-navigation-item-icon" [svgIcon]="'heroicons_solid:chevron-right'"></mat-icon>
           <a class="ml-1 text-primary-500">Tráfico</a>
-        </div>
+        </div> -->
       </div>
       <div class="mt-2">
-        <h2 class="text-3xl md:text-4xl font-extrabold tracking-tight leading-7 sm:leading-10 truncate"> Tráfico Local </h2>
+        <h2 class="text-3xl md:text-4xl font-extrabold tracking-tight leading-7 sm:leading-10 truncate">
+          Tráfico Local
+        </h2>
       </div>
     </div>
   </div>
 
+  <!-- Contenedor principal -->
+  <div class="p-6 sm:px-10 bg-white dark:bg-surface-800 rounded-xl shadow space-y-6">
 
-  <div class="flex flex-col min-w-0 w-full">
+    <!-- Resumen -->
+    <div class="grid grid-cols-1 lg:grid-cols-5 gap-4">
+      <div class="bg-indigo-50 dark:bg-surface-700 rounded-xl p-4 shadow flex flex-col items-center">
+        <span class="text-indigo-700 font-medium text-sm">Total Camiones Hoy</span>
+        <span class="text-2xl font-bold text-indigo-800">{{ resumen.cantidadTotal }}</span>
+      </div>
 
+      <div class="bg-green-50 dark:bg-surface-700 rounded-xl p-4 shadow flex flex-col items-center">
+        <span class="text-green-700 font-medium text-sm">Total Recojos</span>
+        <span class="text-2xl font-bold text-green-800">{{ resumen.totalRecojos }}</span>
+      </div>
 
+      <div class="bg-blue-50 dark:bg-surface-700 rounded-xl p-4 shadow flex flex-col items-center">
+        <span class="text-blue-700 font-medium text-sm">Total Entregas</span>
+        <span class="text-2xl font-bold text-blue-800">{{ resumen.totalEntregas }}</span>
+      </div>
 
-    <p-tabView styleClass="tabview-custom">
-      <p-tabPanel>
-          <ng-template pTemplate="header">
-              <div class="flex align-items-center gap-2">
-                   <i class="fa fa-truck" ></i>
-                  <span class="font-bold white-space-nowrap m-0">
-                     Móviles
-                  </span>
-              </div>
-          </ng-template>
-            <p-panel header="Móviles Local" class="w-full mb-3">
+      <div class="bg-purple-50 dark:bg-surface-700 rounded-xl p-4 shadow flex flex-col items-center">
+        <span class="text-purple-700 font-medium text-sm">Toneladas Entregadas</span>
+        <span class="text-2xl font-bold text-purple-800">{{ resumen.toneladasEntregadas | number:'1.0-1' }}</span>
+      </div>
 
+      <div class="bg-orange-50 dark:bg-surface-700 rounded-xl p-4 shadow flex flex-col items-center">
+        <span class="text-orange-700 font-medium text-sm">Toneladas Recojidas</span>
+        <span class="text-2xl font-bold text-orange-800">{{ resumen.toneladasRecojidas | number:'1.0-1' }}</span>
+      </div>
+    </div>
 
-            <p-table [columns]="cols" dataKey="idhojaruta"
-            [tableStyle]="{ 'table-layout': 'fixed', 'width': '100%' , 'size': '9px' }"
-            [value]="ordenes"  selectionMode="single" scrollable="true"  [scrollHeight]="'600px'"
-            sortField="numHojaruta"  
-            [rows]="200" >
+    <!-- Tabla con título -->
+    <div class="rounded-xl border border-gray-200 overflow-hidden shadow">
+      <div class="px-4 py-3 bg-gray-50 border-b">
+        <h3 class="text-lg font-semibold text-gray-700">Detalle de Móviles en Ruta</h3>
+      </div>
+   <p-table [value]="ordenes"
+         dataKey="idHojaRuta"
+         [(selection)]="selectedOrden"
+         selectionMode="single"
+         scrollable="true"
+         [scrollHeight]="'400px'"
+         sortField="numHojaRuta"
+         [rows]="100">
 
+  <ng-template pTemplate="header">
+    <tr>
+      <th rowspan="2" class="text-center">Acc.</th>
+      <th rowspan="2" class="text-center">Hoja Ruta</th>
+      <th rowspan="2" class="text-center">Placa</th>
+      <th colspan="3" class="text-center bg-green-400 border-r">Entregas</th>
+      <th colspan="3" class="text-center bg-blue-400">Recojos</th>
+      <th rowspan="2" class="text-center">Destino</th>
+    </tr>
+    <tr>
+      <th class="text-center bg-green-200">OTs</th>
+      <th class="text-center bg-green-200">Peso</th>
+      <th class="text-center bg-green-200 border-r">Bultos</th>
+      <th class="text-center bg-blue-200">OTs</th>
+      <th class="text-center bg-blue-200">Peso</th>
+      <th class="text-center bg-blue-200">Bultos</th>
+    </tr>
+  </ng-template>
 
-            
+  <ng-template pTemplate="body" let-rowData>
+    <tr [pSelectableRow]="rowData">
+      <td class="text-center">
+        <p-button icon="pi pi-search" severity="success"
+                  (click)="verDetalle(rowData.idHojaRuta)" size="small" class="mr-1"></p-button>
+        <p-button icon="pi pi-paperclip" severity="warning"
+                  (click)="verHojaRuta(rowData.idHojaRuta)" size="small"></p-button>
+      </td>
+      <td class="text-center">{{ rowData.numHojaRuta }}</td>
+      <td class="text-center">{{ rowData.placa }}</td>
 
-            <ng-template pTemplate="header" let-columns>
-              <tr>
-                <!-- Encabezado con colores y estilos -->
-                <th colspan="6" style="text-align: center; color: white; width: 60%"></th>
-              
-                <th colspan="2" style="text-align: center; color: white; background-color: rgb(251, 192, 45); width: 20%">EN RUTA</th>
-              </tr>
-            <tr>
-                <th *ngFor="let col of columns" [ngStyle]="{'width': col.width}"  [pSortableColumn]="col.field">
-                {{col.header}}
-                </th>
-            </tr>
-            </ng-template>
+      <td class="text-right">{{ rowData.entregasOTs }}</td>
+      <td class="text-right">{{ rowData.entregasPeso | number:'1.0-0' }}</td>
+      <td class="text-right border-r">{{ rowData.entregasBultos }}</td>
 
-          
+      <td class="text-right">{{ rowData.recojosOTs }}</td>
+      <td class="text-right">{{ rowData.recojosPeso | number:'1.0-0' }}</td>
+      <td class="text-right">{{ rowData.recojosBultos }}</td>
 
-            <ng-template pTemplate="body" let-rowData>
-            <tr [pSelectableRow]="rowData">
-                <td class="text-center">
-                  <p-button icon="pi pi-search" severity="success" (click)="verDetalle(rowData.idhojaruta)" size="small" ></p-button>
-                  <p-button icon="pi pi-paperclip" severity="warning" (click)="verHojaRuta(rowData.iddespacho)" size="small" ></p-button>
+      <td class="truncate">{{ rowData.destino }}</td>
+    </tr>
+  </ng-template>
+</p-table>
 
-                </td>
-                <td class="text-center" style="white-space: normal; word-wrap: break-word; overflow-wrap: break-word;">{{rowData.proveedor}}</td>
-                <td class="text-center">{{rowData.placa}}</td>
-                <td class="text-center cursor-pointer" (click)="ver(rowData.idhojaruta)">
-                  {{ rowData.numcarga2 }}
-                  </td>
-                <td class="text-center">{{rowData.fecharegistro | date: 'dd/MM/yyyy'}}</td>
-                <td class="text-center">{{rowData.origen}}</td>
-               
-
-
-                <td class="text-center">{{rowData.totalots}}</td>
-                <td class="text-center">{{rowData.peso | number:'1.0-0'}}</td>
-
-             
-
-
-            </tr>
-            </ng-template>
-
-       
-            </p-table>
-
-            </p-panel>
-        </p-tabPanel>
- 
-    </p-tabView>
-  
-</div>
-
+    </div>
+  </div>
 </div>

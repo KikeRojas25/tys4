@@ -15,6 +15,9 @@ import { MessageService } from 'primeng/api';
 import { ToastModule } from 'primeng/toast';
 import { EntregarOtModalComponent } from './modalentregarOT';
 import { OrdenTransporte } from '../../recepcion/ordentransporte/ordentransporte.types';
+import { BadgeModule } from 'primeng/badge';
+import { AsignartipooperacionComponent } from '../../planning/porprovincia/asignartipooperacion/asignartipooperacion.component';
+import { AsignartipooperacionRutaComponent } from './asignartipooperacion/asignartipooperacionruta.component';
 
 @Component({
   selector: 'app-vistarepartidor',
@@ -30,7 +33,9 @@ import { OrdenTransporte } from '../../recepcion/ordentransporte/ordentransporte
     TableModule,
     ButtonModule,
     DialogModule,
-    ToastModule
+    ToastModule,
+    BadgeModule
+    
   ],
   providers: [
     DialogService ,
@@ -59,6 +64,16 @@ export class VistarepartidorComponent implements OnInit {
   ordenes4: OrdenTransporte[] = [];
   ordenes5: OrdenTransporte[] = [];
 
+  selectedOrdenes: OrdenTransporte[] = [];
+
+
+  totalRecojo: number = 0;
+  totalRecepcion: number = 0;
+  totalReparto: number = 0;
+  totalRecabarCargo: number = 0;
+  totalEnviarCargo: number = 0;
+  totalObservadas: number = 0;
+
   selectedManifiesto: any = {};
   selectedManifiestoRecojo: any = {};
   SelectedOrdenTransporte?: OrdenTransporte | undefined;
@@ -81,22 +96,24 @@ export class VistarepartidorComponent implements OnInit {
     {header: 'BULTOS', field: 'bulto'  , width: '60px'   },
     {header: 'PESO', field: 'peso'  ,  width: '30px'  },
     {header: 'ACCIONES', field: 'acciones'  ,  width: '30px'  },
+  
   ];
 
   this.cols2 = [
     { field: 'numcp', header: 'N° OT',  width: '40px'},
     {header: 'FECHA RECOJO', field: 'fecharegistro'  , width: '60px'   },
-    {header: 'CLIENTE', field: 'razonsocial'  ,  width: '100px'  },
-    {header: 'DESTINATARIO', field: 'destinatario'  , width: '60px'   },
+    {header: 'CLIENTE', field: 'razonsocial'  ,  width: '180px'  },
+    {header: 'DESTINATARIO', field: 'destinatario'  , width: '180px'   },
 
 
     {header: 'F. ENTREGA REPARTIDOR', field: 'fecha_estado_actual'  ,  width: '90px'  },
-    {header: 'F. ENTREGA COMPROMETIDA', field: 'fechaentrega'  , width: '90px'   },
-    {header: 'Dif. Fechas', field: 'diferencia_fechas'  ,  width: '20px'  },
+    // {header: 'F. ENTREGA COMPROMETIDA', field: 'fechaentrega'  , width: '90px'   },
+    // {header: 'Dif. Fechas', field: 'diferencia_fechas'  ,  width: '20px'  },
 
     {header: 'BULTOS', field: 'bulto'  , width: '30px'   },
     {header: 'PESO', field: 'peso'  ,  width: '30px'  },
     {header: 'ESTADO', field: 'destino'  ,  width: '30px'  },
+    {header: 'ACCIONES', field: 'acciones'  ,  width: '20px'  },
 
   ];
 
@@ -147,34 +164,44 @@ this.cols4 = [
   }
   reloadDetalles() {
 
-
-
-
-
     
 
     this.traficoService.getAllManifiestosForProvider(this.idproveedor, 11,  this.iddepartamento ).subscribe(x=> {
       this.despachos1 = x; 
+      this.totalRecepcion = x.length;
     });
 
     this.traficoService.getAllManifiestosForProviderRecojo (this.idproveedor, this.iddepartamento).subscribe(list => {
       this.despachos = list;
+      this.totalRecojo = list.length;
     });
 
     this.traficoService.getAllOrdersxRepartidor(this.idproveedor, 13).subscribe(x => {
-      this.ordenes2 = x;
+      this.ordenes2 = x; 
+      this.totalReparto = x.length;
     });
 
       this.traficoService.getAllOrdersxRepartidor(this.idproveedor, 34).subscribe(x => {
-      this.ordenes3 = x;
+      
+        this.ordenes3 = x;
+        this.totalRecabarCargo = x.length;
+
       const conTipoEntrega = x.filter(o => o.tipoentrega !== null);
       this.ordenes5 = [...(this.ordenes5 || []), ...conTipoEntrega];
+
+       this.totalObservadas = this.ordenes5.length;
+
     });
 
     this.traficoService.getAllOrdersxRepartidor(this.idproveedor, 35).subscribe(x => {
       this.ordenes4 = x;
+      this.totalEnviarCargo = x.length;
       const conTipoEntrega = x.filter(o => o.tipoentrega !== null);
       this.ordenes5 = [...(this.ordenes5 || []), ...conTipoEntrega];
+
+      this.totalObservadas = this.ordenes5.length;
+
+     
     });
 
 
@@ -199,7 +226,7 @@ this.cols4 = [
 
     this.traficoService.ListarOrdenesTransporte(id).subscribe(x=> {
   
-      console.log(x);
+      console.log('detalle ots:',x);
       this.ordenes = x;
   
     });
@@ -214,7 +241,7 @@ this.cols4 = [
     console.log(this.selectedManifiestoRecojo);
 
 
-    let ids  = ',' + this.selectedManifiestoRecojo.idmanifiesto  ;
+    let ids  = ',' + this.selectedManifiestoRecojo.idManifiesto  ;
     if(this.selectedManifiestoRecojo  === undefined )
       {
        
@@ -305,7 +332,94 @@ modalEntregarOT() {
     const url = `http://104.36.166.65/webreports/ot.aspx?idorden=${idOrdenTrabajo}`;
     window.open(url, '_blank');
 }
-  
-  
+ asignarTipoOperacion() {
+  if (!this.selectedManifiesto || !this.selectedManifiesto.idManifiesto) {
+    this.messageService.add({
+      severity: 'warn',
+      summary: 'Proveedor de reparto',
+      detail: 'Debe seleccionar al menos un manifiesto'
+    });
+    return;
+  }
+
+  this.traficoService.ListarOrdenesTransporte(this.selectedManifiesto.idManifiesto).subscribe(x => {
+    console.log('ordenes:', x);
+    this.ordenes = x;
+
+    // Concatenar los idOrdenTrabajo separados por coma
+    const ids = this.ordenes.map(m => m.idOrdenTrabajo).join(',');
+    console.log('ids', ids);
+
+    this.ref = this.dialogService.open(AsignartipooperacionRutaComponent, {
+      header: 'Reasignar Tipo de Operación',
+      width: '60%',
+      contentStyle: { 'max-height': '450px', overflow: 'auto' },
+      baseZIndex: 10000,
+      data: { ids }
+    });
+
+    this.ref.onClose.subscribe((response: any) => {
+      console.log('respuesta', response);
+      this.reloadDetalles();
+
+      if (!response?.error) {
+        this.messageService.add({
+          severity: 'success',
+          summary: 'Planning',
+          detail: 'Se ha asignado el tipo de operación de manera correcta.'
+        });
+      } else {
+        this.messageService.add({
+          severity: 'error',
+          summary: 'Planning',
+          detail: 'Hubo un error en la asignación de tipo de operación.'
+        });
+      }
+    });
+  });
+}
+asignarTipoOperacionxOt() {
+  if (!this.selectedOrdenes || this.selectedOrdenes.length === 0) {
+    this.messageService.add({
+      severity: 'warn',
+      summary: 'Proveedor de reparto',
+      detail: 'Debe seleccionar al menos un manifiesto'
+    });
+    return;
+  }
+    this.ordenes = this.selectedOrdenes;
+
+    // Concatenar los idOrdenTrabajo separados por coma
+    const ids = this.ordenes.map(m => m.idOrdenTrabajo).join(',');
+    console.log('ids', ids);
+
+    this.ref = this.dialogService.open(AsignartipooperacionRutaComponent, {
+      header: 'Reasignar Tipo de Operación',
+      width: '60%',
+      contentStyle: { 'max-height': '450px', overflow: 'auto' },
+      baseZIndex: 10000,
+      data: { ids }
+    });
+
+    this.ref.onClose.subscribe((response: any) => {
+      console.log('respuesta', response);
+      this.reloadDetalles();
+
+      if (!response?.error) {
+        this.messageService.add({
+          severity: 'success',
+          summary: 'Planning',
+          detail: 'Se ha asignado el tipo de operación de manera correcta.'
+        });
+      } else {
+        this.messageService.add({
+          severity: 'error',
+          summary: 'Planning',
+          detail: 'Hubo un error en la asignación de tipo de operación.'
+        });
+      }
+    });
+  
+}
 
 }

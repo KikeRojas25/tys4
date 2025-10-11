@@ -66,21 +66,21 @@
           <!-- Nro OT -->
           <div>
             <label>Nro OT:</label>
-            <input pInputText [(ngModel)]="model.numcp" 
+            <input pInputText [(ngModel)]="model.numcp" (keydown.enter)="buscar()" 
                    [style]="{'width':'100%'}" placeholder="Ingrese Nro OT" />
           </div>
 
           <!-- Nro Manifiesto -->
           <div>
             <label>Nro Manifiesto:</label>
-            <input pInputText [(ngModel)]="model.numanifiesto" 
+            <input pInputText [(ngModel)]="model.nummanifiesto" (keydown.enter)="buscar()" 
                    [style]="{'width':'100%'}" placeholder="Ingrese Manifiesto" />
           </div>
 
           <!-- Nro HR -->
           <div>
             <label>Nro HR:</label>
-            <input pInputText [(ngModel)]="model.numhojaruta" 
+            <input pInputText [(ngModel)]="model.numhojaruta" (keydown.enter)="buscar()" 
                    [style]="{'width':'100%'}" placeholder="Ingrese HR" />
           </div>
 
@@ -98,7 +98,7 @@
                     class="p-button-primary" (click)="buscar()">
           </p-button>
           <p-button label="EXCEL" icon="pi pi-file-excel" 
-                    class="p-button-primary">
+                    class="p-button-primary" (click)="exportExcel()">
           </p-button>
         </div>
       </div>
@@ -168,6 +168,7 @@
                 {{ rowData.numcp }}
               </a>
             </td>
+            <td>{{ rowData.usuarioregistro }}</td>
             <td style="text-align: center;">{{ rowData.fecharecojo | date:'dd/MM/yyyy' }}</td>
             <td style="text-align: center;">{{ rowData.fechadespacho | date:'dd/MM/yyyy '}}</td>
             <td class="word-wrap">{{ rowData.razonsocial }}</td>
