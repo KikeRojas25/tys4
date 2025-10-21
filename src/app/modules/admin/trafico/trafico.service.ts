@@ -11,6 +11,7 @@ import {
     HojaRuta,
     Manifiesto,
     ManifiestoReporte,
+    OrdenRecojo,
     Proveedor,
 } from './trafico.types';
 
@@ -110,6 +111,9 @@ export class TraficoService {
             httpOptions
         );
     }
+        actualizarOrdenRecojo(orden: OrdenRecojo): Observable<any> {
+        return this._httpClient.put(`${this.baseUrl}actualizar-orden-recojo`, orden);
+        }
 
     getAllManifiestosForProviderRecojo(
         IdProveedor: number,

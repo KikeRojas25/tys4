@@ -398,7 +398,7 @@ agregaracarga() {
 
 
 
-   reprogramarArribos(){
+  //  reprogramarArribos(){
 
   //   let ids  = '';
 
@@ -441,7 +441,7 @@ agregaracarga() {
   //     return ;
   //   });
 
-  }
+  // }
   ver(despacho){
 
 

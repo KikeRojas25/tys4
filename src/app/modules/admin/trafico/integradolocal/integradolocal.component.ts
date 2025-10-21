@@ -11,6 +11,7 @@ import { TabViewModule } from 'primeng/tabview';
 import { TraficoService } from '../trafico.service';
 import { User } from '../trafico.types';
 
+
 @Component({
     selector: 'app-integradolocal',
     templateUrl: './integradolocal.component.html',

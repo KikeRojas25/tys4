@@ -56,7 +56,7 @@
       <div class="px-4 py-3 bg-gray-50 border-b">
         <h3 class="text-lg font-semibold text-gray-700">Detalle de Móviles en Ruta</h3>
       </div>
-   <p-table [value]="ordenes"
+<p-table [value]="ordenes"
          dataKey="idHojaRuta"
          [(selection)]="selectedOrden"
          selectionMode="single"
@@ -65,6 +65,7 @@
          sortField="numHojaRuta"
          [rows]="100">
 
+  <!-- 🧩 CABECERA -->
   <ng-template pTemplate="header">
     <tr>
       <th rowspan="2" class="text-center">Acc.</th>
@@ -73,6 +74,7 @@
       <th colspan="3" class="text-center bg-green-400 border-r">Entregas</th>
       <th colspan="3" class="text-center bg-blue-400">Recojos</th>
       <th rowspan="2" class="text-center">Destino</th>
+      <th rowspan="2" class="text-center">Avance</th>
     </tr>
     <tr>
       <th class="text-center bg-green-200">OTs</th>
@@ -84,6 +86,7 @@
     </tr>
   </ng-template>
 
+  <!-- 🧾 CUERPO -->
   <ng-template pTemplate="body" let-rowData>
     <tr [pSelectableRow]="rowData">
       <td class="text-center">
@@ -92,6 +95,7 @@
         <p-button icon="pi pi-paperclip" severity="warning"
                   (click)="verHojaRuta(rowData.idHojaRuta)" size="small"></p-button>
       </td>
+
       <td class="text-center">{{ rowData.numHojaRuta }}</td>
       <td class="text-center">{{ rowData.placa }}</td>
 
@@ -104,9 +108,24 @@
       <td class="text-right">{{ rowData.recojosBultos }}</td>
 
       <td class="truncate">{{ rowData.destino }}</td>
+
+      <!-- 📊 NUEVA COLUMNA: AVANCE -->
+      <td class="text-center" style="width: 180px;">
+        <p-progressBar
+          [value]="rowData.porcentajeAvance"
+          [showValue]="true"
+          [style]="{ height: '20px' }"
+          [ngClass]="{
+            'bg-green-200': rowData.porcentajeAvance === 100,
+            'bg-yellow-200': rowData.porcentajeAvance < 100 && rowData.porcentajeAvance >= 50,
+            'bg-red-200': rowData.porcentajeAvance < 50
+          }">
+        </p-progressBar>
+      </td>
     </tr>
   </ng-template>
 </p-table>
+
 
     </div>
   </div>

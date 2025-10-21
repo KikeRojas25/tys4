@@ -188,3 +188,24 @@ export interface EquipoProvincia {
   equipo?: string;
   provincias: Provincia[];
 }
+
+export interface OrdenRecojo {
+  idOrdenRecojo: number;             // bigint
+  responsableComercialId?: number;   // int
+  fechaHoraCita?: string;            // datetime
+  idTipoUnidad?: number;             // int
+  centroAcopio?: string;             // varchar(50)
+  observaciones?: string;            // nvarchar(1000)
+  idOrdenTrabajo?: number;           // bigint
+  pesoReal?: number;                 // decimal(12,2)
+  bultoReal?: number;                // int
+  fechaHoraCitaFin?: string;         // datetime
+  fechaHoraCitaReal?: string;        // datetime
+  fechaHoraCitaFinReal?: string;     // datetime
+  horaProgramada?: string;           // time(7)
+  horaCita?: string;                 // time(7)
+  horaLlegada?: string;              // time(7)
+  horaAtencion?: string;             // time(7)
+  horaSalida?: string;               // time(7)
+  km?: number;                       // decimal(12,2)
+}

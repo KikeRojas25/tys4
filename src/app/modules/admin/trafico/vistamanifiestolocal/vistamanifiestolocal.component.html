@@ -48,39 +48,82 @@
                         <p-button severity="primary" (click)="reloadDetalles()">Refrescar</p-button> 
                     </div>
 
-                        <p-table [value]="despachos" [paginator]="true"  selectionMode="single"
-                        [(selection)]="selectedOTs" 
-                        dataKey="idOrdenTrabajo" [rows]="10" [responsiveLayout]="'scroll'">
-                            <ng-template pTemplate="header">
-                                <tr>
-                                    <th *ngFor="let col of cols3" pSortableColumn>
-                                        {{col.header}}
-                                       
-                                    </th>
-                                </tr>
-                            </ng-template>
-                            <ng-template pTemplate="body" let-rowData>
-                                <tr [pSelectableRow]="rowData">
+                    <p-table
+  [value]="despachos"
+  [paginator]="true"
+  selectionMode="single"
+  [(selection)]="selectedOTs"
+  dataKey="idordentrabajo"
+  [rows]="10"
+  [responsiveLayout]="'scroll'">
 
-                                    <td>{{ rowData.horaProgramada      }}</td>
-                                    <td>{{ rowData.destino }}</td>
-                                    <td>{{ rowData.razonSocial }}</td>  
-                                     <td>{{ rowData.numCp }}</td>
-                               
-                           
-                                    <td>{{ rowData.peso | number: '1.0-2' }}</td>
-                                    <td class="ui-resizable-column" style="text-align:center;"> {{rowData.bulto }}</td>
-                                    <td class="ui-resizable-column" style="text-align:center;"> {{rowData.cantidad }}</td>
-                                      <td>{{ rowData.fechaHoraCitaReal   | date: 'dd/MM/yyyy HH:mm' }}</td>
-                                      <!-- Nuevos campos -->
-                            
-                                    <!-- <td>
-                                        <p-button icon="fa fa-search"  serverity="danger" (click)="verEventos(rowData.idManifiesto)" size="small" ></p-button>
-                                        <p-button icon="pi pi-paperclip" severity="warning" (click)="verManifiesto(rowData.idManifiesto)" size="small" ></p-button>
-                                    </td> -->
-                                </tr> 
-                            </ng-template>  
-                        </p-table>
+  <!-- 🧩 CABECERA -->
+  <ng-template pTemplate="header">
+    <tr>
+      <th>Acciones</th>
+      <th>Estado </th>
+      <th>Hora Cita</th>
+      <th>Hora Reprogramada</th>
+      <th>Hora Llegada</th>
+      <th>Hora Atención</th>
+      <th>Hora Salida</th>
+      <th>Destino</th>
+      <th>Cliente</th>
+      <th>N° CP</th>
+      <th>Peso (kg)</th>
+      <th>Bultos</th>
+      <th>Peso Real (kg)</th>
+      <th>Bultos Reales</th>
+
+    </tr>
+  </ng-template>
+
+  <!-- 🧾 CUERPO -->
+  <ng-template pTemplate="body" let-rowData>
+    <tr [pSelectableRow]="rowData">
+      
+      
+      <td class="text-center">
+          <button
+            *ngIf="rowData.estado === 'Recojo Confirmado'"
+            pButton
+            
+            label="Crear OT"
+            class="p-button-sm p-button-success"
+            (click)="crearOT(rowData)"
+          ></button>
+    </td>
+
+
+
+        <td>{{ rowData.estado }}</td>
+        <!-- 🕒 Horas (TimeSpan) -->
+         <td>{{ rowData.fechaHoraCita | date: 'HH:mm' }}</td>
+        <td>{{ rowData.horaProgramada ? (rowData.horaProgramada.substring(0,5)) : '-' }}</td>
+        <!-- <td>{{ rowData.horaCita ? (rowData.horaCita.substring(0,5)) : '-' }}</td> -->
+        <td>{{ rowData.horaLlegada ? (rowData.horaLlegada.substring(0,5)) : '-' }}</td>
+        <td>{{ rowData.horaAtencion ? (rowData.horaAtencion.substring(0,5)) : '-' }}</td>
+        <td>{{ rowData.horaSalida ? (rowData.horaSalida.substring(0,5)) : '-' }}</td>
+
+      
+
+      <!-- 📍 Datos de transporte -->
+      <td>{{ rowData.destino }}</td>
+      <td>{{ rowData.razonSocial }}</td>
+      <td>{{ rowData.numCp }}</td>
+
+      <!-- ⚖️ Pesos y bultos -->
+      <td>{{ rowData.peso | number: '1.0-2' }}</td>
+      <td style="text-align:center;">{{ rowData.bulto }}</td>
+      <td style="text-align:center;">{{ rowData.pesoReal ? (rowData.pesoReal | number:'1.0-2') : '-' }}</td>
+      <td style="text-align:center;">{{ rowData.bultoReal ?? '-' }}</td>
+
+      <!-- 📅 Fechas -->
+      
+    </tr>
+  </ng-template>
+</p-table>
+
                         
                 </div>
             </div>

@@ -147,7 +147,6 @@ export class VistamanifiestoLocalComponent {
         this.router.navigate(['/seguimiento/verorden', idordentrabajo]);
     }
 
-    crearcarga() {}
     verEventos(id) {
         this.traficoService.ListarOrdenesTransporte(id).subscribe((x) => {
             console.log(x);
@@ -169,8 +168,15 @@ export class VistamanifiestoLocalComponent {
                 this.model.placa = this.despachos[0].placa;
             });
     }
+    crearOT(rowData: any): void {
+    console.log('🟢 Redirigiendo a creación de OT:', rowData);
+
+    // Redirige a la ruta deseada
+    this.router.navigate(['/seguimientoot/crearot']);
+  }
 
     cambiarEstado() {
+
         if (!this.selectedOTs || !this.selectedOTs.idordentrabajo) {
           this.messageService.add({
             severity: 'warn',
@@ -181,7 +187,6 @@ export class VistamanifiestoLocalComponent {
         }
 
 
-        alert(this.selectedOTs.idordentrabajo);
 
         
         const ids = this.selectedOTs.idordentrabajo.toString();
