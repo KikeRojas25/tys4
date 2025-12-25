@@ -93,4 +93,190 @@ select.ng-invalid.ng-touched {
   font-size: 12px;
     padding: 0.55625rem 0.62375rem !important;
 }
+
+/* Reducir tamaño de texto en elementos emergentes */
+/* Dropdowns */
+::ng-deep .p-dropdown,
+::ng-deep .p-dropdown .p-inputtext,
+::ng-deep .p-dropdown-panel {
+  font-size: 0.75rem !important; /* text-xs (12px) */
+}
+
+
+/* Reducir específicamente los items del dropdown - más compactos y mismo tamaño que el control */
+/* Usar selectores más específicos con mayor prioridad */
+::ng-deep body .p-dropdown-panel .p-dropdown-items .p-dropdown-item,
+::ng-deep body .p-dropdown-items .p-dropdown-item,
+::ng-deep body .p-dropdown-item,
+::ng-deep .p-dropdown-panel .p-dropdown-items-wrapper .p-dropdown-items .p-dropdown-item {
+  font-size: 0.75rem !important; /* Mismo tamaño que el control (12px) */
+  padding: 0.375rem 0.5rem !important; /* Padding ajustado */
+  line-height: 1.25rem !important;
+  min-height: 2rem !important;
+}
+
+/* Reducir también el texto dentro de los items - mismo tamaño que el control */
+::ng-deep body .p-dropdown-panel .p-dropdown-items .p-dropdown-item span,
+::ng-deep body .p-dropdown-items .p-dropdown-item span,
+::ng-deep body .p-dropdown-item span,
+::ng-deep .p-dropdown-panel .p-dropdown-items-wrapper .p-dropdown-items .p-dropdown-item span,
+::ng-deep .p-dropdown-panel .p-dropdown-items .p-dropdown-item * {
+  font-size: 0.75rem !important; /* Mismo tamaño que el control (12px) */
+  line-height: 1.25rem !important;
+}
+
+/* Forzar el tamaño en todos los elementos dentro del item */
+::ng-deep .p-dropdown-panel .p-dropdown-items .p-dropdown-item * {
+  font-size: 0.75rem !important;
+}
+
+::ng-deep .p-dropdown-panel .p-dropdown-header {
+  font-size: 0.75rem !important;
+  padding: 0.5rem !important;
+}
+
+::ng-deep .p-dropdown-panel .p-dropdown-filter-container .p-inputtext {
+  font-size: 0.75rem !important;
+  padding: 0.375rem 0.5rem !important;
+}
+
+
+
+
+/* Calendarios */
+::ng-deep .p-calendar .p-inputtext,
+::ng-deep .p-datepicker,
+::ng-deep .p-datepicker table td > span,
+::ng-deep .p-datepicker .p-datepicker-header {
+  font-size: 0.75rem !important; /* text-xs (12px) */
+}
+
+::ng-deep .p-datepicker table td {
+  padding: 0.25rem !important;
+}
+
+::ng-deep .p-datepicker .p-datepicker-header .p-datepicker-title {
+  font-size: 0.75rem !important;
+}
+
+::ng-deep .p-datepicker .p-timepicker {
+  font-size: 0.75rem !important;
+}
+
+::ng-deep .p-datepicker .p-timepicker span {
+  font-size: 0.75rem !important;
+}
+
+/* Overlay panels y otros elementos emergentes */
+::ng-deep .p-overlaypanel,
+::ng-deep .p-overlaypanel .p-overlaypanel-content {
+  font-size: 0.75rem !important;
+}
+
+/* Menús y context menus */
+::ng-deep .p-menu,
+::ng-deep .p-menu .p-menuitem-link,
+::ng-deep .p-contextmenu,
+::ng-deep .p-contextmenu .p-menuitem-link {
+  font-size: 0.75rem !important;
+}
+
+/* Dialogs */
+::ng-deep .p-dialog .p-dialog-header,
+::ng-deep .p-dialog .p-dialog-content {
+  font-size: 0.75rem !important;
+}
+
+::ng-deep .p-dialog .p-dialog-title {
+  font-size: 0.875rem !important; /* ligeramente más grande para el título */
+}
+
+/* Autocomplete */
+::ng-deep .p-autocomplete-panel,
+::ng-deep .p-autocomplete-panel .p-autocomplete-items .p-autocomplete-item {
+  font-size: 0.75rem !important;
+}
+
+/* MultiSelect */
+::ng-deep .p-multiselect-panel,
+::ng-deep .p-multiselect-panel .p-multiselect-items .p-multiselect-item {
+  font-size: 0.75rem !important;
+}
+
+/* Tooltips */
+::ng-deep .p-tooltip {
+  font-size: 0.6875rem !important; /* aún más pequeño para tooltips */
+}
+
+/* ============================================
+   Reducir espacio del breadcrumb/header 
+   en todas las páginas de forma general
+   Header más compacto
+   ============================================ */
+
+/* Reducir padding del contenedor principal del header con breadcrumb */
+/* Aplica a divs que tienen las clases p-6 sm:py-8 sm:px-10 */
+div[class*="p-6"][class*="sm:py-8"],
+div[class*="p-6"][class*="sm:px-10"] {
+  padding: 0.5rem 0.75rem !important; /* Reducido a p-2 px-3 (8px/12px) - más compacto */
+}
+
+@media (min-width: 640px) {
+  div[class*="p-6"][class*="sm:py-8"],
+  div[class*="p-6"][class*="sm:px-10"] {
+    padding-top: 0.5rem !important; /* Reducido a py-2 (8px) - más compacto */
+    padding-bottom: 1.5rem !important;
+    padding-left: 0.75rem !important; /* Reducido a px-3 (12px) - más compacto */
+    padding-right: 0.75rem !important;
+  }
+}
+
+/* Reducir espacio entre breadcrumb y título */
+.flex-1 > div.mt-2,
+.flex-1 > div[class*="mt-2"] {
+  margin-top: 0.9rem !important; /* Reducido a mt-0.5 (2px) - más compacto */
+}
+
+/* Reducir tamaño y espacio del breadcrumb - más compacto */
+.flex.flex-wrap.items-center[class*="font-medium"],
+nav[class*="flex"][class*="items-center"] {
+  font-size: 0.6875rem !important; /* text-xs más pequeño (11px) */
+  margin-bottom: 0.225rem !important; /* mb-0.5 (2px) */
+  line-height: 0.875rem !important; /* line-height más compacto */
+}
+
+/* Reducir tamaño del título principal - más compacto */
+h2[class*="text-3xl"],
+h2[class*="text-4xl"],
+h2.text-3xl,
+h2.text-4xl {
+  font-size: 1.25rem !important; /* text-xl (20px) en lugar de text-2xl - más compacto */
+  line-height: 1.5rem !important; /* line-height más compacto */
+  margin-top: 0.925rem !important; /* mt-0.5 (2px) */
+  margin-bottom: 0 !important; /* Sin margen inferior */
+}
+
+@media (min-width: 768px) {
+  h2[class*="text-3xl"][class*="md:text-4xl"],
+  h2.text-3xl.md\:text-4xl,
+  h2[class*="md:text-4xl"] {
+    font-size: 1.5rem !important; /* text-2xl (24px) en lugar de text-3xl - más compacto */
+    line-height: 1.75rem !important; /* line-height más compacto */
+  }
+}
+
+/* Reducir espacio del subtítulo/descripción - más compacto */
+p.text-sm[class*="mt-"],
+p[class*="text-sm"][class*="mt-"] {
+  margin-top: 1.125rem !important; /* mt-0.5 (2px) - más compacto */
+  margin-bottom: 0 !important; /* Sin margen inferior */
+  font-size: 0.6875rem !important; /* text-xs más pequeño (11px) */
+  line-height: 0.875rem !important; /* line-height más compacto */
+}
+
+/* Reducir espacio general del contenedor flex-1 */
+.flex-1.min-w-0 {
+  padding-top: 0 !important;
+  padding-bottom: 0 !important;
+}
     

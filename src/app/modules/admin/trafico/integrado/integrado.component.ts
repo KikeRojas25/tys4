@@ -35,9 +35,11 @@ export class IntegradoComponent implements OnInit {
 
     cols: any[];
     cols2: any[];
+    cols3: any[];
 
     ordenes: any[];
     ordenes2: any[];
+    ordenes3: any[];
     user: User;
 
     model: any = {};
@@ -98,6 +100,32 @@ export class IntegradoComponent implements OnInit {
             { header: 'MANIFIESTOS', field: 'observadas', width: '80px' }, // 👈 Nueva columna
         ];
 
+
+          this.cols3 = [
+            { header: 'ACCIONES', field: 'acciones', width: '6px' },
+            { header: 'ESTACIÓN', field: 'departamento', width: '100px' },
+            
+            { header: '#OTS', field: 'cantidad', width: '60px' },
+            { header: 'PESO', field: 'peso', width: '60px' },
+            { header: 'BULTOS', field: 'bulto', width: '60px' },
+
+            { header: '#OTS', field: 'cantidad', width: '60px' },
+            { header: 'PESO', field: 'peso', width: '60px' },
+            { header: 'BULTOS', field: 'bulto', width: '60px' },
+
+            { header: '#OTS', field: 'cantidad', width: '60px' },
+            { header: 'PESO', field: 'peso', width: '60px' },
+            { header: 'BULTOS', field: 'bulto', width: '60px' },
+
+            { header: '#OTS', field: 'cantidad', width: '60px' },
+            { header: '#OTS', field: 'cantidad', width: '60px' },
+
+            { header: 'OTS', field: 'observadas', width: '80px' }, // 👈 Nueva columna
+            { header: 'MANIFIESTOS', field: 'observadas', width: '80px' }, // 👈 Nueva columna
+        ];
+
+
+
         this.reload();
     }
     reload() {
@@ -112,6 +140,13 @@ export class IntegradoComponent implements OnInit {
             .VerDespachosxDepartamentoxProveedor(this.model)
             .subscribe((list) => {
                 this.ordenes2 = list;
+            });
+
+
+             this.traficoService
+            .VerDespachosxDepartamentoxEstacion(this.model)
+            .subscribe((list) => {
+                this.ordenes3 = list;
             });
     }
 

@@ -1,0 +1,77 @@
+/* Estilos profesionales para las tablas */
+::ng-deep .custom-table {
+  border-collapse: separate;
+  border-spacing: 0;
+}
+
+::ng-deep .custom-table .p-datatable-thead > tr > th {
+  border: none;
+  background: transparent;
+}
+
+::ng-deep .custom-table .p-datatable-tbody > tr {
+  border-bottom: 1px solid #e5e7eb;
+}
+
+::ng-deep .custom-table .p-datatable-tbody > tr:last-child {
+  border-bottom: none;
+}
+
+::ng-deep .custom-table .p-datatable-tbody > tr.p-highlight {
+  background-color: #f3f4f6;
+}
+
+::ng-deep .custom-table .p-paginator {
+  background: transparent;
+  border: none;
+  padding: 1rem 0;
+}
+
+::ng-deep .custom-table .p-paginator .p-paginator-pages .p-paginator-page {
+  border-radius: 0.375rem;
+  margin: 0 0.125rem;
+}
+
+::ng-deep .custom-table .p-paginator .p-paginator-pages .p-paginator-page.p-highlight {
+  background-color: #374151;
+  color: white;
+}
+
+/* Mejoras en los inputs */
+::ng-deep .p-inputtext {
+  border-radius: 0.375rem;
+  border: 1px solid #d1d5db;
+  padding: 0.5rem 0.75rem;
+  font-size: 0.875rem;
+  transition: all 0.15s ease-in-out;
+}
+
+::ng-deep .p-inputtext:focus {
+  outline: none;
+  border-color: #f59e0b;
+  box-shadow: 0 0 0 3px rgba(245, 158, 11, 0.1);
+}
+
+/* Estilos para botones más profesionales */
+::ng-deep .p-button {
+  border-radius: 0.375rem;
+  font-weight: 500;
+  transition: all 0.15s ease-in-out;
+}
+
+::ng-deep .p-button:not(.p-button-icon-only) {
+  padding: 0.5rem 1rem;
+}
+
+/* Mejoras en las tarjetas */
+.card {
+  box-shadow: 0 1px 3px 0 rgba(0, 0, 0, 0.1), 0 1px 2px 0 rgba(0, 0, 0, 0.06);
+}
+
+/* Transiciones suaves */
+* {
+  transition-property: background-color, border-color, color, fill, stroke, opacity, box-shadow, transform;
+  transition-timing-function: cubic-bezier(0.4, 0, 0.2, 1);
+  transition-duration: 150ms;
+}
+

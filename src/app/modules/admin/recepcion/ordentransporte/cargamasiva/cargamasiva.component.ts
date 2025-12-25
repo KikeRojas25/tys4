@@ -15,6 +15,7 @@ import { FileUpload, FileUploadModule } from 'primeng/fileupload';
 import { OrdenTransporteService } from '../ordentransporte.service';
 import { User } from 'app/core/user/user.types';
 import { ConfirmDialogModule } from 'primeng/confirmdialog';
+import { BadgeModule } from 'primeng/badge';
 import { Router } from '@angular/router';
 
 @Component({
@@ -35,7 +36,8 @@ import { Router } from '@angular/router';
     FileUploadModule ,
     ToastModule ,
     ProgressBarModule,
-    ConfirmDialogModule
+    ConfirmDialogModule,
+    BadgeModule
   ],
   providers: [
     ConfirmationService,
@@ -88,6 +90,10 @@ export class CargamasivaComponent implements OnInit {
   fileUploadProgress: string = null;
   uploadedFilePath: string = null;
   user: User;
+  
+  // Variables para manejo de errores
+  errorMessage: string = null;
+  showError: boolean = false;
 
 
   constructor(private ordenTransporteService: OrdenTransporteService,
@@ -153,9 +159,12 @@ export class CargamasivaComponent implements OnInit {
       this.ordenTransporteService.uploadFile( file, this.user.id , this.model.idcliente).subscribe({
         next: (response) => {
           this.messageService.add({ severity: 'info', summary: 'Success', detail: 'File Uploaded', life: 3000 });
+          this.hideError();
         },
         error: (error) => {
           console.error('Error al cargar el archivo', error);
+          const errorMsg = this.extractErrorMessage(error);
+          this.showErrorMessage(errorMsg);
         },
       });
     }
@@ -206,6 +215,11 @@ uploadSelectedFiles() {
     return;
   }
 
+  if (!this.model.idcliente) {
+    this.showErrorMessage('Por favor, seleccione un cliente antes de subir los archivos.');
+    return;
+  }
+
   for (const file of this.files) {
     this.ordenTransporteService.uploadFile(file, this.user.id , this.model.idcliente).subscribe(resp => {
      
@@ -227,7 +241,7 @@ uploadSelectedFiles() {
           this.btnprocesar = true;
         }
   
-
+        this.hideError();
         this.messageService.add({
           severity: 'info',
           summary: 'Exitoso',
@@ -239,6 +253,8 @@ uploadSelectedFiles() {
 
       }, error => {
         console.error('Error downloading the file', error);
+        const errorMsg = this.extractErrorMessage(error);
+        this.showErrorMessage(errorMsg);
       });
 
       
@@ -259,6 +275,7 @@ uploadSelectedFiles() {
 
         this.ordenTransporteService.procesarCargaMasiva(this.idcarga ).subscribe(resp => {
 
+          this.hideError();
           this.messageService.add({
             severity: 'info',
             summary: 'Exitoso',
@@ -270,9 +287,9 @@ uploadSelectedFiles() {
 
 
        }, error => {
-
-
-
+        console.error('Error al procesar la carga', error);
+        const errorMsg = this.extractErrorMessage(error);
+        this.showErrorMessage(errorMsg);
         this.divvisible = false;
 
 
@@ -289,5 +306,63 @@ uploadSelectedFiles() {
 
       }
   });
+  }
+
+  // Métodos para manejo de errores
+  showErrorMessage(message: string) {
+    this.errorMessage = message;
+    this.showError = true;
+  }
+
+  hideError() {
+    this.errorMessage = null;
+    this.showError = false;
+  }
+
+  // Método para extraer el mensaje de error del JSON de respuesta
+  extractErrorMessage(error: any): string {
+    // Si el error es una cadena de texto
+    if (typeof error === 'string') {
+      return error;
+    }
+
+    // Si error.error existe (objeto de respuesta HTTP)
+    if (error?.error) {
+      // Buscar en diferentes propiedades comunes del JSON de error
+      if (typeof error.error === 'string') {
+        return error.error;
+      }
+      
+      if (error.error?.error) {
+        return error.error.error;
+      }
+      
+      if (error.error?.message) {
+        return error.error.message;
+      }
+      
+      if (error.error?.mensaje) {
+        return error.error.mensaje;
+      }
+      
+      // Si error.error es un objeto, intentar obtener el primer valor de string
+      if (typeof error.error === 'object') {
+        const errorObj = error.error;
+        // Buscar propiedades comunes que contengan el mensaje
+        for (const key in errorObj) {
+          if (typeof errorObj[key] === 'string' && errorObj[key].length > 0) {
+            return errorObj[key];
+          }
+        }
+      }
+    }
+
+    // Si error.message existe
+    if (error?.message) {
+      return error.message;
+    }
+
+    // Mensaje por defecto
+    return 'Error inesperado. Por favor, intente nuevamente.';
   }
 }

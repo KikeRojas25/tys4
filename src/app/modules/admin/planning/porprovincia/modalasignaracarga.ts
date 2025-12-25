@@ -77,7 +77,7 @@ export class ModalAsignaraCargaComponent  implements OnInit {
       this.user = JSON.parse(localStorage.getItem('user'));
 
 
-      this.ordenService.GetAllCargasTemporal(1).subscribe(resp => {
+      this.ordenService.GetAllCargasTemporal(1, this.user.idestacionorigen).subscribe(resp => {
 
         console.log( resp, 'aca' );
         resp.forEach(element => {

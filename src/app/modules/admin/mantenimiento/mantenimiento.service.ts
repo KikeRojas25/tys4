@@ -3,8 +3,9 @@ import { inject, Injectable } from '@angular/core';
 import { JwtHelperService } from '@auth0/angular-jwt';
 import { environment } from 'environments/environment';
 import { catchError, map, Observable, throwError } from 'rxjs';
-import { Chofer, InsertarPrecintoRequest, InsertarPrecintoResponse, Precinto, Proveedor, Provincia } from './mantenimiento.types';
-import { Cliente, ValorTabla } from '../recepcion/ordentransporte/ordentransporte.types';
+import { Chofer, Departamento, Distrito, Estacion, InsertarPrecintoRequest, InsertarPrecintoResponse, Precinto, Proveedor, Provincia } from './mantenimiento.types';
+import { Cliente, Ubigeo, ValorTabla, ClienteDetalleResult } from '../recepcion/ordentransporte/ordentransporte.types';
+import { Tarifa } from './tarifa/tarifa.types';
 
 
 
@@ -24,6 +25,7 @@ export class MantenimientoService {
   public jwtHelper = new JwtHelperService();
   private baseUrl = environment.baseUrl + '/api/Mantenimiento/';
   private baseUrlCliente = environment.baseUrl + '/api/Cliente/';
+    private baseUrlTarifa = environment.baseUrl + '/api/tarifa/';
 
 constructor() { }
 
@@ -36,6 +38,10 @@ getValorTabla(TablaId: number): Observable<ValorTabla[]> {
 get(idcliente : number) : Observable<Cliente> {
   return this._httpClient.get<Cliente>(this.baseUrlCliente +"Get?id=" + idcliente  ,httpOptions)
   };
+
+getClienteDetalle(idCliente: number): Observable<ClienteDetalleResult> {
+  return this._httpClient.get<ClienteDetalleResult>(`${this.baseUrlCliente}GetCliente?id=${idCliente}`, httpOptions);
+}
 
 getAllClientes(criterio: string, usuarioid : number) : Observable<Cliente[]> {
   return this._httpClient.get<Cliente[]>(this.baseUrlCliente +"GetAllClientes?criterio="+ criterio+"&UsuarioId=" + usuarioid  ,httpOptions)
@@ -137,5 +143,117 @@ editar_chofer(model: any) {
 
   getProvincias(): Observable<Provincia[]> {
     return this._httpClient.get<Provincia[]>(`${this.baseUrl}GetProvincias`, httpOptions);
+  }
+
+  getDepartamentos(): Observable<Departamento[]> {
+    return this._httpClient.get<Departamento[]>(`${this.baseUrl}GetDepartamentos`, httpOptions);
+  }
+
+  getProvinciasByDepartamento(iddepartamento: number): Observable<Provincia[]> {
+    return this._httpClient.get<Provincia[]>(`${this.baseUrl}GetProvinciasByDepartamento/${iddepartamento}`, httpOptions);
+  }
+
+  getDistritosByProvincia(idprovincia: number): Observable<Distrito[]> {
+    return this._httpClient.get<Distrito[]>(`${this.baseUrl}GetDistritosByProvincia/${idprovincia}`, httpOptions);
+  }
+
+  // Métodos para Estaciones
+  getAllEstaciones(criterio: string): Observable<Estacion[]> {
+    return this._httpClient.get<Estacion[]>(this.baseUrl + 'GetAllEstaciones?criterio=' + criterio, httpOptions);
+  }
+
+  getEstacionById(id: number): Observable<Estacion> {
+    return this._httpClient.get<Estacion>(this.baseUrl + 'GetEstacion/' + id, httpOptions);
+  }
+
+  registrarEstacion(model: any): Observable<any> {
+    return this._httpClient.post(this.baseUrl + 'RegistrarEstacion', model, httpOptions)
+      .pipe(map((response: any) => {
+        return response;
+      }));
+  }
+
+  actualizarEstacion(id: number, model: any): Observable<any> {
+    return this._httpClient.put(this.baseUrl + 'EstacionUpdate?id=' + id, model, httpOptions)
+      .pipe(map((response: any) => {
+        return response;
+      }));
+  }
+
+  eliminarEstacion(id: number): Observable<any> {
+    return this._httpClient.delete(this.baseUrl + 'EliminarEstacion/' + id, httpOptions)
+      .pipe(map((response: any) => {
+        return response;
+      }));
+  }
+
+  inhabilitarEstacion(id: number): Observable<any> {
+    return this._httpClient.put(this.baseUrl + 'EstacionInhabilitar?id=' + id, {}, httpOptions)
+      .pipe(map((response: any) => {
+        return response;
+      }));
+  }
+
+  getUbigeo(criterio: string): Observable<Ubigeo[]> {
+    return this._httpClient.get<Ubigeo[]>(this.baseUrl + 'GetListUbigeo?criterio=' + criterio, httpOptions);
+  }
+
+
+
+
+  obtenerTarifasPorCliente(
+    idCliente: number,
+    idorigendepartamento?: number,
+    idorigenprovincia?: number,
+    idorigendistrito?: number,
+    iddepartamentodestino?: number,
+    idprovinciadestino?: number,
+    iddistritodestino?: number,
+    idtipotransporte?: number
+  ): Observable<Tarifa[]> {
+    let params = new HttpParams();
+    if (idorigendepartamento) params = params.set('idorigendepartamento', idorigendepartamento.toString());
+    if (idorigenprovincia) params = params.set('idorigenprovincia', idorigenprovincia.toString());
+    if (idorigendistrito) params = params.set('idorigendistrito', idorigendistrito.toString());
+    if (iddepartamentodestino) params = params.set('iddepartamentodestino', iddepartamentodestino.toString());
+    if (idprovinciadestino) params = params.set('idprovinciadestino', idprovinciadestino.toString());
+    if (iddistritodestino) params = params.set('iddistritodestino', iddistritodestino.toString());
+    if (idtipotransporte) params = params.set('idtipotransporte', idtipotransporte.toString());
+    
+    return this._httpClient.get<Tarifa[]>(`${this.baseUrlTarifa}cliente/${idCliente}/filtrado`, {
+      headers: httpOptions.headers,
+      params: params
+    });
+  }
+
+  obtenerTarifaPorId(idTarifa: number): Observable<Tarifa> {
+    return this._httpClient.get<Tarifa>(`${this.baseUrlTarifa}/${idTarifa}`, httpOptions);
+  }
+
+  obtenerTarifasMismoOrigenDestino(idTarifa: number): Observable<Tarifa[]> {
+    return this._httpClient.get<Tarifa[]>(`${this.baseUrlTarifa}${idTarifa}/mismo-origen-destino`, httpOptions);
+  }
+
+  crearTarifa(tarifa: Tarifa): Observable<Tarifa> {
+    return this._httpClient.post<Tarifa>(this.baseUrlTarifa, tarifa, httpOptions);
+  }
+
+  actualizarTarifa(idTarifa: number, tarifa: Tarifa): Observable<Tarifa> {
+    return this._httpClient.put<Tarifa>(`${this.baseUrlTarifa}${idTarifa}`, tarifa, httpOptions);
+  }
+
+  eliminarTarifa(idTarifa: number): Observable<void> {
+    return this._httpClient.delete<void>(`${this.baseUrlTarifa}/${idTarifa}`, httpOptions);
+  }
+
+  copiarTarifas(idClienteOrigen: number, idClienteDestino: number): Observable<void> {
+    return this._httpClient.post<void>(`${this.baseUrlTarifa}/copiar`, {
+      idClienteOrigen,
+      idClienteDestino
+    }, httpOptions);
+  }
+
+  getFormulas(): Observable<any[]> {
+    return this._httpClient.get<any[]>(`${this.baseUrl}GetFormulas`, httpOptions);
   }
 }

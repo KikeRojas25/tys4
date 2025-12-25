@@ -1,0 +1,4 @@
+:host ::ng-deep .p-datatable-tfoot > tr {
+  background-color: #e8f0fe !important;
+  font-weight: 600;
+}

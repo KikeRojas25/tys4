@@ -112,6 +112,11 @@ getAllOrder(model: any) {
     .set('idusuario', model.idusuario.toString())
     .set('tipoorden', model.tipoorden.toString());
 
+  // Agregar idtipoentrega si existe
+  if (model.idsubestado !== null && model.idsubestado !== undefined) {
+    params = params.set('idsubestado', model.idsubestado.toString());
+  }
+
     return this._httpClient.get<OrdenTransporte[]>(`${this.baseUrlOrden}GetAllOrder`, { params, ...httpOptions })
     .pipe(
       // Manejo de errores
@@ -122,8 +127,15 @@ getAllOrder(model: any) {
 getEventos(idordentransporte:number): Observable<any[]> {
   return this._httpClient.get<any[]>(`${this.baseUrlOrden}getAllEventosxOt?idOrden=${idordentransporte}`,httpOptions );
 }
-GetAllCargasTemporal (tipo: number) {
-  return this._httpClient.get<OperacionCarga[]>(this.baseUrlOrden + 'GetAllCargasTemporal?tipooperacioncarga=' + tipo   , httpOptions);
+GetAllCargasTemporal(tipo: number, idestacion: number) {
+  const params = new HttpParams()
+    .set('tipooperacioncarga', tipo.toString())
+    .set('idestacion', idestacion.toString());
+
+  return this._httpClient.get<OperacionCarga[]>(
+    `${this.baseUrlOrden}GetAllCargasTemporal`,
+    { params, ...httpOptions }
+  );
 }
 GetAllOrdersCargasTemporal (id: number){
   return this._httpClient.get<OrdenTransporte[]>(this.baseUrlOrden + 'GetAllOrdersCargasTemporal?idcarga=' + id   , httpOptions);
@@ -226,10 +238,10 @@ GetAllOrdersDetailDistrito(idestacionorigen: number, model: any) {
   return this._httpClient.get<OrdenTransporte[]>(this.baseUrlOrden + 'GetAllOrdersDetailDistrito?idestacionorigen=' + idestacionorigen + '&iddistrito=' + model.id
  + '&fecini=' + model.fechainicio + '&fecfin=' + model.fechafin , httpOptions);
 }
-GetAllCargasTemporalTrafico (tipo: number) {
-  return this._httpClient.get<OperacionCarga[]>(this.baseUrlOrden + 'GetAllCargasTemporalTrafico?tipooperacioncarga=' + tipo   , httpOptions);
+GetAllCargasTemporalTrafico(tipo: number, idEstacion: number) {
+  const url = `${this.baseUrlOrden}GetAllCargasTemporalTrafico?tipoOperacionCarga=${tipo}&idestacion=${idEstacion}`;
+  return this._httpClient.get<OperacionCarga[]>(url, httpOptions);
 }
-
 calcularPrecio(model: any): Observable<OrdenTransporte> {
   return this._httpClient.post<OrdenTransporte>(`${this.baseUrlOrden}calcularPrecio`, model, httpOptions);
 }
@@ -295,6 +307,11 @@ uploadFileSite(formData: FormData, orden_id: number) {
  getAllDocumentos(id: number): Observable<Documento[]> {
   const params = '?Id=' + id ;
   return this._httpClient.get<Documento[]>(this.baseUrlOrden + 'getAllDocumentos' + params, httpOptions);
+}
+
+deleteFotos(idOrdenTrabajo: number): Observable<any> {
+  const params = new HttpParams().set('idOrdenTrabajo', idOrdenTrabajo.toString());
+  return this._httpClient.delete<any>(this.baseUrlOrden + 'DeleteFotos', { params, ...httpOptions });
 }
 
 AsignarOtsCarga(idprovincia: string, idcarga: number) {

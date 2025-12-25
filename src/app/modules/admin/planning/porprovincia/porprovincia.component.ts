@@ -169,6 +169,8 @@ ngOnInit() {
   {header: 'Planificador', field: 'planificador'  ,  width: '90px'  },
   {header: 'Estado', field: 'estado'  ,  width: '90px'  },
   {header: 'Fecha de Registro', field: 'fecharegistro'  ,  width: '70px'  },
+  {header: 'Placa', field: 'placa'  ,  width: '70px'  },
+  {header: 'Último Destino', field: 'ultimoDestino'  ,  width: '100px'  },
   {header: 'Peso', field: 'peso'  ,  width: '30px'  },
   {header: 'Volumen', field: 'volumen'  ,  width: '60px'  },
   {header: 'SubTotal', field: 'subtotal'  ,  width: '60px'  },
@@ -245,6 +247,14 @@ eliminarDespacho(idcarga: number) {
 
 }
 
+
+agregarEtapa(despacho: any) {
+  console.log('Agregar etapa para despacho:', despacho);
+  // Redirigir a la ventana de gestión de etapas con el idcarga del despacho seleccionado
+  this.router.navigate(['/planning/despachos-generados'], {
+    queryParams: { idcarga: despacho.idcarga }
+  });
+}
 
 verOT(idordentrabajo: number){
 
@@ -328,7 +338,7 @@ agregaracarga() {
     });
 
 
-    this.ordenService.GetAllCargasTemporal(1).subscribe(list1 => {
+    this.ordenService.GetAllCargasTemporal(1,     this.model.idestacionorigen ).subscribe(list1 => {
 
        this.despachos = list1;
 

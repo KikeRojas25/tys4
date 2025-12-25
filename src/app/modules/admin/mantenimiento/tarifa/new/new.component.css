@@ -1,0 +1,201 @@
+/* Estilos del formulario de tarifa */
+
+/* Inputs */
+::ng-deep .p-inputtext {
+  border-radius: 0.375rem;
+  border: 1px solid #d1d5db;
+  padding: 0.5rem 0.75rem;
+  font-size: 0.875rem;
+  transition: all 0.15s ease-in-out;
+}
+
+::ng-deep .p-inputtext:focus {
+  outline: none;
+  border-color: #f59e0b;
+  box-shadow: 0 0 0 3px rgba(245, 158, 11, 0.1);
+}
+
+::ng-deep .p-inputtext:disabled {
+  background-color: #f3f4f6;
+  cursor: not-allowed;
+}
+
+/* Dropdowns */
+::ng-deep .p-dropdown {
+  border-radius: 0.375rem;
+  border: 1px solid #d1d5db;
+  transition: all 0.15s ease-in-out;
+}
+
+::ng-deep .p-dropdown:not(.p-disabled):hover {
+  border-color: #9ca3af;
+}
+
+::ng-deep .p-dropdown:not(.p-disabled).p-focus {
+  outline: none;
+  border-color: #f59e0b;
+  box-shadow: 0 0 0 3px rgba(245, 158, 11, 0.1);
+}
+
+::ng-deep .p-dropdown-item {
+  cursor: pointer !important;
+  font-weight: 400 !important;
+  font-size: 12px !important;
+  white-space: nowrap !important;
+  position: relative !important;
+  overflow: hidden !important;
+}
+
+::ng-deep .p-dropdown.p-disabled {
+  opacity: 0.6;
+  background-color: #f3f4f6;
+}
+
+/* Botones */
+::ng-deep .p-button {
+  border-radius: 0.375rem;
+  font-weight: 500;
+  transition: all 0.15s ease-in-out;
+}
+
+::ng-deep .p-button:not(.p-button-icon-only) {
+  padding: 0.5rem 1rem;
+}
+
+/* Tabla de rangos */
+::ng-deep .custom-table {
+  border-collapse: separate;
+  border-spacing: 0;
+}
+
+::ng-deep .custom-table .p-datatable-thead > tr > th {
+  border: none;
+  background-color: #374151 !important;
+  color: #ffffff !important;
+  font-size: 0.875rem;
+  font-weight: 600;
+  padding: 0.75rem;
+}
+
+::ng-deep .custom-table .p-datatable-tbody > tr {
+  border-bottom: 1px solid #e5e7eb;
+}
+
+::ng-deep .custom-table .p-datatable-tbody > tr:hover {
+  background-color: #f9fafb;
+}
+
+::ng-deep .custom-table .p-datatable-tbody > tr:last-child {
+  border-bottom: none;
+}
+
+/* Inputs en la tabla */
+::ng-deep .custom-table input[type="number"] {
+  text-align: right;
+}
+
+/* Botones de acción compactos */
+.action-btn {
+  width: 28px !important;
+  height: 28px !important;
+  padding: 0 !important;
+  border-radius: 0.25rem !important;
+  display: flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+  font-size: 0.75rem !important;
+  transition: all 0.15s ease-in-out !important;
+  border: none !important;
+}
+
+.action-btn-danger {
+  background-color: #ef4444 !important;
+  color: white !important;
+}
+
+.action-btn-danger:hover {
+  background-color: #dc2626 !important;
+  transform: scale(1.05);
+}
+
+.action-btn-primary {
+  background-color: #3b82f6 !important;
+  color: white !important;
+}
+
+.action-btn-primary:hover {
+  background-color: #2563eb !important;
+  transform: scale(1.05);
+}
+
+.action-btn-success {
+  background-color: #10b981 !important;
+  color: white !important;
+}
+
+.action-btn-success:hover {
+  background-color: #059669 !important;
+  transform: scale(1.05);
+}
+
+.action-btn-secondary {
+  background-color: #6b7280 !important;
+  color: white !important;
+}
+
+.action-btn-secondary:hover {
+  background-color: #4b5563 !important;
+  transform: scale(1.05);
+}
+
+/* Ajustar iconos dentro de los botones */
+.action-btn .p-button-icon {
+  font-size: 0.75rem !important;
+  margin: 0 !important;
+}
+
+/* Labels */
+label {
+  display: block;
+  margin-bottom: 0.25rem;
+  font-size: 0.875rem;
+  font-weight: 500;
+  color: #374151;
+}
+
+/* Secciones */
+h3 mat-icon {
+  font-size: 1.25rem;
+  width: 1.25rem;
+  height: 1.25rem;
+}
+
+/* Transiciones suaves */
+* {
+  transition-property: background-color, border-color, color, fill, stroke, opacity, box-shadow, transform;
+  transition-timing-function: cubic-bezier(0.4, 0, 0.2, 1);
+  transition-duration: 150ms;
+}
+
+/* Scroll en tabla */
+::ng-deep .p-datatable-scrollable-body {
+  overflow-y: auto !important;
+}
+
+::ng-deep .p-datatable-scrollable-body::-webkit-scrollbar {
+  width: 8px;
+}
+
+::ng-deep .p-datatable-scrollable-body::-webkit-scrollbar-track {
+  background: #f1f1f1;
+}
+
+::ng-deep .p-datatable-scrollable-body::-webkit-scrollbar-thumb {
+  background: #888;
+  border-radius: 4px;
+}
+
+::ng-deep .p-datatable-scrollable-body::-webkit-scrollbar-thumb:hover {
+  background: #555;
+}
+

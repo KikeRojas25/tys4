@@ -1,31 +1,42 @@
-<div class="flex flex-col flex-auto min-w-0 bg-card">
-  <div class="flex flex-col sm:flex-row flex-0 sm:items-center sm:justify-between p-6 sm:py-8 sm:px-10 border-b bg-card dark:bg-transparent">
+<div class="flex flex-col flex-auto min-w-0 bg-gray-50">
+  <!-- Header -->
+  <div class="flex flex-col sm:flex-row flex-0 sm:items-center sm:justify-between p-2 sm:py-8 sm:px-10 border-b border-gray-200 bg-white shadow-sm">
     <div class="flex-1 min-w-0">
-      <div class="flex flex-wrap items-center font-medium">
+      <div class="flex flex-wrap items-center font-medium text-sm text-gray-600">
         <div>
-          <a class="whitespace-nowrap text-primary-500">TMS</a>
+          <a class="whitespace-nowrap text-gray-700 hover:text-gray-900">TMS</a>
         </div>
         <div class="flex items-center ml-1 whitespace-nowrap">
-          <mat-icon class="fuse-horizontal-navigation-item-icon" [svgIcon]="'heroicons_solid:chevron-right'"></mat-icon>
-          <a class="ml-1 text-primary-500">Recepción</a>
+          <mat-icon class="fuse-horizontal-navigation-item-icon text-gray-400" [svgIcon]="'heroicons_solid:chevron-right'"></mat-icon>
+          <a class="ml-1 text-gray-700 hover:text-gray-900">Recepción</a>
         </div>
       </div>
       <div class="mt-2">
-        <h2 class="text-3xl md:text-4xl font-extrabold tracking-tight leading-7 sm:leading-10 truncate">Seguimiento de Orden de Transporte</h2>
+        <h2 class="text-3xl md:text-4xl font-semibold tracking-tight leading-7 sm:leading-10 truncate text-gray-900">Seguimiento de Orden de Transporte</h2>
+        <p class="text-sm text-amber-700 mt-1.5">Gestión y seguimiento de órdenes de transporte</p>
       </div>
     </div>
   </div>
 
-  <div class="main-content container-fluid p-6">
-   
-      <div class="card-body">
-        <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+  <p-toast />
+
+  <!-- Contenido Principal -->
+  <div class="main-content container-fluid p-2">
+    <!-- Filtros de Búsqueda -->
+    <div class="bg-white rounded-lg shadow-sm border border-gray-200 mb-2 overflow-hidden">
+      <!-- <div class="bg-gray-800 text-white px-6 py-4 border-b border-gray-700">
+        <h3 class="text-lg font-semibold text-gray-100">Filtros de Búsqueda</h3>
+        <p class="text-sm text-amber-300 mt-0.5">Seleccione los criterios para buscar órdenes de transporte</p>
+      </div> -->
+      <div class="p-2">
+        <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-5 gap-2">
           <!-- Cliente -->
-          <div>
-            <label>Cliente:</label>
+          <div class="flex flex-col">
+            <label class="mb-1">Cliente:</label>
             <p-dropdown name="clientes"   
                         [options]="clientes" [(ngModel)]="model.idcliente"
                         scrollHeight="30vh" class="input-form-field"
+                        appendTo="body"
                         [virtualScroll]="true" itemSize="30" 
                         [style]="{'width':'100%'}" [resetFilterOnHide]="false" 
                         [filter]="true">
@@ -36,86 +47,129 @@
           </div>
 
           <!-- Inicio -->
-          <div>
-            <label>Fecha de Inicio:</label>
-            <p-calendar [(ngModel)]="dateInicio" baseZIndex="100" 
-                        dateFormat="dd/mm/yy" placeholder="Seleccione una fecha">
+          <div class="flex flex-col">
+            <label class="mb-1">Fecha de Inicio:</label>
+            <p-calendar [(ngModel)]="dateInicio" baseZIndex="100" appendTo="body"
+                        dateFormat="dd/mm/yy" placeholder="Seleccione una fecha"
+                        [style]="{'width':'100%'}">
             </p-calendar>
           </div>
 
           <!-- Fin -->
-          <div>
-            <label>Fecha de Final:</label>
-            <p-calendar [(ngModel)]="dateFin" baseZIndex="100" 
-                        dateFormat="dd/mm/yy" placeholder="Seleccione una fecha">
+          <div class="flex flex-col">
+            <label class="mb-1">Fecha de Final:</label>
+            <p-calendar [(ngModel)]="dateFin" baseZIndex="100" appendTo="body"    
+                        dateFormat="dd/mm/yy" placeholder="Seleccione una fecha"
+                        [style]="{'width':'100%'}">
             </p-calendar>
           </div>
 
-          <!-- Estado (opcional si se requiere) -->
-          <div>
-            <label>Estado:</label>
-            <p-dropdown name="estados" [options]="estados" 
-                        [(ngModel)]="model.idestado" scrollHeight="20vh" 
-                        [style]="{'width':'100%'}" filter="false">
+        
+
+          <!-- Nro OT -->
+          <div class="flex flex-col">
+            <label class="mb-1">Nro OT:</label>
+            <input pInputText [(ngModel)]="model.numcp" 
+                   [style]="{'width':'100%'}" placeholder="Ingrese Nro OT"
+                   (keyup.enter)="buscar()" />
+          </div>
+
+          <!-- Nro Manifiesto -->
+          <div class="flex flex-col">
+            <label class="mb-1">Nro Manifiesto:</label>
+            <input pInputText [(ngModel)]="model.nummanifiesto" 
+                   [style]="{'width':'100%'}" placeholder="Ingrese Manifiesto"
+                   (keyup.enter)="buscar()" />
+          </div>
+
+          <!-- Nro HR -->
+          <div class="flex flex-col">
+            <label class="mb-1">Nro HR:</label>
+            <input pInputText [(ngModel)]="model.numhojaruta" 
+                   [style]="{'width':'100%'}" placeholder="Ingrese HR"
+                   (keyup.enter)="buscar()" />
+          </div>
+
+            <!-- Estado (opcional si se requiere) -->
+            <div class="flex flex-col">
+              <label class="mb-1">Estado:</label>
+              <p-dropdown name="estados" [options]="estados"  appendTo="body"
+                          [(ngModel)]="model.idestado" scrollHeight="20vh" 
+                          [style]="{'width':'100%'}" filter="false"
+                          (onChange)="onChangeEstado()">
+                <ng-template let-item pTemplate="selectedItem">
+                  <span>{{item.label}}</span>
+                </ng-template>
+              </p-dropdown>
+            </div>
+
+              <!-- Sub-Estado (solo visible cuando estado es "Entregado") -->
+          <div class="flex flex-col" >
+            <label class="mb-1">Sub-Estado:</label>
+            <p-dropdown name="subestados" [options]="subestados"  appendTo="body"
+                        [(ngModel)]="model.idsubestado" scrollHeight="20vh" 
+                        [style]="{'width':'100%'}" filter="false"
+                        (onChange)="onChangeSubEstado()">
               <ng-template let-item pTemplate="selectedItem">
                 <span>{{item.label}}</span>
               </ng-template>
             </p-dropdown>
           </div>
 
-          <!-- Nro OT -->
-          <div>
-            <label>Nro OT:</label>
-            <input pInputText [(ngModel)]="model.numcp" 
-                   [style]="{'width':'100%'}" placeholder="Ingrese Nro OT" />
-          </div>
-
-          <!-- Nro Manifiesto -->
-          <div>
-            <label>Nro Manifiesto:</label>
-            <input pInputText [(ngModel)]="model.nummanifiesto" 
-                   [style]="{'width':'100%'}" placeholder="Ingrese Manifiesto" />
-          </div>
-
-          <!-- Nro HR -->
-          <div>
-            <label>Nro HR:</label>
-            <input pInputText [(ngModel)]="model.numhojaruta" 
-                   [style]="{'width':'100%'}" placeholder="Ingrese HR" />
-          </div>
-
           <!-- Referencia -->
-          <div>
-            <label>Referencia:</label>
+          <!-- <div class="flex flex-col">
+            <label class="mb-1">Referencia:</label>
             <input pInputText [(ngModel)]="model.referencia" 
                    [style]="{'width':'100%'}" placeholder="Ingrese Referencia" />
-          </div>
-        </div>
+          </div> -->
+     
 
         <!-- Botones -->
-        <div class="flex justify-end space-x-4 mt-4 mb-4">
-          <p-button label="Buscar" icon="pi pi-search" 
-                    class="p-button-primary" (click)="buscar()">
-          </p-button>
-          <p-button label="EXCEL" icon="pi pi-file-excel" 
-                    class="p-button-primary">
-          </p-button>
-        </div>
+        <div class="flex flex-col mt-4">
+          <button 
+            class="px-4 py-2.5 text-sm font-medium text-white bg-gray-700 hover:bg-gray-600 rounded-md shadow-sm transition-all duration-150" 
+            pButton 
+            label="Buscar" 
+            icon="pi pi-search"
+            iconPos="left" 
+            (click)="buscar()">
+          </button>
+          </div>
+          <div class="flex flex-col mt-4">
+          <button 
+            class="px-4 py-2.5 text-sm font-medium text-gray-700 bg-white border border-gray-300 hover:bg-gray-50 rounded-md shadow-sm transition-all duration-150" 
+            pButton 
+            label="EXCEL" 
+            icon="pi pi-file-excel"
+            iconPos="left">
+          </button>
+        </div>      
       </div>
+    </div>
+  </div>
 
-      <!-- Órdenes de Transporte -->
-      <!-- <div class="p-mb-2">
-        <p-button label="Despachar" icon="pi pi-plus" (onClick)="save('info')">
-        </p-button>
+    <!-- Tabla de Órdenes de Transporte -->
+    <div class="bg-white rounded-lg shadow-sm border border-gray-200 overflow-hidden">
+      <!-- <div class="bg-gray-800 text-white px-6 py-4 border-b border-gray-700">
+        <h3 class="text-lg font-semibold text-gray-100">Órdenes de Transporte</h3>
+        <p class="text-sm text-amber-300 mt-1.5">Lista de órdenes de transporte encontradas</p>
       </div> -->
-
-      <!-- Tabla -->
-      <p-table     class="tabla-pequena" [value]="ordenes" [paginator]="true" [rows]="10" 
-               [rowsPerPageOptions]="[20,40,60,120]" 
-               [columns]="cols" [resizableColumns]="true" 
-               [tableStyle]="{ 'table-layout': 'fixed', 'width': '100%' }"
-               [scrollable]="false" [selection]="selected" 
-               selectionMode="multiple" [(selection)]="selected">
+      <div class="p-6">
+        <p-table 
+          [value]="ordenesFiltradas.length > 0 ? ordenesFiltradas : ordenes" 
+          [paginator]="true" 
+          [rows]="20" 
+          [rowsPerPageOptions]="[20,40,60,120]" 
+          [columns]="cols" 
+          scrollHeight="80vh"
+          [resizableColumns]="true" 
+          [tableStyle]="{ 'table-layout': 'fixed', 'width': '100%' }"
+          [scrollable]="true" 
+          [selection]="selected" 
+          selectionMode="multiple" 
+          [(selection)]="selected"
+          [styleClass]="'custom-table'"
+          class="w-full">
 
         <!-- Column Definitions -->
         <ng-template pTemplate="colgroup" let-columns>
@@ -126,8 +180,8 @@
 
         <!-- Table Header -->
         <ng-template pTemplate="header" let-columns>
-          <tr>
-            <th style="white-space: normal; word-wrap: break-word;" *ngFor="let col of columns" [style]="col.width" [pSortableColumn]="col.field">
+          <tr class="bg-gray-800 text-white">
+            <th style="white-space: normal; word-wrap: break-word;" *ngFor="let col of columns" [pSortableColumn]="col.field" class="text-center px-4 py-3 text-sm font-semibold text-gray-100 border-b border-gray-700">
               {{ col.header }}
             </th>
           </tr>
@@ -135,99 +189,132 @@
 
         <!-- Table Body -->
         <ng-template pTemplate="body" let-rowData let-columns="columns">
-          <tr [pSelectableRow]="rowData">
+          <tr [pSelectableRow]="rowData" class="border-b border-gray-100 hover:bg-gray-50 transition-colors duration-150">
             <!-- Acción -->
 
             
-            <td style="text-align: left;">
-              <p-button  label=""   size="small" title='Ver Fotos' icon='pi pi-download'  (click)='verarchivos(rowData.idordentrabajo);' > </p-button>
-              
-              <p-button *ngIf="rowData?.estado === 'Entregado' && estrafico === true"  
-              icon="pi pi-book" 
-              title="Editar Confirmación" 
-              size="small"
-              (click)="editarConfirm(rowData.idordentrabajo)">
-            </p-button>
-            <p-button *ngIf="rowData?.estado === 'Entregado' && estrafico === true"  
-                icon="pi pi-camera" 
-                title="Eliminar Fotos" 
-                size="small"
-                severity="danger"
-                (click)="eliminarFotos(rowData.idordentrabajo)">
-            </p-button>
-  
-              <p-button icon="pi pi-pencil" 
-                        title="Editar OT" 
-                        size="small"
-                        (click)="editar(rowData.idordentrabajo)">
-              </p-button>
-              <p-button icon="pi pi-trash" 
-                        title="Eliminar" 
-                        severity="danger"
-                        size="small"
-                        (click)="eliminar(rowData.idordentrabajo)">
-              </p-button>
+            <td class="text-center px-2 py-2">
+              <div class="flex gap-1 justify-center items-center">
+                <!-- Ver Fotos - Azul (Info) -->
+                <button 
+                  pButton 
+                  class="action-btn action-btn-info" 
+                  icon="pi pi-download"
+                  title="Ver Fotos" 
+                  (click)="verarchivos(rowData.idordentrabajo)">
+                </button>
+                
+                <!-- Editar Confirmación - Amarillo (Warning) -->
+                <button 
+                  *ngIf="rowData?.estado === 'Entregado' && estrafico === true"  
+                  pButton 
+                  class="action-btn action-btn-warning" 
+                  icon="pi pi-book" 
+                  title="Editar Confirmación" 
+                  (click)="editarConfirm(rowData.idordentrabajo)">
+                </button>
+                
+                <!-- Eliminar Fotos - Rojo (Danger) -->
+                <button 
+                  *ngIf="estrafico === true"  
+                  pButton 
+                  class="action-btn action-btn-danger" 
+                  icon="pi pi-camera" 
+                  title="Eliminar Fotos" 
+                  (click)="eliminarFotos(rowData.idordentrabajo)">
+                </button>
+      
+                <!-- Editar OT - Azul (Primary) -->
+                <button 
+                  pButton 
+                  class="action-btn action-btn-primary" 
+                  icon="pi pi-pencil" 
+                  title="Editar OT" 
+                  (click)="editar(rowData.idordentrabajo)">
+                </button>
+                
+                <!-- Eliminar - Rojo (Danger) -->
+                <button 
+                  pButton 
+                  class="action-btn action-btn-danger" 
+                  icon="pi pi-trash" 
+                  title="Eliminar" 
+                  (click)="eliminar(rowData.idordentrabajo)">
+                </button>
 
-
-              <p-button icon="pi pi-search" 
-              title="ver" 
-              severity="secondary"
-              size="small"
-              (click)="vertracking(rowData.idordentrabajo)">
-            </p-button>
-
-
-
+                <!-- Ver Tracking - Verde (Success) -->
+                <button 
+                  pButton 
+                  class="action-btn action-btn-success" 
+                  icon="pi pi-search" 
+                  title="Ver Tracking" 
+                  (click)="vertracking(rowData.idordentrabajo)">
+                </button>
+              </div>
             </td>
 
             <!-- Datos de la orden -->
-            <td>
-              <a style="cursor: pointer; text-decoration: underline;" (click)="verot(rowData.idordentrabajo)">
+            <td class="text-center px-4 py-3">
+              <a class="text-amber-700 hover:text-amber-900 font-semibold cursor-pointer underline" (click)="verot(rowData.idordentrabajo)">
                 {{ rowData.numcp }}
               </a>
             </td>
-            <td style="text-align: center;">{{ rowData.fecharecojo | date:'dd/MM/yyyy' }}</td>
-            <td style="text-align: center;">{{ rowData.fechadespacho | date:'dd/MM/yyyy '}}</td>
-            <td style="text-align: center;">{{ rowData.fechaentrega | date:'dd/MM/yyyy '}}</td>
-            <td class="word-wrap">{{ rowData.razonsocial }}</td>
-            <td class="word-wrap">{{ rowData.destinatario }}</td>
-            <!-- <td class="word-wrap">{{ rowData.numManifiestoTroncal }}</td>
-            <td class="word-wrap">{{ rowData.numhojarutatroncal }}</td> -->
-            <td class="word-wrap">{{ rowData.estacionorigen }}</td>
+            <td class="text-center px-4 py-3 text-gray-700 text-sm">{{ rowData.fecharecojo | date:'dd/MM/yyyy' }}</td>
+            <td class="text-center px-4 py-3 text-gray-700 text-sm">{{ rowData.fechadespacho | date:'dd/MM/yyyy '}}</td>
+            <td class="text-center px-4 py-3 text-gray-700 text-sm">{{ rowData.fechaentrega | date:'dd/MM/yyyy '}}</td>
+            <td class="text-center px-4 py-3 text-gray-700 text-sm word-wrap">{{ rowData.razonsocial }}</td>
+            <td class="text-center px-4 py-3 text-gray-700 text-sm word-wrap">{{ rowData.destinatario }}</td>
+            <td class="text-center px-4 py-3 text-gray-700 text-sm word-wrap">{{ rowData.estacionorigen }}</td>
             
-       
-            <td class="word-wrap" [ngClass]="rowData.estado == 'Registrado' ? 'very-old-car' : (rowData.estado == 'Programado' ? 'old-car' : '')">
-              {{ rowData.estado }}
+            <td class="text-center px-4 py-3" [ngClass]="rowData.estado == 'Registrado' ? 'very-old-car' : (rowData.estado == 'Programado' ? 'old-car' : '')">
+              <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium"
+                    [ngClass]="{
+                      'bg-gray-100 text-gray-800': rowData.estado === 'Registrado',
+                      'bg-amber-100 text-amber-800': rowData.estado === 'Programado',
+                      'bg-green-100 text-green-800': rowData.estado === 'Entregado'
+                    }">
+                {{ rowData.estado }}
+              </span>
             </td>
-            <td class="word-wrap" [ngClass]="rowData.subestado === 'Pendiente de Cargo'? 'td-alert': ''" > {{ rowData.subestado }}</td>
-               <td style="white-space: normal; word-wrap: break-word;"
-           >
-            {{ rowData.tipoentrega }}
-        </td>
+            <td class="text-center px-4 py-3 word-wrap" [ngClass]="rowData.subestado === 'Pendiente de Cargo'? 'td-alert': ''">
+              {{ rowData.subestado }}
+            </td>
+            <td class="text-center px-4 py-3 text-gray-700 text-sm word-wrap">
+              {{ rowData.tipoentrega }}
+            </td>
         
-            <td class="word-wrap"> {{ rowData.origen }}</td>
-            <td class="word-wrap"> {{ rowData.destino }}</td>
+            <td class="text-center px-4 py-3 text-gray-700 text-sm word-wrap">{{ rowData.origen }}</td>
+            <td class="text-center px-4 py-3 text-gray-700 text-sm word-wrap">{{ rowData.destino }}</td>
 
-            <td>S/. {{ rowData.subtotal }}</td>
-            <td class="word-wrap">
-              <a style="cursor: pointer; text-decoration: underline;" (click)="vermanifiesto(rowData.idManifiesto)">
-              {{ rowData.nummanifiesto }}
+            <td class="text-center px-4 py-3">
+              <span class="text-amber-700 text-sm font-semibold">S/. {{ rowData.subtotal | number:'1.0-2' }}</span>
+            </td>
+            <td class="text-center px-4 py-3">
+              <a class="text-amber-700 hover:text-amber-900 cursor-pointer underline text-sm" (click)="vermanifiesto(rowData.idManifiesto)">
+                {{ rowData.nummanifiesto }}
               </a>
             </td>
-            <td class="word-wrap">
-              <a style="cursor: pointer; text-decoration: underline;" (click)="verhojaruta(rowData.idDespacho)">
-              {{ rowData.numhojaruta }}
+            <td class="text-center px-4 py-3">
+              <a class="text-amber-700 hover:text-amber-900 cursor-pointer underline text-sm" (click)="verhojaruta(rowData.idDespacho)">
+                {{ rowData.numhojaruta }}
               </a>
             </td>
           
-            <td>{{ rowData.bulto }}</td>
-            <td>{{ rowData.peso }}</td>
-            <td>{{ rowData.pesovol }}</td>
+            <td class="text-center px-4 py-3 text-gray-700 text-sm">{{ rowData.bulto }}</td>
+            <td class="text-center px-4 py-3">
+              <span class="text-amber-700 font-semibold">{{ rowData.peso | number:'1.0-2' }}</span>
+              <span class="text-gray-500 text-xs ml-1">kg</span>
+            </td>
+            <td class="text-center px-4 py-3">
+              <span class="text-amber-700 font-semibold">{{ rowData.pesovol | number:'1.0-2' }}</span>
+              <span class="text-gray-500 text-xs ml-1">m³</span>
+            </td>
           </tr>
         </ng-template>
       </p-table>
+      </div>
     </div>
-  
+  </div>
 </div>
 <p-dialog header="Tracking OTs" [modal]="true" [(visible)]="dialoglifecycle" [style]="{ width: '80rem' }">
   <div class="p-4">

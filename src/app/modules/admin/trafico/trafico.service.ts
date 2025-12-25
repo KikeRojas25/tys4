@@ -54,6 +54,16 @@ export class TraficoService {
         );
     }
 
+
+    VerDespachosxDepartamentoxEstacion(model: any) {
+        const idequipo = model.idequipo ? model.idequipo : ''; // Si model.idequipo es null, usar una cadena vacía
+        return this._httpClient.get<HojaRuta[]>(
+            `${this.baseUrl}ListarDespachosxDepartamentoxEstacion?idequipo=${idequipo}`,
+            httpOptions
+        );
+    }
+
+
     VerDespachosxDepartamentoxProveedor(model: any) {
         const idequipo = model.idequipo ? model.idequipo : ''; // Si model.idequipo es null, usar una cadena vacía
         return this._httpClient.get<HojaRuta[]>(

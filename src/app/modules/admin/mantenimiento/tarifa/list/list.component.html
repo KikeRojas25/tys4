@@ -1,0 +1,414 @@
+<!-- tarifas.component.html -->
+<div class="flex flex-col flex-auto min-w-0 bg-gray-50">
+
+  <!-- Header con breadcrumb -->
+  <div class="flex flex-col sm:flex-row flex-0 sm:items-center sm:justify-between p-2 sm:py-8 sm:px-10 border-b border-gray-200 bg-white shadow-sm">
+    <div class="flex-1 min-w-0">
+      <div class="flex flex-wrap items-center font-medium text-sm text-gray-600">
+        <div>
+          <a class="whitespace-nowrap text-gray-700 hover:text-gray-900">TMS</a>
+        </div>
+        <div class="flex items-center ml-1 whitespace-nowrap">
+          <mat-icon class="fuse-horizontal-navigation-item-icon text-gray-400" [svgIcon]="'heroicons_solid:chevron-right'"></mat-icon>
+          <a class="ml-1 text-gray-700 hover:text-gray-900">Mantenimiento</a>
+        </div>
+      </div>
+      <div class="mt-2">
+        <h2 class="text-3xl md:text-4xl font-semibold tracking-tight leading-7 sm:leading-10 truncate text-gray-900">
+          Mantenimiento de Tarifas
+        </h2>
+        <p class="text-sm text-amber-700 mt-1.5">Gestión de tarifas de transporte</p>
+      </div>
+    </div>
+  </div>
+
+  <p-toast />
+
+  <!-- Contenido Principal -->
+  <div class="main-content container-fluid p-2">
+    <!-- Filtros de búsqueda -->
+    <div class="bg-white rounded-lg shadow-sm border border-gray-200 mb-2 overflow-hidden">
+      <div class="p-2">
+      <form [formGroup]="filtroForm">
+        <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 xl:grid-cols-5 gap-2">
+          <!-- Cliente -->
+          <div class="flex flex-col">
+            <label class="mb-1">Cliente:</label>
+            <p-dropdown 
+              formControlName="idCliente"
+              [options]="clientes"
+              placeholder="Seleccione un cliente"
+              scrollHeight="30vh"
+              class="input-form-field"
+              appendTo="body"
+              [virtualScroll]="true" 
+              itemSize="30" 
+              [style]="{'width':'100%'}"
+              [resetFilterOnHide]="false"
+              [filter]="true"
+              [showClear]="true">
+              <ng-template let-item pTemplate="selectedItem">
+                <span>{{item.label}}</span>
+              </ng-template>
+            </p-dropdown>
+          </div>
+
+          <!-- Origen - Dept -->
+          <div class="flex flex-col">
+            <label class="mb-1">Origen - Dept:</label>
+            <p-dropdown 
+              formControlName="idorigendepartamento"
+              [options]="departamentosOrigen"
+              placeholder="Todos"
+              scrollHeight="30vh"
+              class="input-form-field"
+              appendTo="body"
+              [virtualScroll]="true" 
+              itemSize="30" 
+              [style]="{'width':'100%'}"
+              [resetFilterOnHide]="false"
+              [filter]="true"
+              [showClear]="true">
+              <ng-template let-item pTemplate="selectedItem">
+                <span>{{item.label}}</span>
+              </ng-template>
+            </p-dropdown>
+          </div>
+
+          <!-- Origen - Prov -->
+          <div class="flex flex-col">
+            <label class="mb-1">Origen - Prov:</label>
+            <p-dropdown 
+              formControlName="idorigenprovincia"
+              [options]="provinciasOrigen"
+              placeholder="Todos"
+              scrollHeight="30vh"
+              class="input-form-field"
+              appendTo="body"
+              [virtualScroll]="true" 
+              itemSize="30" 
+              [style]="{'width':'100%'}"
+              [resetFilterOnHide]="false"
+              [filter]="true"
+              [showClear]="true"
+              [disabled]="!filtroForm.value.idorigendepartamento">
+              <ng-template let-item pTemplate="selectedItem">
+                <span>{{item.label}}</span>
+              </ng-template>
+            </p-dropdown>
+          </div>
+
+          <!-- Origen - Dist -->
+          <div class="flex flex-col">
+            <label class="mb-1">Origen - Dist:</label>
+            <p-dropdown 
+              formControlName="idorigendistrito"
+              [options]="distritosOrigen"
+              placeholder="Todos"
+              scrollHeight="30vh"
+              class="input-form-field"
+              appendTo="body"
+              [virtualScroll]="true" 
+              itemSize="30" 
+              [style]="{'width':'100%'}"
+              [resetFilterOnHide]="false"
+              [filter]="true"
+              [showClear]="true"
+              [disabled]="!filtroForm.value.idorigenprovincia">
+              <ng-template let-item pTemplate="selectedItem">
+                <span>{{item.label}}</span>
+              </ng-template>
+            </p-dropdown>
+          </div>
+
+          <!-- Destino - Dept -->
+          <div class="flex flex-col">
+            <label class="mb-1">Destino - Dept:</label>
+            <p-dropdown 
+              formControlName="iddepartamentodestino"
+              [options]="departamentosDestino"
+              placeholder="Todos"
+              scrollHeight="30vh"
+              class="input-form-field"
+              appendTo="body"
+              [virtualScroll]="true" 
+              itemSize="30" 
+              [style]="{'width':'100%'}"
+              [resetFilterOnHide]="false"
+              [filter]="true"
+              [showClear]="true">
+              <ng-template let-item pTemplate="selectedItem">
+                <span>{{item.label}}</span>
+              </ng-template>
+            </p-dropdown>
+          </div>
+
+          <!-- Destino - Prov -->
+          <div class="flex flex-col">
+            <label class="mb-1">Destino - Prov:</label>
+            <p-dropdown 
+              formControlName="idprovinciadestino"
+              [options]="provinciasDestino"
+              placeholder="Todos"
+              scrollHeight="30vh"
+              class="input-form-field"
+              appendTo="body"
+              [virtualScroll]="true" 
+              itemSize="30" 
+              [style]="{'width':'100%'}"
+              [resetFilterOnHide]="false"
+              [filter]="true"
+              [showClear]="true"
+              [disabled]="!filtroForm.value.iddepartamentodestino">
+              <ng-template let-item pTemplate="selectedItem">
+                <span>{{item.label}}</span>
+              </ng-template>
+            </p-dropdown>
+          </div>
+
+          <!-- Destino - Dist -->
+          <div class="flex flex-col">
+            <label class="mb-1">Destino - Dist:</label>
+            <p-dropdown 
+              formControlName="iddistritodestino"
+              [options]="distritosDestino"
+              placeholder="Todos"
+              scrollHeight="30vh"
+              class="input-form-field"
+              appendTo="body"
+              [virtualScroll]="true" 
+              itemSize="30" 
+              [style]="{'width':'100%'}"
+              [resetFilterOnHide]="false"
+              [filter]="true"
+              [showClear]="true"
+              [disabled]="!filtroForm.value.idprovinciadestino">
+              <ng-template let-item pTemplate="selectedItem">
+                <span>{{item.label}}</span>
+              </ng-template>
+            </p-dropdown>
+          </div>
+
+          <!-- Modo de Transporte -->
+          <div class="flex flex-col">
+            <label class="mb-1">Mod. Transporte:</label>
+            <p-dropdown 
+              formControlName="idtipotransporte"
+              [options]="tiposTransporte"
+              placeholder="Todos"
+              scrollHeight="30vh"
+              class="input-form-field"
+              appendTo="body"
+              [virtualScroll]="true" 
+              itemSize="30" 
+              [style]="{'width':'100%'}"
+              [resetFilterOnHide]="false"
+              [filter]="true"
+              [showClear]="true">
+              <ng-template let-item pTemplate="selectedItem">
+                <span>{{item.label}}</span>
+              </ng-template>
+            </p-dropdown>
+          </div>
+
+          <!-- Botones -->
+          <div class="flex flex-col mt-4">
+            <button 
+              class="px-4 py-2.5 text-sm font-medium text-white bg-gray-700 hover:bg-gray-600 rounded-md shadow-sm transition-all duration-150" 
+              pButton 
+              label="Buscar" 
+              icon="pi pi-search"
+              iconPos="left" 
+              [disabled]="loading"
+              (click)="buscarTarifas()">
+            </button>
+          </div>
+          <div class="flex flex-col mt-4">
+            <button 
+              class="px-4 py-2.5 text-sm font-medium text-white bg-green-600 hover:bg-green-500 rounded-md shadow-sm transition-all duration-150" 
+              pButton 
+              label="Nuevo" 
+              icon="pi pi-plus"
+              iconPos="left"
+              (click)="nuevaTarifa()">
+            </button>
+          </div>
+        </div>
+      </form>
+      </div>
+    </div>
+
+
+    <!-- Tabla de Tarifas -->
+    <div class="bg-white rounded-lg shadow-sm border border-gray-200 overflow-hidden">
+      <div class="p-6">
+        <p-table 
+        [value]="tarifas" 
+        [loading]="loading"
+        [paginator]="true"
+        [rows]="rows"
+        [first]="first"
+        [totalRecords]="totalRecords"
+        [rowsPerPageOptions]="[20,40,60,120]"
+        scrollHeight="80vh"
+        [resizableColumns]="true" 
+        [tableStyle]="{ 'table-layout': 'fixed', 'width': '1290px', 'min-width': '1290px' }"
+        [scrollable]="true"
+        [styleClass]="'custom-table'"
+        class="w-full"
+        (onPage)="onPageChange($event)">
+
+        <!-- Column Definitions -->
+        <ng-template pTemplate="colgroup">
+          <colgroup>
+            <col style="width: 100px">
+            <col style="width: 150px">
+            <col style="width: 150px">
+            <col style="width: 120px">
+            <col style="width: 100px">
+            <col style="width: 130px">
+            <col style="width: 100px">
+            <col style="width: 100px">
+            <col style="width: 80px">
+            <col style="width: 80px">
+            <col style="width: 80px">
+            <col style="width: 100px">
+            <col style="width: 100px">
+          </colgroup>
+        </ng-template>
+
+        <!-- Table Header -->
+        <ng-template pTemplate="header">
+          <tr class="bg-gray-800 text-white">
+            <th style="white-space: normal; word-wrap: break-word;" class="text-center px-4 py-3 text-sm font-semibold text-gray-100 border-b border-gray-700">ACC</th>
+            <th style="white-space: normal; word-wrap: break-word;" class="text-center px-4 py-3 text-sm font-semibold text-gray-100 border-b border-gray-700">Origen</th>
+            <th style="white-space: normal; word-wrap: break-word;" class="text-center px-4 py-3 text-sm font-semibold text-gray-100 border-b border-gray-700">Destino</th>
+            <th style="white-space: normal; word-wrap: break-word;" class="text-center px-4 py-3 text-sm font-semibold text-gray-100 border-b border-gray-700">Formula</th>
+            <th style="white-space: normal; word-wrap: break-word;" class="text-center px-4 py-3 text-sm font-semibold text-gray-100 border-b border-gray-700">Mod. Transp.</th>
+            <th style="white-space: normal; word-wrap: break-word;" class="text-center px-4 py-3 text-sm font-semibold text-gray-100 border-b border-gray-700">Cobrar Por</th>
+            <th style="white-space: normal; word-wrap: break-word;" class="text-center px-4 py-3 text-sm font-semibold text-gray-100 border-b border-gray-700">Tip. Unidad</th>
+            <!-- <th style="white-space: normal; word-wrap: break-word;" class="text-center px-4 py-3 text-sm font-semibold text-gray-100 border-b border-gray-700">Moneda</th> -->
+            <th style="white-space: normal; word-wrap: break-word;" class="text-center px-4 py-3 text-sm font-semibold text-gray-100 border-b border-gray-700">Base</th>
+            
+            <th style="white-space: normal; word-wrap: break-word;" class="text-center px-4 py-3 text-sm font-semibold text-gray-100 border-b border-gray-700">Min</th>
+            <th style="white-space: normal; word-wrap: break-word;" class="text-center px-4 py-3 text-sm font-semibold text-gray-100 border-b border-gray-700">Desde</th>
+            <th style="white-space: normal; word-wrap: break-word;" class="text-center px-4 py-3 text-sm font-semibold text-gray-100 border-b border-gray-700">Hasta</th>
+            <th style="white-space: normal; word-wrap: break-word;" class="text-center px-4 py-3 text-sm font-semibold text-gray-100 border-b border-gray-700">Precio</th>
+            <th style="white-space: normal; word-wrap: break-word;" class="text-center px-4 py-3 text-sm font-semibold text-gray-100 border-b border-gray-700">Adicional</th>
+          </tr>
+        </ng-template>
+
+        <!-- Table Body -->
+        <ng-template pTemplate="body" let-tarifa>
+          <tr class="border-b border-gray-100 hover:bg-gray-50 transition-colors duration-150">
+            <!-- Acciones -->
+            <td class="text-center px-2 py-2">
+              <div class="flex gap-1 justify-center items-center">
+                <!-- Editar - Azul oscuro (Primary) -->
+                <button 
+                  pButton 
+                  class="action-btn action-btn-primary" 
+                  icon="pi pi-pencil" 
+                  title="Editar" 
+                  (click)="editarTarifa(tarifa)">
+                </button>
+                
+                <!-- Eliminar - Rojo (Danger) -->
+                <button 
+                  pButton 
+                  class="action-btn action-btn-danger" 
+                  icon="pi pi-trash" 
+                  title="Eliminar" 
+                  (click)="eliminarTarifa(tarifa)">
+                </button>
+              </div>
+            </td>
+            
+            <!-- Origen - Subt tabla de Ubigeo -->
+            <td class="px-4 py-3 align-top">
+              <table class="w-full text-left text-xs border-collapse">
+                <tr>
+                  <td class="font-semibold text-left text-gray-600 pr-2 py-1 whitespace-nowrap">Dpto:</td>
+                  <td class="text-left text-gray-700 py-1">{{ tarifa.origendepartamento || '-' }}</td>
+                </tr>
+                <tr>
+                  <td class="font-semibold text-left text-gray-600 pr-2 py-1 whitespace-nowrap">Prov:</td>
+                  <td class="text-left text-gray-700 py-1">{{ tarifa.origenprovincia || '-' }}</td>
+                </tr>
+                <tr>
+                  <td class="font-semibold text-left text-gray-600 pr-2 py-1 whitespace-nowrap">Dist:</td>
+                  <td class="text-left text-gray-700 py-1">{{ tarifa.origendistrito || '-' }}</td>
+                </tr>
+              </table>
+            </td>
+            
+            <!-- Destino - Subt tabla de Ubigeo -->
+            <td class="px-4 py-3 align-top">
+              <table class="w-full text-left text-xs border-collapse">
+                <tr>
+                  <td class="font-semibold text-left text-gray-600 pr-2 py-1 whitespace-nowrap">Dpto:</td>
+                  <td class="text-left text-gray-700 py-1">{{ tarifa.destinodepartamento || '-' }}</td>
+                </tr>
+                <tr>
+                  <td class="font-semibold text-left text-gray-600 pr-2 py-1 whitespace-nowrap">Prov:</td>
+                  <td class="text-left text-gray-700 py-1">{{ tarifa.destinoprovincia || '-' }}</td>
+                </tr>
+                <tr>
+                  <td class="font-semibold text-left text-gray-600 pr-2 py-1 whitespace-nowrap">Dist:</td>
+                  <td class="text-left text-gray-700 py-1">{{ tarifa.destinodistrito || '-' }}</td>
+                </tr>
+              </table>
+            </td>
+            
+            <!-- Detalles -->
+            <td class="text-center px-4 py-3 text-gray-700 text-sm">{{ tarifa.formula }}</td>
+            <td class="text-center px-4 py-3 text-gray-700 text-sm">{{ tarifa.tipotransporte }}</td>
+            <td class="text-center px-4 py-3 text-gray-700 text-sm">{{ tarifa.conceptos }}</td>
+            <td class="text-center px-4 py-3 text-gray-700 text-sm">{{ tarifa.tipounidad }}</td>
+            <!-- <td class="text-center px-4 py-3 text-gray-700 text-sm">{{ tarifa.moneda }}</td> -->
+            <td class="text-center px-4 py-3">
+              <span class="text-amber-700 text-sm font-semibold">S/. {{ tarifa.montobase | number:'1.2-2' }}</span>
+            </td>
+        
+            <td class="text-center px-4 py-3">
+              <span class="text-amber-700 text-sm font-semibold">S/. {{ tarifa.minimo | number:'1.2-2' }}</span>
+            </td>
+            <td class="text-center px-4 py-3">
+              <span class="text-amber-700 font-semibold">{{ tarifa.desde | number:'1.2-2' }}</span>
+            </td>
+            <td class="text-center px-4 py-3">
+              <span class="text-amber-700 font-semibold">{{ tarifa.hasta | number:'1.2-2' }}</span>
+            </td>
+            <td class="text-center px-4 py-3">
+              <span class="text-amber-700 text-sm font-semibold">S/. {{ tarifa.precio | number:'1.2-2' }}</span>
+            </td>
+            <td class="text-center px-4 py-3">
+              <span class="text-amber-700 text-sm font-semibold">S/. {{ tarifa.adicional | number:'1.2-2' }}</span>
+            </td>
+          </tr>
+        </ng-template>
+
+        <ng-template pTemplate="emptymessage">
+          <tr>
+            <td colspan="13" class="text-center p-4">
+              <div class="flex flex-col items-center justify-center">
+                <mat-icon class="text-gray-400 mb-2" style="font-size: 48px; width: 48px; height: 48px;">
+                  search_off
+                </mat-icon>
+                <span class="text-gray-600">No se encontraron tarifas</span>
+                <span class="text-gray-400 text-sm mt-1">Seleccione un cliente y presione Buscar</span>
+              </div>
+            </td>
+          </tr>
+        </ng-template>
+      </p-table>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Toast para mensajes -->
+<p-toast />
+
+<!-- Confirmación -->
+<p-confirmDialog />

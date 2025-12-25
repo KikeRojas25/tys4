@@ -1,0 +1,284 @@
+<div class="flex flex-col flex-auto min-w-0 bg-gray-50">
+  <!-- Header -->
+  <div class="flex flex-col sm:flex-row flex-0 sm:items-center sm:justify-between p-2 sm:py-8 sm:px-10 border-b border-gray-200 bg-white shadow-sm">
+    <div class="flex-1 min-w-0">
+      <div class="flex flex-wrap items-center font-medium text-sm text-gray-600">
+        <div>
+          <a class="whitespace-nowrap text-gray-700 hover:text-gray-900">TMS</a>
+        </div>
+        <div class="flex items-center ml-1 whitespace-nowrap">
+          <mat-icon class="fuse-horizontal-navigation-item-icon text-gray-400" [svgIcon]="'heroicons_solid:chevron-right'"></mat-icon>
+          <a class="ml-1 text-gray-700 hover:text-gray-900">Facturación</a>
+        </div>
+      </div>
+      <div class="mt-2">
+        <h2 class="text-3xl md:text-4xl font-semibold tracking-tight leading-7 sm:leading-10 truncate text-gray-900">
+          Listar Preliquidaciones
+        </h2>
+        <p class="text-sm text-amber-700 mt-1.5">Consulte y filtre las preliquidaciones generadas</p>
+      </div>
+    </div>
+  </div>
+
+  <p-toast />
+  <p-confirmDialog />
+
+  <!-- Contenido Principal -->
+  <div class="main-content container-fluid p-2">
+    <!-- Filtros de Búsqueda -->
+    <div class="bg-white rounded-lg shadow-sm border border-gray-200 mb-2 overflow-hidden">
+      <div class="p-2">
+        <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-6 gap-2">
+          <!-- Estado -->
+          <div class="flex flex-col">
+            <label class="mb-1">Estado:</label>
+            <p-dropdown
+              name="estados"
+              [options]="estados"
+              [(ngModel)]="model.idestado"
+              scrollHeight="30vh"
+              class="input-form-field"
+              appendTo="body"
+              [virtualScroll]="true"
+              itemSize="30"
+              [style]="{'width':'100%'}"
+              [resetFilterOnHide]="false"
+              [filter]="true"
+              placeholder="Seleccione estado">
+              <ng-template let-item pTemplate="selectedItem">
+                <span>{{item.label}}</span>
+              </ng-template>
+            </p-dropdown>
+          </div>
+
+          <!-- Cliente -->
+          <div class="flex flex-col">
+            <label class="mb-1">Cliente:</label>
+            <p-dropdown
+              name="clientes"
+              [options]="clientes"
+              [(ngModel)]="model.idcliente"
+              scrollHeight="30vh"
+              class="input-form-field"
+              appendTo="body"
+              [virtualScroll]="true"
+              itemSize="30"
+              [style]="{'width':'100%'}"
+              [resetFilterOnHide]="false"
+              [filter]="true"
+              placeholder="Seleccione cliente">
+              <ng-template let-item pTemplate="selectedItem">
+                <span>{{item.label}}</span>
+              </ng-template>
+            </p-dropdown>
+          </div>
+
+          <!-- Tipo Comprobante -->
+          <div class="flex flex-col">
+            <label class="mb-1">Tipo Comprobante:</label>
+            <p-dropdown
+              name="tiposComprobante"
+              [options]="tiposComprobante"
+              [(ngModel)]="model.idtipocomprobante"
+              scrollHeight="30vh"
+              class="input-form-field"
+              appendTo="body"
+              [virtualScroll]="true"
+              itemSize="30"
+              [style]="{'width':'100%'}"
+              [resetFilterOnHide]="false"
+              [filter]="true"
+              placeholder="Seleccione tipo">
+              <ng-template let-item pTemplate="selectedItem">
+                <span>{{item.label}}</span>
+              </ng-template>
+            </p-dropdown>
+          </div>
+
+          <!-- Nro Comprobante -->
+          <div class="flex flex-col">
+            <label class="mb-1">Nro Comprobante:</label>
+            <input
+              pInputText
+              [(ngModel)]="model.numerocomprobante"
+              [style]="{'width':'100%'}"
+              placeholder="Ingrese Nro Comprobante"
+              (keyup.enter)="buscar()" />
+          </div>
+
+          <!-- Nro Preliquidación -->
+          <div class="flex flex-col">
+            <label class="mb-1">Nro Preliquidación:</label>
+            <input
+              pInputText
+              [(ngModel)]="model.numeroliquidacion"
+              [style]="{'width':'100%'}"
+              placeholder="Ingrese Nro Preliquidación"
+              (keyup.enter)="buscar()" />
+          </div>
+
+          <!-- Botones -->
+          <div class="flex flex-col gap-2 mt-4">
+            <button
+              class="px-4 py-2.5 text-sm font-medium text-white bg-gray-700 hover:bg-gray-600 rounded-md shadow-sm transition-all duration-150"
+              pButton
+              label="Buscar"
+              icon="pi pi-search"
+              iconPos="left"
+              (click)="buscar()">
+            </button>
+            <button
+              class="px-4 py-2.5 text-sm font-medium text-gray-700 bg-white border border-gray-300 hover:bg-gray-50 rounded-md shadow-sm transition-all duration-150"
+              pButton
+              label="EXCEL"
+              icon="pi pi-file-excel"
+              iconPos="left"
+              (click)="exportarExcel()">
+            </button>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Botones de Acción (solo cuando hay item seleccionado) -->
+    <div class="bg-white rounded-lg shadow-sm border border-gray-200 mb-2 overflow-hidden p-4" *ngIf="selectedItem">
+      <div class="flex flex-wrap gap-2">
+        <button
+          class="px-4 py-2 text-sm font-medium text-white bg-blue-600 hover:bg-blue-700 rounded-md shadow-sm transition-all duration-150"
+          pButton
+          label="Editar Preliquidación"
+          icon="pi pi-pencil"
+          iconPos="left"
+          (click)="editarPreliquidacion()">
+        </button>
+        <button
+          class="px-4 py-2 text-sm font-medium text-white bg-green-600 hover:bg-green-700 rounded-md shadow-sm transition-all duration-150"
+          pButton
+          label="Ver Reporte"
+          icon="pi pi-file-pdf"
+          iconPos="left"
+          (click)="verReporte()">
+        </button>
+        <button
+          class="px-4 py-2 text-sm font-medium text-white bg-amber-600 hover:bg-amber-700 rounded-md shadow-sm transition-all duration-150"
+          pButton
+          label="Generar Factura"
+          icon="pi pi-file"
+          iconPos="left"
+          (click)="generarFactura()">
+        </button>
+      </div>
+    </div>
+
+    <!-- Tabla de Preliquidaciones -->
+    <div class="bg-white rounded-lg shadow-sm border border-gray-200 overflow-hidden">
+      <div class="p-6">
+        <p-table
+          [value]="filteredPreliquidaciones"
+          [loading]="loading"
+          [paginator]="true"
+          [rows]="20"
+          [rowsPerPageOptions]="[20,40,60,120]"
+          [columns]="cols"
+          scrollHeight="70vh"
+          [resizableColumns]="true"
+          [tableStyle]="{ 'table-layout': 'fixed', 'width': '100%' }"
+          [scrollable]="true"
+          [(selection)]="selectedItem"
+          selectionMode="single"
+          dataKey="idpreliquidacion"
+          [styleClass]="'custom-table'"
+          class="w-full">
+
+          <!-- Column Definitions -->
+          <ng-template pTemplate="colgroup" let-columns>
+            <colgroup>
+              <col *ngFor="let col of columns" [style.width]="col.width">
+            </colgroup>
+          </ng-template>
+
+          <!-- Table Header -->
+          <ng-template pTemplate="header" let-columns>
+            <tr class="bg-gray-800 text-white">
+              <th
+                style="white-space: normal; word-wrap: break-word;"
+                *ngFor="let col of columns"
+                [pSortableColumn]="col.field"
+                class="text-center px-4 py-3 text-sm font-semibold text-gray-100 border-b border-gray-700">
+                {{ col.header }}
+                <p-sortIcon [field]="col.field"></p-sortIcon>
+              </th>
+            </tr>
+          </ng-template>
+
+          <!-- Table Body -->
+          <ng-template pTemplate="body" let-rowData let-columns="columns">
+            <tr [pSelectableRow]="rowData" class="border-b border-gray-100 hover:bg-gray-50 transition-colors duration-150">
+              <!-- Nro Preliquidación -->
+              <td class="text-center px-4 py-3">
+                <span class="text-amber-700 hover:text-amber-900 font-semibold">{{ rowData.numeropreliquidacion || '-' }}</span>
+              </td>
+
+              <!-- Nro Comprobante -->
+              <td class="text-center px-4 py-3 text-gray-700 text-sm">{{ rowData.numerocomprobante || '-' }}</td>
+
+              <!-- Tipo Comprobante -->
+              <td class="text-center px-4 py-3 text-gray-700 text-sm">{{ rowData.tipocomprobantepago || '-' }}</td>
+
+              <!-- Cliente -->
+              <td class="text-center px-4 py-3 text-gray-700 text-sm word-wrap">{{ rowData.cliente || '-' }}</td>
+
+              <!-- Fecha Emisión -->
+              <td class="text-center px-4 py-3 text-gray-700 text-sm">
+                {{ rowData.fechaemision | date:'dd/MM/yyyy' }}
+              </td>
+
+              <!-- Total Bultos -->
+              <td class="text-center px-4 py-3 text-gray-700 text-sm">{{ rowData.totalbulto || 0 }}</td>
+
+              <!-- Total Peso -->
+              <td class="text-center px-4 py-3">
+                <span class="text-gray-700 text-sm">{{ rowData.totalpeso | number:'1.2-2' }}</span>
+                <span class="text-gray-500 text-xs ml-1">kg</span>
+              </td>
+
+              <!-- Total Volumen -->
+              <td class="text-center px-4 py-3">
+                <span class="text-gray-700 text-sm">{{ rowData.totalvolumen | number:'1.2-2' }}</span>
+                <span class="text-gray-500 text-xs ml-1">m³</span>
+              </td>
+
+              <!-- Subtotal -->
+              <td class="text-center px-4 py-3">
+                <span class="text-amber-700 text-sm font-semibold">S/. {{ rowData.subtotal | number:'1.2-2' }}</span>
+              </td>
+
+              <!-- Recargo -->
+              <td class="text-center px-4 py-3">
+                <span class="text-gray-700 text-sm">S/. {{ rowData.recargo | number:'1.2-2' }}</span>
+              </td>
+
+              <!-- Total -->
+              <td class="text-center px-4 py-3">
+                <span class="text-amber-700 text-sm font-bold">S/. {{ rowData.total | number:'1.2-2' }}</span>
+              </td>
+            </tr>
+          </ng-template>
+
+          <!-- Empty Message -->
+          <ng-template pTemplate="emptymessage">
+            <tr>
+              <td [attr.colspan]="cols.length" class="text-center py-8" colspan="100%">
+                <div class="flex flex-col items-center justify-center text-gray-500">
+                  <mat-icon class="text-6xl mb-2" [svgIcon]="'heroicons_outline:document-text'"></mat-icon>
+                  <p class="text-lg font-medium">No se encontraron preliquidaciones</p>
+                  <p class="text-sm">Intente ajustar los filtros de búsqueda</p>
+                </div>
+              </td>
+            </tr>
+          </ng-template>
+        </p-table>
+      </div>
+    </div>
+  </div>
+</div>

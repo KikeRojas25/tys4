@@ -96,12 +96,14 @@ export class SeguimientootComponent implements OnInit {
   clientes: SelectItem[] = [];
   ubigeo: SelectItem[] = [];
   estados: SelectItem[] = [];
+  subestados: SelectItem[] = [];
   events: EventItem[];
 
   dialoglifecycle = false;
   dialogConfirm = false;
 
     ordenes: OrdenTransporte[] = [];
+  ordenesFiltradas: OrdenTransporte[] = [];
   selected: OrdenTransporte[];
   loading: any;
   model: any = {};
@@ -127,6 +129,12 @@ export class SeguimientootComponent implements OnInit {
     2: [11, 13], // "Por entregar" se mapea a "En Ruta", "En Reparto" y "Entregado"
     3: [34,35], // "TODOS LOS ESTADOS" incluye todos
 };
+
+  // Subestados por tipo de entrega (cuando estado es "Entregado")
+  // Usando SelectItem con los IDs del servidor
+  // 5: Entrega: Conforme (OK)
+  // 11: Entrega: Rechazo Parcial
+  // 10: Entrega: Rechazo Total
 
 
 
@@ -183,7 +191,7 @@ export class SeguimientootComponent implements OnInit {
 
     this.cols =
     [
-        {header: 'ACC', field: 'numcp'  ,  width: '300px' },
+        {header: 'ACC', field: 'numcp'  ,  width: '200px' },
         {header: 'OT', field: 'numcp'  ,  width: '100px' },
         {header: 'F. RECOJO', field: 'fecharegistro' , width: '120px'  },
         {header: 'F. DESPACHO', field: 'fecharegistro' , width: '120px'  },
@@ -249,7 +257,9 @@ export class SeguimientootComponent implements OnInit {
     this.estados.push({ value: 2, label: 'Por entregar' });
     this.estados.push({ value: 3, label: 'Entregado' });
 
-
+    // Inicializar subestados vacío
+    this.subestados.push({ value: null, label: 'TODOS LOS SUB-ESTADOS' });
+    this.model.idsubestado = null;
 
     this.model.idestado = 0;
 
@@ -297,19 +307,81 @@ editarConfirm(id) {
   
   }
   buscar() {
+      // Validar que el rango de fechas no exceda 2 meses
+      if (this.dateInicio && this.dateFin) {
+        const fechaInicio = new Date(this.dateInicio);
+        const fechaFin = new Date(this.dateFin);
+        
+        // Calcular la diferencia en meses
+        const mesesDiferencia = (fechaFin.getFullYear() - fechaInicio.getFullYear()) * 12 + 
+                                (fechaFin.getMonth() - fechaInicio.getMonth());
+        
+        if (mesesDiferencia > 2) {
+          this.messageService.add({
+            severity: 'warn',
+            summary: 'Rango de fechas inválido',
+            detail: 'El rango de búsqueda no puede exceder 2 meses. Por favor, ajuste las fechas.'
+          });
+          return; // Detener la búsqueda
+        }
+        
+        // Validar que la fecha de inicio no sea mayor que la fecha de fin
+        if (fechaInicio > fechaFin) {
+          this.messageService.add({
+            severity: 'warn',
+            summary: 'Rango de fechas inválido',
+            detail: 'La fecha de inicio no puede ser mayor que la fecha de fin.'
+          });
+          return; // Detener la búsqueda
+        }
+      }
+
+      // Guardar el valor original del estado y subestado antes de convertirlos
+      const estadoOriginal = this.model.idestado;
+      const subestadoOriginal = this.model.idsubestado;
 
       this.model.fecinicio = this.dateInicio;
       this.model.fecfin = this.dateFin;
       this.model.idusuario =  this.user.id;
       this.model.tipoorden = '';
 
+      // Convertir el estado para la búsqueda en el servidor
+      const estadoParaBusqueda = this.getEstadosParaBusqueda(this.model.idestado);
+      this.model.idestado = estadoParaBusqueda;
 
-      this.model.idestado = this.getEstadosParaBusqueda(this.model.idestado);
-
+      // El idsubestado ya se envía directamente al servidor (es el ID numérico)
 
       this.ordenTransporteService.getAllOrder(this.model).subscribe(list => {
 
         this.ordenes =  list;
+        
+        // Restaurar el valor original del estado después de la búsqueda
+        this.model.idestado = estadoOriginal;
+        
+        // Recargar los subestados si el estado es "Entregado" (antes de restaurar el subestado)
+        if (estadoOriginal === 3) {
+          // Guardar el subestado antes de recargar
+          const subestadoTemp = subestadoOriginal;
+          this.onChangeEstado();
+          // Restaurar el subestado después de recargar los subestados
+          if (subestadoTemp !== null && subestadoTemp !== undefined) {
+            const existeSubestado = this.subestados.some(s => s.value === subestadoTemp);
+            if (existeSubestado) {
+              this.model.idsubestado = subestadoTemp;
+            } else {
+              this.model.idsubestado = null;
+            }
+          }
+        } else {
+          // Restaurar el subestado solo si no es "Entregado"
+          this.model.idsubestado = subestadoOriginal;
+          // Limpiar subestados si no es "Entregado"
+          this.subestados = [];
+          this.subestados.push({ value: null, label: 'TODOS LOS SUB-ESTADOS' });
+        }
+        
+        // Inicializar ordenesFiltradas con todas las órdenes
+        this.ordenesFiltradas = [...list];
 
         console.log('ordenes:' , this.ordenes);
 
@@ -320,20 +392,32 @@ editarConfirm(id) {
 
    eliminarFotos(id) {
     this.confirmationService.confirm({
-      message: '¿Esta seguro que desea elminar las fotos de esta OT?',
+      message: '¿Está seguro que desea eliminar las fotos de esta OT?',
+      header: 'Confirmar eliminación',
+      icon: 'pi pi-exclamation-triangle',
       accept: () => {
-        
-        this.model.idusuarioregistro = this.user.id;
-        this.model.idordentrabajo = id;
-  
-  
-          this.messageService.add({severity: 'success', summary: 'Orden Transporte ', detail: 'Se ha eliminado con éxito.'});
-  
-          this.buscar();
-  
-       // });
+        this.ordenTransporteService.deleteFotos(id).subscribe(
+          (resp) => {
+            this.messageService.add({
+              severity: 'success', 
+              summary: 'Éxito', 
+              detail: 'Las fotos se han eliminado correctamente.'
+            });
+            this.buscar();
+          },
+          (error) => {
+            this.messageService.add({
+              severity: 'error', 
+              summary: 'Error', 
+              detail: 'Ocurrió un error al eliminar las fotos. Por favor, intente nuevamente.'
+            });
+          }
+        );
+      },
+      reject: () => {
+        // Usuario canceló la acción
       }
-  });
+    });
    }
    createImageFromBlob(image: Blob) {
 
@@ -352,6 +436,44 @@ editarConfirm(id) {
   const estadosArray = this.estadosMap[valueSeleccionado] || [valueSeleccionado];
   return estadosArray.join(","); // Convierte el array a una cadena separada por comas
 }
+
+  // Método para cargar subestados cuando se selecciona "Entregado"
+  onChangeEstado() {
+    const subestadoAnterior = this.model.idsubestado; // Guardar el valor anterior (ID)
+    this.subestados = [];
+    
+    if (this.model.idestado === 3) { // Estado "Entregado"
+      this.subestados.push({ value: null, label: 'TODOS LOS SUB-ESTADOS' });
+      
+      // Agregar los tipos principales de entrega usando SelectItem con IDs
+      // this.subestados.push({ value: 5, label: 'Entrega Perfecta' });      // ID: 5 - Entrega: Conforme (OK)
+      // this.subestados.push({ value: 5, label: 'Entrega Sin Cargo' });    // ID: 5 - Entrega: Conforme (OK)
+      this.subestados.push({ value: 11, label: 'Rechazo Parcial' });      // ID: 11 - Entrega: Rechazo Parcial
+      // "No Entrega" puede corresponder a los IDs 10 y 34
+      this.subestados.push({ value: '10,34', label: 'No Entrega' });     // IDs: 10 y 34 - No Entrega
+      
+      // Restaurar el subestado anterior si existe y es válido
+      if (subestadoAnterior !== null && subestadoAnterior !== undefined) {
+        const existeSubestado = this.subestados.some(s => s.value === subestadoAnterior);
+        if (existeSubestado) {
+          this.model.idsubestado = subestadoAnterior;
+        } else {
+          this.model.idsubestado = null;
+        }
+      }
+    } else {
+      this.subestados.push({ value: null, label: 'TODOS LOS SUB-ESTADOS' });
+      this.model.idsubestado = null; // Solo resetear si no es "Entregado"
+    }
+  }
+
+  // Método cuando cambia el subestado - ahora dispara nueva búsqueda al servidor
+  onChangeSubEstado() {
+    // Si hay órdenes cargadas, hacer nueva búsqueda con el filtro de subestado
+    if (this.ordenes.length > 0) {
+      this.buscar();
+    }
+  }
 
 
 verot(idOrdenTrabajo) {

@@ -1,0 +1,73 @@
+/* Estilos profesionales para las tablas */
+::ng-deep .custom-table {
+  border-collapse: separate;
+  border-spacing: 0;
+}
+
+/* Cabecera fija al hacer scroll */
+::ng-deep .custom-table .p-datatable-scrollable-header {
+  position: sticky !important;
+  top: 0 !important;
+  z-index: 10 !important;
+}
+
+::ng-deep .custom-table .p-datatable-thead > tr > th {
+  border: none;
+  position: sticky !important;
+  top: 0 !important;
+  z-index: 10 !important;
+  background-color: #374151 !important;
+  color: #ffffff !important;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1) !important;
+}
+
+::ng-deep .custom-table .p-datatable-wrapper {
+  position: relative;
+}
+
+::ng-deep .custom-table .p-datatable-scrollable-wrapper {
+  position: relative;
+}
+
+::ng-deep .custom-table .p-datatable-scrollable-header-table {
+  position: sticky !important;
+  top: 0 !important;
+  z-index: 10 !important;
+}
+
+::ng-deep .custom-table .p-datatable-tbody > tr {
+  border-bottom: 1px solid #e5e7eb;
+}
+
+::ng-deep .custom-table .p-datatable-tbody > tr:last-child {
+  border-bottom: none;
+}
+
+.word-wrap {
+  white-space: normal;
+  word-wrap: break-word;
+}
+
+::ng-deep .p-inputtext {
+  border-radius: 0.375rem;
+  border: 1px solid #d1d5db;
+  padding: 0.5rem 0.75rem;
+  font-size: 0.875rem;
+  transition: all 0.15s ease-in-out;
+}
+
+::ng-deep .p-inputtext:focus {
+  outline: none;
+  border-color: #f59e0b;
+  box-shadow: 0 0 0 3px rgba(245, 158, 11, 0.1);
+}
+
+::ng-deep .p-button {
+  border-radius: 0.375rem;
+  font-weight: 500;
+  transition: all 0.15s ease-in-out;
+}
+
+.text-amber-700 {
+  font-family: 'SF Mono', Monaco, 'Cascadia Code', 'Roboto Mono', Consolas, 'Courier New', monospace;
+}

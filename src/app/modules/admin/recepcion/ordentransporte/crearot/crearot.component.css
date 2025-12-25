@@ -11,4 +11,59 @@
     background-color: #f8d7da;
     border-color: #f5c2c7;
   }
+
+  /* Estilos para la tabla de GRR */
+  ::ng-deep .custom-table .p-datatable-thead > tr > th {
+    background-color: #374151 !important;
+    color: #ffffff !important;
+    font-size: 0.875rem;
+    font-weight: 600;
+    padding: 0.75rem;
+    border: none;
+  }
+
+  ::ng-deep .custom-table .p-datatable-tbody > tr {
+    border-bottom: 1px solid #e5e7eb;
+  }
+
+  ::ng-deep .custom-table .p-datatable-tbody > tr:hover {
+    background-color: #f9fafb;
+  }
+
+  ::ng-deep .custom-table .p-datatable-tbody > tr:last-child {
+    border-bottom: none;
+  }
+
+  /* Scroll en tabla */
+  ::ng-deep .p-datatable-scrollable-body {
+    overflow-y: auto !important;
+  }
+
+  ::ng-deep .p-datatable-scrollable-body::-webkit-scrollbar {
+    width: 8px;
+  }
+
+  ::ng-deep .p-datatable-scrollable-body::-webkit-scrollbar-track {
+    background: #f1f1f1;
+  }
+
+  ::ng-deep .p-datatable-scrollable-body::-webkit-scrollbar-thumb {
+    background: #888;
+    border-radius: 4px;
+  }
+
+  ::ng-deep .p-datatable-scrollable-body::-webkit-scrollbar-thumb:hover {
+    background: #555;
+  }
+
+  /* Botones de la tabla */
+  ::ng-deep .p-button.p-button-rounded.p-button-text {
+    width: 2rem;
+    height: 2rem;
+  }
+
+  /* Inputs en la tabla */
+  ::ng-deep .custom-table input[type="text"] {
+    width: 100%;
+  }
   

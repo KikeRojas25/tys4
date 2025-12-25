@@ -16,29 +16,28 @@
     <!-- Sección de Acciones -->
     <div class="col-span-12">
       <div class="flex justify-end space-x-3">
-        <button
-          class=" px-4 py-2 bg-yellow-500 text-white rounded shadow hover:bg-yellow-600 transition"
-          pButton
+        <p-button
+          severity="primary"
           icon="pi pi-file"
           label="Crear Bolsa"
           (click)="crearcarga()"
-          type="button"
-        ></button>
-        <button
-          class="px-4 py-2 bg-secondary-500 text-white rounded shadow hover:bg-secondary-600 transition"
-          pButton
+          
+        ></p-button>
+        <p-button
+          
           icon="pi pi-plus"
+          severity="secondary"
           label="Agregar ORDEN a Bolsa"
           (click)="agregaracarga()"
-          type="button"
-        ></button>
+          
+        ></p-button>
       </div>
     </div>
 
   </div>
 
     <!-- Tabla de Móviles Generadas -->
-    <div class="col-span-12">
+     <section class="col-span-12">
       <div class="card shadow-sm rounded-lg overflow-hidden">
         <div class="bg-primary-600 text-white px-6 py-3 font-semibold">Móviles Generadas</div>
         <div class="card-body p-4">
@@ -49,9 +48,11 @@
             [rowsPerPageOptions]="[20, 40, 60, 120]"
             [value]="despachos"
             paginator="true"
-            [rows]="10"
-            [resizableColumns]="true"
+            [rows]="20"
             [responsive]="true"
+
+            [scrollable]="true"
+            scrollHeight="400px"
             class="w-full"
           >
             <!-- Colgroup -->
@@ -86,16 +87,9 @@
                 <td class="   px-4 py-2">{{ rowData.fecharegistro | date: 'dd/MM/yyyy' }}</td>
                 <td class="   px-4 py-2">{{ rowData.peso | number: '1.0-2' }}</td>
                 <td class="   px-4 py-2">{{ rowData.vol | number: '1.0-2' }}</td>
-                <td class="   px-4 py-2">S/. {{ rowData.subtotal | number: '1.0-2' }}</td>
+                <!-- <td class="   px-4 py-2">S/. {{ rowData.subtotal | number: '1.0-2' }}</td> -->
                 <td class="   px-4 py-2 space-x-2">
-                  <!-- <button
-                    type="button"
-                    class="px-2 py-1 bg-info-500 text-white rounded hover:bg-info-600 transition"
-                    pButton
-                    icon="pi pi-address-book"
-                    title="Asignar"
-                    (click)="asignar(rowData.idcarga)"
-                  ></button> -->
+                 
                   <button
                     type="button"
                     class="px-2 py-1 bg-red-500 text-white rounded hover:bg-red-600 transition"
@@ -109,9 +103,9 @@
                     type="button"
                     class="px-2 py-1 bg-green-500 text-white rounded hover:bg-green-600 transition"
                     pButton
-                    icon="pi pi-check"
-                    title="Confirmar"
-                     *ngIf="rowData.estado !== 'Planificada'"
+                    [icon]="rowData.estado === 'Planificada' ? 'pi pi-refresh' : 'pi pi-check'"
+                    [title]="rowData.estado === 'Planificada' ? 'Reprogramar' : 'Confirmar'"
+                    [label]="rowData.estado === 'Planificada' ? 'Reprogramar' : ''"
                     (click)="generar(rowData.idcarga)"
                   ></button>
                   <button
@@ -137,19 +131,19 @@
             <!-- Pie de Tabla -->
             <ng-template pTemplate="footer">
               <tr class="bg-gray-100 dark:bg-gray-700">
-                <td colspan="6" class="text-right font-semibold px-4 py-2">Totales</td>
-                <td class="   font-semibold px-4 py-2">{{ bultosTotal | number: '1.0-2' }}</td>
-                <td class="   font-semibold px-4 py-2">{{ pesoTotal | number: '1.0-2' }}</td>
-                <!-- <td class="   font-semibold px-4 py-2">{{ volumenTotal | number: '1.0-2' }}</td> -->
+                <td colspan="5" class="text-right font-semibold px-4 py-2">Totales</td>
+                <td class="text-center   font-semibold px-4 py-2">{{ pesoTotal | number: '1.0-2' }}</td>
+                <td class="text-center   font-semibold px-4 py-2">{{ bultosTotal | number: '1.0-2' }}</td>
+                  <td class="text-right font-semibold px-4 py-2"></td>
               </tr>
             </ng-template>
           </p-table>
         </div>
       </div>
-    </div>
+     </section>
 
     <!-- Filtros de Fecha -->
-    <div class="col-span-12">
+    <section class="col-span-12">
       <div class="card shadow-sm rounded-lg p-4 bg-gray-50 dark:bg-gray-700">
         <div class="flex flex-wrap sm:flex-nowrap items-end space-y-4 sm:space-y-0 sm:space-x-4">
           <div class="w-full sm:w-auto flex-1">
@@ -161,73 +155,94 @@
             <p-calendar [(ngModel)]="dateFin" baseZIndex="100" [locale]="es" dateFormat="dd/mm/yy" class="w-full mt-1"></p-calendar>
           </div>
           <div class="w-full sm:w-auto flex items-end">
-            <button class="px-4 py-2 bg-primary-500 text-white rounded shadow hover:bg-primary-600 transition" pButton icon="pi pi-search" label="Buscar" (click)="buscar()" type="button"></button>
+            <p-button severity="success" icon="pi pi-search" label="Buscar" (click)="buscar()" ></p-button>
           </div>
         </div>
       </div>
-    </div>
+    </section>
     
-
-    <div class="main-content container-fluid p-6">
-
-          <p-table #dt2  [columns]="cols"  [value]="ordenes2" [(selection)]="selectedRows"  dataKey="idordentrabajo"
-          selectionMode="multiple" 
-          [resizableColumns]="true" 
-          responsive="false" 
-          [rowsPerPageOptions]="[20,40,60,120]" 
+  
+     <section class="col-span-12">
+      <div class="card rounded-xl shadow-md p-5 bg-white dark:bg-gray-800">
+        <p-table
+          #dt2
+          [columns]="cols"
+          [value]="ordenes2"
+          [(selection)]="selectedRows"
+          dataKey="idordentrabajo"
+          selectionMode="multiple"
+          paginator="true"
+          [rows]="20"
+          class="w-full"
           [scrollable]="true"
-          paginator="true" [rows]="20" >
-            
+          scrollHeight="400px"
+          responsive="true"
+          [rowsPerPageOptions]="[20,40,60,120]"
+          responsiveLayout="scroll"
+        >
+            <!-- Barra de búsqueda -->
             <ng-template pTemplate="caption">
               <div class="flex">
-                  <span class="p-input-icon-left ml-auto">
-                      <i class="pi pi-search"></i>
-                      <input pInputText type="text" (input)="dt2.filterGlobal($event.target.value, 'contains')" placeholder="Buscar..." />
-                  </span>
+                <span class="p-input-icon-left ml-auto">
+                  <i class="pi pi-search"></i>
+                  <input
+                    pInputText
+                    type="text"
+                    (input)="dt2.filterGlobal($event.target.value, 'contains')"
+                    placeholder="Buscar..."
+                  />
+                </span>
               </div>
-          </ng-template>
+            </ng-template>
 
-          <ng-template pTemplate="colgroup" let-columns>
-            <colgroup>
-              <col *ngFor="let col of columns" [style.width]="col.width">
-            </colgroup>
-          </ng-template>
-        <ng-template pTemplate="header" let-cols>
-          <tr>
-              <!-- <th style="width: 50px">
-                  <p-tableHeaderCheckbox></p-tableHeaderCheckbox>
-              </th> -->
-              <th *ngFor="let col of cols"  [style]="col.width" [pSortableColumn]="col.field" >
+            <!-- Columnas -->
+            <!-- <ng-template pTemplate="colgroup" let-columns>
+              <colgroup>
+                <col *ngFor="let col of columns" [style.width]="col.width">
+              </colgroup>
+            </ng-template> -->
+
+            <!-- Encabezado -->
+            <ng-template pTemplate="header" let-cols>
+              <tr>
+                <th *ngFor="let col of cols" [style]="col.width" [pSortableColumn]="col.field" >
                   {{ col.header }}
-              </th>
-          </tr>
-      </ng-template>
+                </th>
+              </tr>
+            </ng-template>
+
+            <!-- Cuerpo -->
             <ng-template pTemplate="body" let-rowData>
               <tr [pSelectableRow]="rowData">
-                <!-- <td class="   px-4 py-2">
-                  <p-tableCheckbox [value]="rowData"></p-tableCheckbox>
-                </td> -->
                 <td class="bg-blue-100">{{ rowData.numcp }}</td>
-                <td class="    ">{{ rowData.fechahoracita | date: 'dd/MM/yyyy' }}</td>
-                <td class="    ">{{ rowData.horacita }}</td>
-                <td class="word-wrap">{{ rowData.remitente }}</td>
-                <td class="    ">{{ rowData.distritoOrigen }}</td>
-                <td class="   word-wrap" >{{ rowData.origen }}</td>
-
-                <td class="    ">{{ rowData.distritoDestino }}</td>
-                <td class="   word-wrap">{{ rowData.centroacopio }}</td>
-
-                
-                <td class="   word-wrap">{{ rowData.personarecojo }}</td>
-                
-                <td class="   word-wrap">{{ rowData.observaciones }}</td>
-                <td class="    ">{{ rowData.bulto }}</td>
-                <td class="    ">{{ rowData.peso | number: '1.0-2' }}</td>
+                <td>{{ rowData.fechahoracita | date: 'dd/MM/yyyy' }}</td>
+                <td>{{ rowData.horacita }}</td>
+                <td class="text-left">{{ rowData.remitente }}</td>
+                <td>{{ rowData.distritoOrigen }}</td>
+                <td >{{ rowData.origen }}</td>
+                <td>{{ rowData.distritoDestino }}</td>
+                <td >{{ rowData.centroacopio }}</td>
+                <td >{{ rowData.personarecojo }}</td>
+                <td >{{ rowData.observaciones }}</td>
+                <td>{{ rowData.bulto }}</td>
+                <td>{{ rowData.peso | number: '1.0-2' }}</td>
+                <td class="px-4 py-2 text-center">
+                  <button
+                    type="button"
+                    class="px-2 py-1 bg-blue-500 text-white rounded hover:bg-blue-600 transition"
+                    pButton
+                    icon="pi pi-search"
+                    title="Ver"
+                    (click)="verDetalle(rowData)"
+                  ></button>
+                </td>
               </tr>
             </ng-template>
           </p-table>
-        </div>
+   
       </div>
+     </section>
+
 
    
 

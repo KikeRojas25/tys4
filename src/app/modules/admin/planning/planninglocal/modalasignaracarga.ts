@@ -87,7 +87,8 @@ export class ModalAsignaraCargaLocalComponent  implements OnInit {
 
       this.user = JSON.parse(localStorage.getItem('user'));
 
-      this.ordenService.GetAllCargasTemporal(2).subscribe(resp => {
+      this.ordenService.GetAllCargasTemporal(2,
+      this.user.idestacionorigen).subscribe(resp => {
 
         resp.forEach(element => {
           this.tiposunidad.push({ value: element.idcarga ,  label : element.numcarga});

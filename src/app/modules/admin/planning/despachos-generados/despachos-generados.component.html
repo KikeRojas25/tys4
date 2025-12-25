@@ -1,0 +1,620 @@
+<div class="flex flex-col flex-auto min-w-0 bg-gray-50">
+  <!-- Header -->
+  <div class="flex flex-col sm:flex-row flex-0 sm:items-center sm:justify-between p-6 sm:py-8 sm:px-10 border-b border-gray-200 bg-white shadow-sm">
+    <div class="flex-1 min-w-0">
+      <div class="flex flex-wrap items-center font-medium text-sm text-gray-600">
+        <div>
+          <a class="whitespace-nowrap text-gray-700 hover:text-gray-900">TMS</a>
+        </div>
+        <div class="flex items-center ml-1 whitespace-nowrap">
+          <mat-icon class="fuse-horizontal-navigation-item-icon text-gray-400" [svgIcon]="'heroicons_solid:chevron-right'"></mat-icon>
+          <a class="ml-1 text-gray-700 hover:text-gray-900">Planeamiento</a>
+        </div>
+        <div class="flex items-center ml-1 whitespace-nowrap">
+          <mat-icon class="fuse-horizontal-navigation-item-icon text-gray-400" [svgIcon]="'heroicons_solid:chevron-right'"></mat-icon>
+          <a class="ml-1 text-gray-700 hover:text-gray-900">Despachos Generados</a>
+        </div>
+      </div>
+      <div class="mt-2">
+        <h2 class="text-3xl md:text-4xl font-semibold tracking-tight leading-7 sm:leading-10 truncate text-gray-900">Despachos Generados </h2>
+      </div>
+    </div>
+  </div>
+
+  <!-- Parte Superior: Tabla de Despachos -->
+  <div class="p-6">
+    <div class="mb-4 flex items-center gap-2 text-sm text-amber-700 bg-amber-50 border border-amber-200 rounded-lg px-4 py-2.5" *ngIf="mostrarTablaDespachos">
+      <i class="pi pi-info-circle"></i>
+      <span>Seleccione un despacho para visualizar y gestionar sus etapas asociadas</span>
+    </div>
+    <div class="mb-4 flex items-center gap-2 text-sm text-amber-700 bg-amber-50 border border-amber-200 rounded-lg px-4 py-2.5" *ngIf="!mostrarTablaDespachos && despachoSeleccionado">
+      <i class="pi pi-info-circle"></i>
+      <span>Gestionando etapas del despacho: <strong>{{ despachoSeleccionado.numDespacho }}</strong></span>
+    </div>
+    <div class="bg-white rounded-lg shadow-sm border border-gray-200 mb-6 overflow-hidden" *ngIf="mostrarTablaDespachos">
+      <div class="bg-gray-800 text-white px-6 py-4 border-b border-gray-700">
+        <h3 class="text-lg font-semibold text-gray-100">Despachos Generados</h3>
+        <p class="text-sm text-amber-300 mt-1.5">Lista de todos los despachos generados en el sistema</p>
+      </div>
+      <div class="p-6">
+        <p-table 
+          [columns]="cols" 
+          [value]="despachos" 
+          dataKey="numDespacho"
+          selectionMode="single"
+          [(selection)]="despachoSeleccionado"
+          (onRowSelect)="onDespachoSelect($event)"
+          (onRowUnselect)="onDespachoUnselect()"
+          [rowsPerPageOptions]="[10, 20, 50]" 
+          [rows]="10" 
+          [paginator]="true"
+          [responsive]="true"
+          [styleClass]="'custom-table'"
+          class="w-full">
+          
+          <ng-template pTemplate="colgroup" let-columns>
+            <colgroup>
+              <col *ngFor="let col of columns" [ngStyle]="{'width': col.width}">
+            </colgroup>
+          </ng-template>
+
+          <ng-template pTemplate="header" let-columns>
+            <tr class="bg-gray-800 text-white">
+              <th *ngFor="let col of columns" pResizableColumn [pSortableColumn]="col.field" class="text-center px-4 py-3 text-sm font-semibold text-gray-100 border-b border-gray-700">
+                {{ col.header }}
+              </th>
+            </tr>
+          </ng-template>
+
+          <ng-template pTemplate="body" let-rowData>
+            <tr [pSelectableRow]="rowData" class="border-b border-gray-100 hover:bg-gray-50 transition-colors duration-150">
+              <td class="bg-gray-700 text-white text-center px-4 py-3 font-medium text-sm">{{ rowData.numDespacho }}</td>
+              <td class="text-center px-4 py-3 text-gray-700 text-sm">{{ rowData.tipoUnidad }}</td>
+              <td class="text-center px-4 py-3 text-gray-700 text-sm">{{ rowData.planificador }}</td>
+              <td class="text-center px-4 py-3">
+                <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium"
+                      [ngClass]="{
+                        'bg-amber-100 text-amber-800': rowData.estado === 'Planificada',
+                        'bg-gray-100 text-gray-800': rowData.estado === 'Pendiente'
+                      }">
+                  {{ rowData.estado }}
+                </span>
+              </td>
+              <td class="text-center px-4 py-3 text-amber-700 text-sm font-medium">{{ rowData.fechaRegistro | date: 'dd/MM/yyyy' }}</td>
+              <td class="text-center px-4 py-3 text-gray-700 text-sm font-medium">
+                <span class="text-amber-700 font-semibold">{{ rowData.peso | number: '1.0-2' }}</span>
+                <span class="text-gray-500 text-xs ml-1">kg</span>
+              </td>
+              <td class="text-center px-4 py-3 text-gray-700 text-sm font-medium">
+                <span class="text-amber-700 font-semibold">{{ rowData.volumen | number: '1.0-2' }}</span>
+                <span class="text-gray-500 text-xs ml-1">m³</span>
+              </td>
+              <td class="text-center px-4 py-3">
+                <span class="text-amber-700 text-sm font-semibold">S/. {{ rowData.subtotal | number: '1.0-2' }}</span>
+              </td>
+              <td class="text-center px-4 py-3">
+                <div class="flex gap-1.5 justify-center items-center">
+                  <button
+                    type="button"
+                    class="p-1.5 text-white hover:bg-gray-100 hover:text-gray-700 rounded transition-all duration-150"
+                    pButton
+                    icon="pi pi-trash"
+                    title="Eliminar"
+                    *ngIf="rowData.estado !== 'Planificada'"
+                    (click)="eliminarDespacho(rowData)"
+                  ></button>
+                  <button
+                    type="button"
+                    class="p-1.5 text-white hover:bg-gray-100 hover:text-gray-700 rounded transition-all duration-150"
+                    pButton
+                    [icon]="rowData.estado === 'Planificada' ? 'pi pi-refresh' : 'pi pi-check'"
+                    [title]="rowData.estado === 'Planificada' ? 'Reprogramar' : 'Confirmar'"
+                    (click)="confirmarDespacho(rowData)"
+                  ></button>
+                  <button
+                    type="button"
+                    class="p-1.5 text-white hover:bg-gray-100 hover:text-gray-700 rounded transition-all duration-150"
+                    pButton
+                    icon="pi pi-search"
+                    title="Ver"
+                    (click)="verDespacho(rowData)"
+                  ></button>
+                </div>
+              </td>
+            </tr>
+          </ng-template>
+        </p-table>
+      </div>
+    </div>
+
+    <!-- Parte Inferior: Gestión de Etapas -->
+    <div class="bg-white rounded-lg shadow-sm border border-gray-200 overflow-hidden">
+      <div class="bg-gray-800 text-white px-6 py-4 border-b border-gray-700 flex justify-between items-center">
+        <div>
+          <h3 class="text-lg font-semibold text-gray-100 mb-1">Gestión de Etapas</h3>
+          <div *ngIf="despachoSeleccionado" class="mt-2">
+            <p class="text-sm text-gray-300">
+              Despacho: <span class="font-semibold text-white">{{ despachoSeleccionado.numDespacho }}</span>
+            </p>
+            <p class="text-xs text-gray-400 mt-1">
+              Tipo de Unidad: {{ despachoSeleccionado.tipoUnidad }} | 
+              Planificador: {{ despachoSeleccionado.planificador }} | 
+              Estado: {{ despachoSeleccionado.estado }} | 
+              Peso: {{ despachoSeleccionado.peso | number:'1.0-2' }} kg | 
+              Volumen: {{ despachoSeleccionado.volumen | number:'1.0-2' }} m³
+            </p>
+          </div>
+          <p class="text-sm text-amber-300 mt-1" *ngIf="!despachoSeleccionado && mostrarTablaDespachos">
+            Seleccione un despacho arriba para gestionar sus etapas
+          </p>
+        </div>
+        <button
+          class="px-4 py-2 text-sm font-medium text-white bg-gray-700 hover:bg-gray-600 rounded-md shadow-sm transition-all duration-150 disabled:opacity-50 disabled:cursor-not-allowed"
+          pButton
+          icon="pi pi-plus"
+          label="Agregar Etapa"
+          iconPos="left"
+          [disabled]="!despachoSeleccionado"
+          (click)="agregarEtapa()"
+        ></button>
+      </div>
+      <div class="p-6">
+        <!-- Formulario para agregar etapa -->
+        <div *ngIf="mostrarAgregarEtapa" class="mb-6 p-5 bg-gray-50 rounded-lg border border-gray-200 shadow-sm">
+          <div class="mb-4 pb-3 border-b border-gray-200">
+            <h4 class="text-base font-semibold text-gray-900">Nueva Etapa</h4>
+            <p class="text-sm text-amber-700 mt-1">Complete los campos para agregar una nueva etapa al despacho seleccionado</p>
+          </div>
+
+          <!-- Selección de Origen -->
+          <div class="mb-4">
+            <label class="block text-sm font-medium mb-2 text-gray-700">
+              Crear etapa desde:
+            </label>
+            <div class="flex gap-4">
+              <div class="flex items-center">
+                <p-radioButton 
+                  name="origenEtapa" 
+                  value="nueva" 
+                  [(ngModel)]="origenNuevaEtapa"
+                  (onClick)="onOrigenNuevaEtapaChange()"
+                  inputId="origenNueva">
+                </p-radioButton>
+                <label for="origenNueva" class="ml-2 text-sm text-gray-700">Nueva etapa</label>
+              </div>
+              <div class="flex items-center">
+                <p-radioButton 
+                  name="origenEtapa" 
+                  value="etapa" 
+                  [(ngModel)]="origenNuevaEtapa"
+                  (onClick)="onOrigenNuevaEtapaChange()"
+                  inputId="origenEtapa">
+                </p-radioButton>
+                <label for="origenEtapa" class="ml-2 text-sm text-gray-700">Desde etapa anterior</label>
+              </div>
+              <div class="flex items-center">
+                <p-radioButton 
+                  name="origenEtapa" 
+                  value="grupo" 
+                  [(ngModel)]="origenNuevaEtapa"
+                  (onClick)="onOrigenNuevaEtapaChange()"
+                  inputId="origenGrupo">
+                </p-radioButton>
+                <label for="origenGrupo" class="ml-2 text-sm text-gray-700">Desde grupo (Tipo Operación | Repartidor)</label>
+              </div>
+            </div>
+          </div>
+
+          <!-- Selección de Etapa Anterior -->
+          <div *ngIf="origenNuevaEtapa === 'etapa'" class="mb-4">
+            <label class="block text-sm font-medium mb-2 text-gray-700">
+              Seleccione la etapa anterior:
+            </label>
+            <p-dropdown
+              [options]="getOpcionesEtapas()"
+              [(ngModel)]="etapaOrigenSeleccionada"
+              (onChange)="onEtapaOrigenSeleccionada()"
+              placeholder="Seleccione una etapa"
+              [style]="{'width':'100%'}"
+              appendTo="body"
+              [filter]="true">
+            </p-dropdown>
+          </div>
+
+          <!-- Selección de Grupo -->
+          <div *ngIf="origenNuevaEtapa === 'grupo'" class="mb-4">
+            <label class="block text-sm font-medium mb-2 text-gray-700">
+              Seleccione el grupo (Tipo Operación | Repartidor):
+            </label>
+            <p-dropdown
+              [options]="getOpcionesGrupos()"
+              [(ngModel)]="grupoOrigenSeleccionado"
+              (onChange)="onGrupoOrigenSeleccionado()"
+              placeholder="Seleccione un grupo"
+              [style]="{'width':'100%'}"
+              appendTo="body"
+              [filter]="true">
+            </p-dropdown>
+          </div>
+
+          <!-- Selección de OTs (cuando hay origen seleccionado) -->
+          <div *ngIf="(origenNuevaEtapa === 'etapa' && etapaOrigenSeleccionada) || (origenNuevaEtapa === 'grupo' && grupoOrigenSeleccionado) || origenNuevaEtapa === 'nueva'" class="mb-4">
+            <label class="block text-sm font-medium mb-2 text-gray-700">
+              Seleccione las OTs para esta etapa:
+            </label>
+            <div class="max-h-60 overflow-y-auto border border-gray-200 rounded-lg">
+              <table class="w-full text-sm">
+                <thead class="bg-gray-100 sticky top-0">
+                  <tr>
+                    <th class="px-3 py-2 text-left text-gray-700 font-medium w-12"></th>
+                    <th class="px-3 py-2 text-left text-gray-700 font-medium">N° OT</th>
+                    <th class="px-3 py-2 text-left text-gray-700 font-medium">Cliente</th>
+                    <th class="px-3 py-2 text-left text-gray-700 font-medium">Destino</th>
+                    <th class="px-3 py-2 text-left text-gray-700 font-medium">Tipo Operación</th>
+                    <th class="px-3 py-2 text-left text-gray-700 font-medium">Repartidor</th>
+                    <th class="px-3 py-2 text-right text-gray-700 font-medium">Peso</th>
+                    <th class="px-3 py-2 text-right text-gray-700 font-medium">Bultos</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <tr *ngFor="let ot of otsParaNuevaEtapa" class="border-b border-gray-100 hover:bg-gray-50">
+                    <td class="px-3 py-2">
+                      <p-checkbox 
+                        [binary]="true" 
+                        [ngModel]="isOTSeleccionadaParaNuevaEtapa(ot)"
+                        (onChange)="toggleOTParaNuevaEtapa(ot)">
+                      </p-checkbox>
+                    </td>
+                    <td class="px-3 py-2 text-gray-700 font-medium">{{ ot.numordentrabajo }}</td>
+                    <td class="px-3 py-2 text-gray-600">{{ ot.razonsocial }}</td>
+                    <td class="px-3 py-2 text-gray-600">{{ ot.destino }}</td>
+                    <td class="px-3 py-2 text-gray-600">{{ ot.tipooperacion || '-' }}</td>
+                    <td class="px-3 py-2 text-gray-600">{{ ot.proveedor || '-' }}</td>
+                    <td class="px-3 py-2 text-right text-amber-700 font-medium">{{ ot.peso || 0 | number:'1.0-2' }}</td>
+                    <td class="px-3 py-2 text-right text-amber-700 font-medium">{{ ot.bultos || 0 }}</td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+            <p class="text-xs text-gray-500 mt-2">
+              <span class="text-amber-700 font-semibold">{{ nuevaEtapa.otsSeleccionadas?.length || 0 }}</span> OT(s) seleccionada(s) de 
+              <span class="text-amber-700 font-semibold">{{ otsParaNuevaEtapa.length }}</span> OT(s) disponibles
+            </p>
+          </div>
+
+          <div class="grid grid-cols-1 md:grid-cols-2 gap-4 mt-4">
+            <div>
+              <label class="block text-sm font-medium mb-2 text-gray-700">
+                Nombre de la Etapa
+                <span class="text-amber-700 text-xs font-normal ml-1">(requerido)</span>
+              </label>
+              <input
+                type="text"
+                pInputText
+                [(ngModel)]="nuevaEtapa.nombre"
+                placeholder="Ej: Recojo, Transporte, Entrega"
+                class="w-full border-gray-300 focus:border-amber-500 focus:ring-amber-500"
+              />
+            </div>
+            <div>
+              <label class="block text-sm font-medium mb-2 text-gray-700">
+                Descripción
+                <span class="text-amber-700 text-xs font-normal ml-1">(requerido)</span>
+              </label>
+              <input
+                type="text"
+                pInputText
+                [(ngModel)]="nuevaEtapa.descripcion"
+                placeholder="Descripción de la etapa"
+                class="w-full border-gray-300 focus:border-amber-500 focus:ring-amber-500"
+              />
+            </div>
+            <div>
+              <label class="block text-sm font-medium mb-2 text-gray-700">
+                Tipo de Operación
+                <span class="text-amber-700 text-xs font-normal ml-1">(requerido)</span>
+              </label>
+              <p-dropdown
+                name="tipoOperacion"
+                [options]="tiposOperacion"
+                [(ngModel)]="nuevaEtapa.tipoOperacion"
+                placeholder="Seleccione un tipo de operación"
+                [style]="{'width':'100%'}"
+                appendTo="body"
+                [baseZIndex]="100000"
+                class="w-full"
+                [styleClass]="'border-gray-300 focus:border-amber-500'">
+              </p-dropdown>
+            </div>
+            <div>
+              <label class="block text-sm font-medium mb-2 text-gray-700">
+                Orden
+                <span class="text-amber-700 text-xs font-normal ml-1">(secuencia)</span>
+              </label>
+              <input
+                type="number"
+                pInputText
+                [(ngModel)]="nuevaEtapa.orden"
+                placeholder="Orden"
+                class="w-full border-gray-300 focus:border-amber-500 focus:ring-amber-500"
+              />
+            </div>
+          </div>
+          <div class="flex gap-3 mt-5">
+            <button
+              class="px-4 py-2 text-sm font-medium text-white bg-gray-700 hover:bg-gray-600 rounded-md shadow-sm transition-all duration-150"
+              pButton
+              label="Guardar"
+              icon="pi pi-check"
+              iconPos="left"
+              (click)="guardarEtapa()"
+            ></button>
+            <button
+              class="px-4 py-2 text-sm font-medium text-gray-700 bg-white border border-gray-300 hover:bg-gray-50 rounded-md shadow-sm transition-all duration-150"
+              pButton
+              label="Cancelar"
+              icon="pi pi-times"
+              iconPos="left"
+              (click)="cancelarAgregarEtapa()"
+            ></button>
+          </div>
+        </div>
+
+        <!-- Tabla de Etapas -->
+        <p-table 
+          [columns]="colsEtapas" 
+          [value]="etapas" 
+          dataKey="id"
+          [rowsPerPageOptions]="[10, 20, 50]" 
+          [rows]="10" 
+          [paginator]="true"
+          [responsive]="true"
+          [styleClass]="'custom-table'"
+          class="w-full">
+          
+          <ng-template pTemplate="colgroup" let-columns>
+            <colgroup>
+              <col *ngFor="let col of columns" [ngStyle]="{'width': col.width}">
+            </colgroup>
+          </ng-template>
+
+          <ng-template pTemplate="header" let-columns>
+            <tr class="bg-gray-100 border-b border-gray-200">
+              <th *ngFor="let col of columns" pResizableColumn [pSortableColumn]="col.field" class="text-center px-4 py-3 text-sm font-semibold text-gray-700">
+                {{ col.header }}
+                <span class="text-amber-700 text-xs font-normal ml-1" *ngIf="col.field === 'orden'">(secuencia)</span>
+              </th>
+            </tr>
+          </ng-template>
+
+          <ng-template pTemplate="body" let-rowData>
+            <tr [pSelectableRow]="rowData" class="border-b border-gray-100 hover:bg-gray-50 transition-colors duration-150">
+              <td class="text-center px-4 py-3">
+                <span class="inline-flex items-center justify-center w-8 h-8 rounded-full bg-amber-100 text-amber-800 text-sm font-semibold">
+                  {{ rowData.orden }}
+                </span>
+              </td>
+              <td class="text-center px-4 py-3 text-gray-700 text-sm font-medium">{{ rowData.nombre }}</td>
+              <td class="text-center px-4 py-3 text-gray-600 text-sm">{{ rowData.descripcion }}</td>
+              <td class="text-center px-4 py-3">
+                <span class="text-amber-700 text-sm font-medium">{{ rowData.tipoOperacionLabel || '-' }}</span>
+              </td>
+              <td class="text-center px-4 py-3">
+                <div class="flex gap-1.5 justify-center items-center">
+                  <button
+                    type="button"
+                    class="p-1.5 text-white hover:bg-gray-100 hover:text-gray-700 rounded transition-all duration-150"
+                    pButton
+                    [icon]="etapaExpandida === rowData.id ? 'pi pi-chevron-up' : 'pi pi-chevron-down'"
+                    [title]="etapaExpandida === rowData.id ? 'Ocultar detalles' : 'Ver detalles'"
+                    (click)="expandirEtapa(rowData)"
+                  ></button>
+                  <button
+                    type="button"
+                    class="p-1.5 text-white hover:bg-gray-100 hover:text-gray-700 rounded transition-all duration-150"
+                    pButton
+                    icon="pi pi-trash"
+                    title="Eliminar"
+                    (click)="eliminarEtapa(rowData)"
+                  ></button>
+                </div>
+              </td>
+            </tr>
+            <!-- Fila expandible con detalles de la etapa -->
+            <tr *ngIf="etapaExpandida === rowData.id" class="bg-gray-50">
+              <td [attr.colspan]="colsEtapas.length" class="px-6 py-6">
+                <div class="bg-white rounded-lg border border-gray-200 p-6 shadow-sm">
+                  <h4 class="text-lg font-semibold text-gray-900 mb-4 pb-3 border-b border-gray-200">
+                    <span class="text-amber-700">Detalles de la Etapa:</span> {{ rowData.nombre }}
+                  </h4>
+                  
+                  <!-- Selección de OTs Agrupadas -->
+                  <div class="mb-6">
+                    <h5 class="text-sm font-semibold text-gray-700 mb-3 text-amber-700">Órdenes de Trabajo (OTs) - Agrupadas por Tipo de Operación y Repartidor</h5>
+                    <div class="space-y-4 max-h-96 overflow-y-auto">
+                      <!-- Grupos de OTs -->
+                      <div *ngFor="let grupo of gruposOTs" class="border border-gray-200 rounded-lg overflow-hidden">
+                        <!-- Cabecera del Grupo (Clickable para expandir/colapsar) -->
+                        <div class="bg-gray-100 px-4 py-2 border-b border-gray-200 cursor-pointer hover:bg-gray-200 transition-colors duration-150" 
+                             (click)="toggleGrupo(grupo)">
+                          <div class="flex items-center justify-between">
+                            <div class="flex items-center gap-3">
+                              <button 
+                                type="button"
+                                class="p-1 text-gray-600 hover:text-gray-900 rounded transition-all duration-150"
+                                [title]="isGrupoExpandido(grupo) ? 'Colapsar grupo' : 'Expandir grupo'">
+                                <i class="pi" 
+                                   [ngClass]="isGrupoExpandido(grupo) ? 'pi-chevron-down' : 'pi-chevron-right'"
+                                   style="font-size: 0.875rem;"></i>
+                              </button>
+                              <span class="text-sm font-semibold text-gray-700">
+                                Tipo de Operación: 
+                                <span class="text-amber-700" [ngClass]="{'text-red-600': grupo.tipoOperacion === 'No Asignado'}">
+                                  {{ grupo.tipoOperacion }}
+                                </span>
+                              </span>
+                              <span class="text-gray-400">|</span>
+                              <span class="text-sm font-semibold text-gray-700">
+                                Repartidor: 
+                                <span class="text-amber-700" [ngClass]="{'text-red-600': grupo.repartidor === 'No Asignado'}">
+                                  {{ grupo.repartidor }}
+                                </span>
+                              </span>
+                            </div>
+                            <div class="flex items-center gap-4 text-xs text-gray-600">
+                              <span><strong>{{ grupo.ots.length }}</strong> OT(s)</span>
+                              <span>Peso: <strong class="text-amber-700">{{ grupo.totalPeso | number:'1.0-2' }}</strong> kg</span>
+                              <span>Bultos: <strong class="text-amber-700">{{ grupo.totalBultos | number:'1.0-0' }}</strong></span>
+                              <span>Subtotal: <strong class="text-amber-700">S/. {{ grupo.totalSubtotal | number:'1.0-2' }}</strong></span>
+                            </div>
+                          </div>
+                        </div>
+                        <!-- Tabla de OTs del Grupo (Solo visible cuando está expandido) -->
+                        <div class="overflow-x-auto" *ngIf="isGrupoExpandido(grupo)">
+                          <table class="w-full text-sm">
+                            <thead class="bg-gray-50">
+                              <tr>
+                                <th class="px-3 py-2 text-left text-gray-700 font-medium w-12"></th>
+                                <th class="px-3 py-2 text-left text-gray-700 font-medium">N° OT</th>
+                                <th class="px-3 py-2 text-left text-gray-700 font-medium">Cliente</th>
+                                <th class="px-3 py-2 text-left text-gray-700 font-medium">Destino</th>
+                                <th class="px-3 py-2 text-right text-gray-700 font-medium">Peso</th>
+                                <th class="px-3 py-2 text-right text-gray-700 font-medium">Bultos</th>
+                                <th class="px-3 py-2 text-right text-gray-700 font-medium">Subtotal</th>
+                              </tr>
+                            </thead>
+                            <tbody>
+                              <tr *ngFor="let ot of grupo.ots" class="border-b border-gray-100 hover:bg-gray-50">
+                                <td class="px-3 py-2">
+                                  <p-checkbox 
+                                    [binary]="true" 
+                                    [ngModel]="isOTSeleccionada(rowData, ot)"
+                                    (onChange)="toggleOTEnEtapa(rowData, ot)">
+                                  </p-checkbox>
+                                </td>
+                                <td class="px-3 py-2 text-gray-700 font-medium">{{ ot.numordentrabajo }}</td>
+                                <td class="px-3 py-2 text-gray-600">{{ ot.razonsocial }}</td>
+                                <td class="px-3 py-2 text-gray-600">{{ ot.destino }}</td>
+                                <td class="px-3 py-2 text-right text-amber-700 font-medium">{{ ot.peso || 0 | number:'1.0-2' }}</td>
+                                <td class="px-3 py-2 text-right text-amber-700 font-medium">{{ ot.bultos || 0 }}</td>
+                                <td class="px-3 py-2 text-right text-amber-700 font-medium">S/. {{ (ot.subtotal || 0) | number: '1.0-2' }}</td>
+                              </tr>
+                            </tbody>
+                          </table>
+                        </div>
+                      </div>
+                    </div>
+                    <p class="text-xs text-gray-500 mt-3 flex items-center gap-2">
+                      <span class="text-amber-700 font-semibold">{{ rowData.otsSeleccionadas?.length || 0 }}</span> OT(s) seleccionada(s) de 
+                      <span class="text-amber-700 font-semibold">{{ otsDisponibles.length }}</span> OT(s) disponibles
+                    </p>
+                  </div>
+
+                  <!-- Datos de Agencia (solo si tipoOperacion === 123) -->
+                  <div *ngIf="esDistribucionPorAgencia(rowData.tipoOperacion)" class="mb-6">
+                    <h5 class="text-sm font-semibold text-gray-700 mb-3 text-amber-700">Datos de Distribución por Agencia</h5>
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                      <div class="flex flex-col">
+                        <label class="block text-sm font-medium mb-2 text-gray-700 text-left">Peso</label>
+                        <p-inputNumber
+                          [(ngModel)]="rowData.pesoAgencia"
+                          mode="decimal"
+                          [minFractionDigits]="2"
+                          [maxFractionDigits]="5"
+                          [style]="{'width':'100%'}"
+                          styleClass="w-full">
+                        </p-inputNumber>
+                      </div>
+                      <div class="flex flex-col">
+                        <label class="block text-sm font-medium mb-2 text-gray-700 text-left">Bultos</label>
+                        <p-inputNumber
+                          [(ngModel)]="rowData.bultoAgencia"
+                          [style]="{'width':'100%'}"
+                          styleClass="w-full">
+                        </p-inputNumber>
+                      </div>
+                      <div class="flex flex-col">
+                        <label class="block text-sm font-medium mb-2 text-gray-700 text-left">Factura</label>
+                        <input
+                          type="text"
+                          pInputText
+                          [(ngModel)]="rowData.nroFactura"
+                          placeholder="Número de factura"
+                          class="w-full text-left">
+                      </div>
+                      <div class="flex flex-col">
+                        <label class="block text-sm font-medium mb-2 text-gray-700 text-left">Consignado</label>
+                        <input
+                          type="text"
+                          pInputText
+                          [(ngModel)]="rowData.consignadoAgencia"
+                          placeholder="Consignado"
+                          class="w-full text-left">
+                      </div>
+                      <div class="flex flex-col">
+                        <label class="block text-sm font-medium mb-2 text-gray-700 text-left">Clave</label>
+                        <input
+                          type="text"
+                          pInputText
+                          [(ngModel)]="rowData.claveAgencia"
+                          placeholder="Clave"
+                          class="w-full text-left">
+                      </div>
+                      <div class="flex flex-col">
+                        <label class="block text-sm font-medium mb-2 text-gray-700 text-left">Nro Remito</label>
+                        <input
+                          type="text"
+                          pInputText
+                          [(ngModel)]="rowData.nroRemito"
+                          placeholder="Número de remito"
+                          class="w-full text-left">
+                      </div>
+                      <div class="flex flex-col">
+                        <label class="block text-sm font-medium mb-2 text-gray-700 text-left">Costo Envío</label>
+                        <p-inputNumber
+                          [(ngModel)]="rowData.costoEnvio"
+                          mode="decimal"
+                          [minFractionDigits]="2"
+                          [maxFractionDigits]="5"
+                          [style]="{'width':'100%'}"
+                          styleClass="w-full">
+                        </p-inputNumber>
+                      </div>
+                      <div class="flex flex-col">
+                        <label class="block text-sm font-medium mb-2 text-gray-700 text-left">Agencia</label>
+                        <p-dropdown
+                          [options]="agencias"
+                          [(ngModel)]="rowData.idAgencia"
+                          placeholder="Seleccione agencia"
+                          [style]="{'width':'100%'}"
+                          [filter]="true"
+                          appendTo="body"
+                          styleClass="w-full">
+                          <ng-template let-item pTemplate="selectedItem">
+                            <span>{{ item.label }}</span>
+                          </ng-template>
+                        </p-dropdown>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </td>
+            </tr>
+          </ng-template>
+
+          <ng-template pTemplate="emptymessage">
+            <tr>
+              <td [attr.colspan]="colsEtapas.length" class="text-center p-8">
+                <div class="flex flex-col items-center">
+                  <i class="pi pi-inbox text-4xl mb-3 text-amber-300"></i>
+                  <span class="text-gray-500 text-sm mb-1">No hay etapas registradas para este despacho</span>
+                  <span class="text-amber-700 text-xs">Seleccione un despacho y agregue etapas para comenzar</span>
+                </div>
+              </td>
+            </tr>
+          </ng-template>
+        </p-table>
+      </div>
+    </div>
+  </div>
+</div>

@@ -17,6 +17,7 @@ import { ToastModule } from 'primeng/toast';
 import { PickListModule } from 'primeng/picklist';
 import { DialogModule } from 'primeng/dialog';
 import { throwIfEmpty } from 'rxjs';
+import { Dropdown, DropdownModule } from 'primeng/dropdown';
 
 @Component({
   selector: 'app-listuser',
@@ -35,7 +36,8 @@ import { throwIfEmpty } from 'rxjs';
     InputTextModule,
     ToastModule,
     PickListModule,
-    DialogModule
+    DialogModule,
+    DropdownModule
   ],
   providers: [
     DialogService,
@@ -54,6 +56,20 @@ export class ListuserComponent implements OnInit {
   roles: any[] = []; // Lista de roles
   selectedRoles: any[] = []; // Roles seleccionados
 
+  dialogAsignarVisible = false;
+  usuarioSeleccionado: any = null;
+
+listaEquipos = [
+  { id: null, nombre: 'Sin equipo asignado' },
+  { id: 21490, nombre: 'Operador 1' },
+  { id: 21491, nombre: 'Operador 2' },
+  { id: 21492, nombre: 'Operador 3' },
+  { id: 24275, nombre: 'Operador 4' },
+  { id: 24282, nombre: 'Supervisor' },
+  { id: 28158, nombre: 'Operador 5' },
+];
+
+
 
   constructor(private userService: SeguridadService,
     private messageService: MessageService,
@@ -69,9 +85,11 @@ export class ListuserComponent implements OnInit {
 
   buscar() {
     // Llama al método get() del servicio y suscríbete al observable
-    this.userService.get().subscribe((users: User[]) => {
+    this.userService.get( this.model.param ).subscribe((users: User[]) => {
       // Asigna los usuarios al array
       this.users = users;
+
+      console.log('Usuarios cargados:', this.users);
   
       // Si no hay ningún valor en 'this.model.param', mostramos todos los usuarios
       if (!this.model.param || this.model.param.trim() === '') {
@@ -79,7 +97,7 @@ export class ListuserComponent implements OnInit {
       } else {
         // Aplica el filtro basado en el parámetro 'param' del modelo
         this.filteredUsers = this.users.filter(user =>
-          user.nombreCompleto.toLowerCase().includes(this.model.param.toLowerCase())
+          user.usr_str_nombre.toLowerCase().includes(this.model.param.toLowerCase())
         );
       }
   
@@ -87,7 +105,22 @@ export class ListuserComponent implements OnInit {
       console.log(this.filteredUsers);
     });
   }
+
+
+
+
   
+getNombreEquipo(id: number): string {
+  const mapaEquipos: { [key: number]: string } = {
+    21490: 'Operador 1',
+    21491: 'Operador 2',
+    21492: 'Operador 3',
+    24275: 'Operador 4',
+    24282: 'Supervisor',
+    28158: 'Operador 5'
+  };
+  return mapaEquipos[id] || 'Sin asignar';
+}
 
   nuevo() {
     this.router.navigate(['/seguridad/newusuario']  );
@@ -129,18 +162,51 @@ export class ListuserComponent implements OnInit {
 
   }
 
+guardarCambioEquipo() {
+  if (!this.usuarioSeleccionado) return;
+
+  const userId = this.usuarioSeleccionado.usr_int_id;
+  const idEquipo = this.usuarioSeleccionado.idequipo;
+
+  // 🔹 Llamada al backend para actualizar el equipo
+  this.userService.updateEquipo(userId, idEquipo).subscribe({
+    next: (res) => {
+      // ✅ Actualizar en memoria la lista local
+      const index = this.users.findIndex(u => u.usr_int_id === userId);
+      if (index >= 0) {
+        this.users[index].idequipo = idEquipo;
+      }
+
+      // ✅ Mensaje visual de éxito
+      this.messageService.add({
+        severity: 'success',
+        summary: 'Equipo actualizado',
+        detail: res.message || `El usuario ${this.users[index]?.usr_str_nombre || ''} fue asignado al nuevo equipo.`,
+        life: 3000
+      });
+
+      // ✅ Cierra el modal
+      this.dialogAsignarVisible = false;
+    },
+    error: (err) => {
+      console.error('Error al actualizar equipo:', err);
+      this.messageService.add({
+        severity: 'error',
+        summary: 'Error',
+        detail: 'No se pudo actualizar el equipo. Intenta nuevamente.',
+        life: 3000
+      });
+    }
+  });
+}
+
   verRolesUsuario(id: any) {
 
-    // this.userService.getRolesByUser(id).subscribe(roles=> {
-    //   this.roles = roles;
-    // })
-
-    // this.userService.getRoles(id).subscribe(roles=> {
-    //   this.selectedRoles = roles;
-    // })
-
-
-    this.displayDialog = true;
+    const usuario = this.users.find(u => u.usr_int_id === id);
+    if (usuario) {
+      this.usuarioSeleccionado = { ...usuario }; // copia para edición
+      this.dialogAsignarVisible = true;
+    }
   }
 
   saveRoles() {

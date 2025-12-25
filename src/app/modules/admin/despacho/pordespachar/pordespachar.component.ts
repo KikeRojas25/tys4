@@ -158,7 +158,7 @@ export class PordespacharComponent implements OnInit {
       this.model.fec_ini = this.dateInicio;
       this.model.fec_fin = this.dateFin;
       this.loading = true;
-
+      this.model.idestacion = this.user.idestacionorigen;
 
 
       if(this.model.iddestinatario == undefined) {

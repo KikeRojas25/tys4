@@ -49,9 +49,17 @@ getAllOrderTransportPending(model: any) : Observable<OrdenTransporte[]> {
   return this._httpClient.get<OrdenTransporte[]>(this.baseUrl + 'GetAllOrderPending' + param  , httpOptions);
 }
 getAllPreHojaRutaEnBase(model: any) {
-  const param = '?idestado=' + 1
-  return this._httpClient.get<OrdenTransporte[]>(this.baseUrl + 'getAllPreHojasRutaEnBase' + param  , httpOptions);
+  const idestado = 1;
+  const idestacion = model.idestacion || ''; // 👈 si no existe, se envía vacío
+
+  const params = `?idestado=${idestado}&idestacionorigen=${idestacion}`;
+
+  return this._httpClient.get<OrdenTransporte[]>(
+    this.baseUrl + 'getAllPreHojasRutaEnBase' + params,
+    httpOptions
+  );
 }
+
 
 
 getAllPreManifiestos(model: any): any {

@@ -91,8 +91,6 @@ export class AsignartipooperacionComponent implements OnInit {
 
     this.mantenimientoService.getProveedores("", 21514).subscribe(resp => {
 
-      console.log('repartidor', resp);
-
       resp.forEach(element => {
         this.repartidores.push({ value: element.idProveedor ,  label : element.razonSocial  +   ' - '   +    element.ruc});
       });
@@ -184,6 +182,7 @@ export class AsignartipooperacionComponent implements OnInit {
     this.proveedoresDestino = this.repartidores;
 
     this.model.IdDestinatario = null;
+    this.model.idrepartidor = null; // Limpiar selección de repartidor
 
     this.traficoService.getProveedorxDireccion(this.model.iddestino ).subscribe(response =>  {
       console.log('bd',response.proveedores);
@@ -204,6 +203,9 @@ export class AsignartipooperacionComponent implements OnInit {
         this.proveedoresDestino = proveedoresFiltered; // Asigna solo los destinos válidos
       }
       else {
+        // Si no hay proveedores asociados, dejar el listado en blanco
+        this.proveedoresDestino = [];
+        this.model.idrepartidor = null; // Limpiar selección de repartidor
      //   this.messageService.add({ severity: 'warn', summary: 'Generación de Manifiesto', detail: 'El destino seleccionado no tiene proveedores asociados.' });
       }
 

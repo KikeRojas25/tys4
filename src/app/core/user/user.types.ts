@@ -21,4 +21,8 @@ export interface User {
     estrafico?: boolean;
     idclientes: string;
     
+    usr_str_nombre: string;
+    usr_str_apellidos: string;
+    idequipo: number;
+    
 }

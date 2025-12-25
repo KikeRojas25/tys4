@@ -1,0 +1,57 @@
+.generar-factura-modal {
+  max-height: 90vh;
+  overflow-y: auto;
+}
+
+::ng-deep .generar-factura-dialog .p-dialog-content {
+  padding: 0;
+  max-height: 85vh;
+  overflow-y: auto;
+}
+
+::ng-deep .generar-factura-dialog {
+  max-width: 1200px;
+  width: 90% !important;
+}
+
+/* Estilos compactos para controles */
+::ng-deep .generar-factura-modal .compact-calendar .p-inputtext {
+  font-size: 0.75rem !important;
+  padding: 0.375rem 0.5rem !important;
+}
+
+::ng-deep .generar-factura-modal .compact-dropdown .p-dropdown {
+  font-size: 0.75rem !important;
+}
+
+::ng-deep .generar-factura-modal .compact-dropdown .p-dropdown .p-dropdown-label {
+  padding: 0.375rem 0.5rem !important;
+  font-size: 0.75rem !important;
+}
+
+::ng-deep .generar-factura-modal .compact-dropdown .p-dropdown-trigger {
+  width: 2rem !important;
+}
+
+::ng-deep .generar-factura-modal .compact-table .p-datatable-tbody > tr > td {
+  padding: 0.25rem 0.5rem !important;
+  font-size: 0.75rem !important;
+}
+
+::ng-deep .generar-factura-modal .compact-table .p-datatable-thead > tr > th {
+  padding: 0.375rem 0.5rem !important;
+  font-size: 0.75rem !important;
+}
+
+::ng-deep .generar-factura-modal .p-button-sm {
+  padding: 0.375rem 0.75rem !important;
+  font-size: 0.75rem !important;
+}
+
+::ng-deep .generar-factura-modal .p-button-sm .p-button-label {
+  font-size: 0.75rem !important;
+}
+
+::ng-deep .generar-factura-modal .p-button-sm .p-button-icon {
+  font-size: 0.75rem !important;
+}

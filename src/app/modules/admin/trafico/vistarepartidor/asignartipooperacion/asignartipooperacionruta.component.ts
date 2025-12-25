@@ -102,7 +102,7 @@ export class AsignartipooperacionRutaComponent implements OnInit {
 
   }
   cancelar() {
-    this.ref.close();
+    this.ref.close({ cancelado: true });
   }
   mostrarDireccion() {
       // this.ordenService.getProveedor(this.model.idrepartidor).subscribe(x=> {

@@ -1,5 +1,4 @@
 export const environment = {
     production: true,
-    baseUrl: 'http://104.36.166.65/apitwh_tce',
-    uploadsDocuments: 'D:\\APPS\\Toscanos\\Web\\UploadedFiles\\'
+    baseUrl: 'http://199.89.55.49/apitys4-test'
 };

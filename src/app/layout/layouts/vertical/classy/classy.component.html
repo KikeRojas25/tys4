@@ -24,20 +24,11 @@
         </div>
         <!-- User -->
         <div class="flex w-full flex-col items-center p-4">
-            <div class="relative h-24 w-24">
-                @if (user.avatar) {
-                    <img
-                        class="h-full w-full rounded-full"
-                        [src]="user.avatar"
-                        alt="User avatar"
-                    />
-                }
-                @if (!user.avatar) {
-                    <mat-icon
-                        class="icon-size-24"
-                        [svgIcon]="'heroicons_solid:user-circle'"
-                    ></mat-icon>
-                }
+            <div class="relative flex h-24 w-24 items-center justify-center rounded-full bg-gray-200 dark:bg-gray-700">
+                <mat-icon
+                    class="icon-size-24 text-gray-600 dark:text-gray-300"
+                    [svgIcon]="'heroicons_solid:user-circle'"
+                ></mat-icon>
             </div>
             <div class="mt-6 flex w-full flex-col items-center justify-center">
                 <div

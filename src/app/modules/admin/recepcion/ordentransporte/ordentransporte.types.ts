@@ -25,6 +25,8 @@ export interface OrdenTransporte {
     idtipomercaderia?: number;
     descripciongeneral?: string;
     guiasremitente?: string;
+    tipooperacion?: string;
+    proveedor?: string;
 
     numcarga?: string;
     idcarga?: number;
@@ -45,6 +47,7 @@ export interface OrdenTransporte {
     horacita?: string;
     peso?: number;
     volumen?: number;
+    vol?: number;
     bulto?: number;
     docgeneral?: string;
     grr?: string;
@@ -123,6 +126,28 @@ export interface Cliente {
     tipoDocumentoId: number;
     documento: string;
     idproveedor: number;
+}
+
+export interface ClienteDireccionResult {
+    idClienteDireccion?: number;
+    direccion?: string;
+    referencia?: string;
+    distrito?: string;
+    provincia?: string;
+    departamento?: string;
+    ubigeo?: string;
+    esPrincipal?: boolean;
+}
+
+export interface ClienteDetalleResult {
+    idCliente: number;
+    razonSocial?: string;
+    ruc?: string;
+    nombreCorto?: string;
+    lineaCredito?: number;
+    rutaLogo?: string;
+    pagoContado?: boolean;
+    direccionPrincipal?: ClienteDireccionResult;
 }
 
 export interface ValorTabla {

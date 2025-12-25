@@ -1,0 +1,202 @@
+/* Estilos profesionales para las tablas */
+::ng-deep .custom-table {
+  border-collapse: separate;
+  border-spacing: 0;
+}
+
+/* Cabecera fija al hacer scroll */
+::ng-deep .custom-table .p-datatable-scrollable-header {
+  position: sticky !important;
+  top: 0 !important;
+  z-index: 10 !important;
+}
+
+::ng-deep .custom-table .p-datatable-thead > tr > th {
+  border: none;
+  position: sticky !important;
+  top: 0 !important;
+  z-index: 10 !important;
+  background-color: #374151 !important; /* Color de fondo del header */
+  color: #ffffff !important;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1) !important; /* Sombra para efecto de elevación */
+}
+
+/* Asegurar que el contenedor de la tabla tenga scroll */
+::ng-deep .custom-table .p-datatable-wrapper {
+  position: relative;
+}
+
+/* Asegurar que el scroll funcione correctamente */
+::ng-deep .custom-table .p-datatable-scrollable-wrapper {
+  position: relative;
+}
+
+/* Mantener el header visible durante el scroll - override de PrimeNG */
+::ng-deep .custom-table .p-datatable-scrollable-header-table {
+  position: sticky !important;
+  top: 0 !important;
+  z-index: 10 !important;
+}
+
+::ng-deep .custom-table .p-datatable-tbody > tr {
+  border-bottom: 1px solid #e5e7eb;
+}
+
+::ng-deep .custom-table .p-datatable-tbody > tr:last-child {
+  border-bottom: none;
+}
+
+::ng-deep .custom-table .p-datatable-tbody > tr.p-highlight {
+  background-color: #fef3c7 !important; /* Amber/Yellow light background for selected rows */
+}
+
+::ng-deep .custom-table .p-paginator {
+  background: transparent;
+  border: none;
+  padding: 1rem 0;
+}
+
+::ng-deep .custom-table .p-paginator .p-paginator-pages .p-paginator-page {
+  border-radius: 0.375rem;
+  margin: 0 0.125rem;
+}
+
+::ng-deep .custom-table .p-paginator .p-paginator-pages .p-paginator-page.p-highlight {
+  background-color: #374151;
+  color: white;
+}
+
+/* Mejoras en los inputs */
+::ng-deep .p-inputtext {
+  border-radius: 0.375rem;
+  border: 1px solid #d1d5db;
+  padding: 0.5rem 0.75rem;
+  font-size: 0.875rem;
+  transition: all 0.15s ease-in-out;
+}
+
+::ng-deep .p-inputtext:focus {
+  outline: none;
+  border-color: #f59e0b;
+  box-shadow: 0 0 0 3px rgba(245, 158, 11, 0.1);
+}
+
+/* Estilos para botones más profesionales */
+::ng-deep .p-button {
+  border-radius: 0.375rem;
+  font-weight: 500;
+  transition: all 0.15s ease-in-out;
+}
+
+::ng-deep .p-button:not(.p-button-icon-only) {
+  padding: 0.5rem 1rem;
+}
+
+/* Mejoras en las tarjetas */
+.card {
+  box-shadow: 0 1px 3px 0 rgba(0, 0, 0, 0.1), 0 1px 2px 0 rgba(0, 0, 0, 0.06);
+}
+
+/* Transiciones suaves */
+* {
+  transition-property: background-color, border-color, color, fill, stroke, opacity, box-shadow, transform;
+  transition-timing-function: cubic-bezier(0.4, 0, 0.2, 1);
+  transition-duration: 150ms;
+}
+
+.word-wrap {
+  white-space: normal;
+  word-wrap: break-word;
+}
+
+.text-wrap {
+  overflow-wrap: break-word;
+}
+
+/* Alineación de campos de fecha con otros campos */
+.flex.flex-col label {
+  display: block;
+  margin-bottom: 0.25rem;
+  font-size: 0.875rem;
+  font-weight: 500;
+  color: #374151;
+}
+
+/* Asegurar que p-calendar tenga la misma altura que otros inputs */
+::ng-deep .flex.flex-col p-calendar {
+  display: block;
+  width: 100%;
+}
+
+::ng-deep .flex.flex-col p-calendar .p-inputtext {
+  width: 100%;
+  height: 2.5rem;
+  display: flex;
+  align-items: center;
+}
+
+/* Alinear el contenido interno del calendario */
+::ng-deep .flex.flex-col p-calendar .p-calendar .p-inputtext {
+  padding-top: 0.5rem;
+  padding-bottom: 0.5rem;
+  line-height: 1.5rem;
+}
+
+::ng-deep .p-dropdown-item {
+  cursor: pointer !important;
+  font-weight: 400 !important;
+  font-size: 12px !important;
+  white-space: nowrap !important;
+  position: relative !important;
+  overflow: hidden !important;
+}
+
+/* Estilos para checkboxes */
+::ng-deep .custom-table .p-checkbox {
+  width: 18px;
+  height: 18px;
+}
+
+::ng-deep .custom-table .p-checkbox .p-checkbox-box {
+  width: 18px;
+  height: 18px;
+  border-radius: 0.25rem;
+  border: 2px solid #d1d5db;
+}
+
+::ng-deep .custom-table .p-checkbox .p-checkbox-box.p-highlight {
+  background-color: #f59e0b;
+  border-color: #f59e0b;
+}
+
+::ng-deep .custom-table .p-checkbox .p-checkbox-box .p-checkbox-icon {
+  color: white;
+  font-size: 12px;
+}
+
+/* Estilos para hover en filas seleccionables */
+::ng-deep .custom-table tbody tr.p-selectable-row:hover {
+  background-color: #f9fafb;
+  cursor: pointer;
+}
+
+/* Estilo para el resumen de totales */
+.bg-white.rounded-lg.shadow-sm.border.p-4 {
+  animation: slideDown 0.3s ease-out;
+}
+
+@keyframes slideDown {
+  from {
+    opacity: 0;
+    transform: translateY(-10px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+/* Mejora visual para números monetarios */
+.text-amber-700 {
+  font-family: 'SF Mono', Monaco, 'Cascadia Code', 'Roboto Mono', Consolas, 'Courier New', monospace;
+}

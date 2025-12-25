@@ -1,0 +1,197 @@
+<div class="flex flex-col flex-auto min-w-0 bg-gray-50">
+  <!-- Header -->
+  <div class="flex flex-col sm:flex-row flex-0 sm:items-center sm:justify-between p-2 sm:py-8 sm:px-10 border-b border-gray-200 bg-white shadow-sm">
+    <div class="flex-1 min-w-0">
+      <div class="flex flex-wrap items-center font-medium text-sm text-gray-600">
+        <div>
+          <a class="whitespace-nowrap text-gray-700 hover:text-gray-900 cursor-pointer" routerLink="/facturacion">TMS</a>
+        </div>
+        <div class="flex items-center ml-1 whitespace-nowrap">
+          <mat-icon class="fuse-horizontal-navigation-item-icon text-gray-400" [svgIcon]="'heroicons_solid:chevron-right'"></mat-icon>
+          <a class="ml-1 text-gray-700 hover:text-gray-900 cursor-pointer" routerLink="/facturacion">Facturación</a>
+        </div>
+        <div class="flex items-center ml-1 whitespace-nowrap">
+          <mat-icon class="fuse-horizontal-navigation-item-icon text-gray-400" [svgIcon]="'heroicons_solid:chevron-right'"></mat-icon>
+          <a class="ml-1 text-gray-700 hover:text-gray-900">Comprobantes</a>
+        </div>
+      </div>
+      <div class="mt-2">
+        <h2 class="text-3xl md:text-4xl font-semibold tracking-tight leading-7 sm:leading-10 truncate text-gray-900">
+          Listar Comprobantes
+        </h2>
+        <p class="text-sm text-amber-700 mt-1.5">Consulte y filtre los comprobantes generados</p>
+      </div>
+    </div>
+  </div>
+
+  <p-toast />
+  <p-confirmDialog />
+
+  <!-- Contenido Principal -->
+  <div class="flex flex-col flex-auto min-w-0 p-2 sm:p-4">
+    <!-- Filtros de Búsqueda -->
+    <div class="bg-white rounded-lg shadow-sm border border-gray-200 mb-2 overflow-hidden">
+      <div class="p-2">
+        <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-2">
+          <!-- Cliente -->
+          <div class="flex flex-col">
+            <label class="mb-1 text-xs font-medium text-gray-700">Cliente:</label>
+            <p-dropdown
+              name="clientes"
+              [options]="clientes"
+              [(ngModel)]="model.idcliente"
+              scrollHeight="30vh"
+              class="input-form-field"
+              appendTo="body"
+              [virtualScroll]="true"
+              itemSize="30"
+              [style]="{'width':'100%'}"
+              [resetFilterOnHide]="false"
+              [filter]="true"
+              placeholder="Seleccione cliente">
+              <ng-template let-item pTemplate="selectedItem">
+                <span>{{item.label}}</span>
+              </ng-template>
+            </p-dropdown>
+          </div>
+
+          <!-- Estado -->
+          <div class="flex flex-col">
+            <label class="mb-1 text-xs font-medium text-gray-700">Estado:</label>
+            <p-dropdown
+              name="estados"
+              [options]="estados"
+              [(ngModel)]="model.idestado"
+              scrollHeight="30vh"
+              class="input-form-field"
+              appendTo="body"
+              [virtualScroll]="true"
+              itemSize="30"
+              [style]="{'width':'100%'}"
+              [resetFilterOnHide]="false"
+              [filter]="true"
+              placeholder="Seleccione estado">
+              <ng-template let-item pTemplate="selectedItem">
+                <span>{{item.label}}</span>
+              </ng-template>
+            </p-dropdown>
+          </div>
+
+          <!-- Botones -->
+          <div class="flex items-end gap-2 sm:col-span-2 lg:col-span-2">
+            <button
+              pButton
+              type="button"
+              label="Buscar"
+              icon="pi pi-search"
+              iconPos="left"
+              class="p-button-primary p-button-sm"
+              (click)="buscar()">
+            </button>
+            <button
+              pButton
+              type="button"
+              label="Limpiar"
+              icon="pi pi-refresh"
+              iconPos="left"
+              class="p-button-secondary p-button-sm"
+              (click)="limpiarFiltros()">
+            </button>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Tabla de Comprobantes -->
+    <div class="bg-white rounded-lg shadow-sm border border-gray-200 overflow-hidden">
+      <p-table
+        [value]="filteredComprobantes"
+        [columns]="cols"
+        [paginator]="true"
+        [rows]="20"
+        [rowsPerPageOptions]="[10, 20, 50, 100]"
+        [loading]="loading"
+        [tableStyle]="{'min-width':'100%'}"
+        styleClass="p-datatable-sm"
+        [globalFilterFields]="['numeroComprobante', 'tipoComprobante', 'numeroPreliquidacion', 'nombreCliente', 'estado']"
+        #dt>
+        
+        <ng-template pTemplate="caption">
+          <div class="flex justify-between items-center p-2">
+            <span class="text-sm font-semibold text-gray-700">
+              Total de comprobantes: {{ filteredComprobantes.length }}
+            </span>
+            <span class="p-input-icon-left">
+              <i class="pi pi-search"></i>
+              <input
+                pInputText
+                type="text"
+                placeholder="Buscar..."
+                (input)="dt.filterGlobal($any($event.target).value, 'contains')"
+                class="text-xs" />
+            </span>
+          </div>
+        </ng-template>
+
+        <ng-template pTemplate="header" let-columns>
+          <tr>
+            <th *ngFor="let col of columns" class="text-center px-2 py-2 bg-gray-100 text-gray-700 text-xs font-semibold">
+              {{ col.header }}
+            </th>
+            <th class="text-center px-2 py-2 bg-gray-100 text-gray-700 text-xs font-semibold">Acciones</th>
+          </tr>
+        </ng-template>
+
+        <ng-template pTemplate="body" let-comprobante>
+          <tr>
+            <td class="text-center px-2 py-2 text-xs">{{ comprobante.numeroComprobante }}</td>
+            <td class="text-center px-2 py-2 text-xs">
+              <p-chip [label]="comprobante.tipoComprobante" styleClass="text-xs"></p-chip>
+            </td>
+            <td class="text-center px-2 py-2 text-xs">{{ comprobante.numeroPreliquidacion }}</td>
+            <td class="px-2 py-2 text-xs">{{ comprobante.nombreCliente }}</td>
+            <td class="text-center px-2 py-2 text-xs">{{ comprobante.fechaEmision | date:'dd/MM/yyyy' }}</td>
+            <td class="text-center px-2 py-2 text-xs">{{ comprobante.usuarioRegistro }}</td>
+            <td class="text-right px-2 py-2 text-xs">S/. {{ comprobante.subtotal | number:'1.2-2' }}</td>
+            <td class="text-right px-2 py-2 text-xs">S/. {{ comprobante.igv | number:'1.2-2' }}</td>
+            <td class="text-right px-2 py-2 text-xs font-semibold">S/. {{ comprobante.total | number:'1.2-2' }}</td>
+            <td class="text-center px-2 py-2 text-xs">
+              <p-chip [label]="comprobante.estado" styleClass="text-xs"></p-chip>
+            </td>
+            <td class="text-center px-2 py-2">
+              <div class="flex gap-1 justify-center">
+                <button
+                  pButton
+                  type="button"
+                  icon="pi pi-eye"
+                  class="p-button-rounded p-button-text p-button-sm"
+                  pTooltip="Ver Detalle"
+                  [style]="{'width': '1.75rem', 'height': '1.75rem'}"
+                  (click)="verDetalle(comprobante)">
+                </button>
+                <button
+                  pButton
+                  type="button"
+                  icon="pi pi-download"
+                  class="p-button-rounded p-button-text p-button-sm"
+                  pTooltip="Exportar"
+                  [style]="{'width': '1.75rem', 'height': '1.75rem'}"
+                  (click)="exportar(comprobante)">
+                </button>
+              </div>
+            </td>
+          </tr>
+        </ng-template>
+
+        <ng-template pTemplate="emptymessage">
+          <tr>
+            <td [attr.colspan]="cols.length + 1" class="text-center py-8 text-gray-500">
+              No se encontraron comprobantes
+            </td>
+          </tr>
+        </ng-template>
+      </p-table>
+    </div>
+  </div>
+</div>
+

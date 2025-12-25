@@ -1,0 +1,179 @@
+::ng-deep .custom-table .p-datatable-thead > tr > th {
+  background-color: #1f2937 !important;
+  color: white !important;
+  font-weight: 600;
+  padding: 12px 16px;
+  border-bottom: 2px solid #374151;
+  position: sticky;
+  top: 0;
+  z-index: 1;
+}
+
+::ng-deep .custom-table .p-datatable-tbody > tr {
+  transition: background-color 0.15s ease;
+}
+
+::ng-deep .custom-table .p-datatable-tbody > tr:hover {
+  background-color: #f9fafb !important;
+}
+
+::ng-deep .custom-table .p-datatable-tbody > tr.p-highlight {
+  background-color: #fef3c7 !important;
+  color: #92400e;
+}
+
+::ng-deep .custom-table .p-datatable-tbody > tr.p-highlight:hover {
+  background-color: #fde68a !important;
+}
+
+::ng-deep .custom-table .p-checkbox .p-checkbox-box.p-highlight {
+  border-color: #d97706 !important;
+  background: #d97706 !important;
+}
+
+::ng-deep .custom-table .p-datatable-tbody > tr > td {
+  padding: 12px 16px;
+  border-bottom: 1px solid #f3f4f6;
+}
+
+::ng-deep .custom-table .p-datatable .p-datatable-wrapper {
+  border-radius: 8px;
+}
+
+::ng-deep .p-dropdown {
+  border-radius: 6px;
+  border-color: #d1d5db;
+}
+
+::ng-deep .p-dropdown:hover {
+  border-color: #9ca3af;
+}
+
+::ng-deep .p-dropdown.p-focus {
+  border-color: #d97706;
+  box-shadow: 0 0 0 3px rgba(217, 119, 6, 0.1);
+}
+
+::ng-deep .p-inputtext {
+  border-radius: 6px;
+  border-color: #d1d5db;
+  padding: 10px 12px;
+}
+
+::ng-deep .p-inputtext:hover {
+  border-color: #9ca3af;
+}
+
+::ng-deep .p-inputtext:focus {
+  border-color: #d97706;
+  box-shadow: 0 0 0 3px rgba(217, 119, 6, 0.1);
+}
+
+::ng-deep .p-button {
+  border-radius: 6px;
+  font-weight: 500;
+  transition: all 0.15s ease;
+}
+
+::ng-deep .p-button:hover {
+  transform: translateY(-1px);
+  box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+}
+
+::ng-deep .p-paginator {
+  background: #f9fafb;
+  border-top: 1px solid #e5e7eb;
+  padding: 12px 16px;
+}
+
+::ng-deep .p-paginator .p-paginator-pages .p-paginator-page.p-highlight {
+  background: #d97706;
+  border-color: #d97706;
+  color: white;
+}
+
+::ng-deep .p-paginator .p-paginator-pages .p-paginator-page:hover {
+  background: #fef3c7;
+  border-color: #fde68a;
+  color: #92400e;
+}
+
+.dashboard-card {
+  transition: transform 0.2s ease, box-shadow 0.2s ease;
+}
+
+.dashboard-card:hover {
+  transform: translateY(-4px);
+  box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04);
+}
+
+.word-wrap {
+  word-wrap: break-word;
+  white-space: normal;
+}
+
+::ng-deep .p-toast {
+  z-index: 9999 !important;
+}
+
+::ng-deep .p-toast .p-toast-message {
+  border-radius: 8px;
+  box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
+}
+
+/* Animación para las tarjetas del dashboard */
+@keyframes fadeInUp {
+  from {
+    opacity: 0;
+    transform: translateY(20px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.grid > div {
+  animation: fadeInUp 0.3s ease-out;
+}
+
+.grid > div:nth-child(1) {
+  animation-delay: 0.05s;
+}
+
+.grid > div:nth-child(2) {
+  animation-delay: 0.1s;
+}
+
+.grid > div:nth-child(3) {
+  animation-delay: 0.15s;
+}
+
+/* Mejoras visuales para la tabla */
+::ng-deep .custom-table .p-datatable-scrollable-header {
+  background: #1f2937;
+}
+
+::ng-deep .custom-table .p-datatable-scrollable-body {
+  scrollbar-width: thin;
+  scrollbar-color: #d97706 #f3f4f6;
+}
+
+::ng-deep .custom-table .p-datatable-scrollable-body::-webkit-scrollbar {
+  width: 8px;
+  height: 8px;
+}
+
+::ng-deep .custom-table .p-datatable-scrollable-body::-webkit-scrollbar-track {
+  background: #f3f4f6;
+  border-radius: 4px;
+}
+
+::ng-deep .custom-table .p-datatable-scrollable-body::-webkit-scrollbar-thumb {
+  background: #d97706;
+  border-radius: 4px;
+}
+
+::ng-deep .custom-table .p-datatable-scrollable-body::-webkit-scrollbar-thumb:hover {
+  background: #b45309;
+}

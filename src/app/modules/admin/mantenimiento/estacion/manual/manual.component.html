@@ -1,0 +1,53 @@
+<div class="flex flex-col min-h-screen">
+  <!-- Encabezado -->
+  <div class="flex flex-col sm:flex-row items-center justify-between p-3 border-b dark:bg-transparent bg-card">
+    <div class="flex-1 min-w-0">
+      <div class="flex items-center font-medium">
+        <a class="whitespace-nowrap text-primary-500">TTrack</a>
+        <div class="flex items-center ml-1 whitespace-nowrap">
+          <mat-icon class="fuse-horizontal-navigation-item-icon" [svgIcon]="'heroicons_solid:chevron-right'"></mat-icon>
+          <a class="ml-1 text-primary-500">Mantenimiento</a>
+          <div class="flex items-center ml-1 whitespace-nowrap">
+            <mat-icon class="fuse-horizontal-navigation-item-icon" [svgIcon]="'heroicons_solid:chevron-right'"></mat-icon>
+            <a class="ml-1 text-primary-500">Estación</a>
+          </div>
+        </div>
+      </div>
+      <div class="mt-2">
+        <h2 class="text-3xl md:text-4xl font-extrabold leading-7 sm:leading-10 truncate">Manual de Usuario</h2>
+      </div>
+    </div>
+    <div class="mt-4 sm:mt-0">
+      <button
+        mat-flat-button
+        color="primary"
+        [routerLink]="['/mantenimiento/estacion/list']"
+      >
+        <mat-icon>arrow_back</mat-icon>
+        <span class="ml-2">Volver al Listado</span>
+      </button>
+    </div>
+  </div>
+
+  <!-- Contenedor del Manual -->
+  <div class="flex-1 p-6">
+    <div class="bg-white rounded-lg shadow-lg p-6" style="min-height: 800px;">
+      <iframe 
+        [src]="manualUrl" 
+        class="w-full border-0 rounded-lg"
+        style="min-height: 800px; height: calc(100vh - 250px);"
+        title="Manual de Usuario - Mantenimiento de Estaciones"
+        loading="lazy"
+      ></iframe>
+      <div *ngIf="false" class="text-center p-8 text-gray-500">
+        <p>Si el manual no se muestra, verifica que el archivo esté en:</p>
+        <code class="block mt-2">public/manuales/estacion/MANUAL_USUARIO.html</code>
+        <p class="mt-4">O accede directamente a:</p>
+        <a href="/manuales/estacion/MANUAL_USUARIO.html" target="_blank" class="text-blue-500 underline">
+          /manuales/estacion/MANUAL_USUARIO.html
+        </a>
+      </div>
+    </div>
+  </div>
+</div>
+

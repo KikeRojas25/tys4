@@ -44,3 +44,9 @@ testem.log
 # System Files
 .DS_Store
 Thumbs.db
+
+# Apache configuration (not needed for build)
+.htaccess
+
+# IIS configuration (not needed for build)
+web.config

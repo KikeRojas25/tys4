@@ -26,7 +26,12 @@ import { NewComponent } from 'app/modules/admin/mantenimiento/cliente/new/new.co
 import { ChangeDetectorRef } from '@angular/core';
 import { DialogOrdenResumenComponent } from '../dialog-orden-resumen/dialog-orden-resumen.component';
 
-
+interface GuiaGRR {
+  idguia?: number;
+  nroGrr: string;
+  nroDocumento: string;
+  editando?: boolean;
+}
 
 @Component({
   selector: 'app-crearot',
@@ -69,6 +74,8 @@ export class CrearotComponent implements OnInit {
 
 
   guias: any[] = [];
+  guiasGrr: GuiaGRR[] = [];
+  mostrarTablaGuias = true;
 
 
   etiquetas: any[] = [];
@@ -512,23 +519,63 @@ else {
 
 
   generarGrr(){
+    if (!this.model.cantidadguias || this.model.cantidadguias <= 0) {
+      this.messageService.add({
+        severity: 'warn',
+        summary: 'Advertencia',
+        detail: 'Ingrese una cantidad válida de guías a generar'
+      });
+      return;
+    }
 
-   
+    if (!this.model.guiaInicial) {
+      this.messageService.add({
+        severity: 'warn',
+        summary: 'Advertencia',
+        detail: 'Ingrese el número de GRR inicial'
+      });
+      return;
+    }
     
     const [prefix, initialNumber] = this.model.guiaInicial.split('-');
     const start = parseInt(initialNumber, 10);
 
-    this.guias = [...this.guias];
-
-
-    for (let i = 0; i < this.model.cantidadguias; i++) {
-      this.guias.push(`${prefix}-${start + i}`);
+    if (isNaN(start)) {
+      this.messageService.add({
+        severity: 'warn',
+        summary: 'Advertencia',
+        detail: 'El formato del GRR inicial debe ser: PREFIJO-NUMERO (ej: GRR-001)'
+      });
+      return;
     }
 
-    console.log(this.guias, 'xD');
+    // Generar las guías en el array de strings (para mantener compatibilidad)
+    this.guias = [...this.guias];
 
+    // Generar las guías en la nueva tabla
+    for (let i = 0; i < this.model.cantidadguias; i++) {
+      const nroGrr = `${prefix}-${start + i}`;
+      this.guias.push(nroGrr);
+      
+      // Agregar a la tabla editable
+      this.guiasGrr.push({
+        nroGrr: nroGrr,
+        nroDocumento: '',
+        editando: false
+      });
+    }
 
+    this.mostrarTablaGuias = true;
+    this.dialogGrr = false;
 
+    this.messageService.add({
+      severity: 'success',
+      summary: 'Éxito',
+      detail: `Se generaron ${this.model.cantidadguias} guías GRR`
+    });
+
+    // Actualizar el formControl con las guías
+    this.form.patchValue({ guiasremitente: this.guias });
   }
   nuevoremitente () {
      this.ref = this.dialogService.open(NewComponent, {
@@ -603,6 +650,77 @@ else {
           });
         });
     }
+  }
+
+  // ===== MÉTODOS PARA TABLA DE GUÍAS GRR =====
+  
+  toggleTablaGuias(): void {
+    this.mostrarTablaGuias = !this.mostrarTablaGuias;
+  }
+
+  editarGuiaGrr(guia: GuiaGRR): void {
+    // Desactivar edición en todas las guías
+    this.guiasGrr.forEach(g => g.editando = false);
+    // Activar edición en la guía seleccionada
+    guia.editando = true;
+  }
+
+  actualizarGuiaGrr(guia: GuiaGRR): void {
+    if (!guia.nroGrr || guia.nroGrr.trim() === '') {
+      this.messageService.add({
+        severity: 'warn',
+        summary: 'Advertencia',
+        detail: 'El número de GRR no puede estar vacío'
+      });
+      return;
+    }
+
+    // Desactivar modo edición
+    guia.editando = false;
+
+    // Actualizar el array de guías (para mantener sincronizado con el control chips)
+    this.actualizarArrayGuias();
+
+    this.messageService.add({
+      severity: 'success',
+      summary: 'Éxito',
+      detail: 'Guía actualizada correctamente'
+    });
+  }
+
+  cancelarEdicionGuiaGrr(guia: GuiaGRR): void {
+    guia.editando = false;
+  }
+
+  eliminarGuiaGrr(index: number): void {
+    if (index >= 0 && index < this.guiasGrr.length) {
+      this.guiasGrr.splice(index, 1);
+      this.actualizarArrayGuias();
+      
+      this.messageService.add({
+        severity: 'success',
+        summary: 'Éxito',
+        detail: 'Guía eliminada correctamente'
+      });
+    }
+  }
+
+  limpiarTodasLasGuiasGrr(): void {
+    this.guiasGrr = [];
+    this.guias = [];
+    this.form.patchValue({ guiasremitente: [] });
+    
+    this.messageService.add({
+      severity: 'success',
+      summary: 'Éxito',
+      detail: 'Todas las guías han sido eliminadas'
+    });
+  }
+
+  private actualizarArrayGuias(): void {
+    // Mantener sincronizado el array de guías con la tabla
+    this.guias = this.guiasGrr.map(g => g.nroGrr);
+    this.form.patchValue({ guiasremitente: this.guias });
   }
 
 }

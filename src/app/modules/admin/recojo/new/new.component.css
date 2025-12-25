@@ -1,0 +1,6 @@
+::ng-deep .dropdown-fixed {
+  width: 100% !important;
+  max-width: 100% !important;
+  display: block !important;
+
+}

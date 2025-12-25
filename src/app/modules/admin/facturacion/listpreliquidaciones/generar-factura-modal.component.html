@@ -1,0 +1,266 @@
+<div class="generar-factura-modal">
+  <div class="p-3">
+    <!-- Header -->
+    <div class="mb-2">
+      <h3 class="text-base font-semibold text-gray-900 mb-0.5">Generar Factura</h3>
+      <p class="text-xs text-gray-600">Se muestran los datos de la factura.</p>
+    </div>
+
+    <!-- Formulario Principal -->
+    <form [formGroup]="facturaForm" class="space-y-2">
+      <!-- Primera fila -->
+      <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-2">
+        <!-- Fecha de emisión -->
+        <div class="flex flex-col">
+          <label class="mb-0.5 text-xs font-medium text-gray-700">Fecha de emisión:</label>
+          <p-calendar
+            formControlName="fechaEmision"
+            [showIcon]="true"
+            dateFormat="dd/mm/yy"
+            appendTo="body"
+            [style]="{'width':'100%'}"
+            inputStyleClass="w-full text-xs"
+            styleClass="compact-calendar">
+          </p-calendar>
+        </div>
+
+        <!-- Señor(es) -->
+        <div class="flex flex-col">
+          <label class="mb-0.5 text-xs font-medium text-gray-700">Señor(es):</label>
+          <input
+            pInputText
+            formControlName="senor"
+            [style]="{'width':'100%', 'font-size': '0.75rem', 'padding': '0.375rem 0.5rem'}"
+            placeholder="Cliente"
+            readonly />
+        </div>
+
+        <!-- RUC -->
+        <div class="flex flex-col">
+          <label class="mb-0.5 text-xs font-medium text-gray-700">RUC:</label>
+          <input
+            pInputText
+            formControlName="ruc"
+            [style]="{'width':'100%', 'font-size': '0.75rem', 'padding': '0.375rem 0.5rem'}"
+            placeholder="Ingrese RUC"
+            maxlength="11" />
+        </div>
+
+        <!-- Dirección -->
+        <div class="flex flex-col">
+          <label class="mb-0.5 text-xs font-medium text-gray-700">Dirección:</label>
+          <input
+            pInputText
+            formControlName="direccion"
+            [style]="{'width':'100%', 'font-size': '0.75rem', 'padding': '0.375rem 0.5rem'}"
+            placeholder="Ingrese dirección" />
+        </div>
+      </div>
+
+      <!-- Segunda fila -->
+      <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-2">
+        <!-- Serie -->
+        <div class="flex flex-col">
+          <label class="mb-0.5 text-xs font-medium text-gray-700">Serie:</label>
+          <p-dropdown
+            formControlName="serie"
+            [options]="series"
+            placeholder="[Serie]"
+            [style]="{'width':'100%'}"
+            styleClass="compact-dropdown"
+            appendTo="body">
+          </p-dropdown>
+        </div>
+
+        <!-- Número -->
+        <div class="flex flex-col">
+          <label class="mb-0.5 text-xs font-medium text-gray-700">Número:</label>
+          <input
+            pInputText
+            formControlName="numero"
+            [style]="{'width':'100%', 'font-size': '0.75rem', 'padding': '0.375rem 0.5rem'}"
+            placeholder="Ingrese número" />
+        </div>
+
+        <!-- Observación -->
+        <div class="flex flex-col md:col-span-2">
+          <label class="mb-0.5 text-xs font-medium text-gray-700">Observación:</label>
+          <textarea
+            pInputTextarea
+            formControlName="observacion"
+            rows="1"
+            [style]="{'width':'100%', 'font-size': '0.75rem', 'padding': '0.375rem 0.5rem'}"
+            placeholder="Ingrese observaciones">
+          </textarea>
+        </div>
+      </div>
+
+      <!-- Orden de Compra -->
+      <div class="grid grid-cols-1 md:grid-cols-4 gap-2">
+        <div class="flex flex-col">
+          <label class="mb-0.5 text-xs font-medium text-gray-700">Orden de Compra:</label>
+          <input
+            pInputText
+            formControlName="ordenCompra"
+            [style]="{'width':'100%', 'font-size': '0.75rem', 'padding': '0.375rem 0.5rem'}"
+            placeholder="Ingrese orden de compra" />
+        </div>
+      </div>
+    </form>
+
+    <!-- Tabla de Items -->
+    <div class="mt-3">
+      <div class="flex justify-between items-center mb-2">
+        <h4 class="text-sm font-semibold text-gray-900">Items de Factura</h4>
+        <button
+          pButton
+          type="button"
+          label="+ Agregar Item"
+          icon="pi pi-plus"
+          iconPos="left"
+          class="p-button-primary p-button-sm"
+          (click)="agregarItem()">
+        </button>
+      </div>
+
+      <div class="bg-white border border-gray-200 rounded-lg overflow-hidden">
+        <p-table
+          [value]="detalles"
+          [columns]="cols"
+          [paginator]="true"
+          [rows]="10"
+          [tableStyle]="{'min-width':'100%'}"
+          styleClass="p-datatable-sm compact-table">
+          
+          <ng-template pTemplate="header" let-columns>
+            <tr>
+              <th *ngFor="let col of columns" class="text-center px-2 py-1.5 bg-gray-100 text-gray-700 text-xs font-semibold">
+                {{ col.header }}
+              </th>
+            </tr>
+          </ng-template>
+
+          <ng-template pTemplate="body" let-item let-rowIndex="rowIndex">
+            <tr>
+              <td class="text-center px-2 py-1">
+                <input
+                  type="number"
+                  pInputText
+                  [(ngModel)]="item.cantidad"
+                  [ngModelOptions]="{standalone: true}"
+                  (blur)="calcularItem(rowIndex)"
+                  [style]="{'width':'70px', 'text-align':'center', 'font-size': '0.75rem', 'padding': '0.25rem 0.375rem'}"
+                  min="0.01"
+                  step="0.01" />
+              </td>
+              <td class="text-center px-2 py-1">
+                <p-dropdown
+                  [(ngModel)]="item.conceptoCobro"
+                  [options]="conceptosCobro"
+                  [ngModelOptions]="{standalone: true}"
+                  [style]="{'width':'100%'}"
+                  styleClass="compact-dropdown"
+                  placeholder="Seleccione"
+                  appendTo="body">
+                </p-dropdown>
+              </td>
+              <td class="px-2 py-1">
+                <input
+                  pInputText
+                  [(ngModel)]="item.descripcion"
+                  [ngModelOptions]="{standalone: true}"
+                  [style]="{'width':'100%', 'font-size': '0.75rem', 'padding': '0.25rem 0.375rem'}"
+                  placeholder="Descripción del servicio" />
+              </td>
+              <td class="text-center px-2 py-1">
+                <input
+                  type="number"
+                  pInputText
+                  [(ngModel)]="item.precioUnitario"
+                  [ngModelOptions]="{standalone: true}"
+                  (blur)="calcularItem(rowIndex)"
+                  [style]="{'width':'100px', 'text-align':'right', 'font-size': '0.75rem', 'padding': '0.25rem 0.375rem'}"
+                  min="0"
+                  step="0.01" />
+              </td>
+              <td class="text-center px-2 py-1">
+                <div class="flex gap-0.5 justify-center">
+                  <button
+                    pButton
+                    type="button"
+                    icon="pi pi-pencil"
+                    class="p-button-rounded p-button-text p-button-sm"
+                    [style]="{'width': '1.75rem', 'height': '1.75rem'}"
+                    pTooltip="Editar"
+                    (click)="editarItem(rowIndex)">
+                  </button>
+                  <button
+                    pButton
+                    type="button"
+                    icon="pi pi-folder"
+                    class="p-button-rounded p-button-text p-button-sm"
+                    [style]="{'width': '1.75rem', 'height': '1.75rem'}"
+                    pTooltip="Ver"
+                    (click)="verItem(rowIndex)">
+                  </button>
+                  <button
+                    pButton
+                    type="button"
+                    icon="pi pi-trash"
+                    class="p-button-rounded p-button-text p-button-danger p-button-sm"
+                    [style]="{'width': '1.75rem', 'height': '1.75rem'}"
+                    pTooltip="Eliminar"
+                    (click)="eliminarItem(rowIndex)">
+                  </button>
+                </div>
+              </td>
+            </tr>
+          </ng-template>
+        </p-table>
+      </div>
+    </div>
+
+    <!-- Totales -->
+    <div class="mt-3 flex justify-end">
+      <div class="bg-gray-50 border border-gray-200 rounded-lg p-2 w-full max-w-md">
+        <div class="space-y-1">
+          <div class="flex justify-between items-center">
+            <span class="text-gray-700 font-medium text-xs">Sub Total:</span>
+            <span class="text-gray-900 font-semibold text-xs">S/. {{ getSubtotal() | number:'1.2-2' }}</span>
+          </div>
+          <div class="flex justify-between items-center">
+            <span class="text-gray-700 font-medium text-xs">IGV:</span>
+            <span class="text-gray-900 font-semibold text-xs">S/. {{ getIGV() | number:'1.2-2' }}</span>
+          </div>
+          <div class="flex justify-between items-center border-t border-gray-300 pt-1">
+            <span class="text-gray-900 font-bold text-sm">Total:</span>
+            <span class="text-gray-900 font-bold text-sm">S/. {{ getTotal() | number:'1.2-2' }}</span>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Botones de Acción -->
+    <div class="mt-3 flex justify-end gap-2">
+      <button
+        pButton
+        type="button"
+        label="Cerrar"
+        class="p-button-secondary p-button-sm"
+        (click)="cerrar()">
+      </button>
+      <button
+        pButton
+        type="button"
+        label="Generar"
+        icon="pi pi-check"
+        iconPos="left"
+        class="p-button-primary p-button-sm"
+        (click)="generar()">
+      </button>
+    </div>
+  </div>
+  
+  <p-confirmDialog></p-confirmDialog>
+  <p-toast></p-toast>
+</div>

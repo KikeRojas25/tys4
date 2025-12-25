@@ -3,11 +3,7 @@
   <div class="flex flex-col sm:flex-row flex-0 sm:items-center sm:justify-between border-b bg-card dark:bg-transparent">
     <div class="flex-1 min-w-0">
       <div class="flex flex-wrap items-center font-medium">
-        <div>
-          <a [routerLink]="['/comercio']">
-            <i class="fa fa-home" style="font-size: 34px; color: #6c6a6b;"></i>
-          </a>
-        </div>
+          <a class="whitespace-nowrap text-primary-500">TMS</a>
         <div class="flex items-center ml-2 whitespace-nowrap">
           <mat-icon class="fuse-horizontal-navigation-item-icon" [svgIcon]="'heroicons_solid:chevron-right'"></mat-icon>
           <a class="ml-2 subtitulo">Seguridad</a>
@@ -33,7 +29,7 @@
       <p-button label="Buscar" severity="primary" (onClick)="buscar()" class="p-button-sm p-2"></p-button>
 
       <!-- Nuevo Botón -->
-      <p-button label="Nuevo Usuario" severity="secondary" (onClick)="nuevo()" class="p-button-sm p-ml-4 p-2"></p-button>
+      <!-- <p-button label="Nuevo Usuario" severity="secondary" (onClick)="nuevo()" class="p-button-sm p-ml-4 p-2"></p-button> -->
     </div>
   </div>
 
@@ -49,10 +45,10 @@
       <ng-template pTemplate="header">
         <tr>
           <th style="text-align: center; width: 80px;">ID</th>
-          <th style="text-align: center; width: 100px;">DNI</th>
+          
           <th style="text-align: center; width: 280px;">Usuario</th>
           <th style="text-align: center; width: 280px;">Nombre completo</th>
-          <th style="text-align: center; width: 180px;">Última conexión</th>
+          <th style="text-align: center; width: 180px;">Equipo</th>
           <th>Email</th>
           <th>Estado</th>
           <th style="text-align: center; width: 280px;">Acciones</th>
@@ -62,20 +58,20 @@
       <!-- Cuerpo de la tabla -->
       <ng-template pTemplate="body" let-usuario>
         <tr [pSelectableRow]="usuario">
-          <td style="text-align: center">{{ usuario.id }}</td>
-          <td style="text-align: center">{{ usuario.dni }}</td>
-          <td>{{ usuario.username }}</td>
-          <td>{{ usuario.nombreCompleto }}</td>
-          <td>{{ usuario.lastActive | date: 'dd-MM-YYYY' }}</td>
+          <td style="text-align: center">{{ usuario.usr_int_id }}</td>
+          
+          <td>{{ usuario.usr_str_red }}</td>
+          <td>{{ usuario.usr_str_nombre + ' ' + usuario.usr_str_apellidos }}</td>
+          <td>{{ getNombreEquipo(usuario.idequipo) }}</td>
           <td>{{ usuario.email }}</td>
           <td>
             <p-chip *ngIf="usuario.estadoId === 1" label="Activo" class="p-chip-success"></p-chip>
             <p-chip *ngIf="usuario.estadoId !== 1" label="Inactivo" class="p-chip-danger"></p-chip>
           </td>
           <td>
-            <p-button size="small" severity="secondary" icon="fa fa-pencil" (click)="editarUsuario(usuario.id)"></p-button>
-            <p-button size="small" icon="fa fa-trash" (click)="eliminarUsuario(usuario.id)"></p-button>
-            <p-button size="small" icon="fa fa-user-o" (click)="verRolesUsuario(usuario.id)"></p-button>
+            <!-- <p-button size="small" severity="secondary" icon="fa fa-pencil" (click)="editarUsuario(usuario.usr_int_id)"></p-button>
+            <p-button size="small" icon="fa fa-trash" (click)="eliminarUsuario(usuario.usr_int_id)"></p-button> -->
+            <p-button size="small" icon="fa fa-user-o" (click)="verRolesUsuario(usuario.usr_int_id)"></p-button>
           </td>
         </tr>
       </ng-template>
@@ -85,6 +81,61 @@
 <p-confirmDialog />
 
 <p-toast />
+
+
+
+<!-- Modal Asignar Equipo -->
+<p-dialog
+  header="Asignar Equipo al Usuario"
+  [(visible)]="dialogAsignarVisible"
+  [modal]="true"
+  [style]="{ width: '400px' }"
+  [draggable]="false"
+  [resizable]="false"
+>
+  <div *ngIf="usuarioSeleccionado" class="flex flex-col gap-4">
+    <div class="text-sm text-gray-700">
+      <strong>Usuario ID:</strong> {{ usuarioSeleccionado.usr_int_id }}
+    </div>
+
+    <div>
+      <label for="equipo" class="block text-sm font-medium text-gray-700 mb-1">Seleccionar Equipo</label>
+     <p-dropdown
+        id="equipo"
+        [options]="listaEquipos"
+        [(ngModel)]="usuarioSeleccionado.idequipo"
+        optionLabel="nombre"
+        optionValue="id"
+        appendTo="body"
+        placeholder="Seleccione un equipo"
+        class="w-full"
+      >
+        <ng-template let-item pTemplate="selectedItem">
+          <span *ngIf="!item">Sin equipo asignado</span>
+          <span *ngIf="item">{{ item.nombre }}</span>
+        </ng-template>
+      </p-dropdown>
+
+    </div>
+
+    <div class="flex justify-end gap-3 mt-4">
+      <p-button
+        label="Cancelar"
+        icon="pi pi-times"
+        class="p-button-text"
+        (click)="dialogAsignarVisible = false"
+      ></p-button>
+      <p-button
+        label="Guardar"
+        icon="pi pi-check"
+        class="p-button-success"
+        (click)="guardarCambioEquipo()"
+      ></p-button>
+    </div>
+  </div>
+</p-dialog>
+
+
 
 <p-dialog [(visible)]="displayDialog" header="Asignar Roles" [modal]="true" [closable]="false">
   <div class="p-fluid">

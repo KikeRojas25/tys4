@@ -412,24 +412,153 @@
                 </div>
             </div>
     
-            <div class="field flex flex-col">
-                <label>GRRs masivas :</label>
-                <div class="card p-fluid">
-                    <p-button severity="warning" label="Generar..." (onClick)="grr()"></p-button>
-                </div>
-            </div>
-    
-            <div class="field flex flex-col">
+            <div class="field flex flex-col col-span-2">
                 <label>GRR (Guías de remitente) :</label>
                 <div class="card p-fluid">
-                    <p-chips name="guiasremitente" [(ngModel)]="guias" formControlName="guiasremitente" required />
-                    <div *ngIf="form.get('guiasremitente')?.invalid && form.get('guiasremitente')?.touched" class="alert-danger">
+                    <div class="flex gap-2">
+                        <p-button severity="warning" label="Generar GRRs Masivas..." (onClick)="grr()" class="flex-grow-0"></p-button>
+                        <p-button 
+                            *ngIf="guiasGrr.length > 0" 
+                            [severity]="mostrarTablaGuias ? 'secondary' : 'info'" 
+                            [icon]="mostrarTablaGuias ? 'pi pi-eye-slash' : 'pi pi-eye'"
+                            [label]="mostrarTablaGuias ? 'Ocultar Tabla' : 'Mostrar Tabla'"
+                            (onClick)="toggleTablaGuias()" 
+                            class="flex-grow-0">
+                        </p-button>
+                        <p-button 
+                            *ngIf="guiasGrr.length > 0" 
+                            severity="danger" 
+                            icon="pi pi-trash"
+                            label="Limpiar Todas"
+                            (onClick)="limpiarTodasLasGuiasGrr()" 
+                            class="flex-grow-0">
+                        </p-button>
+                    </div>
+                    <div *ngIf="form.get('guiasremitente')?.invalid && form.get('guiasremitente')?.touched" class="alert-danger mt-2">
                         <div *ngIf="form.get('guiasremitente')?.errors?.required">Requiere al menos una guía de remitente.</div>
                     </div>
                 </div>
             </div>
     
         </div>
+    </p-panel>
+
+    <!-- Tabla de Guías GRR -->
+    <p-panel *ngIf="guiasGrr.length > 0 && mostrarTablaGuias" header="Guías GRR Generadas" class="w-full mb-3 custom-header-panel">
+        <div class="mb-3 flex justify-between items-center">
+            <span class="text-sm text-gray-600">
+                Total de guías: <strong>{{ guiasGrr.length }}</strong>
+            </span>
+        </div>
+
+        <p-table 
+            [value]="guiasGrr" 
+            [scrollable]="true"
+            scrollHeight="400px"
+            [tableStyle]="{ 'min-width': '30rem' }"
+            styleClass="custom-table">
+            
+            <ng-template pTemplate="header">
+                <tr class="bg-gray-800 text-white">
+                    <th class="text-center px-3 py-2 text-sm font-semibold" style="width: 80px;">#</th>
+                    <th class="text-center px-3 py-2 text-sm font-semibold">Número de GRR</th>
+                    <th class="text-center px-3 py-2 text-sm font-semibold">Número de Documento</th>
+                    <th class="text-center px-3 py-2 text-sm font-semibold" style="width: 150px;">Acciones</th>
+                </tr>
+            </ng-template>
+            
+            <ng-template pTemplate="body" let-guia let-rowIndex="rowIndex">
+                <tr class="border-b border-gray-100 hover:bg-gray-50">
+                    <!-- Número de fila -->
+                    <td class="text-center px-3 py-2 text-sm font-medium text-gray-700">
+                        {{ rowIndex + 1 }}
+                    </td>
+                    
+                    <!-- Número de GRR (editable inline) -->
+                    <td class="px-2 py-2">
+                        <input 
+                            *ngIf="guia.editando"
+                            type="text" 
+                            pInputText 
+                            [(ngModel)]="guia.nroGrr" 
+                            [ngModelOptions]="{standalone: true}"
+                            class="w-full p-2 text-sm border border-blue-400 rounded focus:border-blue-600"
+                            placeholder="Ingrese número de GRR">
+                        <span *ngIf="!guia.editando" class="block px-2 py-2 text-sm">
+                            {{ guia.nroGrr || '-' }}
+                        </span>
+                    </td>
+                    
+                    <!-- Número de Documento (editable inline) -->
+                    <td class="px-2 py-2">
+                        <input 
+                            *ngIf="guia.editando"
+                            type="text" 
+                            pInputText 
+                            [(ngModel)]="guia.nroDocumento" 
+                            [ngModelOptions]="{standalone: true}"
+                            class="w-full p-2 text-sm border border-blue-400 rounded focus:border-blue-600"
+                            placeholder="Ingrese número de documento">
+                        <span *ngIf="!guia.editando" class="block px-2 py-2 text-sm">
+                            {{ guia.nroDocumento || '-' }}
+                        </span>
+                    </td>
+                    
+                    <!-- Acciones -->
+                    <td class="text-center px-2 py-2">
+                        <div class="flex justify-center gap-1">
+                            <!-- Botones cuando NO está editando -->
+                            <p-button 
+                                *ngIf="!guia.editando"
+                                icon="pi pi-pencil" 
+                                severity="info"
+                                [rounded]="true"
+                                [text]="true"
+                                title="Editar" 
+                                (onClick)="editarGuiaGrr(guia)">
+                            </p-button>
+                            <p-button 
+                                *ngIf="!guia.editando"
+                                icon="pi pi-trash" 
+                                severity="danger"
+                                [rounded]="true"
+                                [text]="true"
+                                title="Eliminar" 
+                                (onClick)="eliminarGuiaGrr(rowIndex)">
+                            </p-button>
+                            
+                            <!-- Botones cuando SÍ está editando -->
+                            <p-button 
+                                *ngIf="guia.editando"
+                                icon="pi pi-check" 
+                                severity="success"
+                                [rounded]="true"
+                                [text]="true"
+                                title="Guardar" 
+                                (onClick)="actualizarGuiaGrr(guia)">
+                            </p-button>
+                            <p-button 
+                                *ngIf="guia.editando"
+                                icon="pi pi-times" 
+                                severity="secondary"
+                                [rounded]="true"
+                                [text]="true"
+                                title="Cancelar" 
+                                (onClick)="cancelarEdicionGuiaGrr(guia)">
+                            </p-button>
+                        </div>
+                    </td>
+                </tr>
+            </ng-template>
+
+            <ng-template pTemplate="emptymessage">
+                <tr>
+                    <td colspan="4" class="text-center p-4">
+                        <span class="text-gray-600">No hay guías GRR generadas</span>
+                    </td>
+                </tr>
+            </ng-template>
+        </p-table>
     </p-panel>
     
     <p-dialog header="Generador Etiquetas" [modal]="true" [(visible)]="dialogEtiqueta" [style]="{ width: '25rem' }">

@@ -359,16 +359,22 @@ modalEntregarOT() {
     });
 
     this.ref.onClose.subscribe((response: any) => {
+      // Si se canceló, no hacer nada
+      if (response?.cancelado) {
+        return;
+      }
+
       console.log('respuesta', response);
       this.reloadDetalles();
 
-      if (!response?.error) {
+      // Solo mostrar mensaje si hay una respuesta válida (no cancelado)
+      if (response && !response.error) {
         this.messageService.add({
           severity: 'success',
           summary: 'Planning',
           detail: 'Se ha asignado el tipo de operación de manera correcta.'
         });
-      } else {
+      } else if (response?.error) {
         this.messageService.add({
           severity: 'error',
           summary: 'Planning',
@@ -383,18 +389,18 @@ asignarTipoOperacionxOt() {
     this.messageService.add({
       severity: 'warn',
       summary: 'Proveedor de reparto',
-      detail: 'Debe seleccionar al menos un manifiesto'
+      detail: 'Debe seleccionar al menos una OT'
     });
     return;
   }
     this.ordenes = this.selectedOrdenes;
 
-    // Concatenar los idOrdenTrabajo separados por coma
+    // Concatenar los idOrdenTrabajo separados por coma (para Manifiesto)
     const ids = this.ordenes.map(m => m.idOrdenTrabajo).join(',');
     console.log('ids', ids);
 
     this.ref = this.dialogService.open(AsignartipooperacionRutaComponent, {
-      header: 'Reasignar Tipo de Operación',
+      header: 'Reasignar Tipo de Operación (Manifiesto)',
       width: '60%',
       contentStyle: { 'max-height': '450px', overflow: 'auto' },
       baseZIndex: 10000,
@@ -402,24 +408,160 @@ asignarTipoOperacionxOt() {
     });
 
     this.ref.onClose.subscribe((response: any) => {
+      // Si se canceló, no hacer nada
+      if (response?.cancelado) {
+        return;
+      }
+
       console.log('respuesta', response);
       this.reloadDetalles();
 
-      if (!response?.error) {
+      // Solo mostrar mensaje si hay una respuesta válida (no cancelado)
+      if (response && !response.error) {
         this.messageService.add({
           severity: 'success',
           summary: 'Planning',
           detail: 'Se ha asignado el tipo de operación de manera correcta.'
         });
-      } else {
+      } else if (response?.error) {
         this.messageService.add({
           severity: 'error',
           summary: 'Planning',
           detail: 'Hubo un error en la asignación de tipo de operación.'
         });
       }
-    });
-  
+    });
+  
+}
+
+asignarTipoOperacionxOtMasivo() {
+  if (!this.selectedOrdenes || this.selectedOrdenes.length === 0) {
+    this.messageService.add({
+      severity: 'warn',
+      summary: 'Proveedor de reparto',
+      detail: 'Debe seleccionar al menos una OT'
+    });
+    return;
+  }
+
+  // Obtener todos los IDs de las OT seleccionadas
+  const idsOrdenTrabajo: number[] = [];
+  this.selectedOrdenes.forEach(orden => {
+    const idOrdenTrabajo = (orden as any).idOrdenTrabajo || orden.idordentrabajo;
+    if (idOrdenTrabajo) {
+      idsOrdenTrabajo.push(idOrdenTrabajo);
+    }
+  });
+
+  if (idsOrdenTrabajo.length === 0) {
+    this.messageService.add({
+      severity: 'warn',
+      summary: 'Proveedor de reparto',
+      detail: 'No se encontraron IDs válidos en las OT seleccionadas'
+    });
+    return;
+  }
+
+  // Convertir a string separado por comas para el componente (formato: ,id1,id2,id3)
+  const idsString = ',' + idsOrdenTrabajo.join(',');
+
+  // Abrir modal para procesar todas las OT masivamente
+  this.ref = this.dialogService.open(AsignartipooperacionRutaComponent, {
+    header: `Reasignar Tipo de Operación (${idsOrdenTrabajo.length} OT seleccionada${idsOrdenTrabajo.length > 1 ? 's' : ''})`,
+    width: '60%',
+    contentStyle: { 'max-height': '450px', overflow: 'auto' },
+    baseZIndex: 10000,
+    data: { ids: idsString }
+  });
+
+  this.ref.onClose.subscribe((response: any) => {
+    // Si se canceló, no hacer nada
+    if (response?.cancelado) {
+      return;
+    }
+
+    console.log('Respuesta procesamiento masivo:', response);
+    this.reloadDetalles();
+
+    // Solo mostrar mensaje si hay una respuesta válida (no cancelado)
+    if (response && !response.error) {
+      this.messageService.add({
+        severity: 'success',
+        summary: 'Planning',
+        detail: `Se ha asignado el tipo de operación a ${idsOrdenTrabajo.length} OT(s) correctamente.`
+      });
+    } else if (response?.error) {
+      this.messageService.add({
+        severity: 'error',
+        summary: 'Planning',
+        detail: 'Hubo un error en la asignación de tipo de operación.'
+      });
+    }
+  });
+}
+
+asignarTipoOperacionxOtIndividualDesdeFila(orden: any) {
+  if (!orden) {
+    this.messageService.add({
+      severity: 'warn',
+      summary: 'Proveedor de reparto',
+      detail: 'No se pudo obtener la información de la OT'
+    });
+    return;
+  }
+
+  // El objeto puede tener idOrdenTrabajo (del servicio) o idordentrabajo (de la interfaz)
+  const idOrdenTrabajo = (orden as any).idOrdenTrabajo || orden.idordentrabajo;
+  if (!idOrdenTrabajo) {
+    this.messageService.add({
+      severity: 'warn',
+      summary: 'Proveedor de reparto',
+      detail: 'La OT no tiene un ID válido'
+    });
+    return;
+  }
+
+  this.abrirModalAsignarTipoOperacionOt(idOrdenTrabajo);
+}
+
+private abrirModalAsignarTipoOperacionOt(idOrdenTrabajo: number) {
+  console.log('idOrdenTrabajo individual', idOrdenTrabajo);
+
+  // Formato requerido: ,id (con coma al inicio)
+  const idsString = ',' + idOrdenTrabajo;
+
+  this.ref = this.dialogService.open(AsignartipooperacionRutaComponent, {
+    header: 'Reasignar Tipo de Operación (OT Individual)',
+    width: '60%',
+    contentStyle: { 'max-height': '450px', overflow: 'auto' },
+    baseZIndex: 10000,
+    data: { ids: idsString }
+  });
+
+  this.ref.onClose.subscribe((response: any) => {
+    // Si se canceló, no hacer nada
+    if (response?.cancelado) {
+      return;
+    }
+
+    console.log('respuesta', response);
+    this.reloadDetalles();
+
+    // Solo mostrar mensaje si hay una respuesta válida (no cancelado)
+    if (response && !response.error) {
+      this.messageService.add({
+        severity: 'success',
+        summary: 'Planning',
+        detail: 'Se ha asignado el tipo de operación de manera correcta.'
+      });
+    } else if (response?.error) {
+      this.messageService.add({
+        severity: 'error',
+        summary: 'Planning',
+        detail: 'Hubo un error en la asignación de tipo de operación.'
+      });
+    }
+  });
 }
 
 }

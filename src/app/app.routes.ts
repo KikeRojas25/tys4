@@ -184,6 +184,23 @@ export const appRoutes: Route[] = [
                 loadComponent: () => import('./modules/admin/recepcion/recepcion.component')
                                       .then(m => m.RecepcionComponent),
                 children: [
+                     {
+                    path: 'ordenrecojo',
+                    loadComponent: () => import('./modules/admin/recojo/list/list.component')
+                                          .then(m => m.listarOrdenRecojoComponent)
+                  },
+                      {
+                    path: 'nuevaordenrecojo',
+                    loadComponent: () => import('./modules/admin/recojo/new/new.component')
+                                          .then(m => m.NuevaordenrecojoComponent)
+                  },
+
+                  {
+                    path: 'editarordenrecojo/:id',
+                    loadComponent: () => import('./modules/admin/recojo/edit/edit.component')
+                                          .then(m => m.EditComponent)
+                  },
+
                   {
                     path: 'generacionmanifiestos',
                     loadComponent: () => import('./modules/admin/recepcion/ordentransporte/generacionmanifiesto/generacionmanifiesto.component')
@@ -226,6 +243,11 @@ export const appRoutes: Route[] = [
                     path: 'generarrutaslocaldetalle/:uid',
                     loadComponent: () => import('./modules/admin/planning/planning-local-detalle/planning-local-detalle.component')
                                           .then(m => m.PlanningLocalDetalleComponent)
+                  },
+                  {
+                    path: 'despachos-generados',
+                    loadComponent: () => import('./modules/admin/planning/despachos-generados/despachos-generados.component')
+                                          .then(m => m.DespachosGeneradosComponent)
                   },
 
 
@@ -328,6 +350,22 @@ export const appRoutes: Route[] = [
                                               .then(m => m.ListComponent),}
                     ]
                   },
+                  {
+                    path: 'estacion',
+                    loadComponent: () => import('./modules/admin/mantenimiento/estacion/estacion.component')
+                                          .then(m => m.EstacionComponent),
+                    children: [
+                      {  
+                        path: 'list',
+                        loadComponent: () => import('./modules/admin/mantenimiento/estacion/list/list.component')
+                                              .then(m => m.ListComponent),},
+                      {
+                        path: 'manual',
+                        loadComponent: () => import('./modules/admin/mantenimiento/estacion/manual/manual.component')
+                                              .then(m => m.ManualComponent)
+                      }
+                    ]
+                  },
 
 
                   {
@@ -345,6 +383,19 @@ export const appRoutes: Route[] = [
                     path: 'precinto',
                     loadComponent: () => import('./modules/admin/mantenimiento/precinto/precinto.component')
                                           .then(m => m.PrecintoComponent)
+                  },
+                  {
+                    path: 'tarifa',
+                    loadComponent: () => import('./modules/admin/mantenimiento/tarifa/tarifa.component')
+                                  .then(m => m.TarifaComponent),
+                                  children: [
+                                    {  
+                                      path: 'list',
+                                      loadComponent: () => import('./modules/admin/mantenimiento/tarifa/list/list.component')
+                                                            .then(m => m.ListComponent),
+                                    },
+                                 
+                     ]
                   },
                  
                 ]
@@ -369,7 +420,39 @@ export const appRoutes: Route[] = [
                   loadComponent: () => import('./modules/admin/seguridad/edituser/edituser.component')
                                         .then(m => m.EdituserComponent)
                 }
-             
+
+              ]
+            },
+            {
+              path: 'facturacion',
+              loadComponent: () => import('./modules/admin/facturacion/facturacion.component')
+                                    .then(m => m.FacturacionComponent),
+              children: [
+                {
+                  path: 'generarpreliquidacion',
+                  loadComponent: () => import('./modules/admin/facturacion/listpendientes/listpendientes.component')
+                                        .then(m => m.ListpendientesComponent)
+                },
+                {
+                  path: 'listarpreliquidacion',
+                  loadComponent: () => import('./modules/admin/facturacion/listpreliquidaciones/listpreliquidaciones.component')
+                                        .then(m => m.ListpreliquidacionesComponent)
+                },
+                {
+                  path: 'listarcomprobantes',
+                  loadComponent: () => import('./modules/admin/facturacion/listcomprobantes/listcomprobantes.component')
+                                        .then(m => m.ListcomprobantesComponent)
+                },
+                {
+                  path: 'nueva',
+                  loadComponent: () => import('./modules/admin/facturacion/listpendientes/listpendientes.component')
+                                        .then(m => m.ListpendientesComponent)
+                },
+                {
+                  path: 'editar/:id',
+                  loadComponent: () => import('./modules/admin/facturacion/editarpreliquidacion/editarpreliquidacion.component')
+                                        .then(m => m.EditarpreliquidacionComponent)
+                }
               ]
             },
         ]

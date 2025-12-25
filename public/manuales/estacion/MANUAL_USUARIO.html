@@ -1,0 +1,607 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Manual de Usuario - Mantenimiento de Estaciones | TTrack</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            line-height: 1.6;
+            color: #333;
+            background-color: #f5f5f5;
+            padding: 20px;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            background: white;
+            padding: 40px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+            border-radius: 8px;
+        }
+
+        h1 {
+            color: #2c3e50;
+            border-bottom: 4px solid #3498db;
+            padding-bottom: 15px;
+            margin-bottom: 30px;
+            font-size: 2.5em;
+        }
+
+        h2 {
+            color: #34495e;
+            margin-top: 40px;
+            margin-bottom: 20px;
+            padding-top: 20px;
+            border-top: 2px solid #ecf0f1;
+            font-size: 1.8em;
+        }
+
+        h3 {
+            color: #555;
+            margin-top: 30px;
+            margin-bottom: 15px;
+            font-size: 1.4em;
+        }
+
+        h4 {
+            color: #666;
+            margin-top: 20px;
+            margin-bottom: 10px;
+            font-size: 1.2em;
+        }
+
+        h5 {
+            color: #777;
+            margin-top: 15px;
+            margin-bottom: 8px;
+            font-size: 1.1em;
+        }
+
+        p {
+            margin-bottom: 15px;
+            text-align: justify;
+        }
+
+        ul, ol {
+            margin-left: 30px;
+            margin-bottom: 20px;
+        }
+
+        li {
+            margin-bottom: 10px;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin: 20px 0;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+        }
+
+        th {
+            background-color: #3498db;
+            color: white;
+            padding: 12px;
+            text-align: left;
+            font-weight: 600;
+        }
+
+        td {
+            padding: 12px;
+            border-bottom: 1px solid #ddd;
+        }
+
+        tr:hover {
+            background-color: #f8f9fa;
+        }
+
+        .toc {
+            background-color: #ecf0f1;
+            padding: 20px;
+            border-radius: 5px;
+            margin-bottom: 30px;
+            border-left: 4px solid #3498db;
+        }
+
+        .toc h2 {
+            margin-top: 0;
+            border-top: none;
+            padding-top: 0;
+        }
+
+        .toc ol {
+            margin-left: 20px;
+        }
+
+        .toc a {
+            color: #3498db;
+            text-decoration: none;
+            font-weight: 500;
+        }
+
+        .toc a:hover {
+            text-decoration: underline;
+        }
+
+        img {
+            max-width: 100%;
+            height: auto;
+            border: 2px solid #ddd;
+            border-radius: 5px;
+            margin: 20px 0;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+            display: block;
+        }
+
+        .warning {
+            background-color: #fff3cd;
+            border-left: 4px solid #ffc107;
+            padding: 15px;
+            margin: 20px 0;
+            border-radius: 4px;
+        }
+
+        .warning strong {
+            color: #856404;
+        }
+
+        .info-box {
+            background-color: #d1ecf1;
+            border-left: 4px solid #17a2b8;
+            padding: 15px;
+            margin: 20px 0;
+            border-radius: 4px;
+        }
+
+        .success-box {
+            background-color: #d4edda;
+            border-left: 4px solid #28a745;
+            padding: 15px;
+            margin: 20px 0;
+            border-radius: 4px;
+        }
+
+        code {
+            background-color: #f4f4f4;
+            padding: 2px 6px;
+            border-radius: 3px;
+            font-family: 'Courier New', monospace;
+            color: #e83e8c;
+        }
+
+        blockquote {
+            border-left: 4px solid #3498db;
+            padding-left: 20px;
+            margin: 20px 0;
+            color: #555;
+            font-style: italic;
+        }
+
+        hr {
+            border: none;
+            border-top: 2px solid #ecf0f1;
+            margin: 40px 0;
+        }
+
+        .footer {
+            margin-top: 50px;
+            padding-top: 20px;
+            border-top: 2px solid #ecf0f1;
+            text-align: center;
+            color: #777;
+            font-size: 0.9em;
+        }
+
+        .step-number {
+            background-color: #3498db;
+            color: white;
+            border-radius: 50%;
+            width: 30px;
+            height: 30px;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: bold;
+            margin-right: 10px;
+        }
+
+        .section-icon {
+            font-size: 1.2em;
+            margin-right: 8px;
+        }
+
+        @media print {
+            body {
+                background: white;
+            }
+            .container {
+                box-shadow: none;
+            }
+        }
+
+        @media (max-width: 768px) {
+            .container {
+                padding: 20px;
+            }
+            h1 {
+                font-size: 2em;
+            }
+            h2 {
+                font-size: 1.5em;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1><span class="section-icon">📖</span>Manual de Usuario - Mantenimiento de Estaciones</h1>
+
+        <div class="toc">
+            <h2>📋 Tabla de Contenidos</h2>
+            <ol>
+                <li><a href="#introduccion">Introducción</a></li>
+                <li><a href="#acceso">Acceso al Módulo</a></li>
+                <li><a href="#listar">Listar Estaciones</a></li>
+                <li><a href="#crear">Crear Nueva Estación</a></li>
+                <li><a href="#editar">Editar Estación</a></li>
+                <li><a href="#eliminar">Eliminar Estación</a></li>
+                <li><a href="#inhabilitar">Inhabilitar Estación</a></li>
+                <li><a href="#filtros">Filtros y Búsqueda</a></li>
+                <li><a href="#faq">Preguntas Frecuentes</a></li>
+            </ol>
+        </div>
+
+        <hr>
+
+        <section id="introduccion">
+            <h2><span class="section-icon">📖</span>Introducción</h2>
+            <p>El módulo de <strong>Mantenimiento de Estaciones</strong> permite gestionar las estaciones del sistema. Con este módulo puedes crear, editar, eliminar e inhabilitar estaciones, así como consultar la información de las estaciones existentes.</p>
+
+            <h3>Campos de una Estación</h3>
+            <ul>
+                <li><strong>ID Estación</strong>: Identificador único de la estación (generado automáticamente)</li>
+                <li><strong>Estación Origen</strong>: Nombre de la estación (obligatorio)</li>
+                <li><strong>Distrito</strong>: Distrito al que pertenece la estación (obligatorio)</li>
+                <li><strong>Flujo Regular</strong>: Indica si la estación tiene flujo regular (Sí/No)</li>
+            </ul>
+        </section>
+
+        <hr>
+
+        <section id="acceso">
+            <h2><span class="section-icon">🚪</span>Acceso al Módulo</h2>
+            <ol>
+                <li>Inicia sesión en el sistema TTrack</li>
+                <li>En el menú principal, navega a <strong>Mantenimiento</strong></li>
+                <li>Selecciona <strong>Estación</strong> del submenú</li>
+                <li>Se abrirá la pantalla de listado de estaciones</li>
+            </ol>
+            <p><strong>Ruta directa</strong>: <code>/mantenimiento/estacion/list</code></p>
+            <img src="/manuales/estacion/imagenes/01-listado-estaciones.png" alt="Acceso al módulo desde el menú">
+        </section>
+
+        <hr>
+
+        <section id="listar">
+            <h2><span class="section-icon">📊</span>Listar Estaciones</h2>
+            <p>La pantalla principal muestra una tabla con todas las estaciones registradas en el sistema.</p>
+            <img src="/manuales/estacion/imagenes/01-listado-estaciones.png" alt="Pantalla principal - Listado de estaciones">
+
+            <h3>Información mostrada</h3>
+            <p>La tabla incluye las siguientes columnas:</p>
+            <table>
+                <thead>
+                    <tr>
+                        <th>Columna</th>
+                        <th>Descripción</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td><strong>ID</strong></td>
+                        <td>Identificador único de la estación</td>
+                    </tr>
+                    <tr>
+                        <td><strong>Estación Origen</strong></td>
+                        <td>Nombre de la estación</td>
+                    </tr>
+                    <tr>
+                        <td><strong>Distrito</strong></td>
+                        <td>Nombre del distrito</td>
+                    </tr>
+                    <tr>
+                        <td><strong>Flujo Regular</strong></td>
+                        <td>Estado del flujo regular (Sí en verde / No en rojo)</td>
+                    </tr>
+                    <tr>
+                        <td><strong>Acciones</strong></td>
+                        <td>Botones para editar y eliminar</td>
+                    </tr>
+                </tbody>
+            </table>
+
+            <h3>Características</h3>
+            <ul>
+                <li><strong>Paginación</strong>: La tabla muestra 10 registros por página</li>
+                <li><strong>Ordenamiento</strong>: Haz clic en el encabezado de cualquier columna para ordenar</li>
+                <li><strong>Filtros</strong>: Utiliza los campos de búsqueda en la parte superior de cada columna</li>
+            </ul>
+        </section>
+
+        <hr>
+
+        <section id="crear">
+            <h2><span class="section-icon">➕</span>Crear Nueva Estación</h2>
+            <h3>Pasos para crear una estación</h3>
+            <ol>
+                <li>En la pantalla de listado, haz clic en el botón <strong>"Nueva Estación"</strong> (botón azul con icono +)</li>
+            </ol>
+            <img src="/manuales/estacion/imagenes/02-boton-nueva-estacion.png" alt="Botón Nueva Estación">
+            <ol start="2">
+                <li>Se abrirá un modal con el formulario de registro</li>
+            </ol>
+            <img src="/manuales/estacion/imagenes/03-formulario-crear.png" alt="Formulario para crear estación">
+            <ol start="3">
+                <li>Completa los siguientes campos:</li>
+            </ol>
+
+            <h4>Campos del formulario</h4>
+            <h5>Estación Origen (Obligatorio)</h5>
+            <ul>
+                <li><strong>Campo</strong>: Campo de texto</li>
+                <li><strong>Requisitos</strong>:
+                    <ul>
+                        <li>Mínimo 3 caracteres</li>
+                        <li>Máximo 100 caracteres</li>
+                    </ul>
+                </li>
+                <li><strong>Ejemplo</strong>: "Estación Lima Centro"</li>
+            </ul>
+
+            <h5>Distrito (Obligatorio)</h5>
+            <ul>
+                <li><strong>Campo</strong>: Dropdown (lista desplegable)</li>
+                <li><strong>Funcionalidad</strong>:
+                    <ul>
+                        <li>Puedes buscar escribiendo en el campo</li>
+                        <li>Selecciona un distrito de la lista</li>
+                    </ul>
+                </li>
+                <li><strong>Ejemplo</strong>: "LIMA - LIMA - LIMA"</li>
+            </ul>
+            <img src="/manuales/estacion/imagenes/12-dropdown-distrito.png" alt="Dropdown de distritos">
+
+            <h5>Flujo Regular (Opcional)</h5>
+            <ul>
+                <li><strong>Campo</strong>: Checkbox</li>
+                <li><strong>Funcionalidad</strong>: Marca la casilla si la estación tiene flujo regular</li>
+                <li><strong>Valor por defecto</strong>: Desmarcado (No)</li>
+            </ul>
+            <img src="/manuales/estacion/imagenes/13-checkbox-flujo-regular.png" alt="Checkbox Flujo Regular">
+
+            <ol start="4">
+                <li>Una vez completados los campos, haz clic en <strong>"Guardar"</strong> (botón verde)</li>
+            </ol>
+            <img src="/manuales/estacion/imagenes/04-formulario-crear-completado.png" alt="Formulario completado">
+            <ol start="5">
+                <li>Se mostrará un diálogo de confirmación</li>
+            </ol>
+            <img src="/manuales/estacion/imagenes/05-dialogo-confirmacion-guardar.png" alt="Diálogo de confirmación">
+            <ol start="6">
+                <li>Confirma la acción haciendo clic en <strong>"Sí"</strong></li>
+                <li>Si el registro es exitoso, verás un mensaje de confirmación y la tabla se actualizará automáticamente</li>
+            </ol>
+            <img src="/manuales/estacion/imagenes/06-mensaje-exito-guardar.png" alt="Mensaje de éxito">
+
+            <h3>Validaciones</h3>
+            <ul>
+                <li>El campo <strong>Estación Origen</strong> es obligatorio y debe tener entre 3 y 100 caracteres</li>
+                <li>El campo <strong>Distrito</strong> es obligatorio</li>
+                <li>El botón <strong>Guardar</strong> se habilita solo cuando todos los campos obligatorios están completos y válidos</li>
+            </ul>
+        </section>
+
+        <hr>
+
+        <section id="editar">
+            <h2><span class="section-icon">✏️</span>Editar Estación</h2>
+            <h3>Pasos para editar una estación</h3>
+            <ol>
+                <li>En la tabla de estaciones, localiza la estación que deseas editar</li>
+                <li>Haz clic en el botón <strong>"Editar"</strong> (icono de lápiz azul) en la columna de Acciones</li>
+            </ol>
+            <img src="/manuales/estacion/imagenes/07-botones-acciones.png" alt="Botones de acción">
+            <ol start="3">
+                <li>Se abrirá un modal con el formulario pre-cargado con los datos actuales</li>
+            </ol>
+            <img src="/manuales/estacion/imagenes/08-formulario-editar.png" alt="Formulario de edición">
+            <ol start="4">
+                <li>Modifica los campos que necesites:
+                    <ul>
+                        <li><strong>Estación Origen</strong>: Puedes cambiar el nombre</li>
+                        <li><strong>Distrito</strong>: Puedes seleccionar un distrito diferente</li>
+                        <li><strong>Flujo Regular</strong>: Puedes marcar o desmarcar la casilla</li>
+                    </ul>
+                </li>
+                <li>Haz clic en <strong>"Guardar"</strong> (botón verde)</li>
+                <li>Se mostrará un diálogo de confirmación</li>
+                <li>Confirma la acción haciendo clic en <strong>"Sí"</strong></li>
+                <li>Si la actualización es exitosa, verás un mensaje de confirmación y la tabla se actualizará</li>
+            </ol>
+
+            <h3>Notas importantes</h3>
+            <ul>
+                <li>Todos los campos mantienen las mismas validaciones que en el formulario de creación</li>
+                <li>Los cambios se aplican inmediatamente después de confirmar</li>
+            </ul>
+        </section>
+
+        <hr>
+
+        <section id="eliminar">
+            <h2><span class="section-icon">🗑️</span>Eliminar Estación</h2>
+            <h3>Pasos para eliminar una estación</h3>
+            <ol>
+                <li>En la tabla de estaciones, localiza la estación que deseas eliminar</li>
+                <li>Haz clic en el botón <strong>"Eliminar"</strong> (icono de papelera rojo) en la columna de Acciones</li>
+                <li>Se mostrará un diálogo de confirmación con el mensaje:</li>
+            </ol>
+            <blockquote>"¿Está seguro que desea eliminar esta estación?"</blockquote>
+            <img src="/manuales/estacion/imagenes/09-dialogo-confirmacion-eliminar.png" alt="Diálogo de confirmación eliminar">
+            <ol start="4">
+                <li><strong>IMPORTANTE</strong>: Esta acción es permanente y no se puede deshacer</li>
+                <li>Si estás seguro, haz clic en <strong>"Sí"</strong> para confirmar</li>
+                <li>Si cancelas, haz clic en <strong>"No"</strong></li>
+                <li>Si la eliminación es exitosa, verás un mensaje de confirmación y la estación desaparecerá de la tabla</li>
+            </ol>
+
+            <div class="warning">
+                <strong>⚠️ Advertencia</strong><br>
+                La eliminación de una estación es <strong>permanente</strong>. Asegúrate de que realmente deseas eliminar la estación antes de confirmar.
+            </div>
+        </section>
+
+        <hr>
+
+        <section id="inhabilitar">
+            <h2><span class="section-icon">🚫</span>Inhabilitar Estación</h2>
+            <h3>Pasos para inhabilitar una estación</h3>
+            <ol>
+                <li>En la tabla de estaciones, localiza la estación que deseas inhabilitar</li>
+                <li>Haz clic en el botón <strong>"Inhabilitar"</strong> (icono de prohibición amarillo) en la columna de Acciones
+                    <ul>
+                        <li><strong>Nota</strong>: Este botón solo aparece si la estación está activa</li>
+                    </ul>
+                </li>
+                <li>Se mostrará un diálogo de confirmación con el mensaje:</li>
+            </ol>
+            <blockquote>"¿Está seguro que desea inhabilitar esta estación?"</blockquote>
+            <ol start="4">
+                <li>Si estás seguro, haz clic en <strong>"Sí"</strong> para confirmar</li>
+                <li>Si cancelas, haz clic en <strong>"No"</strong></li>
+                <li>Si la inhabilitación es exitosa, verás un mensaje de confirmación y el estado de la estación cambiará a "Inactivo" (en rojo)</li>
+            </ol>
+
+            <h3>Diferencia entre Eliminar e Inhabilitar</h3>
+            <ul>
+                <li><strong>Eliminar</strong>: Elimina permanentemente la estación de la base de datos</li>
+                <li><strong>Inhabilitar</strong>: Desactiva la estación pero mantiene los datos en el sistema (permite reactivarla más tarde)</li>
+            </ul>
+        </section>
+
+        <hr>
+
+        <section id="filtros">
+            <h2><span class="section-icon">🔍</span>Filtros y Búsqueda</h2>
+            <p>La tabla incluye funcionalidades de búsqueda y filtrado para facilitar la localización de estaciones.</p>
+
+            <h3>Filtros disponibles</h3>
+            <h4>Por Estación Origen</h4>
+            <ol>
+                <li>Localiza la columna <strong>"Estación Origen"</strong></li>
+                <li>En el campo de búsqueda debajo del encabezado, escribe el nombre o parte del nombre</li>
+                <li>La tabla se filtrará automáticamente mientras escribes</li>
+                <li>Los resultados mostrarán solo las estaciones que contengan el texto ingresado</li>
+            </ol>
+
+            <h4>Por Distrito</h4>
+            <ol>
+                <li>Localiza la columna <strong>"Distrito"</strong></li>
+                <li>En el campo de búsqueda debajo del encabezado, escribe el nombre del distrito</li>
+                <li>La tabla se filtrará automáticamente</li>
+            </ol>
+            <img src="/manuales/estacion/imagenes/10-filtros-busqueda.png" alt="Filtros de búsqueda">
+            <img src="/manuales/estacion/imagenes/11-tabla-filtrada.png" alt="Tabla con filtros aplicados">
+
+            <h3>Características de los filtros</h3>
+            <ul>
+                <li><strong>Búsqueda en tiempo real</strong>: Los resultados se actualizan mientras escribes</li>
+                <li><strong>Búsqueda parcial</strong>: No necesitas escribir el texto completo</li>
+                <li><strong>No distingue mayúsculas/minúsculas</strong>: Puedes escribir en cualquier formato</li>
+                <li><strong>Combinación de filtros</strong>: Puedes usar múltiples filtros simultáneamente</li>
+            </ul>
+
+            <h3>Limpiar filtros</h3>
+            <p>Para limpiar un filtro, simplemente borra el texto del campo de búsqueda correspondiente.</p>
+        </section>
+
+        <hr>
+
+        <section id="faq">
+            <h2><span class="section-icon">❓</span>Preguntas Frecuentes</h2>
+
+            <h3>¿Puedo crear una estación sin distrito?</h3>
+            <p><strong>No</strong>. El campo Distrito es obligatorio. Debes seleccionar un distrito de la lista desplegable.</p>
+
+            <h3>¿Cuál es la diferencia entre "Flujo Regular: Sí" y "Flujo Regular: No"?</h3>
+            <ul>
+                <li><strong>Sí (verde)</strong>: La estación tiene flujo regular activo</li>
+                <li><strong>No (rojo)</strong>: La estación no tiene flujo regular activo</li>
+            </ul>
+
+            <h3>¿Puedo editar el ID de una estación?</h3>
+            <p><strong>No</strong>. El ID de la estación se genera automáticamente y no se puede modificar.</p>
+
+            <h3>¿Qué pasa si intento eliminar una estación que está en uso?</h3>
+            <p>El sistema validará si la estación puede ser eliminada. Si está siendo utilizada en otros módulos, es posible que no se permita la eliminación y se mostrará un mensaje de error.</p>
+
+            <h3>¿Cómo puedo reactivar una estación inhabilitada?</h3>
+            <p>Actualmente, el módulo permite inhabilitar estaciones. Para reactivar una estación, contacta con el administrador del sistema o utiliza la funcionalidad de edición si está disponible.</p>
+
+            <h3>¿Puedo exportar la lista de estaciones?</h3>
+            <p>La funcionalidad de exportación no está disponible en esta versión del módulo. Si necesitas exportar los datos, contacta con el administrador del sistema.</p>
+
+            <h3>¿Hay un límite de caracteres para el nombre de la estación?</h3>
+            <p>Sí. El nombre de la estación (Estación Origen) debe tener:</p>
+            <ul>
+                <li><strong>Mínimo</strong>: 3 caracteres</li>
+                <li><strong>Máximo</strong>: 100 caracteres</li>
+            </ul>
+
+            <h3>¿Puedo buscar estaciones por ID?</h3>
+            <p>Sí, puedes ordenar la tabla por ID haciendo clic en el encabezado de la columna "ID", pero el filtro de búsqueda por ID no está disponible en esta versión.</p>
+        </section>
+
+        <hr>
+
+        <section id="soporte">
+            <h2><span class="section-icon">📞</span>Soporte</h2>
+            <p>Si encuentras algún problema o tienes dudas sobre el uso del módulo:</p>
+            <ol>
+                <li>Revisa este manual</li>
+                <li>Contacta con el administrador del sistema</li>
+                <li>Reporta el problema al equipo de soporte técnico</li>
+            </ol>
+        </section>
+
+        <hr>
+
+        <section id="notas">
+            <h2><span class="section-icon">📝</span>Notas Adicionales</h2>
+            <ul>
+                <li>Todos los cambios realizados en el módulo se guardan inmediatamente en la base de datos</li>
+                <li>Los mensajes de confirmación aparecen en la esquina superior derecha de la pantalla</li>
+                <li>La tabla se actualiza automáticamente después de crear, editar o eliminar una estación</li>
+                <li>Es recomendable verificar los datos antes de confirmar cualquier acción</li>
+            </ul>
+        </section>
+
+        <div class="footer">
+            <p><strong>Versión del Manual</strong>: 1.0</p>
+            <p><strong>Última actualización</strong>: 2024</p>
+            <p><strong>Módulo</strong>: Mantenimiento de Estaciones</p>
+            <p><strong>Sistema</strong>: TTrack</p>
+        </div>
+    </div>
+</body>
+</html>
+

@@ -107,7 +107,7 @@
             <div class="flex align-items-center gap-2">
               <i class="fa fa-bus" ></i>
                 <span class="font-bold white-space-nowrap m-0">
-                    Ver Pendientes
+                    Ver Repartidores
                 </span>
             </div>
         </ng-template>
@@ -185,6 +185,153 @@
 
           </p-panel>
       </p-tabPanel>
+
+
+<p-tabPanel>
+  <ng-template pTemplate="header">
+    <div class="flex align-items-center gap-2">
+      <i class="fa fa-map-marker"></i>
+      <span class="font-bold white-space-nowrap m-0">
+        Ver Estaciones
+      </span>
+    </div>
+  </ng-template>
+
+  <p-panel [showHeader]="false">
+
+
+      <p-table [columns]="cols2" dataKey="iddepartamento"
+          [value]="ordenes3"  
+          sortField="zona"
+          class="tabla-chica"
+          selectionMode="single"
+          [tableStyle]="{ 'table-layout': 'fixed', 'width': '100%' }"
+           selectionMode="single" scrollable="true"  [scrollHeight]="'600px'"
+          [rows]="20"  [responsive]="true">
+
+
+<ng-template pTemplate="header" let-columns>
+  <tr>
+    <!-- Encabezado superior -->
+    <th colspan="2" style="text-align:center; color:white; background-color:#1E88E5;">GENERAL</th>
+
+    <th colspan="3" style="text-align:center; color:white; background-color:#6A1B9A;">
+      PENDIENTE DE DESPACHO
+    </th>
+
+    <th colspan="3" style="text-align:center; color:white; background-color:#F57C00;">
+      PENDIENTE DE PROGRAMAR
+    </th>
+
+    <th colspan="3" style="text-align:center; color:white; background-color:#FBC02D;">
+      RECEPCIÓN
+    </th>
+
+    <th colspan="3" style="text-align:center; color:white; background-color:#0288D1;">
+      RECOJO
+    </th>
+
+    <th colspan="3" style="text-align:center; color:white; background-color:#03A9F4;">
+      ENTREGA
+    </th>
+
+    <th colspan="1" style="text-align:center; color:white; background-color:#B3E5FC;">
+      RECABAR CARGOS
+    </th>
+
+    <th colspan="1" style="text-align:center; color:white; background-color:#00796B;">
+      ENVIAR CARGOS
+    </th>
+
+    <!-- <th colspan="2" style="text-align:center; color:white; background-color:#790E00;">
+      OBSERVADAS
+    </th> -->
+  </tr>
+
+  <!-- Encabezado inferior -->
+  <tr>
+    <th>Acc</th>
+    <th>Estación</th>
+    <!-- <th>Proveedor</th> -->
+
+    <th>#OTs</th>
+    <th>Peso</th>
+    <th>Bultos</th>
+
+    <th>#OTs</th>
+    <th>Peso</th>
+    <th>Bultos</th>
+
+    <th>#OTs</th>
+    <th>Peso</th>
+    <th>Bultos</th>
+
+    <th>#OTs</th>
+    <th>Peso</th>
+    <th>Bultos</th>
+
+    <th>#OTs</th>
+    <th>Peso</th>
+    <th>Bultos</th>
+
+
+    <th>Recabar</th>
+    <th>Enviar</th>
+    <!-- <th>Obs1</th>
+    <th>Obs2</th> -->
+  </tr>
+</ng-template>
+
+ <ng-template pTemplate="body" let-rowData>
+  <tr>
+    <td class="text-center">
+      <p-button icon="pi pi-search" severity="info"
+        (click)="verEstacion(rowData.idproveedor, rowData.iddepartamento)"
+        size="small"></p-button>
+    </td>
+    <td class="text-left">{{ rowData.estacion }}</td>
+    <!-- <td class="text-left">{{ rowData.repartidor }}</td> -->
+
+    <!-- Pendiente de Despacho -->
+    <td class="text-center">{{rowData.cantidad_pendiente_programar}}</td>
+    <td class="text-center">{{rowData.peso_pendiente_programar}}</td>
+    <td class="text-center">{{rowData.bulto_pendiente_programar}}</td>
+
+    <!-- Pendiente de Programar -->
+    <td class="text-center">{{rowData.cantidad_pendiente_despacho}}</td>
+    <td class="text-center">{{rowData.peso_pendiente_despacho}}</td>
+    <td class="text-center">{{rowData.bulto_pendiente_despacho}}</td>
+
+    <!-- Recepción -->
+    <td class="text-center">{{rowData.cantidad_recepcion}}</td>
+    <td class="text-center">{{rowData.peso_recepcion}}</td>
+    <td class="text-center">{{rowData.bulto_recepcion}}</td>
+
+    <!-- Recojo -->
+    <td class="text-center">{{rowData.cantidad_recojo}}</td>
+    <td class="text-center">{{rowData.peso_recojo}}</td>
+    <td class="text-center">{{rowData.bulto_recojo}}</td>
+
+    <!-- Entrega -->
+    <td class="text-center">{{rowData.cantidad_enreparto}}</td>
+    <td class="text-center">{{rowData.peso_enreparto}}</td>
+    <td class="text-center">{{rowData.bulto_enreparto}}</td>
+
+    <!-- Recabar / Enviar / Obs -->
+    <td class="text-center">{{rowData.cantidad_recabarcargo}}</td>
+    <td class="text-center">{{rowData.cantidad_enviocargo}}</td>
+    <!-- <td class="text-center">{{rowData.cantidad_observadas}}</td>
+    <td class="text-center">{{rowData.cantidad_observadas}}</td> -->
+  </tr>
+</ng-template>
+
+    </p-table>
+  </p-panel>
+</p-tabPanel>
+
+
+
+
     </p-tabView>
   
 </div>

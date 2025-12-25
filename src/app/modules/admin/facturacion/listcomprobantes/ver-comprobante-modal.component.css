@@ -1,0 +1,13 @@
+.ver-comprobante-modal {
+  max-height: 90vh;
+  overflow-y: auto;
+}
+
+.ver-comprobante-modal ::ng-deep .p-table {
+  font-size: 0.875rem;
+}
+
+.ver-comprobante-modal ::ng-deep .p-table .p-datatable-tbody > tr:hover {
+  background-color: #f9fafb;
+}
+

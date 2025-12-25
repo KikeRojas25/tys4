@@ -29,12 +29,16 @@ export class SeguridadService {
   constructor() { }
 
 
-  get(): Observable<User[]> {
-    return this._httpClient.get<User[]>(`${this.baseUrlUser}`).pipe(
-        tap((users: User[]) => {
-            this._users.next(users);  
-        })
-    );
+get(param?: any): Observable<User[]> {
+  const url = param
+    ? `${this.baseUrlUser}?param=${encodeURIComponent(param)}`
+    : `${this.baseUrlUser}`;
+
+  return this._httpClient.get<User[]>(url).pipe(
+    tap((users: User[]) => {
+      this._users.next(users);
+    })
+  );
 }
 
 getUser(id: any): Observable<User> {
@@ -45,7 +49,10 @@ getUser(id: any): Observable<User> {
   );
 }
 
-
+  updateEquipo(userId: number, idEquipo: number): Observable<any> {
+    const body = { userId, idEquipo };
+    return this._httpClient.post(`${this.baseUrlUser}update-equipo`, body);
+  }
   registerUser(user: User): Observable<any> {
     console.log('para registrar:', user);
     return this._httpClient.post(`${this.baseUrlUser}register`, user);

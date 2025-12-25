@@ -1,227 +1,365 @@
-
-<div class="flex flex-col flex-auto min-w-0 bg-card">
-  <div class="flex flex-col sm:flex-row flex-0 sm:items-center sm:justify-between p-6 sm:py-8 sm:px-10 border-b bg-card dark:bg-transparent">
+<div class="flex flex-col flex-auto min-w-0 bg-gray-50">
+  <!-- Header -->
+  <div class="flex flex-col sm:flex-row flex-0 sm:items-center sm:justify-between p-6 sm:py-8 sm:px-10 border-b border-gray-200 bg-white shadow-sm">
     <div class="flex-1 min-w-0">
-      <div class="flex flex-wrap items-center font-medium">
+      <div class="flex flex-wrap items-center font-medium text-sm text-gray-600">
         <div>
-          <a class="whitespace-nowrap text-primary-500">TMS</a>
+          <a class="whitespace-nowrap text-gray-700 hover:text-gray-900">TMS</a>
         </div>
         <div class="flex items-center ml-1 whitespace-nowrap">
-          <mat-icon class="fuse-horizontal-navigation-item-icon" [svgIcon]="'heroicons_solid:chevron-right'"></mat-icon>
-          <a class="ml-1 text-primary-500">Planeamiento</a>
+          <mat-icon class="fuse-horizontal-navigation-item-icon text-gray-400" [svgIcon]="'heroicons_solid:chevron-right'"></mat-icon>
+          <a class="ml-1 text-gray-700 hover:text-gray-900">Planeamiento</a>
         </div>
       </div>
       <div class="mt-2">
-        <h2 class="text-3xl md:text-4xl font-extrabold tracking-tight leading-7 sm:leading-10 truncate"> Planificación por Provincias </h2>
+        <h2 class="text-3xl md:text-4xl font-semibold tracking-tight leading-7 sm:leading-10 truncate text-gray-900">Planificación por Provincias</h2>
+        <p class="text-sm text-amber-700 mt-1.5">Gestión y planificación de despachos por provincia</p>
       </div>
     </div>
   </div>
 
-
   <p-toast />
 
-<!-- Contenido Principal -->
-<div class="main-content container-fluid p-6">
-      <!-- Tabla de Provincias -->
-      <div class="card w-full mb-6">
-        <div class="card-body">
-          <div class="card w-full">
-            <div class="card-body grid grid-cols-1 md:grid-cols-2 gap-4">
-              <!-- Tabla Provincias -->
-              <div>
-                <p-table [columns]="cols" [value]="ordenes2" dataKey="idprovincia"
-                  [rowsPerPageOptions]="[20, 40, 60, 120]" [rows]="20" selectionMode="multiple"
-                  [(selection)]="selectedDepartaments"  [responsive]="true"
-                  class="w-full">
-                  
-                  <ng-template pTemplate="colgroup" let-columns>
-                    <colgroup>
-                      <col *ngFor="let col of columns" [ngStyle]="{'width': col.width}">
-                    </colgroup>
-                  </ng-template>
+  <!-- Contenido Principal -->
+  <div class="main-content container-fluid p-6">
+    <!-- Mensaje Informativo -->
+    <div class="mb-4 flex items-center gap-2 text-sm text-amber-700 bg-amber-50 border border-amber-200 rounded-lg px-4 py-2.5">
+      <i class="pi pi-info-circle"></i>
+      <span>Seleccione las provincias y cree despachos para gestionar las órdenes de transporte</span>
+    </div>
 
-                  <ng-template pTemplate="header" let-columns>
-                    <tr>
-                      <th *ngFor="let col of columns" pResizableColumn [pSortableColumn]="col.field" class="text-center">
-                        {{ col.header }}
-                      </th>
-                    </tr>
-                  </ng-template>
-
-                  <ng-template pTemplate="body" let-rowData>
-                    <tr [pSelectableRow]="rowData">
-                      <td class="text-center">{{ rowData.provincia }}</td>
-                      <td class="text-center">{{ rowData.cantidad }}</td>
-                      <td class="text-center">{{ rowData.bulto }}</td>
-                      <td class="text-center">{{ rowData.peso | number:'1.0-2' }}</td>
-                      <td class="text-center">{{ rowData.volumen | number:'1.0-2' }}</td>
-                      <td class="text-center">S/. {{ rowData.subtotal | number:'1.0-2' }}</td>
-                    </tr>
-                  </ng-template>
-
-                  <ng-template pTemplate="footer">
-                    <tr>
-                      <td class="text-right">Totales</td>
-                      <td class="text-center">{{ otsTotal | number:'1.0-0' }}</td>
-                      <td class="text-center">{{ bultosTotal | number:'1.0-2' }}</td>
-                      <td class="text-center">{{ pesoTotal | number:'1.0-2' }}</td>
-                      <td></td>
-                      <td class="text-center">S/. {{ subtotalTotal | number:'1.0-2' }}</td>
-                    </tr>
-                  </ng-template>
-                </p-table>
-              </div>
-
-              <!-- Botones de Acción -->
-              <div class="flex flex-col gap-4">
-                <button class="btn-warning btn w-full" pButton label="Crear Despacho" icon="pi pi-file"
-                  iconPos="left" (click)="crearcarga()"></button>
-                <button class="btn-secondary btn w-full" pButton label="Agregar Provincia a despacho" icon="pi pi-plus"
-                  iconPos="left" (click)="agregaracarga()"></button>
-              </div>
-            </div>
-          </div>
-        </div>
+    <!-- Tabla de Provincias -->
+    <div class="bg-white rounded-lg shadow-sm border border-gray-200 mb-6 overflow-hidden">
+      <div class="bg-gray-800 text-white px-6 py-4 border-b border-gray-700">
+        <h3 class="text-lg font-semibold text-gray-100">Provincias Disponibles</h3>
+        <p class="text-sm text-amber-300 mt-1.5">Seleccione una o más provincias para crear o agregar a un despacho</p>
       </div>
+      <div class="p-6">
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+          <!-- Tabla Provincias -->
+          <div>
+            <p-table 
+              [columns]="cols" 
+              [value]="ordenes2" 
+              dataKey="idprovincia"
+              [rowsPerPageOptions]="[20, 40, 60, 120]" 
+              [rows]="20" 
+              selectionMode="multiple"
+              [(selection)]="selectedDepartaments"  
+              [responsive]="true"
+              [styleClass]="'custom-table'"
+              class="w-full">
+              
+              <ng-template pTemplate="colgroup" let-columns>
+                <colgroup>
+                  <col *ngFor="let col of columns" [ngStyle]="{'width': col.width}">
+                </colgroup>
+              </ng-template>
 
-      <!-- Tabla de Despachos -->
-      <div class="col-span-12 mb-6">
-        <div class="card border-primary">
-          <div class="card-header">
-            <b>Despachos generados</b>
-          </div>
-          <div class="card-body">
-          
-          <p-table [columns]="cols3" [value]="despachos" dataKey="idcarga" selectionMode="single"
-              [rowsPerPageOptions]="[20, 40, 60, 120]" [rows]="10" [paginator]="true"
-              (onRowSelect)="ver($event)" responsiveLayout="scroll" class="w-full">
-
-          <!-- Colgroup -->
-          <ng-template pTemplate="colgroup" let-cols>
-              <colgroup>
-                  <col *ngFor="let col of cols" [ngStyle]="{'width': col.width}">
-              </colgroup>
-          </ng-template>
-
-          <!-- Header -->
-          <ng-template pTemplate="header" let-cols>
-              <tr>
-                  <th *ngFor="let col of cols" pResizableColumn [pSortableColumn]="col.field" class="text-center">
-                      {{ col.header }}
+              <ng-template pTemplate="header" let-columns>
+                <tr class="bg-gray-800 text-white">
+                  <th *ngFor="let col of columns" pResizableColumn [pSortableColumn]="col.field" class="text-center px-4 py-3 text-sm font-semibold text-gray-100 border-b border-gray-700">
+                    {{ col.header }}
                   </th>
-              </tr>
-          </ng-template>
+                </tr>
+              </ng-template>
 
-          <!-- Body -->
-          <ng-template pTemplate="body" let-rowData>
-              <tr [pSelectableRow]="rowData">
-                  <td class="bg-green-600 text-white text-center">{{ rowData.numcarga }}</td>
-                  <td class="text-center">{{ rowData.tipounidad }}</td>
-                  <td class="text-center">{{ rowData.planificador }}</td>
-                  <td class="bg-yellow-500 text-black text-center">{{ rowData.estado }}</td>
-                  <td class="text-center">{{ rowData.fecharegistro | date: 'dd/MM/yyyy' }}</td>
-                  <td class="text-center">{{ rowData.peso | number:'1.0-2' }}</td>
-                  <td class="text-center">{{ rowData.vol | number:'1.0-2' }}</td>
-                  <td class="text-center">S/. {{ rowData.subtotal | number:'1.0-2' }}</td>
-                  <td class="text-left flex space-x-2">
-                      <button pButton class="p-button-danger p-button-rounded p-button-sm" icon="pi pi-trash"
-                              title="Eliminar" (click)="eliminarDespacho(rowData.idcarga)"></button>
-                      <button pButton class="p-button-success p-button-rounded p-button-sm" icon="pi pi-check"
-                              title="Confirmar" (click)="generar(rowData.idcarga)"></button>
+              <ng-template pTemplate="body" let-rowData>
+                <tr [pSelectableRow]="rowData" class="border-b border-gray-100 hover:bg-gray-50 transition-colors duration-150">
+                  <td class="text-center px-4 py-3 text-gray-700 text-sm font-medium">{{ rowData.provincia }}</td>
+                  <td class="text-center px-4 py-3 text-amber-700 text-sm font-semibold">{{ rowData.cantidad }}</td>
+                  <td class="text-center px-4 py-3 text-gray-700 text-sm">{{ rowData.bulto | number:'1.0-2' }}</td>
+                  <td class="text-center px-4 py-3">
+                    <span class="text-amber-700 font-semibold">{{ rowData.peso | number:'1.0-2' }}</span>
+                    <span class="text-gray-500 text-xs ml-1">kg</span>
                   </td>
-              </tr>
-          </ng-template>
-      </p-table>
+                  <td class="text-center px-4 py-3">
+                    <span class="text-amber-700 font-semibold">{{ rowData.volumen | number:'1.0-2' }}</span>
+                    <span class="text-gray-500 text-xs ml-1">m³</span>
+                  </td>
+                  <td class="text-center px-4 py-3">
+                    <span class="text-amber-700 text-sm font-semibold">S/. {{ rowData.subtotal | number:'1.0-2' }}</span>
+                  </td>
+                </tr>
+              </ng-template>
 
+              <ng-template pTemplate="footer">
+                <tr class="bg-gray-50 border-t border-gray-200">
+                  <td class="text-right px-4 py-3 text-gray-700 text-sm font-semibold">Totales</td>
+                  <td class="text-center px-4 py-3 text-amber-700 text-sm font-bold">{{ otsTotal | number:'1.0-0' }}</td>
+                  <td class="text-center px-4 py-3 text-gray-700 text-sm font-semibold">{{ bultosTotal | number:'1.0-2' }}</td>
+                  <td class="text-center px-4 py-3 text-gray-700 text-sm font-semibold">{{ pesoTotal | number:'1.0-2' }}</td>
+                  <td class="text-center px-4 py-3"></td>
+                  <td class="text-center px-4 py-3">
+                    <span class="text-amber-700 text-sm font-bold">S/. {{ subtotalTotal | number:'1.0-2' }}</span>
+                  </td>
+                </tr>
+              </ng-template>
+            </p-table>
           </div>
-        </div>
-      </div>
 
-      <!-- Detalle de Despacho -->
-      <div class="col-span-12">
-        <div class="card border-primary">
-          <div class="border border-primary rounded-lg">
-            <div class="bg-primary text-white p-4 rounded-t-lg">
-                <div class="grid grid-cols-3 gap-4 p-4 bg-gray-100 rounded-lg shadow">
-                    <div class="font-semibold text-gray-700">
-                      <b>Detalle de despachos de {{carga11detalle}}</b>
-                    </div>
-                </div> 
-              </div> 
-          
-          </div>
-          <div class="card-body">
-            <div class="flex gap-4 mb-4">
-              <button class="btn-danger btn" pButton label="Vincular Tipo Operación" icon="pi pi-file"
-                iconPos="left" (click)="asignarTipoOperacion()"></button>
-              <button class="btn-primary btn" pButton label="Quitar seleccionados" icon="pi pi-arrow-up"
-                iconPos="left" (click)="quitarSeleccionados()"></button>
-              <button class="btn-primary btn" pButton label="Quitar NO seleccionados" icon="pi pi-arrow-up"
-                iconPos="left" (click)="quitarNoSeleccionados()"></button>
+          <!-- Botones de Acción -->
+          <div class="flex flex-col gap-4 justify-start">
+            <div class="bg-gray-50 rounded-lg border border-gray-200 p-4">
+              <h4 class="text-sm font-semibold text-gray-700 mb-3">Acciones de Despacho</h4>
+              <p class="text-xs text-amber-700 mb-4">Seleccione provincias y elija una acción</p>
+              <button 
+                class="w-full px-4 py-2.5 text-sm font-medium text-white bg-gray-700 hover:bg-gray-600 rounded-md shadow-sm transition-all duration-150 mb-3" 
+                pButton 
+                label="Crear Despacho" 
+                icon="pi pi-file"
+                iconPos="left" 
+                (click)="crearcarga()">
+              </button>
+              <button 
+                class="w-full px-4 py-2.5 text-sm font-medium text-gray-700 bg-white border border-gray-300 hover:bg-gray-50 rounded-md shadow-sm transition-all duration-150" 
+                pButton 
+                label="Agregar Provincia a despacho" 
+                icon="pi pi-plus"
+                iconPos="left" 
+                (click)="agregaracarga()">
+              </button>
             </div>
-            <p-table #dt2 [columns]="cols2" [value]="ordenes11" dataKey="idordentrabajo" selectionMode="multiple" 
-            [(selection)]="selectedOTs"
-            [rowsPerPageOptions]="[120, 240, 480, 1200]" [rows]="120" [responsive]="true">
-   
-       <!-- Barra de búsqueda -->
-       <ng-template pTemplate="caption">
-           <div class="flex">
-               <span class="p-input-icon-left ml-auto">
-                   <i class="pi pi-search"></i>
-                   <input pInputText type="text" (input)="dt2.filterGlobal($event.target.value, 'contains')" placeholder="Buscar..." />
-               </span>
-           </div>
-       </ng-template>
-   
-       <!-- Colgroup -->
-       <ng-template pTemplate="colgroup" let-cols>
-           <colgroup>
-               <col style="width: 50px"> <!-- Ancho del checkbox -->
-               <col *ngFor="let col of cols" [ngStyle]="{'width': col.width}">
-           </colgroup>
-       </ng-template>
-   
-       <!-- Header -->
-       <ng-template pTemplate="header" let-cols>
-           <tr>
-               <th style="width: 50px">
-                   <p-tableHeaderCheckbox></p-tableHeaderCheckbox> <!-- Checkbox para seleccionar todas las filas -->
-               </th>
-               <th *ngFor="let col of cols" pResizableColumn [pSortableColumn]="col.field" class="text-center">
-                   {{ col.header }}
-               </th>
-           </tr>
-       </ng-template>
-   
-       <!-- Body -->
-       <ng-template pTemplate="body" let-rowData>
-           <tr [pSelectableRow]="rowData">
-   
-               <!-- Checkbox en cada fila -->
-               <td>
-                   <p-tableCheckbox [value]="rowData"></p-tableCheckbox>
-               </td>
-   
-               <td class="text-center">{{ rowData.numcp }}</td>
-               <td class="text-center">{{ rowData.bulto }}</td>
-               <td class="text-center">{{ rowData.fecharegistro | date: 'dd/MM/yyyy' }}</td>
-               <td class="text-center">{{ rowData.peso | number:'1.0-2' }}</td>
-               <td class="text-center">{{ rowData.subtotal | number:'1.0-2' }}</td>
-               <td class="text-center">{{ rowData.destino }}</td>
-               <td class="text-center">{{ rowData.razonsocial }}</td>
-               <td class="text-center">{{ rowData.tipooperacion }}</td>
-               <td class="text-center">{{ rowData.proveedor }}</td>
-               <td class="text-center">
-                   <p-button icon="pi pi-trash" severity="danger" iconPos="left" (click)="desasignarOT(rowData.idordentrabajo)"></p-button>
-               </td>
-           </tr>
-       </ng-template>
-   </p-table>
-   
           </div>
         </div>
       </div>
     </div>
 
+    <!-- Tabla de Despachos -->
+    <div class="bg-white rounded-lg shadow-sm border border-gray-200 mb-6 overflow-hidden">
+      <div class="bg-gray-800 text-white px-6 py-4 border-b border-gray-700">
+        <h3 class="text-lg font-semibold text-gray-100">Despachos Generados</h3>
+        <p class="text-sm text-amber-300 mt-1.5">Lista de despachos creados para esta planificación</p>
+      </div>
+      <div class="p-6">
+        <p-table 
+          [columns]="cols3" 
+          [value]="despachos" 
+          dataKey="idcarga" 
+          selectionMode="single"
+          [rowsPerPageOptions]="[20, 40, 60, 120]" 
+          [rows]="10" 
+          [paginator]="true"
+          (onRowSelect)="ver($event)" 
+          responsiveLayout="scroll" 
+          [styleClass]="'custom-table'"
+          class="w-full">
+
+          <!-- Colgroup -->
+          <ng-template pTemplate="colgroup" let-cols>
+            <colgroup>
+              <col *ngFor="let col of cols" [ngStyle]="{'width': col.width}">
+            </colgroup>
+          </ng-template>
+
+          <!-- Header -->
+          <ng-template pTemplate="header" let-cols>
+            <tr class="bg-gray-800 text-white">
+              <th *ngFor="let col of cols" pResizableColumn [pSortableColumn]="col.field" class="text-center px-4 py-3 text-sm font-semibold text-gray-100 border-b border-gray-700">
+                {{ col.header }}
+              </th>
+            </tr>
+          </ng-template>
+
+          <!-- Body -->
+          <ng-template pTemplate="body" let-rowData>
+            <tr [pSelectableRow]="rowData" class="border-b border-gray-100 hover:bg-gray-50 transition-colors duration-150">
+              <td class="bg-gray-700 text-white text-center px-4 py-3 font-medium text-sm">{{ rowData.numcarga }}</td>
+              <td class="text-center px-4 py-3 text-gray-700 text-sm">{{ rowData.tipounidad }}</td>
+              <td class="text-center px-4 py-3 text-gray-700 text-sm">{{ rowData.planificador }}</td>
+              <td class="text-center px-4 py-3">
+                <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium"
+                      [ngClass]="{
+                        'bg-amber-100 text-amber-800': rowData.estado === 'Planificada',
+                        'bg-gray-100 text-gray-800': rowData.estado === 'Pendiente'
+                      }">
+                  {{ rowData.estado }}
+                </span>
+              </td>
+              <td class="text-center px-4 py-3 text-amber-700 text-sm font-medium">{{ rowData.fecharegistro | date: 'dd/MM/yyyy' }}</td>
+              <td class="text-center px-4 py-3 text-gray-700 text-sm font-medium">{{ rowData.placa || '-' }}</td>
+              <td class="text-center px-4 py-3 text-gray-700 text-sm">{{ rowData.ultimoDestino || '-' }}</td>
+              <td class="text-center px-4 py-3">
+                <span class="text-amber-700 font-semibold">{{ rowData.peso | number:'1.0-2' }}</span>
+                <span class="text-gray-500 text-xs ml-1">kg</span>
+              </td>
+              <td class="text-center px-4 py-3">
+                <span class="text-amber-700 font-semibold">{{ rowData.vol | number:'1.0-2' }}</span>
+                <span class="text-gray-500 text-xs ml-1">m³</span>
+              </td>
+              <td class="text-center px-4 py-3">
+                <span class="text-amber-700 text-sm font-semibold">S/. {{ rowData.subtotal | number:'1.0-2' }}</span>
+              </td>
+              <td class="text-center px-4 py-3">
+                <div class="flex gap-1.5 justify-center items-center">
+                  <button 
+                    pButton 
+                    class="p-1.5 text-white hover:bg-gray-100 hover:text-gray-700 rounded transition-all duration-150" 
+                    icon="pi pi-trash"
+                    title="Eliminar" 
+                    (click)="eliminarDespacho(rowData.idcarga)">
+                  </button>
+                  <button 
+                    pButton 
+                    class="p-1.5 text-white hover:bg-gray-100 hover:text-gray-700 rounded transition-all duration-150" 
+                    icon="pi pi-check"
+                    [icon]="rowData.estado === 'Planificada' ? 'pi pi-refresh' : 'pi pi-check'"
+                    [title]="rowData.estado === 'Planificada' ? 'Reprogramar' : 'Confirmar'"
+                    (click)="generar(rowData.idcarga)">
+                  </button>
+                  <!-- <button 
+                    pButton 
+                    class="px-3 py-1.5 text-sm font-medium text-white bg-gray-700 hover:bg-gray-800 rounded-md shadow-sm transition-all duration-150" 
+                    icon="pi pi-plus"
+                    label="Agregar Etapa"
+                    iconPos="left"
+                    (click)="agregarEtapa(rowData)">
+                  </button> -->
+                </div>
+              </td>
+            </tr>
+          </ng-template>
+        </p-table>
+      </div>
+    </div>
+
+    <!-- Detalle de Despacho -->
+    <div class="bg-white rounded-lg shadow-sm border border-gray-200 overflow-hidden">
+      <div class="bg-gray-800 text-white px-6 py-4 border-b border-gray-700">
+        <div class="flex items-center justify-between">
+          <div>
+            <h3 class="text-lg font-semibold text-gray-100">Detalle de Despacho</h3>
+            <p class="text-sm text-amber-300 mt-1.5" *ngIf="carga11detalle">
+              Despacho: <span class="font-semibold text-white">{{ carga11detalle }}</span>
+            </p>
+            <p class="text-sm text-amber-300 mt-1.5" *ngIf="!carga11detalle">
+              Seleccione un despacho para ver su detalle
+            </p>
+          </div>
+        </div>
+      </div>
+      <div class="p-6">
+        <div class="mb-4 flex flex-wrap gap-3">
+          <button 
+            class="px-4 py-2 text-sm font-medium text-white bg-gray-700 hover:bg-gray-600 rounded-md shadow-sm transition-all duration-150" 
+            pButton 
+            label="Vincular Tipo Operación" 
+            icon="pi pi-file"
+            iconPos="left" 
+            (click)="asignarTipoOperacion()">
+          </button>
+          <button 
+            class="px-4 py-2 text-sm font-medium text-gray-700 bg-white border border-gray-300 hover:bg-gray-50 rounded-md shadow-sm transition-all duration-150" 
+            pButton 
+            label="Quitar seleccionados" 
+            icon="pi pi-arrow-up"
+            iconPos="left" 
+            (click)="quitarSeleccionados()">
+          </button>
+          <button 
+            class="px-4 py-2 text-sm font-medium text-gray-700 bg-white border border-gray-300 hover:bg-gray-50 rounded-md shadow-sm transition-all duration-150" 
+            pButton 
+            label="Quitar NO seleccionados" 
+            icon="pi pi-arrow-up"
+            iconPos="left" 
+            (click)="quitarNoSeleccionados()">
+          </button>
+        </div>
+        
+        <p-table 
+          #dt2 
+          [columns]="cols2" 
+          [value]="ordenes11" 
+          dataKey="idordentrabajo" 
+          selectionMode="multiple" 
+          [(selection)]="selectedOTs"
+          [rowsPerPageOptions]="[120, 240, 480, 1200]" 
+          [rows]="120" 
+          [responsive]="true"
+          [styleClass]="'custom-table'">
+   
+          <!-- Barra de búsqueda -->
+          <ng-template pTemplate="caption">
+            <div class="flex items-center mb-4">
+              <div class="flex-1">
+                <p class="text-sm text-amber-700 mb-2">
+                  <i class="pi pi-info-circle mr-1"></i>
+                  Busque y seleccione las órdenes de transporte para gestionar
+                </p>
+              </div>
+              <span class="p-input-icon-left">
+                <i class="pi pi-search text-gray-400"></i>
+                <input 
+                  pInputText 
+                  type="text" 
+                  (input)="dt2.filterGlobal($event.target.value, 'contains')" 
+                  placeholder="Buscar..." 
+                  class="border-gray-300 focus:border-amber-500 focus:ring-amber-500" />
+              </span>
+            </div>
+          </ng-template>
+   
+          <!-- Colgroup -->
+          <ng-template pTemplate="colgroup" let-cols>
+            <colgroup>
+              <col style="width: 50px">
+              <col *ngFor="let col of cols" [ngStyle]="{'width': col.width}">
+            </colgroup>
+          </ng-template>
+   
+          <!-- Header -->
+          <ng-template pTemplate="header" let-cols>
+            <tr class="bg-gray-100 border-b border-gray-200">
+              <th style="width: 50px" class="px-4 py-3">
+                <p-tableHeaderCheckbox></p-tableHeaderCheckbox>
+              </th>
+              <th *ngFor="let col of cols" pResizableColumn [pSortableColumn]="col.field" class="text-center px-4 py-3 text-sm font-semibold text-gray-700">
+                {{ col.header }}
+              </th>
+            </tr>
+          </ng-template>
+   
+          <!-- Body -->
+          <ng-template pTemplate="body" let-rowData>
+            <tr [pSelectableRow]="rowData" class="border-b border-gray-100 hover:bg-gray-50 transition-colors duration-150">
+              <!-- Checkbox -->
+              <td class="px-4 py-3">
+                <p-tableCheckbox [value]="rowData"></p-tableCheckbox>
+              </td>
+   
+              <td class="text-center px-4 py-3">
+                <span class="inline-flex items-center justify-center px-2 py-1 rounded bg-gray-700 text-white text-xs font-semibold">
+                  {{ rowData.numcp }}
+                </span>
+              </td>
+              <td class="text-center px-4 py-3 text-gray-700 text-sm">{{ rowData.bulto }}</td>
+              <td class="text-center px-4 py-3 text-amber-700 text-sm font-medium">{{ rowData.fecharegistro | date: 'dd/MM/yyyy' }}</td>
+              <td class="text-center px-4 py-3">
+                <span class="text-amber-700 font-semibold">{{ rowData.peso | number:'1.0-2' }}</span>
+                <span class="text-gray-500 text-xs ml-1">kg</span>
+              </td>
+              <td class="text-center px-4 py-3">
+                <span class="text-amber-700 text-sm font-semibold">S/. {{ rowData.subtotal | number:'1.0-2' }}</span>
+              </td>
+              <td class="text-center px-4 py-3 text-gray-700 text-sm">{{ rowData.destino }}</td>
+              <td class="text-center px-4 py-3 text-gray-700 text-sm">{{ rowData.razonsocial }}</td>
+              <td class="text-center px-4 py-3 text-gray-600 text-sm">{{ rowData.tipooperacion }}</td>
+              <td class="text-center px-4 py-3 text-gray-600 text-sm">{{ rowData.proveedor }}</td>
+              <td class="text-center px-4 py-3">
+                <button 
+                  pButton 
+                  class="p-1.5 text-white hover:bg-gray-100 hover:text-gray-700 rounded transition-all duration-150" 
+                  icon="pi pi-trash" 
+                  severity="danger" 
+                  iconPos="left" 
+                  (click)="desasignarOT(rowData.idordentrabajo)">
+                </button>
+              </td>
+            </tr>
+          </ng-template>
+        </p-table>
+      </div>
+    </div>
+  </div>
 </div>
-<p-confirmDialog  header="Confirmación" icon="pi pi-exclamation-triangle"></p-confirmDialog>
+<p-confirmDialog header="Confirmación" icon="pi pi-exclamation-triangle"></p-confirmDialog>

@@ -213,7 +213,7 @@ export class PordepartamentoComponent implements OnInit {
 
     const ref = this.dialogService.open(VerDetalleOrdenxDepartamentoModalComponent, {
      header: 'Detalle por departamento',
-     width: '50%',
+     width: '75%',
      contentStyle: { overflow: 'auto',  },
      data : { iddepartamento,  idestacionorigen}
    });

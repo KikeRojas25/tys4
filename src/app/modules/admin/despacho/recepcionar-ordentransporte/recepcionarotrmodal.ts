@@ -150,6 +150,7 @@ export class RecepcioanrOTRModalComponent  implements OnInit {
       this.ordenService.getOrden( this.model.idordentrabajo).subscribe( resp => {
             this.model = resp.ordenTransporte;
             this.model.idusuariocreacion = this.user.id;
+            this.model.idestacionorigen = this.user.idestacionorigen;
             console.log(this.model,'popup');
       });
 

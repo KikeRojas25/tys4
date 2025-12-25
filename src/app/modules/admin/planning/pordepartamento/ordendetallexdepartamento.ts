@@ -22,20 +22,21 @@ import { TraficoService } from '../../trafico/trafico.service';
         ToastModule
     ],
     providers: [MessageService],
+    styleUrls: ['./ordendetallexdepartamento.component.css'],
     template: `
-        <div class="p-6">
+        <div class="p-2">
 
             <!-- Filtros y Botón -->
-            <div class="flex flex-row items-center justify-between mb-4">
+            <div class="flex flex-row items-end gap-4 mb-4">
                 <!-- Dropdown para seleccionar agencia -->
-                <div class="flex flex-col">
-                    <label for="agencia" class="text-gray-700 font-semibold mb-1">Seleccionar Agencia:</label>
+                <div class="flex flex-col flex-1">
+                    <label for="agencia" class="text-gray-700 font-semibold mb-1 text-sm">Seleccionar Agencia:</label>
                     <p-dropdown 
                         id="agencia"
                         [options]="agencias"
                         [(ngModel)]="selectedAgencia"
                         placeholder="Seleccione una agencia"
-                        class="w-64"
+                        [style]="{'width': '100%', 'font-size': '0.875rem'}"
                         filter="true">
                         <ng-template let-item pTemplate="selectedItem">
                               <span style="vertical-align:left;">{{item.label}}</span>
@@ -49,56 +50,90 @@ import { TraficoService } from '../../trafico/trafico.service';
                     icon="pi pi-check"
                     (click)="enviarSeleccion()" 
                     severity="success"
-                    class="mt-5">
+                    [style]="{'font-size': '0.875rem'}">
                 </p-button>
             </div>
 
             <!-- Tabla de órdenes -->
-            <p-table [columns]="cols"
-                     [value]="ordenes2"
-                     [style]="{width:'100%'}"
-                     dataKey="idordentrabajo"
-                     [rowsPerPageOptions]="[20,40,60,120]"
-                     [paginator]="true"
-                     [(selection)]="selectedOrdenes"
-                     selectionMode="multiple"
-                     [rows]="10"
-                     [resizableColumns]="true"
-                     [responsive]="true">
-            
-                <ng-template pTemplate="colgroup" let-columns>
-                    <colgroup>
-                        <col *ngFor="let col of columns" [ngStyle]="{'width': col.width}">
-                    </colgroup>
-                </ng-template>
+            <div class="bg-white rounded-lg shadow-sm border border-gray-200 overflow-x-auto">
+                <!-- <div class="bg-gray-800 text-white px-6 py-4 border-b border-gray-700">
+                    <h3 class="text-lg font-semibold text-gray-100">Órdenes de Transporte</h3>
+                    <p class="text-sm text-amber-300 mt-1.5">Seleccione las órdenes para asignar a una agencia</p>
+                </div> -->
+                <div class="p-2">
+                    <p-table [columns]="cols"
+                             [value]="ordenes2"
+                             [tableStyle]="{'table-layout': 'fixed'}"
+                             dataKey="idordentrabajo"
+                             [rowsPerPageOptions]="[20,40,60,120]"
+                             [paginator]="true"
+                             [(selection)]="selectedOrdenes"
+                             selectionMode="multiple"
+                             [rows]="20"
+                             [scrollable]="true"
+                             scrollDirection="horizontal"
+                             [styleClass]="'custom-table compact-table'">
+                    
+                        <ng-template pTemplate="colgroup" let-columns>
+                            <colgroup>
+                                <col style="width: 30px">
+                                <col *ngFor="let col of columns" [ngStyle]="{'width': col.width}">
+                            </colgroup>
+                        </ng-template>
 
-                <ng-template pTemplate="header" let-columns>
-                    <tr>
-                        <th style="width: 3rem">
-                            <p-tableHeaderCheckbox></p-tableHeaderCheckbox>
-                        </th>
-                        <th *ngFor="let col of columns" [pSortableColumn]="col.field">
-                            {{ col.header }}
-                        </th>
-                    </tr>
-                </ng-template>
+                        <ng-template pTemplate="header" let-columns>
+                            <tr class="bg-gray-100 border-b border-gray-200">
+                                <th style="width: 30px" class="px-1 py-1">
+                                    <p-tableHeaderCheckbox></p-tableHeaderCheckbox>
+                                </th>
+                                <th *ngFor="let col of columns" [pSortableColumn]="col.field" pResizableColumn class="text-center px-2 py-1.5 text-xs font-semibold text-gray-700">
+                                    {{ col.header }}
+                                </th>
+                            </tr>
+                        </ng-template>
 
-                <ng-template pTemplate="body" let-rowData>
-                    <tr [pSelectableRow]="rowData">
-                        <td>
-                            <p-tableCheckbox [value]="rowData"></p-tableCheckbox>
-                        </td>
-                        <td class="text-center"> {{ rowData.numcp }} </td>
-                        <td class="text-left"> {{ rowData.remitente }} </td>
-                        <td class="text-center"> {{ rowData.fecharecojo | date:'dd/MM/yyyy' }} </td>
-                        <td class="text-left"> {{ rowData.destinatario }} </td>
-                        <td class="text-left"> S/. {{ rowData.subtotal }} </td>
-                        <td class="text-left"> {{ rowData.peso }} </td>
-                        <td class="text-left"> {{ rowData.bulto }} </td>
-                    </tr>
-                </ng-template>
+                        <ng-template pTemplate="body" let-rowData>
+                            <tr [pSelectableRow]="rowData" class="border-b border-gray-100 hover:bg-gray-50 transition-colors duration-150">
+                                <td class="px-1 py-1">
+                                    <p-tableCheckbox [value]="rowData"></p-tableCheckbox>
+                                </td>
+                                <td class="text-center px-2 py-1.5 text-gray-700 text-xs">{{ rowData.provincia }}</td>
+                                <td class="text-center px-2 py-1.5">
+                                    <span class="inline-flex items-center justify-center px-1.5 py-0.5 rounded bg-gray-700 text-white text-xs font-semibold">
+                                        {{ rowData.numcp }}
+                                    </span>
+                                </td>
+                                <td class="text-left px-2 py-1.5 text-gray-700 text-xs truncate" [title]="rowData.remitente">{{ rowData.remitente }}</td>
+                                <td class="text-center px-2 py-1.5 text-amber-700 text-xs font-medium">{{ rowData.fecharecojo | date:'dd/MM/yyyy' }}</td>
+                                <td class="text-left px-2 py-1.5 text-gray-700 text-xs truncate" [title]="rowData.destinatario">{{ rowData.destinatario }}</td>
+                                <td class="text-center px-2 py-1.5">
+                                    <span class="text-amber-700 text-xs font-semibold">S/. {{ rowData.subtotal | number:'1.0-2' }}</span>
+                                </td>
+                                <td class="text-center px-2 py-1.5">
+                                    <span class="text-amber-700 text-xs font-semibold">{{ rowData.peso | number:'1.0-2' }}</span>
+                                    <span class="text-gray-500 text-xs ml-0.5">kg</span>
+                                </td>
+                                <td class="text-center px-2 py-1.5 text-gray-700 text-xs font-medium">{{ rowData.bulto | number:'1.0-0' }}</td>
+                            </tr>
+                        </ng-template>
 
-            </p-table>
+                        <ng-template pTemplate="footer">
+                            <tr class="bg-gray-50 border-t border-gray-200">
+                                <td colspan="6" class="text-right px-2 py-1.5 text-gray-700 text-xs font-semibold">Totales</td>
+                                <td class="text-center px-2 py-1.5">
+                                    <span class="text-amber-700 text-xs font-bold">S/. {{ subtotalTotal | number:'1.0-2' }}</span>
+                                </td>
+                                <td class="text-center px-2 py-1.5 text-gray-700 text-xs font-semibold">
+                                    <span>{{ pesoTotal | number:'1.0-2' }}</span>
+                                    <span class="text-gray-500 text-xs ml-0.5">kg</span>
+                                </td>
+                                <td class="text-center px-2 py-1.5 text-gray-700 text-xs font-semibold">{{ bultosTotal | number:'1.0-0' }}</td>
+                            </tr>
+                        </ng-template>
+
+                    </p-table>
+                </div>
+            </div>
 
         </div>
 
@@ -115,6 +150,9 @@ export class VerDetalleOrdenxDepartamentoModalComponent implements OnInit {
     agencias: any[] = [];
     selectedAgencia: any;
     selectedOrdenes: OrdenTransporte[] = [];
+    subtotalTotal: number = 0;
+    pesoTotal: number = 0;
+    bultosTotal: number = 0;
 
     constructor(
         private ordenService: PlanningService,
@@ -129,19 +167,34 @@ export class VerDetalleOrdenxDepartamentoModalComponent implements OnInit {
 
     ngOnInit() {
         this.cols = [
-            { header: 'N° OT', field: 'idordentrabajo', width: '105px' },
-            { header: 'REMITENTE', field: 'remitente', width: '180px' },
-            { header: 'FEC. RECOJO', field: 'fecharecojo', width: '100px' },
-            { header: 'DESTINATARIO', field: 'destinatario', width: '180px' },
-            { header: 'SUBTOTAL', field: 'subtotal', width: '60px' },
-            { header: 'PESO', field: 'peso', width: '60px' },
-            { header: 'BULTO', field: 'bulto', width: '60px' }
+            { header: 'PROVINCIA', field: 'provincia', width: '60px' },
+            { header: 'N° OT', field: 'idordentrabajo', width: '55px' },
+            { header: 'REMITENTE', field: 'remitente', width: '90px' },
+            { header: 'FEC. RECOJO', field: 'fecharecojo', width: '70px' },
+            { header: 'DESTINATARIO', field: 'destinatario', width: '90px' },
+            { header: 'SUBTOTAL', field: 'subtotal', width: '40px' },
+            { header: 'PESO', field: 'peso', width: '40px' },
+            { header: 'BULTO', field: 'bulto', width: '40px' }
         ];
+
+        
 
         // Cargar órdenes
         this.ordenService.GetAllOrdersDetailDeparment(this.idestacionorigen, this.iddepartamento)
             .subscribe(list => {
                 this.ordenes2 = list;
+
+                // Calcular totales
+                this.subtotalTotal = 0;
+                this.pesoTotal = 0;
+                this.bultosTotal = 0;
+
+                this.ordenes2.forEach(obj => {
+                    this.subtotalTotal = this.subtotalTotal + (obj.subtotal || 0);
+                    this.pesoTotal = this.pesoTotal + (obj.peso || 0);
+                    this.bultosTotal = this.bultosTotal + (obj.bulto || 0);
+                });
+
                 console.log('Órdenes cargadas:', this.ordenes2);
             });
 
