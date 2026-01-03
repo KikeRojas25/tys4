@@ -19,6 +19,8 @@ import { MantenimientoService } from '../../mantenimiento/mantenimiento.service'
 import { OrdenTransporte } from '../../recepcion/ordentransporte/ordentransporte.types';
 import { User } from 'app/core/user/user.types';
 import { Usuario } from '../recojo.types';
+import { DetalleOrdenModalComponent } from './detalle-orden-modal.component';
+import { forkJoin, of } from 'rxjs';
 
 @Component({
   selector: 'app-list',
@@ -110,20 +112,20 @@ export class listarOrdenRecojoComponent implements OnInit {
   // ===========================
   private initColumnas(): void {
     this.cols = [
-      { header: 'ACC', field: '', width: '150px' },
-      { header: 'OR', field: 'numcp', width: '80px' },
+      { header: 'ACC', field: '', width: '70px' },
+      { header: 'OR', field: 'numcp', width: '90px' },
+      { header: 'CLIENTE', field: 'razonsocial', width: '150px' },
       { header: 'F. REGISTRO', field: 'fecharegistro', width: '120px' },
-      { header: 'RESPONSABLE', field: 'responsable', width: '150px' },
-      { header: 'CLIENTE', field: 'razonsocial', width: '180px' },
       { header: 'F. CITA', field: 'fechahoracita', width: '120px' },
       { header: 'ESTADO', field: 'estado', width: '120px' },
       { header: 'CONTACTO', field: 'personarecojo', width: '120px' },
-      { header: 'PT. RECOJO', field: 'puntorecojo', width: '220px' },
-      { header: 'CE. ACOPIO', field: 'centroacopio', width: '120px' },
-      { header: 'BULTOS', field: 'bulto', width: '80px' },
-      { header: 'PESO', field: 'peso', width: '80px' },
-      { header: 'VOL', field: 'pesovol', width: '80px' },
-      { header: 'OBSERVACIÓN', field: 'observaciones', width: '580px' },
+      { header: 'PT. RECOJO', field: 'puntorecojo', width: '170px' },
+      { header: 'CE. ACOPIO', field: 'centroacopio', width: '90px' },
+      { header: 'BULTOS', field: 'bulto', width: '60px' },
+      { header: 'PESO', field: 'peso', width: '60px' },
+      { header: 'VOL', field: 'pesovol', width: '60px' },
+      { header: 'OBSERVACIÓN', field: 'observaciones', width: '280px' },
+      { header: 'RESPONSABLE', field: 'responsable', width: '150px' },
     ];
   }
 
@@ -173,25 +175,40 @@ export class listarOrdenRecojoComponent implements OnInit {
   private cargarDatosIniciales(): void {
     this.model.idusuario = this.user?.id;
 
-    this.cargarClientes();
-    this.cargarUbigeo();
+    // Cargar estados (síncrono)
     this.cargarEstados();
-    this.cargarUsuariosPorRol(14); // 👈 Cargar usuarios de rol específico
-  }
 
-  private cargarClientes(): void {
-    this.mantenimientoService.getAllClientes('', this.model.idusuario).subscribe((resp) => {
-      this.clientes = [{ value: 0, label: 'TODOS LOS CLIENTES' }];
-      resp.forEach((c) => this.clientes.push({ value: c.idCliente, label: c.razonSocial }));
-      this.model.idcliente = 0;
-    });
-  }
+    // Cargar datos asíncronos y luego ejecutar búsqueda
+    forkJoin({
+      clientes: this.mantenimientoService.getAllClientes('', this.model.idusuario, true),
+      ubigeo: this.orderRecojoService.getUbigeo(''),
+      usuarios: this.orderRecojoService.getUsuariosPorRol(14),
+    }).subscribe({
+      next: (resultados) => {
+        // Procesar clientes
+        this.clientes = [{ value: 0, label: 'TODOS LOS CLIENTES' }];
+        resultados.clientes.forEach((c) => this.clientes.push({ value: c.idCliente, label: c.razonSocial }));
+        this.model.idcliente = 0;
 
-  private cargarUbigeo(): void {
-    this.orderRecojoService.getUbigeo('').subscribe((resp) => {
-      this.ubigeo = [{ value: 0, label: 'TODOS LOS DESTINOS' }];
-      resp.forEach((u) => this.ubigeo.push({ value: u.idDistrito, label: u.ubigeo }));
-      this.model.iddistrito = 0;
+        // Procesar ubigeo
+        this.ubigeo = [{ value: 0, label: 'TODOS LOS DESTINOS' }];
+        resultados.ubigeo.forEach((u) => this.ubigeo.push({ value: u.idDistrito, label: u.ubigeo }));
+        this.model.iddistrito = 0;
+
+        // Procesar usuarios
+        this.usuariosRol = resultados.usuarios.map((u) => ({
+          value: u.usr_int_id,
+          label: `${u.usr_str_nombre} ${u.usr_str_apellidos}`,
+        }));
+
+        // Ejecutar búsqueda automática después de cargar todos los datos
+        this.buscar();
+      },
+      error: (err) => {
+        console.error('Error cargando datos iniciales:', err);
+        // Intentar búsqueda incluso si hay errores
+        this.buscar();
+      },
     });
   }
 
@@ -203,21 +220,6 @@ export class listarOrdenRecojoComponent implements OnInit {
       { value: 28, label: 'Liquidado' },
     ];
     this.model.idestado = 0;
-  }
-
-  // ===========================
-  // 👥 Cargar usuarios (Rol específico)
-  // ===========================
-  private cargarUsuariosPorRol(rolId: number): void {
-    this.orderRecojoService.getUsuariosPorRol(rolId).subscribe({
-      next: (data: Usuario[]) => {
-        this.usuariosRol = data.map((u) => ({
-          value: u.usr_int_id,
-          label: `${u.usr_str_nombre} ${u.usr_str_apellidos}`,
-        }));
-      },
-      error: (err) => console.error('Error cargando usuarios de rol:', err),
-    });
   }
 
   // ===========================
@@ -239,11 +241,73 @@ export class listarOrdenRecojoComponent implements OnInit {
   // 🧾 Exportar Excel
   // ===========================
   exportExcel(): void {
+    if (!this.ordenes || this.ordenes.length === 0) {
+      this.messageService.add({
+        severity: 'warn',
+        summary: 'Exportar Excel',
+        detail: 'No hay datos para exportar.',
+      });
+      return;
+    }
+
     import('xlsx').then((xlsx) => {
-      const worksheet = xlsx.utils.json_to_sheet(this.ordenes);
+      const exportData = this.ordenes.map((orden: any) => ({
+        OR: orden.numcp || '',
+        Cliente: orden.razonsocial || '',
+        'F. Registro': orden.fecharegistro
+          ? new Date(orden.fecharegistro).toLocaleString('es-PE', {
+              day: '2-digit',
+              month: '2-digit',
+              year: 'numeric',
+              hour: '2-digit',
+              minute: '2-digit',
+              hour12: false,
+            })
+          : '',
+        'F. Cita': orden.fechahoracita
+          ? new Date(orden.fechahoracita).toLocaleString('es-PE', {
+              day: '2-digit',
+              month: '2-digit',
+              year: 'numeric',
+              hour: '2-digit',
+              minute: '2-digit',
+              hour12: false,
+            })
+          : '',
+        Estado: orden.estado || '',
+        Contacto: orden.personarecojo || '',
+        'Pt. Recojo': orden.puntorecojo || '',
+        'Ce. Acopio': orden.centroacopio || '',
+        Bultos: orden.bulto || 0,
+        Peso: orden.peso ? Number(orden.peso).toFixed(2) : '0.00',
+        Vol: orden.pesovol ? Number(orden.pesovol).toFixed(2) : '0.00',
+        Observación: orden.observaciones || '',
+        Responsable: orden.responsable || '',
+      }));
+
+      const worksheet = xlsx.utils.json_to_sheet(exportData);
+
+      // Establecer ancho de columnas
+      const columnWidths = [
+        { wch: 10 }, // OR
+        { wch: 30 }, // Cliente
+        { wch: 18 }, // F. Registro
+        { wch: 18 }, // F. Cita
+        { wch: 20 }, // Estado
+        { wch: 20 }, // Contacto
+        { wch: 30 }, // Pt. Recojo
+        { wch: 20 }, // Ce. Acopio
+        { wch: 10 }, // Bultos
+        { wch: 12 }, // Peso
+        { wch: 12 }, // Vol
+        { wch: 40 }, // Observación
+        { wch: 20 }, // Responsable
+      ];
+      worksheet['!cols'] = columnWidths;
+
       const workbook = { Sheets: { data: worksheet }, SheetNames: ['data'] };
       const excelBuffer: any = xlsx.write(workbook, { bookType: 'xlsx', type: 'array' });
-      this.saveAsExcelFile(excelBuffer, 'ListaOT');
+      this.saveAsExcelFile(excelBuffer, 'ListadoRecojos');
     });
   }
 
@@ -252,19 +316,33 @@ export class listarOrdenRecojoComponent implements OnInit {
       const EXCEL_TYPE = 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet;charset=UTF-8';
       const EXCEL_EXTENSION = '.xlsx';
       const data: Blob = new Blob([buffer], { type: EXCEL_TYPE });
-      FileSaver.saveAs(data, `${fileName}_export_${new Date().getTime()}${EXCEL_EXTENSION}`);
+      FileSaver.saveAs(data, `${fileName}_${new Date().getTime()}${EXCEL_EXTENSION}`);
     });
   }
 
   // ===========================
   // ⚙️ Acciones CRUD
   // ===========================
+  nuevo(): void {
+    this.router.navigate(['/seguimiento/nuevaordenrecojo']);
+  }
+
   editar(id: number): void {
     this.router.navigate(['/seguimiento/editarordenrecojo', id]);
   }
 
   verguias(id: number): void {
     this.router.navigate(['/seguimiento/verorden', id]);
+  }
+
+  verDetalleOrden(orden: any): void {
+    this.dialogService.open(DetalleOrdenModalComponent, {
+      header: `Detalle de Orden: ${orden.numcp}`,
+      width: '900px',
+      data: { orden },
+      baseZIndex: 10000,
+      styleClass: 'detalle-orden-modal',
+    });
   }
 
   eliminar(id: number): void {

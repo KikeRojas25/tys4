@@ -43,8 +43,8 @@ getClienteDetalle(idCliente: number): Observable<ClienteDetalleResult> {
   return this._httpClient.get<ClienteDetalleResult>(`${this.baseUrlCliente}GetCliente?id=${idCliente}`, httpOptions);
 }
 
-getAllClientes(criterio: string, usuarioid : number) : Observable<Cliente[]> {
-  return this._httpClient.get<Cliente[]>(this.baseUrlCliente +"GetAllClientes?criterio="+ criterio+"&UsuarioId=" + usuarioid  ,httpOptions)
+getAllClientes(criterio: string, usuarioid : number, esComercial : boolean = false) : Observable<Cliente[]> {
+  return this._httpClient.get<Cliente[]>(this.baseUrlCliente +"GetAllClientes?criterio="+ criterio+"&UsuarioId=" + usuarioid + "&esComercial=" + esComercial, httpOptions)
   };
 
   registrarCliente(model: any){

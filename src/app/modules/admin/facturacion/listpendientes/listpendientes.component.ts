@@ -83,7 +83,7 @@ export class ListpendientesComponent implements OnInit {
 
   cargarClientes(): void {
     const userId = this.user?.id || 2; // 2 como ID por defecto si no hay usuario
-    this.mantenimientoService.getAllClientes('', userId).subscribe({
+    this.mantenimientoService.getAllClientes('', userId,true).subscribe({
       next: (clientes) => {
         this.clientes = [{ label: 'Todos los clientes', value: null }];
         clientes.forEach((cliente) => {

@@ -9,6 +9,7 @@ import { DynamicDialogConfig, DynamicDialogRef } from 'primeng/dynamicdialog';
 import { InputTextModule } from 'primeng/inputtext';
 import { TableModule } from 'primeng/table';
 import { ToastModule } from 'primeng/toast';
+import { CheckboxModule } from 'primeng/checkbox';
 import { MantenimientoService } from '../../mantenimiento.service';
 import { Tarifa } from '../tarifa.types';
 
@@ -42,7 +43,8 @@ interface GuiaGRR {
     DropdownModule,
     InputTextModule,
     TableModule,
-    ToastModule
+    ToastModule,
+    CheckboxModule
   ],
   templateUrl: './new.component.html',
   styleUrls: ['./new.component.css']
@@ -94,7 +96,8 @@ export class NewComponent implements OnInit {
       idformula: [null],
       idtipotransporte: [null],
       idtipounidad: [null],
-      conceptos: [null]
+      conceptos: [null],
+      consideraPesoVolumetrico: [false]
     });
   }
 
@@ -121,11 +124,11 @@ export class NewComponent implements OnInit {
 
   cargarDatosIniciales(): void {
     // Cargar clientes
-    this.mantenimientoService.getAllClientes('', 2).subscribe({
+    this.mantenimientoService.getAllClientes('', 2,true).subscribe({
       next: (clientes) => {
         this.clientes = clientes.map(c => ({
           value: c.idCliente,
-          label: `${c.razonSocial} - ${c.documento || '-'}`
+          label: `${c.razonSocial} `
         }));
       },
       error: () => {
@@ -358,7 +361,8 @@ export class NewComponent implements OnInit {
       iddepartamentodestino: primeraTarifa.iddepartamentodestino,
       idtipotransporte: primeraTarifa.idtipotransporte,
       idtipounidad: primeraTarifa.idtipounidad,
-      conceptos: primeraTarifa.conceptos
+      conceptos: primeraTarifa.conceptos,
+      consideraPesoVolumetrico: (primeraTarifa as any).consideraPesoVolumetrico || false
     });
 
     // Si las fórmulas ya están cargadas, establecer el valor inmediatamente
@@ -411,7 +415,8 @@ export class NewComponent implements OnInit {
       iddepartamentodestino: tarifa.iddepartamentodestino,
       idtipotransporte: tarifa.idtipotransporte,
       idtipounidad: tarifa.idtipounidad,
-      conceptos: tarifa.conceptos
+      conceptos: tarifa.conceptos,
+      consideraPesoVolumetrico: (tarifa as any).consideraPesoVolumetrico || false
     });
 
     // Si las fórmulas ya están cargadas, establecer el valor inmediatamente

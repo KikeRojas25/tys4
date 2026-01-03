@@ -213,15 +213,19 @@
 <ng-template pTemplate="header" let-columns>
   <tr>
     <!-- Encabezado superior -->
-    <th colspan="2" style="text-align:center; color:white; background-color:#1E88E5;">GENERAL</th>
+    <th colspan="1" style="text-align:center; color:white; background-color:#1E88E5;">GENERAL</th>
+
+
+    <th colspan="3" style="text-align:center; color:white; background-color:#F57C00;">
+      PENDIENTE DE PROGRAMAR
+    </th>
+
 
     <th colspan="3" style="text-align:center; color:white; background-color:#6A1B9A;">
       PENDIENTE DE DESPACHO
     </th>
 
-    <th colspan="3" style="text-align:center; color:white; background-color:#F57C00;">
-      PENDIENTE DE PROGRAMAR
-    </th>
+ 
 
     <th colspan="3" style="text-align:center; color:white; background-color:#FBC02D;">
       RECEPCIÓN
@@ -250,7 +254,7 @@
 
   <!-- Encabezado inferior -->
   <tr>
-    <th>Acc</th>
+
     <th>Estación</th>
     <!-- <th>Proveedor</th> -->
 
@@ -284,42 +288,91 @@
 
  <ng-template pTemplate="body" let-rowData>
   <tr>
-    <td class="text-center">
+    <!-- <td class="text-center">
       <p-button icon="pi pi-search" severity="info"
         (click)="verEstacion(rowData.idproveedor, rowData.iddepartamento)"
         size="small"></p-button>
-    </td>
+    </td> -->
     <td class="text-left">{{ rowData.estacion }}</td>
     <!-- <td class="text-left">{{ rowData.repartidor }}</td> -->
 
-    <!-- Pendiente de Despacho -->
-    <td class="text-center">{{rowData.cantidad_pendiente_programar}}</td>
+    <!-- Pendiente de Programar -->
+    <td class="text-center">
+      <a *ngIf="rowData.cantidad_pendiente_programar > 0" 
+         (click)="verDetalleOT(rowData.idestacion, 'pendiente_programar', 'Pendiente de Programar - ' + rowData.estacion)"
+         class="text-blue-600 hover:text-blue-800 underline cursor-pointer">
+        {{rowData.cantidad_pendiente_programar}}
+      </a>
+      <span *ngIf="rowData.cantidad_pendiente_programar === 0 || !rowData.cantidad_pendiente_programar">{{rowData.cantidad_pendiente_programar || 0}}</span>
+    </td>
     <td class="text-center">{{rowData.peso_pendiente_programar}}</td>
     <td class="text-center">{{rowData.bulto_pendiente_programar}}</td>
 
-    <!-- Pendiente de Programar -->
-    <td class="text-center">{{rowData.cantidad_pendiente_despacho}}</td>
+    <!-- Pendiente de Despacho -->
+    <td class="text-center">
+      <a *ngIf="rowData.cantidad_pendiente_despacho > 0" 
+         (click)="verDetalleOT(rowData.idestacion, 'pendiente_despacho', 'Pendiente de Despacho - ' + rowData.estacion)"
+         class="text-blue-600 hover:text-blue-800 underline cursor-pointer">
+        {{rowData.cantidad_pendiente_despacho}}
+      </a>
+      <span *ngIf="rowData.cantidad_pendiente_despacho === 0 || !rowData.cantidad_pendiente_despacho">{{rowData.cantidad_pendiente_despacho || 0}}</span>
+    </td>
     <td class="text-center">{{rowData.peso_pendiente_despacho}}</td>
     <td class="text-center">{{rowData.bulto_pendiente_despacho}}</td>
 
     <!-- Recepción -->
-    <td class="text-center">{{rowData.cantidad_recepcion}}</td>
+    <td class="text-center">
+      <a *ngIf="rowData.cantidad_recepcion > 0" 
+         (click)="verDetalleOT(rowData.idestacion, 'recepcion', 'Recepción - ' + rowData.estacion)"
+         class="text-blue-600 hover:text-blue-800 underline cursor-pointer">
+        {{rowData.cantidad_recepcion}}
+      </a>
+      <span *ngIf="rowData.cantidad_recepcion === 0 || !rowData.cantidad_recepcion">{{rowData.cantidad_recepcion || 0}}</span>
+    </td>
     <td class="text-center">{{rowData.peso_recepcion}}</td>
     <td class="text-center">{{rowData.bulto_recepcion}}</td>
 
     <!-- Recojo -->
-    <td class="text-center">{{rowData.cantidad_recojo}}</td>
+    <td class="text-center">
+      <a *ngIf="rowData.cantidad_recojo > 0" 
+         (click)="verDetalleOT(rowData.idestacion, 'recojo', 'Recojo - ' + rowData.estacion)"
+         class="text-blue-600 hover:text-blue-800 underline cursor-pointer">
+        {{rowData.cantidad_recojo}}
+      </a>
+      <span *ngIf="rowData.cantidad_recojo === 0 || !rowData.cantidad_recojo">{{rowData.cantidad_recojo || 0}}</span>
+    </td>
     <td class="text-center">{{rowData.peso_recojo}}</td>
     <td class="text-center">{{rowData.bulto_recojo}}</td>
 
     <!-- Entrega -->
-    <td class="text-center">{{rowData.cantidad_enreparto}}</td>
+    <td class="text-center">
+      <a *ngIf="rowData.cantidad_enreparto > 0" 
+         (click)="verDetalleOT(rowData.idestacion, 'enreparto', 'Entrega - ' + rowData.estacion)"
+         class="text-blue-600 hover:text-blue-800 underline cursor-pointer">
+        {{rowData.cantidad_enreparto}}
+      </a>
+      <span *ngIf="rowData.cantidad_enreparto === 0 || !rowData.cantidad_enreparto">{{rowData.cantidad_enreparto || 0}}</span>
+    </td>
     <td class="text-center">{{rowData.peso_enreparto}}</td>
     <td class="text-center">{{rowData.bulto_enreparto}}</td>
 
     <!-- Recabar / Enviar / Obs -->
-    <td class="text-center">{{rowData.cantidad_recabarcargo}}</td>
-    <td class="text-center">{{rowData.cantidad_enviocargo}}</td>
+    <td class="text-center">
+      <a *ngIf="rowData.cantidad_recabarcargo > 0" 
+         (click)="verDetalleOT(rowData.idestacion, 'recabarcargo', 'Recabar Cargos - ' + rowData.estacion)"
+         class="text-blue-600 hover:text-blue-800 underline cursor-pointer">
+        {{rowData.cantidad_recabarcargo}}
+      </a>
+      <span *ngIf="rowData.cantidad_recabarcargo === 0 || !rowData.cantidad_recabarcargo">{{rowData.cantidad_recabarcargo || 0}}</span>
+    </td>
+    <td class="text-center">
+      <a *ngIf="rowData.cantidad_enviocargo > 0" 
+         (click)="verDetalleOT(rowData.idestacion, 'enviocargo', 'Enviar Cargos - ' + rowData.estacion)"
+         class="text-blue-600 hover:text-blue-800 underline cursor-pointer">
+        {{rowData.cantidad_enviocargo}}
+      </a>
+      <span *ngIf="rowData.cantidad_enviocargo === 0 || !rowData.cantidad_enviocargo">{{rowData.cantidad_enviocargo || 0}}</span>
+    </td>
     <!-- <td class="text-center">{{rowData.cantidad_observadas}}</td>
     <td class="text-center">{{rowData.cantidad_observadas}}</td> -->
   </tr>

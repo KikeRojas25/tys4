@@ -1,24 +1,30 @@
 
 <!-- Pantalla Principal -->
-<div class="flex flex-col min-h-screen flex-auto ">
-  <!-- Encabezado -->
-  <div class="flex flex-col sm:flex-row items-center justify-between p-3 border-b dark:bg-transparent bg-card">
+<div class="flex flex-col flex-auto min-w-0 bg-gray-50">
+  <!-- Header -->
+  <div class="flex flex-col sm:flex-row flex-0 sm:items-center sm:justify-between p-2 sm:py-8 sm:px-10 border-b border-gray-200 bg-white shadow-sm">
     <div class="flex-1 min-w-0">
-      <div class="flex items-center font-medium">
-        <a class="whitespace-nowrap text-primary-500">TMS</a>
+      <div class="flex flex-wrap items-center font-medium text-sm text-gray-600">
+        <div>
+          <a class="whitespace-nowrap text-gray-700 hover:text-gray-900">TMS</a>
+        </div>
         <div class="flex items-center ml-1 whitespace-nowrap">
-          <mat-icon class="fuse-horizontal-navigation-item-icon" [svgIcon]="'heroicons_solid:chevron-right'"></mat-icon>
-          <a class="ml-1 text-primary-500">Comercial</a>
+          <mat-icon class="fuse-horizontal-navigation-item-icon text-gray-400" [svgIcon]="'heroicons_solid:chevron-right'"></mat-icon>
+          <span class="ml-1 text-gray-500">Listado de recojos</span>
         </div>
       </div>
       <div class="mt-2">
-        <h2 class="text-3xl md:text-4xl font-extrabold leading-7 sm:leading-10 truncate">Listado de recojos</h2>
+        <h2 class="text-3xl md:text-4xl font-semibold tracking-tight leading-7 sm:leading-10 truncate text-gray-900">Listado de recojos</h2>
       </div>
     </div>
+
   </div>
 
-<div class="flex flex-col p-6 bg-card ">
-    <div class="p-4 space-y-4">
+  <!-- Contenido Principal -->
+  <div class="main-content container-fluid p-2">
+    <!-- Filtros de Búsqueda -->
+    <div class="bg-white rounded-lg shadow-sm border border-gray-200 mb-2 overflow-hidden">
+      <div class="p-2">
       <div class="grid grid-cols-1 md:grid-cols-4 gap-4">
 
         <!-- Cliente -->
@@ -27,12 +33,12 @@
           <p-dropdown name="clientes"
               [options]="clientes" [(ngModel)]="model.idcliente"
               scrollHeight="30vh"
-              [virtualScroll]="true" itemSize="30"
-              class="w-full"
+               itemSize="60"
+              class="w-full cliente-dropdown-compact"
               [resetFilterOnHide]="false"
               [hideTransitionOptions]="'0ms'"
               [showTransitionOptions]="'0ms'"
-              filter="false">
+              filter="true">
               <ng-template let-item pTemplate="selectedItem">
                 <span>{{item.label}}</span>
               </ng-template>
@@ -42,13 +48,13 @@
         <!-- Inicio -->
         <div>
           <label class="block text-sm font-semibold text-gray-700 mb-1">Inicio:</label>
-          <p-calendar [(ngModel)]="dateInicio" baseZIndex="100" [locale]="es" dateFormat="dd/mm/yy"></p-calendar>
+          <p-calendar [(ngModel)]="dateInicio" baseZIndex="100" [locale]="es" dateFormat="dd/mm/yy" class="filter-control-compact"></p-calendar>
         </div>
 
         <!-- Fin -->
         <div>
           <label class="block text-sm font-semibold text-gray-700 mb-1">Fin:</label>
-          <p-calendar [(ngModel)]="dateFin" baseZIndex="100" [locale]="es" dateFormat="dd/mm/yy"></p-calendar>
+          <p-calendar [(ngModel)]="dateFin" baseZIndex="100" [locale]="es" dateFormat="dd/mm/yy" class="filter-control-compact"></p-calendar>
         </div>
 
         <!-- Estado -->
@@ -57,7 +63,7 @@
           <p-dropdown name="estados"
               [options]="estados" [(ngModel)]="model.idestado"
               scrollHeight="20vh"
-              class="w-full"
+              class="w-full filter-control-compact"
               [resetFilterOnHide]="false"
               [hideTransitionOptions]="'0ms'"
               [showTransitionOptions]="'0ms'"
@@ -67,101 +73,124 @@
               </ng-template>
           </p-dropdown>
         </div>
+        
         <!-- Usuario / Responsable -->
-          <div>
-            <label class="block text-sm font-semibold text-gray-700 mb-1">Responsable:</label>
-            <p-dropdown
-              [options]="usuariosRol"
-              [(ngModel)]="model.idresponsable"
-              placeholder="Seleccione usuario"
-              class="w-full"
-              filter="true"
-              scrollHeight="30vh"
-              itemSize="30">
-              <ng-template let-item pTemplate="selectedItem">
-                <span>{{ item.label }}</span>
-              </ng-template>
-            </p-dropdown>
+        <div>
+          <label class="block text-sm font-semibold text-gray-700 mb-1">Responsable:</label>
+          <p-dropdown
+            [options]="usuariosRol"
+            [(ngModel)]="model.idresponsable"
+            placeholder="Seleccione usuario"
+            class="w-full filter-control-compact"
+            filter="true"
+            scrollHeight="30vh"
+            itemSize="30">
+            <ng-template let-item pTemplate="selectedItem">
+              <span>{{ item.label }}</span>
+            </ng-template>
+          </p-dropdown>
+        </div>
+
+        <!-- Botones -->
+        <div class="flex items-end justify-end gap-2 md:col-span-3">
+          <button pButton type="button" icon="pi pi-search" label="Buscar" iconPos="left" (click)="buscar()"
+                  class="px-4 py-2.5 text-sm font-medium text-white bg-gray-700 hover:bg-gray-600 rounded-md shadow-sm transition-all duration-150">
+          </button>
+          <button pButton type="button" icon="pi pi-file-excel" label="EXCEL" iconPos="left" (click)="exportExcel()"
+                  class="px-4 py-2.5 text-sm font-medium text-gray-700 bg-white border border-gray-300 hover:bg-gray-50 rounded-md shadow-sm transition-all duration-150">
+          </button>
+          <div class="flex items-center gap-2 mt-4 sm:mt-0">
+            <button pButton type="button" icon="pi pi-plus" label="Nuevo" iconPos="left" (click)="nuevo()"
+                    class="px-4 py-2.5 text-sm font-medium text-white bg-red-700 hover:bg-gray-600 rounded-md shadow-sm transition-all duration-150">
+            </button>
           </div>
+        </div>
 
-      </div>
-
-      <!-- Botones -->
-      <div class="flex justify-end gap-4 mt-4">
-        <button pButton type="button" icon="fa fa-search" label="Buscar" (click)="buscar()"
-                class="p-button-sm bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-md shadow">
-        </button>
-        <button pButton type="button" icon="pi pi-file-excel" label="EXCEL"
-                class="p-button-sm bg-green-600 hover:bg-green-700 text-white px-4 py-2 rounded-md shadow">
-        </button>
       </div>
     </div>
-  </div>
 
-  <!-- Card Órdenes -->
-  <div class="rounded-2xl shadow-md border border-blue-400">
+    <!-- Tabla de Recojos -->
+    <div class="bg-white rounded-lg shadow-sm border border-gray-200 overflow-hidden">
+      <div class="p-6">
+        <p-table 
+          [columns]="cols" 
+          [value]="ordenes" 
+          #dt
+          [paginator]="true" 
+          [rows]="20" 
+          [rowsPerPageOptions]="[20,40,60,120]"
+          scrollHeight="80vh"
+          [resizableColumns]="true" 
+          [tableStyle]="{ 'table-layout': 'fixed', 'width': '100%' }"
+          [scrollable]="true"
+          [(selection)]="selected" 
+          selectionMode="multiple"
+          [styleClass]="'custom-table'"
+          class="w-full">
 
+          <ng-template pTemplate="colgroup" let-columns>
+            <colgroup>
+              <col *ngFor="let col of columns" [style.width]="col.width">
+            </colgroup>
+          </ng-template>
 
-    <div class="p-4">
-      <!-- <div class="flex justify-end pb-3">
-        <p-button label="Nuevo" icon="pi pi-plus"
+          <ng-template pTemplate="header" let-columns>
+            <tr class="bg-gray-800 text-white">
+              <th style="white-space: normal; word-wrap: break-word;" *ngFor="let col of columns" [pSortableColumn]="col.field" class="text-center px-4 py-3 text-sm font-semibold text-gray-100 border-b border-gray-700">
+                {{ col.header }}
+              </th>
+            </tr>
+          </ng-template>
 
-          (click)="save('info')"></p-button>
-      </div> -->
+          <ng-template pTemplate="body" let-rowData let-columns="columns">
+            <tr [pSelectableRow]="rowData" class="border-b border-gray-100 hover:bg-gray-50 transition-colors duration-150">
+              <td class="text-center px-2 py-2">
+                <div class="flex gap-1 justify-center items-center">
+                  <button pButton icon="pi pi-pencil" class="action-btn action-btn-primary"
+                          (click)="editar(rowData.idordenrecojo)" title="Editar"></button>
+                  <button pButton icon="pi pi-trash" class="action-btn action-btn-danger"
+                          (click)="eliminar(rowData.idordentrabajo)" title="Eliminar"></button>
+                </div>
+              </td>
 
-      <p-table [columns]="cols" [value]="ordenes" #dt
-        [paginator]="true" [rows]="10" [rowsPerPageOptions]="[20,40,60,120]"
-        [(selection)]="selected" selectionMode="multiple"
-         
-        >
+              <td class="text-center px-4 py-3">
+                <a class="text-amber-700 hover:text-amber-900 font-semibold cursor-pointer underline" (click)="verDetalleOrden(rowData)">
+                  {{rowData.numcp}}
+                </a>
+              </td>
+              <td class="text-center px-4 py-3 text-gray-700 text-sm word-wrap">{{rowData.razonsocial}}</td>
+              <td class="text-center px-4 py-3 text-gray-700 text-sm">{{rowData.fecharegistro | date:'dd/MM/yyyy HH:mm'}}</td>
+          
 
-        <ng-template pTemplate="colgroup" let-columns>
-          <colgroup>
-            <col *ngFor="let col of columns" [ngStyle]="{'width': col.width}">
-          </colgroup>
-        </ng-template>
-
-        <ng-template pTemplate="header" let-columns>
-          <tr class="bg-gray-100 text-gray-700 font-semibold text-sm">
-            <th *ngFor="let col of columns" [ngStyle]="{'width': col.width}" pResizableColumn>
-              {{col.header}}
-            </th>
-          </tr>
-        </ng-template>
-
-        <ng-template pTemplate="body" let-rowData let-columns="columns">
-          <tr [pSelectableRow]="rowData" class="hover:bg-gray-50">
-            <td class="text-left space-x-1">
-              <button pButton icon="fa fa-edit" class="p-button-sm bg-blue-500 hover:bg-blue-600 text-white rounded"
-                      (click)="editar(rowData.idordenrecojo)" title="Ver Archivos"></button>
-              <button pButton icon="fa fa-trash" class="p-button-sm bg-red-500 hover:bg-red-600 text-white rounded"
-                      (click)="eliminar(rowData.idordentrabajo)" title="Eliminar"></button>
-           
-            </td>
-
-            <td class="text-center text-blue-800 underline cursor-pointer"
-                (click)="verguias(rowData.idordentrabajo)">
-              {{rowData.numcp}}
-            </td>
-            <td class="text-center">{{rowData.fecharegistro | date:'dd/MM/yyyy HH:mm:ss'}}</td>
-            <td class="text-center">{{rowData.responsable}}</td>
-            <td>{{rowData.razonsocial}}</td>
-            <td class="text-center">{{rowData.fechahoracita | date:'dd/MM/yyyy HH:mm:ss'}}</td>
-            <td [ngClass]="{
-                  'text-green-600 font-semibold': rowData.estado === 'Registrado',
-                  'text-yellow-600 font-semibold': rowData.estado === 'Programado'
-                }">{{rowData.estado}}</td>
-            <td>{{rowData.personarecojo}}</td>
-            
-            <td>{{rowData.puntorecojo}}</td>
-            <td>{{rowData.centroacopio}}</td>
-            <td class="text-center">{{rowData.bulto}}</td>
-            <td class="text-center">{{rowData.peso}}</td>
-            <td class="text-center">{{rowData.pesovol}}</td>
-            <td>{{rowData.observaciones}}</td>
-          </tr>
-        </ng-template>
-      </p-table>
+              <td class="text-center px-4 py-3 text-gray-700 text-sm">{{rowData.fechahoracita | date:'dd/MM/yyyy HH:mm'}}</td>
+              <td class="text-center px-4 py-3">
+                <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium"
+                      [ngClass]="{
+                        'bg-gray-100 text-gray-800': rowData.estado === 'Pend. Programacion',
+                        'bg-amber-100 text-amber-800': rowData.estado === 'Programado',
+                        'bg-green-100 text-green-800': rowData.estado === 'Liquidado'
+                      }">
+                  {{rowData.estado}}
+                </span>
+              </td>
+              <td class="text-center px-4 py-3 text-gray-700 text-sm word-wrap">{{rowData.personarecojo}}</td>
+              <td class="text-left px-4 py-3 text-gray-700 text-sm word-wrap">{{rowData.puntorecojo}}</td>
+              <td class="text-center px-4 py-3 text-gray-700 text-sm word-wrap">{{rowData.centroacopio}}</td>
+              <td class="text-center px-4 py-3 text-gray-700 text-sm">{{rowData.bulto}}</td>
+              <td class="text-center px-4 py-3">
+                <span class="text-amber-700 font-semibold">{{rowData.peso | number:'1.0-2'}}</span>
+                <span class="text-gray-500 text-xs ml-1">kg</span>
+              </td>
+              <td class="text-center px-4 py-3">
+                <span class="text-amber-700 font-semibold">{{rowData.pesovol | number:'1.0-2'}}</span>
+                <span class="text-gray-500 text-xs ml-1">m³</span>
+              </td>
+              <td class="text-left px-4 py-3 text-gray-700 text-sm word-wrap">{{rowData.observaciones}}</td>
+              <td class="text-left px-4 py-3 text-gray-700 text-sm">{{rowData.responsable}}</td>
+            </tr>
+          </ng-template>
+        </p-table>
+      </div>
     </div>
   </div>
 </div>

@@ -9,8 +9,10 @@ import { PanelModule } from 'primeng/panel';
 import { ProgressBarModule } from 'primeng/progressbar';
 import { TableModule } from 'primeng/table';
 import { TabViewModule } from 'primeng/tabview';
+import { DialogService, DynamicDialogRef } from 'primeng/dynamicdialog';
 import { TraficoService } from '../trafico.service';
 import { User } from '../trafico.types';
+import { ModalOtEstacionComponent } from './modal-ot-estacion.component';
 declare var $: any;
 
 @Component({
@@ -28,7 +30,7 @@ declare var $: any;
         TabViewModule,
         ProgressBarModule,
     ],
-    providers: [ConfirmationService],
+    providers: [ConfirmationService, DialogService],
 })
 export class IntegradoComponent implements OnInit {
     baseUrlHRu: string = 'http://104.36.166.65/webreports/hojaruta.aspx';
@@ -44,10 +46,23 @@ export class IntegradoComponent implements OnInit {
 
     model: any = {};
     selectedOrden: any;
+    ref: DynamicDialogRef | undefined;
+
+    // Mapeo de estados según la columna (según stored procedure)
+    estadosMap: { [key: string]: number | number[] } = {
+        'pendiente_programar': 6,
+        'pendiente_despacho': [7, 8, 9, 10],
+        'recepcion': [10, 11, 25],
+        'recojo': 11, // Nota: también requiere idtipooperacion = 123
+        'enreparto': 13,
+        'recabarcargo': 34,
+        'enviocargo': 35
+    };
 
     constructor(
         private traficoService: TraficoService,
-        private router: Router
+        private router: Router,
+        public dialogService: DialogService
     ) {}
 
     ngOnInit() {
@@ -177,5 +192,26 @@ export class IntegradoComponent implements OnInit {
             idproveedor,
             iddepartamento,
         ]);
+    }
+
+    verDetalleOT(idestacion: number, tipoColumna: string, titulo: string) {
+        const estados = this.estadosMap[tipoColumna];
+        if (!estados) {
+            console.warn('Estado no mapeado para:', tipoColumna);
+            return;
+        }
+
+        this.ref = this.dialogService.open(ModalOtEstacionComponent, {
+            header: titulo,
+            width: '90%',
+            modal: true,
+            closable: true,
+            dismissableMask: true,
+            data: {
+                idestacion: idestacion,
+                estados: estados,
+                titulo: titulo
+            }
+        });
     }
 }

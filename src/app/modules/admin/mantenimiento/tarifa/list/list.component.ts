@@ -95,13 +95,13 @@ export class ListComponent implements OnInit {
   }
 
   cargarClientes(): void {
-    this.tarifaService.getAllClientes('', 2).subscribe({
+    this.tarifaService.getAllClientes('', 2, true).subscribe({
       next: (clientes) => {
         this.clientes = [];
         clientes.forEach(cliente => {
           this.clientes.push({ 
             value: cliente.idCliente, 
-            label: `${cliente.razonSocial} - ${cliente.documento || '-'}`
+            label: `${cliente.razonSocial} `
           });
         });
       },
@@ -461,5 +461,171 @@ export class ListComponent implements OnInit {
     if (tarifa.destinoprovincia) partes.push(tarifa.destinoprovincia);
     if (tarifa.destinodistrito) partes.push(tarifa.destinodistrito);
     return partes.length > 0 ? partes.join(' - ') : '-';
+  }
+
+  exportarExcel(): void {
+    if (this.tarifas.length === 0) {
+      this.messageService.add({
+        severity: 'warn',
+        summary: 'Advertencia',
+        detail: 'No hay tarifas para exportar'
+      });
+      return;
+    }
+
+    import('xlsx').then((xlsx) => {
+      const exportData = this.tarifas.map(tarifa => ({
+        'Cliente': tarifa.razonsocial || '-',
+        'Origen - Departamento': tarifa.origendepartamento || '-',
+        'Origen - Provincia': tarifa.origenprovincia || '-',
+        'Origen - Distrito': tarifa.origendistrito || '-',
+        'Destino - Departamento': tarifa.destinodepartamento || '-',
+        'Destino - Provincia': tarifa.destinoprovincia || '-',
+        'Destino - Distrito': tarifa.destinodistrito || '-',
+        'Fórmula': tarifa.formula || '-',
+        'Tipo Transporte': tarifa.tipotransporte || '-',
+        'Cobrar Por': tarifa.conceptos || '-',
+        'Tipo Unidad': tarifa.tipounidad || '-',
+        'Base': tarifa.montobase || 0,
+        'Peso Volumen': tarifa.pesovolumen || 0,
+        'Mínimo': tarifa.minimo || 0,
+        'Desde': tarifa.desde || 0,
+        'Hasta': tarifa.hasta || 0,
+        'Precio': tarifa.precio || 0,
+        'Adicional': tarifa.adicional || 0
+      }));
+
+      const worksheet = xlsx.utils.json_to_sheet(exportData);
+      const workbook = { Sheets: { 'Tarifas': worksheet }, SheetNames: ['Tarifas'] };
+      const excelBuffer: any = xlsx.write(workbook, { bookType: 'xlsx', type: 'array' });
+      this.saveAsExcelFile(excelBuffer, 'Tarifas');
+    });
+  }
+
+  private saveAsExcelFile(buffer: any, fileName: string): void {
+    import('file-saver').then((FileSaver) => {
+      const EXCEL_TYPE = 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet;charset=UTF-8';
+      const EXCEL_EXTENSION = '.xlsx';
+      const data: Blob = new Blob([buffer], { type: EXCEL_TYPE });
+      FileSaver.default.saveAs(data, fileName + '_' + new Date().getTime() + EXCEL_EXTENSION);
+      
+      this.messageService.add({
+        severity: 'success',
+        summary: 'Éxito',
+        detail: 'Archivo Excel exportado correctamente'
+      });
+    });
+  }
+
+  exportarPDF(): void {
+    if (this.tarifas.length === 0) {
+      this.messageService.add({
+        severity: 'warn',
+        summary: 'Advertencia',
+        detail: 'No hay tarifas para exportar'
+      });
+      return;
+    }
+
+    // Crear HTML para el PDF
+    const fechaExportacion = new Date().toLocaleString('es-PE');
+    let htmlContent = `
+      <!DOCTYPE html>
+      <html>
+      <head>
+        <meta charset="UTF-8">
+        <title>Lista de Tarifas</title>
+        <style>
+          body { font-family: Arial, sans-serif; margin: 20px; font-size: 10px; }
+          h1 { font-size: 18px; margin-bottom: 10px; }
+          .fecha { font-size: 10px; margin-bottom: 15px; color: #666; }
+          table { width: 100%; border-collapse: collapse; margin-top: 10px; }
+          th { background-color: #374151; color: white; padding: 8px; text-align: left; font-weight: bold; border: 1px solid #ddd; }
+          td { padding: 6px; border: 1px solid #ddd; }
+          tr:nth-child(even) { background-color: #f9fafb; }
+          .text-right { text-align: right; }
+          @media print {
+            body { margin: 0; }
+            @page { size: landscape; margin: 10mm; }
+          }
+        </style>
+      </head>
+      <body>
+        <h1>Lista de Tarifas</h1>
+        <div class="fecha">Exportado el: ${fechaExportacion}</div>
+        <table>
+          <thead>
+            <tr>
+              <th>Cliente</th>
+              <th>Origen Dept</th>
+              <th>Origen Prov</th>
+              <th>Origen Dist</th>
+              <th>Destino Dept</th>
+              <th>Destino Prov</th>
+              <th>Destino Dist</th>
+              <th>Fórmula</th>
+              <th>Tipo Transporte</th>
+              <th>Cobrar Por</th>
+              <th>Tipo Unidad</th>
+              <th class="text-right">Base</th>
+              <th class="text-right">Mínimo</th>
+              <th class="text-right">Desde</th>
+              <th class="text-right">Hasta</th>
+              <th class="text-right">Precio</th>
+              <th class="text-right">Adicional</th>
+            </tr>
+          </thead>
+          <tbody>
+    `;
+
+    this.tarifas.forEach(tarifa => {
+      htmlContent += `
+        <tr>
+          <td>${tarifa.razonsocial || '-'}</td>
+          <td>${tarifa.origendepartamento || '-'}</td>
+          <td>${tarifa.origenprovincia || '-'}</td>
+          <td>${tarifa.origendistrito || '-'}</td>
+          <td>${tarifa.destinodepartamento || '-'}</td>
+          <td>${tarifa.destinoprovincia || '-'}</td>
+          <td>${tarifa.destinodistrito || '-'}</td>
+          <td>${tarifa.formula || '-'}</td>
+          <td>${tarifa.tipotransporte || '-'}</td>
+          <td>${tarifa.conceptos || '-'}</td>
+          <td>${tarifa.tipounidad || '-'}</td>
+          <td class="text-right">${(tarifa.montobase || 0).toFixed(2)}</td>
+          <td class="text-right">${(tarifa.minimo || 0).toFixed(2)}</td>
+          <td class="text-right">${(tarifa.desde || 0).toFixed(2)}</td>
+          <td class="text-right">${(tarifa.hasta || 0).toFixed(2)}</td>
+          <td class="text-right">${(tarifa.precio || 0).toFixed(2)}</td>
+          <td class="text-right">${(tarifa.adicional || 0).toFixed(2)}</td>
+        </tr>
+      `;
+    });
+
+    htmlContent += `
+          </tbody>
+        </table>
+      </body>
+      </html>
+    `;
+
+    // Crear ventana nueva y abrir el PDF
+    const printWindow = window.open('', '_blank');
+    if (printWindow) {
+      printWindow.document.write(htmlContent);
+      printWindow.document.close();
+      
+      // Esperar a que el contenido se cargue y luego imprimir/guardar como PDF
+      printWindow.onload = () => {
+        setTimeout(() => {
+          printWindow.print();
+          this.messageService.add({
+            severity: 'success',
+            summary: 'Éxito',
+            detail: 'PDF generado. Use la opción "Guardar como PDF" en el diálogo de impresión.'
+          });
+        }, 250);
+      };
+    }
   }
 }

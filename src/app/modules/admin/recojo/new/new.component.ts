@@ -7,7 +7,7 @@ import { DynamicDialogModule, DialogService, DynamicDialogRef } from 'primeng/dy
 import { InputTextModule } from 'primeng/inputtext';
 import { TableModule } from 'primeng/table';
 import { MessageModule } from 'primeng/message';
-import { Router } from '@angular/router';
+import { Router, RouterModule } from '@angular/router';
 import { OverlayPanel } from 'primeng/overlaypanel';
 import { ToastModule } from 'primeng/toast';
 import { ConfirmDialogModule } from 'primeng/confirmdialog';
@@ -42,7 +42,8 @@ import { CalendarModule } from 'primeng/calendar';
     ConfirmDialogModule,
     DropdownModule,
     CalendarModule,
-    TableModule
+    TableModule,
+    RouterModule
   ],
   providers: [
     ConfirmationService ,
@@ -120,7 +121,7 @@ destinosFinales: any[] = [];
     this.user = JSON.parse(localStorage.getItem('user'));
 
 
-    this.mantenimientoService.getAllClientes('', this.user.id).subscribe(resp => {
+    this.mantenimientoService.getAllClientes('', this.user.id,true).subscribe(resp => {
       resp.forEach(element => {
           this.clientes.push({ value: element.idCliente ,  label : element.razonSocial});
         });

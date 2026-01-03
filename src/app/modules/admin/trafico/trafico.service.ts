@@ -226,4 +226,12 @@ export class TraficoService {
         return this._httpClient.get<any[]>(`${this.baseUrl}GetEquiposConProvincias`);
     }
 
+    ObtenerOrdenTrabajoDetallePorEstacionEstado(idestacion: number, estados: number | number[]): Observable<any[]> {
+        const estadosParam = Array.isArray(estados) ? estados.join(',') : estados.toString();
+        return this._httpClient.get<any[]>(
+            `${this.baseUrl}ObtenerOrdenTrabajoDetallePorEstacionEstado?idestacion=${idestacion}&estados=${estadosParam}`,
+            httpOptions
+        );
+    }
+
 }

@@ -280,6 +280,20 @@
           </p-dropdown>
         </div>
 
+        <!-- Considerar Peso Volumétrico -->
+        <div class="flex flex-col justify-end">
+          <div class="flex items-center mt-2">
+            <p-checkbox 
+              formControlName="consideraPesoVolumetrico"
+              inputId="consideraPesoVolumetrico"
+              [binary]="true">
+            </p-checkbox>
+            <label for="consideraPesoVolumetrico" class="ml-2 text-sm font-medium text-gray-700 cursor-pointer">
+              Considerar peso volumétrico
+            </label>
+          </div>
+        </div>
+
       </div>
 
 

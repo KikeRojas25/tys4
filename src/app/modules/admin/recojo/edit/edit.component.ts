@@ -2,7 +2,7 @@ import { CommonModule } from '@angular/common';
 import { Component, OnInit } from '@angular/core';
 import { FormsModule, ReactiveFormsModule } from '@angular/forms';
 import { MatIcon } from '@angular/material/icon';
-import { Router, ActivatedRoute } from '@angular/router';
+import { Router, ActivatedRoute, RouterModule } from '@angular/router';
 import { User } from 'app/core/user/user.types';
 import moment from 'moment';
 import { ConfirmationService, MessageService, SelectItem } from 'primeng/api';
@@ -36,7 +36,8 @@ import { forkJoin, of, switchMap } from 'rxjs';
     ConfirmDialogModule,
     DropdownModule,
     CalendarModule,
-    TableModule
+    TableModule,
+    RouterModule
   ],
   providers: [
     ConfirmationService,
@@ -101,7 +102,7 @@ export class EditComponent implements OnInit {
 
     forkJoin({
       ubigeo: this.recojoService.getUbigeo(''),
-      clientes: this.mantenimientoService.getAllClientes('', this.user?.id),
+      clientes: this.mantenimientoService.getAllClientes('', this.user?.id, true),
      // tipounidad: this.mantenimientoService.getValorTabla(8)
     })
     .pipe(

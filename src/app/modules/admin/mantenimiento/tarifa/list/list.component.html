@@ -210,29 +210,45 @@
               </ng-template>
             </p-dropdown>
           </div>
+        </div>
 
-          <!-- Botones -->
-          <div class="flex flex-col mt-4">
-            <button 
-              class="px-4 py-2.5 text-sm font-medium text-white bg-gray-700 hover:bg-gray-600 rounded-md shadow-sm transition-all duration-150" 
-              pButton 
-              label="Buscar" 
-              icon="pi pi-search"
-              iconPos="left" 
-              [disabled]="loading"
-              (click)="buscarTarifas()">
-            </button>
-          </div>
-          <div class="flex flex-col mt-4">
-            <button 
-              class="px-4 py-2.5 text-sm font-medium text-white bg-green-600 hover:bg-green-500 rounded-md shadow-sm transition-all duration-150" 
-              pButton 
-              label="Nuevo" 
-              icon="pi pi-plus"
-              iconPos="left"
-              (click)="nuevaTarifa()">
-            </button>
-          </div>
+        <!-- Botones -->
+        <div class="flex flex-wrap gap-2 mt-4">
+          <button 
+            class="px-4 py-2 text-sm font-medium text-white bg-gray-700 hover:bg-gray-600 rounded-md shadow-sm transition-all duration-150" 
+            pButton 
+            label="Buscar" 
+            icon="pi pi-search"
+            iconPos="left" 
+            [disabled]="loading"
+            (click)="buscarTarifas()">
+          </button>
+          <button 
+            class="px-4 py-2 text-sm font-medium text-white bg-green-600 hover:bg-green-500 rounded-md shadow-sm transition-all duration-150" 
+            pButton 
+            label="Nuevo" 
+            icon="pi pi-plus"
+            iconPos="left"
+            (click)="nuevaTarifa()">
+          </button>
+          <button 
+            class="px-4 py-2 text-sm font-medium text-white bg-blue-600 hover:bg-blue-500 rounded-md shadow-sm transition-all duration-150" 
+            pButton 
+            label="Excel" 
+            icon="pi pi-file-excel"
+            iconPos="left"
+            [disabled]="loading || tarifas.length === 0"
+            (click)="exportarExcel()">
+          </button>
+          <button 
+            class="px-4 py-2 text-sm font-medium text-white bg-red-600 hover:bg-red-500 rounded-md shadow-sm transition-all duration-150" 
+            pButton 
+            label="PDF" 
+            icon="pi pi-file-pdf"
+            iconPos="left"
+            [disabled]="loading || tarifas.length === 0"
+            (click)="exportarPDF()">
+          </button>
         </div>
       </form>
       </div>

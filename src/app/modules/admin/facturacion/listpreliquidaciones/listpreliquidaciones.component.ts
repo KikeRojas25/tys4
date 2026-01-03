@@ -88,7 +88,7 @@ export class ListpreliquidacionesComponent implements OnInit {
 
   cargarClientes(): void {
     const userId = this.user?.id || 2;
-    this.mantenimientoService.getAllClientes('', userId).subscribe({
+    this.mantenimientoService.getAllClientes('', userId,true).subscribe({
       next: (clientes) => {
         this.clientes = [{ label: 'Todos los clientes', value: null }];
         clientes.forEach((cliente) => {
