@@ -26,6 +26,8 @@ export class MantenimientoService {
   private baseUrl = environment.baseUrl + '/api/Mantenimiento/';
   private baseUrlCliente = environment.baseUrl + '/api/Cliente/';
     private baseUrlTarifa = environment.baseUrl + '/api/tarifa/';
+  private baseUrlProveedor = environment.baseUrl + '/api/Proveedor/';
+  private baseUrlVehiculo = environment.baseUrl + '/api/Vehiculo/';
 
 constructor() { }
 
@@ -70,6 +72,63 @@ getAllClientes(criterio: string, usuarioid : number, esComercial : boolean = fal
 
 getProveedores(criterio: string, tipoid : number): Observable<Proveedor[]> {
   return this._httpClient.get<Proveedor[]>(this.baseUrl +'GetProveedores?criterio=' + criterio + '&tipoid=' +  tipoid   , httpOptions);
+}
+
+// =========================
+// ProveedorController CRUD
+// =========================
+getAllProveedores(criterio: string = '', tipoid: number | null = null): Observable<Proveedor[]> {
+  let params = new HttpParams().set('criterio', criterio ?? '');
+  if (tipoid !== null && tipoid !== undefined) {
+    params = params.set('tipoid', String(tipoid));
+  }
+  return this._httpClient.get<Proveedor[]>(`${this.baseUrlProveedor}GetAll`, { params, ...httpOptions });
+}
+
+getProveedorById(id: number): Observable<Proveedor> {
+  return this._httpClient.get<Proveedor>(`${this.baseUrlProveedor}Get/${id}`, httpOptions);
+}
+
+registrarProveedor(model: any): Observable<any> {
+  return this._httpClient.post<any>(`${this.baseUrlProveedor}Registrar`, model, httpOptions);
+}
+
+actualizarProveedor(id: number, model: any): Observable<any> {
+  return this._httpClient.put<any>(`${this.baseUrlProveedor}Actualizar/${id}`, model, httpOptions);
+}
+
+eliminarProveedor(id: number): Observable<any> {
+  return this._httpClient.delete<any>(`${this.baseUrlProveedor}Eliminar/${id}`, httpOptions);
+}
+
+// =========================
+// VehiculoController CRUD
+// =========================
+vehiculoGetAll(placa: string | null = null, idProveedor: number | null = null): Observable<any[]> {
+  let params = new HttpParams();
+  if (placa !== null && placa !== undefined) {
+    params = params.set('placa', placa);
+  }
+  if (idProveedor !== null && idProveedor !== undefined) {
+    params = params.set('idProveedor', String(idProveedor));
+  }
+  return this._httpClient.get<any[]>(`${this.baseUrlVehiculo}GetAll`, { params, ...httpOptions });
+}
+
+vehiculoGetById(id: number): Observable<any> {
+  return this._httpClient.get<any>(`${this.baseUrlVehiculo}Get/${id}`, httpOptions);
+}
+
+vehiculoRegistrar(model: any): Observable<any> {
+  return this._httpClient.post<any>(`${this.baseUrlVehiculo}Registrar`, model, httpOptions);
+}
+
+vehiculoActualizar(id: number, model: any): Observable<any> {
+  return this._httpClient.put<any>(`${this.baseUrlVehiculo}Actualizar/${id}`, model, httpOptions);
+}
+
+vehiculoEliminar(id: number): Observable<any> {
+  return this._httpClient.delete<any>(`${this.baseUrlVehiculo}Eliminar/${id}`, httpOptions);
 }
 
 insertarPrecintos(data: InsertarPrecintoRequest): Observable<InsertarPrecintoResponse> {
@@ -243,7 +302,12 @@ editar_chofer(model: any) {
   }
 
   eliminarTarifa(idTarifa: number): Observable<void> {
-    return this._httpClient.delete<void>(`${this.baseUrlTarifa}/${idTarifa}`, httpOptions);
+    return this._httpClient.delete<void>(`${this.baseUrlTarifa}${idTarifa}`, httpOptions);
+  }
+
+  getAllCentroCosto(idCliente?: number | null): Observable<any[]> {
+    const param = idCliente ? `?idCliente=${idCliente}` : '';
+    return this._httpClient.get<any[]>(`${this.baseUrl}GetAllCentroCosto${param}`, httpOptions);
   }
 
   copiarTarifas(idClienteOrigen: number, idClienteDestino: number): Observable<void> {

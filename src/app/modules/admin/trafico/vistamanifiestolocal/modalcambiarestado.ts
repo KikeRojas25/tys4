@@ -1,13 +1,11 @@
 import { CommonModule } from '@angular/common';
 import { Component, OnInit } from '@angular/core';
-import { FormBuilder, FormGroup, Validators, ReactiveFormsModule } from '@angular/forms';
+import { AbstractControl, FormBuilder, FormGroup, ReactiveFormsModule, ValidationErrors, ValidatorFn, Validators } from '@angular/forms';
 import { MessageService, SelectItem } from 'primeng/api';
 import { CalendarModule } from 'primeng/calendar';
 import { DropdownModule } from 'primeng/dropdown';
 import { DynamicDialogRef, DynamicDialogConfig } from 'primeng/dynamicdialog';
-import { OrdenTransporteService } from '../../recepcion/ordentransporte/ordentransporte.service';
 import { User } from '../trafico.types';
-import { PlanningService } from '../../planning/planning.service';
 import { TraficoService } from '../trafico.service';
 import { ToastModule } from 'primeng/toast';
 import { InputTextModule } from 'primeng/inputtext';
@@ -35,35 +33,35 @@ import { InputTextModule } from 'primeng/inputtext';
     <div class="col-6">
       <label for="horaLlegada" class="block text-sm font-medium text-gray-700">Hora de Llegada</label>
       <input id="horaLlegada" type="time" pInputText formControlName="horaLlegada" class="w-full"/>
-      <small *ngIf="campoInvalido('horaLlegada')" class="text-red-500">Campo obligatorio</small>
+      <small *ngIf="campoInvalido('horaLlegada')" class="text-red-500">Valor inválido</small>
     </div>
 
     <!-- Hora de atención -->
     <div class="col-6">
       <label for="horaAtencion" class="block text-sm font-medium text-gray-700">Hora de Atención</label>
       <input id="horaAtencion" type="time" pInputText formControlName="horaAtencion" class="w-full"/>
-      <small *ngIf="campoInvalido('horaAtencion')" class="text-red-500">Campo obligatorio</small>
+      <small *ngIf="campoInvalido('horaAtencion')" class="text-red-500">Valor inválido</small>
     </div>
 
     <!-- Hora de salida -->
     <div class="col-6">
       <label for="horaSalida" class="block text-sm font-medium text-gray-700">Hora de Salida</label>
       <input id="horaSalida" type="time" pInputText formControlName="horaSalida" class="w-full"/>
-      <small *ngIf="campoInvalido('horaSalida')" class="text-red-500">Campo obligatorio</small>
+      <small *ngIf="campoInvalido('horaSalida')" class="text-red-500">Valor inválido</small>
     </div>
 
     <!-- Kilos recogidos -->
     <div class="col-6">
       <label for="kilos" class="block text-sm font-medium text-gray-700">Kilos Recogidos</label>
       <input id="kilos" type="number" pInputText formControlName="kilosRecogidos" class="w-full"/>
-      <small *ngIf="campoInvalido('kilosRecogidos')" class="text-red-500">Campo obligatorio</small>
+      <small *ngIf="campoInvalido('kilosRecogidos')" class="text-red-500">Debe ser mayor o igual a 0</small>
     </div>
 
     <!-- Bultos recogidos -->
     <div class="col-6">
       <label for="bultos" class="block text-sm font-medium text-gray-700">Bultos Recogidos</label>
       <input id="bultos" type="number" pInputText formControlName="bultosRecogidos" class="w-full"/>
-      <small *ngIf="campoInvalido('bultosRecogidos')" class="text-red-500">Campo obligatorio</small>
+      <small *ngIf="campoInvalido('bultosRecogidos')" class="text-red-500">Debe ser mayor o igual a 0</small>
     </div>
 
     <!-- Botones -->
@@ -106,14 +104,17 @@ export class CambiarEstadoModalLocalComponent implements OnInit {
     console.log(this.config.data.ids);
 
     // Inicializa el formulario reactivo
-    this.form = this.fb.group({
-      idestado: [null, Validators.required],
-      horaLlegada: [''],
-      horaAtencion: [''],
-      horaSalida: [''],
-      kilosRecogidos: [''],
-      bultosRecogidos: ['']
-    });
+    this.form = this.fb.group(
+      {
+        idestado: [null],
+        horaLlegada: [''],
+        horaAtencion: [''],
+        horaSalida: [''],
+        kilosRecogidos: [null, [Validators.min(0)]],
+        bultosRecogidos: [null, [Validators.min(0)]],
+      },
+      { validators: [this.validacionMinima()] }
+    );
 
     // Estados disponibles
     this.estadosnext = [
@@ -121,36 +122,41 @@ export class CambiarEstadoModalLocalComponent implements OnInit {
       { value: 39, label: 'Confirmar Recojo' },
       { value: 40, label: 'Recojo cancelado' }
     ];
-
-    // 🔁 Reacciona al cambio de estado
-    this.form.get('idestado')?.valueChanges.subscribe((value) => {
-      if (value === 39) {
-        // Confirmar Recojo → campos obligatorios
-        this.form.get('horaLlegada')?.setValidators([Validators.required]);
-        this.form.get('horaAtencion')?.setValidators([Validators.required]);
-        this.form.get('horaSalida')?.setValidators([Validators.required]);
-        this.form.get('kilosRecogidos')?.setValidators([Validators.required, Validators.min(1)]);
-        this.form.get('bultosRecogidos')?.setValidators([Validators.required, Validators.min(1)]);
-      } else {
-        // Otros estados → limpia validadores
-        this.form.get('horaLlegada')?.clearValidators();
-        this.form.get('horaAtencion')?.clearValidators();
-        this.form.get('horaSalida')?.clearValidators();
-        this.form.get('kilosRecogidos')?.clearValidators();
-        this.form.get('bultosRecogidos')?.clearValidators();
-      }
-
-      this.form.get('horaLlegada')?.updateValueAndValidity();
-      this.form.get('horaAtencion')?.updateValueAndValidity();
-      this.form.get('horaSalida')?.updateValueAndValidity();
-      this.form.get('kilosRecogidos')?.updateValueAndValidity();
-      this.form.get('bultosRecogidos')?.updateValueAndValidity();
-    });
   }
 
   campoInvalido(campo: string): boolean {
     const control = this.form.get(campo);
     return !!control && control.invalid && control.touched;
+  }
+
+  private validacionMinima(): ValidatorFn {
+    return (control: AbstractControl): ValidationErrors | null => {
+      const fg = control as FormGroup;
+
+      const idestado = fg.get('idestado')?.value;
+      const horaLlegada = fg.get('horaLlegada')?.value;
+      const horaAtencion = fg.get('horaAtencion')?.value;
+      const horaSalida = fg.get('horaSalida')?.value;
+      const kilosRecogidos = fg.get('kilosRecogidos')?.value;
+      const bultosRecogidos = fg.get('bultosRecogidos')?.value;
+
+      const hasEstado = idestado !== null && idestado !== undefined && idestado !== '';
+      const hasHoraLlegada = typeof horaLlegada === 'string' && horaLlegada.trim().length > 0;
+      const hasHoraAtencion = typeof horaAtencion === 'string' && horaAtencion.trim().length > 0;
+      const hasHoraSalida = typeof horaSalida === 'string' && horaSalida.trim().length > 0;
+      const hasKilos = kilosRecogidos !== null && kilosRecogidos !== undefined && kilosRecogidos !== '';
+      const hasBultos = bultosRecogidos !== null && bultosRecogidos !== undefined && bultosRecogidos !== '';
+
+      const hasDato = hasHoraLlegada || hasHoraAtencion || hasHoraSalida || hasKilos || hasBultos;
+
+      // Regla especial: Confirmar Recojo (39) requiere al menos un dato (hora/kilos/bultos)
+      if (idestado === 39) {
+        return hasDato ? null : { missingDataForRecojo: true };
+      }
+
+      // Para otros casos: permitir guardar si se selecciona un estado o se ingresa al menos un dato
+      return hasEstado || hasDato ? null : { missingData: true };
+    };
   }
 
   cancelar() {
@@ -160,16 +166,31 @@ export class CambiarEstadoModalLocalComponent implements OnInit {
   guardar() {
     if (this.form.invalid) {
       this.form.markAllAsTouched();
-      this.messageService.add({ severity: 'warn', summary: 'Tráfico', detail: 'Complete los campos obligatorios.' });
+      const errors = this.form.errors || {};
+
+      if (errors['missingDataForRecojo']) {
+        this.messageService.add({
+          severity: 'warn',
+          summary: 'Tráfico',
+          detail: 'Para “Confirmar Recojo”, registre al menos un dato (p.ej. hora de llegada).',
+        });
+        return;
+      }
+
+      if (errors['missingData']) {
+        this.messageService.add({
+          severity: 'warn',
+          summary: 'Tráfico',
+          detail: 'Ingrese al menos un dato (p.ej. hora de llegada) o seleccione un estado.',
+        });
+        return;
+      }
+
+      this.messageService.add({ severity: 'warn', summary: 'Tráfico', detail: 'Revise los campos ingresados.' });
       return;
     }
 
-    const payload = {
-      ...this.form.value,
-      IdOrdenTrabajo: this.config.data.ids,
-      idusuariocreacion: this.user?.id,
-      fechaestado: new Date(this.dateInicio).toISOString()
-    };
+    const payload = this.normalizarPayload();
 
     console.log('📤 Enviando al backend:', payload);
 
@@ -191,5 +212,46 @@ export class CambiarEstadoModalLocalComponent implements OnInit {
         });
       }
     });
+  }
+
+  private normalizarPayload(): any {
+    const raw = this.form.value as any;
+
+    const payload: any = {
+      IdOrdenTrabajo: this.config.data.ids,
+      idusuariocreacion: this.user?.id,
+      fechaestado: new Date(this.dateInicio).toISOString(),
+    };
+
+    // Estado es opcional: solo enviar si se selecciona
+    if (raw.idestado !== null && raw.idestado !== undefined && raw.idestado !== '') {
+      payload.idestado = raw.idestado;
+    }
+
+    const cleanTime = (v: any): string | null => {
+      if (typeof v !== 'string') return null;
+      const t = v.trim();
+      return t.length ? t : null;
+    };
+
+    const cleanNumber = (v: any): number | null => {
+      if (v === null || v === undefined || v === '') return null;
+      const n = Number(v);
+      return Number.isFinite(n) ? n : null;
+    };
+
+    const horaLlegada = cleanTime(raw.horaLlegada);
+    const horaAtencion = cleanTime(raw.horaAtencion);
+    const horaSalida = cleanTime(raw.horaSalida);
+    const kilosRecogidos = cleanNumber(raw.kilosRecogidos);
+    const bultosRecogidos = cleanNumber(raw.bultosRecogidos);
+
+    if (horaLlegada !== null) payload.horaLlegada = horaLlegada;
+    if (horaAtencion !== null) payload.horaAtencion = horaAtencion;
+    if (horaSalida !== null) payload.horaSalida = horaSalida;
+    if (kilosRecogidos !== null) payload.kilosRecogidos = kilosRecogidos;
+    if (bultosRecogidos !== null) payload.bultosRecogidos = bultosRecogidos;
+
+    return payload;
   }
 }

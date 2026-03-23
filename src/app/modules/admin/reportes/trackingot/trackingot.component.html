@@ -1,0 +1,301 @@
+<p-toast></p-toast>
+
+<div class="tracking-dashboard">
+  <!-- Header -->
+  <header class="tracking-header">
+    <div class="tracking-header-content">
+      <nav class="tracking-breadcrumb">
+        <a class="text-amber-600 hover:text-amber-700">TMS</a>
+        <mat-icon class="breadcrumb-icon" [svgIcon]="'heroicons_solid:chevron-right'"></mat-icon>
+        <a class="text-amber-600 hover:text-amber-700">Seguimiento OT</a>
+        <mat-icon class="breadcrumb-icon" [svgIcon]="'heroicons_solid:chevron-right'"></mat-icon>
+        <span class="text-slate-600">Tracking de Orden</span>
+      </nav>
+      <h1 class="tracking-title">Tracking de Orden de Transporte</h1>
+      <p class="tracking-subtitle">Consulte el estado y detalles de sus órdenes por OT</p>
+    </div>
+  </header>
+
+  <!-- Search box -->
+  <section class="tracking-search-section">
+    <div class="search-card">
+      <div class="search-icon-wrap">
+        <mat-icon class="search-icon" [svgIcon]="'heroicons_solid:magnifying-glass'"></mat-icon>
+      </div>
+      <div class="search-input-wrap">
+        <input
+          pInputText
+          [(ngModel)]="numcp"
+          (keyup.enter)="buscar()"
+          placeholder="Ingrese número de OT..."
+          class="search-input"
+          [disabled]="loading"
+        />
+      </div>
+      <button
+        pButton
+        type="button"
+        icon="pi pi-search"
+        label="Buscar"
+        (click)="buscar()"
+        [loading]="loading"
+        [disabled]="loading"
+        class="search-btn"
+      ></button>
+    </div>
+  </section>
+
+  <!-- Results dashboard -->
+  <section class="tracking-results" *ngIf="ordenesConEventos.length > 0">
+    <div class="results-header">
+      <h2 class="results-title">
+        <mat-icon [svgIcon]="'heroicons_solid:document-text'"></mat-icon>
+        {{ ordenesConEventos.length }} orden(es) encontrada(s)
+      </h2>
+    </div>
+
+    <div class="orden-cards" *ngFor="let item of ordenesConEventos">
+      <article class="orden-card">
+        <!-- Card header: Nº OT + Estado -->
+        <div class="orden-card-header">
+          <div class="orden-id-badge">
+            <span class="orden-id-label">OT</span>
+            <span class="orden-id-value">{{ item.orden.idordentrabajo || item.orden.numcp || '-' }}</span>
+          </div>
+          <div class="orden-meta">
+            <span class="orden-numcp" *ngIf="item.orden.numcp"> {{ item.orden.numcp }}</span>
+            <span class="orden-estado" [ngClass]="getEstadoClass(item.orden.estado)">
+              {{ item.orden.estado || 'Sin estado' }}
+            </span>
+          </div>
+        </div>
+        <div class="orden-card-body">
+          <!-- Tabla de eventos -->
+          <div class="orden-section tracking-events-wrap" *ngIf="item.events.length > 0">
+            <h3 class="section-title">
+              <mat-icon [svgIcon]="'heroicons_solid:clock'"></mat-icon>
+              Tracking de eventos
+            </h3>
+            <div class="tracking-events-card">
+              <p-table [value]="item.events" class="tracking-events-table text-sm w-full">
+                <ng-template pTemplate="header">
+                  <tr>
+                    <th>Evento</th>
+                    <th>Fecha registro</th>
+                    <th>Fecha evento</th>
+                    <th>Usuario registro</th>
+                  </tr>
+                </ng-template>
+                <ng-template pTemplate="body" let-event>
+                  <tr>
+                    <td>
+                      <span
+                        class="event-badge"
+                        [ngClass]="event.dateEvent ? 'event-badge-done' : 'event-badge-pending'">
+                        {{ event.status || 'Sin Estado' }}
+                      </span>
+                    </td>
+                    <td>{{ event.dateEvent ? (event.dateRegister | date:'dd/MM/yyyy HH:mm') : 'Sin dato' }}</td>
+                    <td>{{ event.dateEvent ? (event.dateEvent | date:'dd/MM/yyyy HH:mm') : 'Sin evento' }}</td>
+                    <td>{{ event.dateEvent ? (event.user || 'Sin dato') : 'Sin dato' }}</td>
+                  </tr>
+                </ng-template>
+              </p-table>
+            </div>
+          </div>
+
+          <!-- Fechas -->
+          <div class="orden-section">
+            <h3 class="section-title">
+              <mat-icon [svgIcon]="'heroicons_solid:calendar-days'"></mat-icon>
+              Fechas
+            </h3>
+            <div class="section-grid">
+              <div class="info-item" *ngIf="item.orden.fecharegistro">
+                <span class="info-label">Registro</span>
+                <span class="info-value">{{ formatDate(item.orden.fecharegistro) }}</span>
+              </div>
+              <div class="info-item" *ngIf="item.orden.fecharecojo">
+                <span class="info-label">Recojo</span>
+                <span class="info-value">{{ formatDate(item.orden.fecharecojo) }}</span>
+              </div>
+              <div class="info-item" *ngIf="item.orden.fechadespacho">
+                <span class="info-label">Despacho</span>
+                <span class="info-value">{{ formatDate(item.orden.fechadespacho) }}</span>
+              </div>
+              <div class="info-item" *ngIf="item.orden.fechaenzona">
+                <span class="info-label">En zona</span>
+                <span class="info-value">{{ formatDate(item.orden.fechaenzona) }}</span>
+              </div>
+              <div class="info-item" *ngIf="item.orden.fechaentrega">
+                <span class="info-label">Entrega</span>
+                <span class="info-value">{{ formatDate(item.orden.fechaentrega) }}</span>
+              </div>
+              <div class="info-item" *ngIf="item.orden.fechaentregaconciliacion">
+                <span class="info-label">Conciliación</span>
+                <span class="info-value">{{ formatDate(item.orden.fechaentregaconciliacion) }}</span>
+              </div>
+            </div>
+          </div>
+
+          <!-- Cliente / Remitente / Destinatario -->
+          <div class="orden-section">
+            <h3 class="section-title">
+              <mat-icon [svgIcon]="'heroicons_solid:building-office-2'"></mat-icon>
+              Cliente y Partes
+            </h3>
+            <div class="section-grid section-grid-cols">
+              <div class="info-item" *ngIf="item.orden.cliente">
+                <span class="info-label">Cliente</span>
+                <span class="info-value">{{ item.orden.cliente }}</span>
+              </div>
+              <div class="info-item" *ngIf="item.orden.remitente">
+                <span class="info-label">Remitente</span>
+                <span class="info-value">{{ item.orden.remitente }}</span>
+              </div>
+              <div class="info-item" *ngIf="item.orden.destinatario">
+                <span class="info-label">Destinatario</span>
+                <span class="info-value">{{ item.orden.destinatario }}</span>
+              </div>
+              <div class="info-item" *ngIf="item.orden.rucdestinatario">
+                <span class="info-label">RUC Destinatario</span>
+                <span class="info-value">{{ item.orden.rucdestinatario }}</span>
+              </div>
+              <div class="info-item full-width" *ngIf="item.orden.direcciondestinatario">
+                <span class="info-label">Dirección destino</span>
+                <span class="info-value">{{ item.orden.direcciondestinatario }}</span>
+              </div>
+            </div>
+          </div>
+
+          <!-- Origen / Destino -->
+          <div class="orden-section">
+            <h3 class="section-title">
+              <mat-icon [svgIcon]="'heroicons_solid:map-pin'"></mat-icon>
+              Origen y Destino
+            </h3>
+            <div class="section-grid">
+              <div class="info-item" *ngIf="item.orden.origen">
+                <span class="info-label">Origen</span>
+                <span class="info-value">{{ item.orden.origen }}</span>
+              </div>
+              <div class="info-item" *ngIf="item.orden.destino">
+                <span class="info-label">Destino</span>
+                <span class="info-value">{{ item.orden.destino }}</span>
+              </div>
+              <div class="info-item" *ngIf="item.orden.estacionorigen">
+                <span class="info-label">Estación origen</span>
+                <span class="info-value">{{ item.orden.estacionorigen }}</span>
+              </div>
+              <div class="info-item" *ngIf="item.orden.puntopartida">
+                <span class="info-label">Punto partida</span>
+                <span class="info-value">{{ item.orden.puntopartida }}</span>
+              </div>
+            </div>
+          </div>
+
+          <!-- Transporte -->
+          <div class="orden-section">
+            <h3 class="section-title">
+              <mat-icon [svgIcon]="'heroicons_solid:truck'"></mat-icon>
+              Transporte
+            </h3>
+            <div class="section-grid">
+              <div class="info-item" *ngIf="item.orden.placa">
+                <span class="info-label">Placa</span>
+                <span class="info-value info-value-highlight">{{ item.orden.placa }}</span>
+              </div>
+              <div class="info-item" *ngIf="item.orden.chofer">
+                <span class="info-label">Chofer</span>
+                <span class="info-value">{{ item.orden.chofer }}</span>
+              </div>
+              <div class="info-item" *ngIf="item.orden.dni">
+                <span class="info-label">DNI</span>
+                <span class="info-value">{{ item.orden.dni }}</span>
+              </div>
+              <div class="info-item" *ngIf="item.orden.tipotransporte">
+                <span class="info-label">Tipo transporte</span>
+                <span class="info-value">{{ item.orden.tipotransporte }}</span>
+              </div>
+              <div class="info-item" *ngIf="item.orden.nummanifiesto">
+                <span class="info-label">Manifiesto</span>
+                <span class="info-value">{{ item.orden.nummanifiesto }}</span>
+              </div>
+            </div>
+          </div>
+
+          <!-- Guías -->
+          <div class="orden-section" *ngIf="item.orden.guiarecojo || item.orden.guiatercero || item.orden.guiatransportista || item.orden.GRR">
+            <h3 class="section-title">
+              <mat-icon [svgIcon]="'heroicons_solid:document-duplicate'"></mat-icon>
+              Guías
+            </h3>
+            <div class="section-grid">
+              <div class="info-item" *ngIf="item.orden.guiarecojo">
+                <span class="info-label">Guía recojo</span>
+                <span class="info-value">{{ item.orden.guiarecojo }}</span>
+              </div>
+              <div class="info-item" *ngIf="item.orden.guiatercero">
+                <span class="info-label">Guía tercero</span>
+                <span class="info-value">{{ item.orden.guiatercero }}</span>
+              </div>
+              <div class="info-item" *ngIf="item.orden.guiatransportista">
+                <span class="info-label">Guía transportista</span>
+                <span class="info-value">{{ item.orden.guiatransportista }}</span>
+              </div>
+              <div class="info-item" *ngIf="item.orden.grr">
+                <span class="info-label">GRR</span>
+                <span class="info-value">{{ item.orden.grr }}</span>
+              </div>
+            </div>
+          </div>
+
+          <!-- Carga y montos -->
+          <div class="orden-section">
+            <h3 class="section-title">
+              <mat-icon [svgIcon]="'heroicons_solid:currency-dollar'"></mat-icon>
+              Carga y Montos
+            </h3>
+            <div class="section-grid">
+              <div class="info-item" *ngIf="item.orden.peso != null">
+                <span class="info-label">Peso (kg)</span>
+                <span class="info-value">{{ formatNumber(item.orden.peso) }}</span>
+              </div>
+              <div class="info-item" *ngIf="item.orden.volumen != null">
+                <span class="info-label">Volumen</span>
+                <span class="info-value">{{ formatNumber(item.orden.volumen) }}</span>
+              </div>
+              <div class="info-item" *ngIf="item.orden.bulto != null">
+                <span class="info-label">Bultos</span>
+                <span class="info-value">{{ item.orden.bulto }}</span>
+              </div>
+              <div class="info-item" *ngIf="item.orden.subtotal != null">
+                <span class="info-label">Subtotal</span>
+                <span class="info-value">S/ {{ formatNumber(item.orden.subtotal) }}</span>
+              </div>
+              <div class="info-item" *ngIf="item.orden.igv != null">
+                <span class="info-label">IGV</span>
+                <span class="info-value">S/ {{ formatNumber(item.orden.igv) }}</span>
+              </div>
+              <div class="info-item" *ngIf="item.orden.total != null">
+                <span class="info-label">Total</span>
+                <span class="info-value info-value-total">S/ {{ formatNumber(item.orden.total) }}</span>
+              </div>
+            </div>
+          </div>
+
+
+        </div>
+      </article>
+    </div>
+  </section>
+
+  <!-- Empty state -->
+  <section class="tracking-empty" *ngIf="!loading && ordenesConEventos.length === 0 && numcp">
+    <div class="empty-card">
+      <mat-icon class="empty-icon" [svgIcon]="'heroicons_outline:document-magnifying-glass'"></mat-icon>
+      <p class="empty-text">No se encontraron órdenes para su búsqueda.</p>
+      <p class="empty-hint">Verifique el número de orden (CP) e intente nuevamente.</p>
+    </div>
+  </section>
+</div>

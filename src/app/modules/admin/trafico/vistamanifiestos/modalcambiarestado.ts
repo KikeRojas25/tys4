@@ -112,28 +112,6 @@ export class CambiarEstadoModalComponent  implements OnInit {
 
 
 
-      // this.planningService.GetAllEstaciones().subscribe(resp => {
-      //   resp.forEach(element => {
-      //     this.estaciones.push({ value: element.idEstacion ,  label : element.estacionOrigen});
-      //   });
-      // });
-
-
-      // this.ordenService.getValorTabla(24).subscribe(resp => {
-      //   resp.forEach(element => {
-      //     this.agencias.push({ value: element.idValorTabla ,  label : element.valor});
-      //   });
-      // });
-
-
-      // this.traficoService.getProveedores("", 21514).subscribe(resp => {
-      //   resp.forEach(element => {
-      //     this.repartidores.push({ value: element.idProveedor ,  label : element.razonSocial  +   '-'   +    element.ruc});
-      //   });
-      // });
-
-
-
     }
     cancelar() {
       this.ref.close();
@@ -146,11 +124,7 @@ export class CambiarEstadoModalComponent  implements OnInit {
 
       if(this.model.idestado  === undefined )
         {
-          // this.toastr.error('Debe seleccionar una o más OTs'
-          // , 'Planning', {
-          //   closeButton: true
-          // });
-  
+         
           this.messageService.add({ severity:'warn', summary:'Tráfico', detail:'Debe seleccionar un estado'  })
           return ;
         }

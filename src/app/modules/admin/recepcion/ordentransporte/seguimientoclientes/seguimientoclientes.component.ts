@@ -161,15 +161,12 @@ clientes: SelectItem[] = [];
         {header: 'F. DESPACHO', field: 'fecharegistro' , width: '120px'  },
         {header: 'F. ENTREGA', field: 'fecharegistro' , width: '120px'  },
         {header: 'CLIENTE', field: 'razonsocial'  ,  width: '180px'  },
-      
         {header: 'ESTACIÓN ACTUAL', field: 'estacionactual'  , width: '160px'   },
         {header: 'ESTADO', field: 'estado'  , width: '120px'   },
-          {header: 'INCIDENCIA ENTREGA', field: 'tipoentrega'  , width: '160px'   },
+        {header: 'INCIDENCIA ENTREGA', field: 'tipoentrega'  , width: '160px'   },
         {header: 'ORIGEN', field: 'origen'  , width: '180px'   },
-          {header: 'DESTINATARIO', field: 'razonsocial'  ,  width: '180px'  },
+        {header: 'DESTINATARIO', field: 'razonsocial'  ,  width: '180px'  },
         {header: 'DESTINO', field: 'destino'  , width: '120px'   },
-       
-      
         {header: 'CANT', field: 'cantidad'  ,  width: '80px'  },
         {header: 'PESO', field: 'peso'  ,  width: '80px'  },
         {header: 'VOL', field: 'pesovol'  ,  width: '80px'  }

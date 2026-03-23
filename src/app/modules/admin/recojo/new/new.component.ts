@@ -135,9 +135,6 @@ destinosFinales: any[] = [];
 
   }
 
-
-
-
   numberOnly(event): boolean {
     const charCode = (event.which) ? event.which : event.keyCode;
     if (charCode > 31 && (charCode < 48 || charCode > 57)) {
@@ -166,8 +163,12 @@ registrar(): void {
     accept: () => {
       this.loading = true;
 
+      // No enviar repartidor (se retiró de new/edit)
+      // eslint-disable-next-line @typescript-eslint/no-unused-vars
+      const { idrepartidor, repartidor, ...modelSinRepartidor } = (this.model ?? {}) as any;
+
       const payload = {
-        ...this.model,
+        ...modelSinRepartidor,
         responsablecomercialid: this.user.id,
         idusuarioregistro: this.user.id,
         tipoorden: 2,

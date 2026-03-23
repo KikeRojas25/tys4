@@ -183,6 +183,7 @@ export class PlanninglocalComponent implements OnInit {
             { field: 'numcarga', header: 'N° MOVIL', width: '120px' },
             { header: 'Tipo de Unidad', field: 'tipounidad', width: '60px' },
             { header: 'Planificador', field: 'planificador', width: '90px' },
+            { header: 'Placa', field: 'placa', width: '90px' },
             { header: 'Estado', field: 'estado', width: '90px' },
             {
                 header: 'Fecha de Registro',
@@ -341,6 +342,8 @@ export class PlanninglocalComponent implements OnInit {
             .GetAllCargasTemporalTrafico(2, this.user.idestacionorigen)
             .subscribe((list1) => {
                 this.despachos = list1;
+                console.log('despachos', this.despachos);
+
                 this.despachos.forEach((x) => {
                     this.bultosTotal = this.bultosTotal + x.vol;
                     this.pesoTotal = this.pesoTotal + x.peso;

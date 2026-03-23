@@ -16,6 +16,46 @@
                     </ng-template>
               </p-dropdown>
   </div>
+  <div class="field flex flex-col" *ngIf="model.idtipooperacion === 25085">
+    <label>Transportista:</label>
+    <p-dropdown name="transportistas"
+      [options]="transportistas" [(ngModel)]="model.idtransportista"
+      scrollHeight="20vh"
+      appendTo="body"
+      [baseZIndex]="100000"
+      [virtualScroll]="true" itemSize="4"
+      [style]="{'width':'100%'}" [resetFilterOnHide]="false"
+      [hideTransitionOptions]="'0ms'"
+      [showTransitionOptions]="'0ms'"
+      placeholder="seleccione un transportista"
+      (onChange)="cargarVehiculosTransportista()"
+      [filter]="true">
+      <ng-template let-item pTemplate="selectedItem">
+        <span style="vertical-align:left;">{{item.label}}</span>
+      </ng-template>
+    </p-dropdown>
+  </div>
+  <div class="field flex flex-col" *ngIf="model.idtipooperacion === 25085 && model.idtransportista">
+    <label>Vehículos vinculados:</label>
+    <p-dropdown name="vehiculos"
+      [options]="vehiculosOptions" [(ngModel)]="model.idvehiculo"
+      scrollHeight="20vh"
+      appendTo="body"
+      [baseZIndex]="100000"
+      [virtualScroll]="true" itemSize="4"
+      [style]="{'width':'100%'}" [resetFilterOnHide]="false"
+      [hideTransitionOptions]="'0ms'"
+      [showTransitionOptions]="'0ms'"
+      placeholder="seleccione un vehículo (opcional)"
+      [filter]="true">
+      <ng-template let-item pTemplate="selectedItem">
+        <span style="vertical-align:left;">{{item.label}}</span>
+      </ng-template>
+    </p-dropdown>
+    <div class="mt-2 text-sm text-gray-600" *ngIf="vehiculos.length > 0">
+      {{ vehiculos.length }} vehículo(s) vinculado(s)
+    </div>
+  </div>
   <div class="field flex flex-col" *ngIf="model.idtipooperacion === 18139">
           <label>Destino :</label>
 

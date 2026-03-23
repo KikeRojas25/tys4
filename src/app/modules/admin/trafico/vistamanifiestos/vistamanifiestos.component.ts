@@ -16,6 +16,7 @@ import { DialogService, DynamicDialogRef } from 'primeng/dynamicdialog';
 import { CambiarEstadoModalComponent } from './modalcambiarestado';
 import { ToastModule } from 'primeng/toast';
 import { OrdenTransporte } from '../../recepcion/ordentransporte/ordentransporte.types';
+import { AsignartipooperacionRutaComponent } from '../vistarepartidor/asignartipooperacion/asignartipooperacionruta.component';
 
 @Component({
   selector: 'app-vistamanifiestos',
@@ -78,6 +79,8 @@ export class VistamanifiestosComponent {
 
   selectedDepartaments: Manifiesto[];
   selectedOTs: Manifiesto[]= [];
+  selectedOrdenDetalle: OrdenTransporte | null = null;
+  idManifiestoActual: number | null = null;
 
   constructor( private router: Router,
     private activatedRoute: ActivatedRoute,
@@ -253,10 +256,9 @@ crearcarga( ) {
 
 
 }
-verEventos(id) {
+verEventos(id: number) {
 
-  
-
+  this.idManifiestoActual = id;
   this.traficoService.ListarOrdenesTransporte(id).subscribe(x=> {
 
     console.log(x);
@@ -264,27 +266,87 @@ verEventos(id) {
 
   });
 
-
-this.modalDetalleManifiesto = true;
+  this.selectedOrdenDetalle = null;
+  this.modalDetalleManifiesto = true;
 
 }
-agregaracarga() {
 
-  // let ids = this.selectedDepartaments;
+abrirModalReasignarTipoOperacion(): void {
+  if (!this.selectedOTs?.length || this.selectedOTs.length !== 1) {
+    this.messageService.add({
+      severity: 'warn',
+      summary: 'Reasignar Tipo de Operación',
+      detail: 'Seleccione exactamente un manifiesto.',
+    });
+    return;
+  }
+  const manifiesto = this.selectedOTs[0];
+  if (!manifiesto?.idManifiesto) return;
 
-  // this.ref = this.dialogService.open(ModalAsignaraCargaComponent, {
-  //   data : { ids  },
-  //   header: 'Asignar a carga',
-  //   width: '40%',
-  //   contentStyle: { overflow: 'auto' },
-  //   baseZIndex: 10000,
-  // });
-
-  // this.ref.onClose.subscribe((product: any) => {
-  //     this.reloadDetalles();
-  //    });
-  //  }
+  this.traficoService.ListarOrdenesTransporte(manifiesto.idManifiesto).subscribe(ordenes => {
+    const ids = (ordenes ?? []).map((m: any) => m.idOrdenTrabajo ?? m.idordentrabajo).filter(Boolean).join(',');
+    if (!ids) {
+      this.messageService.add({
+        severity: 'warn',
+        summary: 'Reasignar Tipo de Operación',
+        detail: 'El manifiesto no tiene OTs.',
+      });
+      return;
+    }
+    this.ref = this.dialogService.open(AsignartipooperacionRutaComponent, {
+      header: 'Reasignar Tipo de Operación',
+      width: '60%',
+      contentStyle: { 'max-height': '450px', overflow: 'auto' },
+      baseZIndex: 10000,
+      data: { ids, idManifiesto: manifiesto.idManifiesto },
+    });
+    this.ref.onClose.subscribe((response: any) => {
+      if (response?.cancelado) return;
+      this.reloadDetalles();
+      if (response && !response.error) {
+        this.messageService.add({ severity: 'success', summary: 'Planning', detail: 'Se ha asignado el tipo de operación correctamente.' });
+      } else if (response?.error) {
+        this.messageService.add({ severity: 'error', summary: 'Planning', detail: 'Hubo un error en la asignación de tipo de operación.' });
+      }
+    });
+  });
 }
+
+abrirModalReasignarTipoOperacionDesdeDetalle(): void {
+  const row = this.selectedOrdenDetalle;
+  const idOrdenTrabajo = Number((row as any)?.idOrdenTrabajo ?? row?.idordentrabajo);
+  if (!Number.isFinite(idOrdenTrabajo) || idOrdenTrabajo <= 0) {
+    this.messageService.add({
+      severity: 'warn',
+      summary: 'Reasignar Tipo de Operación',
+      detail: 'Debe seleccionar una OT.',
+    });
+    return;
+  }
+  const ids = ',' + idOrdenTrabajo;
+  const idManifiesto = this.idManifiestoActual ?? (this.selectedOTs[0] as any)?.idManifiesto;
+  this.ref = this.dialogService.open(AsignartipooperacionRutaComponent, {
+    header: 'Reasignar Tipo de Operación (OT Individual)',
+    width: '60%',
+    contentStyle: { 'max-height': '450px', overflow: 'auto' },
+    baseZIndex: 10000,
+    data: { ids, idManifiesto },
+  });
+  this.ref.onClose.subscribe((response: any) => {
+    if (response?.cancelado) return;
+    if (this.idManifiestoActual != null) {
+      this.traficoService.ListarOrdenesTransporte(this.idManifiestoActual).subscribe(x => {
+        this.ordenes11 = x;
+      });
+    }
+    if (response && !response.error) {
+      this.messageService.add({ severity: 'success', summary: 'Planning', detail: 'Se ha asignado el tipo de operación correctamente.' });
+    } else if (response?.error) {
+      this.messageService.add({ severity: 'error', summary: 'Planning', detail: 'Hubo un error en la asignación de tipo de operación.' });
+    }
+  });
+}
+
 
    reloadDetalles() {
 
@@ -307,47 +369,6 @@ agregaracarga() {
 
 
 
-
-   cambiarTipoOperacion(){
-
-    // let ids  = '';
-
-    // if(this.selectedOTs.length  === 0 )
-    //   {
-    //     this.toastr.error('Debe seleccionar una o más OTs'
-    //     , 'Planning', {
-    //       closeButton: true
-    //     });
-    //     return ;
-    //   }
-
-    // this.selectedOTs.forEach(element => {
-    //   if(element.idordentrabajo === undefined){
-    //     return;
-    //   }
-
-    //   ids = ids + ',' + element.idordentrabajo;
-
-    // });
-
-
-
-
-  //   this.ref = this.dialogService.open(ModalAsignarTipoOperacionComponent, {
-  //     header: 'Reasignar Recursos',
-  //     width: '50%',
-  //     contentStyle: {overflow: 'auto'},
-  //     baseZIndex: 10000,
-  //     data : {ids }
-  // });
-
-  //   this.ref.onClose.subscribe((product: any) => {
-
-  //     //this.reloadDetalles();
-  //     return ;
-  //   });
-
-  }
    cambiarEstado(){
 
     let ids  = '';

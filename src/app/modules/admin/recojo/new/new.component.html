@@ -86,7 +86,8 @@
           <label class="block text-sm font-semibold text-gray-700 mb-1">Origen: (*)</label>
           <p-dropdown [options]="ubigeo" [(ngModel)]="model.idorigen"
             optionLabel="label" optionValue="value" filter="true"
-            placeholder="Seleccione un origen" class="w-full" appendTo="body">
+            placeholder="Seleccione un origen" class="w-full" appendTo="body"
+            >
          <ng-template let-item pTemplate="selectedItem">
                 <span>{{item.label}}</span>
               </ng-template>

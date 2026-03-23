@@ -46,8 +46,9 @@
                 <div class="p-4">
                     <div class="flex space-x-2 mb-2">
                         <p-button severity="warning" (click)="cambiarEstado()">Actualizar Estado</p-button>
-                        <!-- <p-button severity="primary" (click)="reprogramarArribos()">Reprogramar Arribos</p-button> -->
-                        <!-- <p-button severity="secondary" (click)="cambiarTipoOperacion()">Asignación Etapa 2</p-button> -->
+                        <p-button severity="secondary" icon="pi pi-exchange" label="Reasignar Tipo de Operación"
+                            [disabled]="!selectedOTs?.length || selectedOTs?.length !== 1"
+                            (click)="abrirModalReasignarTipoOperacion()"></p-button>
                         <p-button severity="primary" (click)="reloadDetalles()">Refrescar</p-button> 
                     </div>
 
@@ -88,12 +89,16 @@
     </div>
 
     <p-dialog header="Detalle de Manifiesto" [modal]="true" [(visible)]="modalDetalleManifiesto" [style]="{ width: '75rem' }">
-        
+        <div class="flex space-x-2 mb-3">
+          <p-button severity="secondary" icon="pi pi-exchange" label="Reasignar Tipo de Operación"
+            [disabled]="!selectedOrdenDetalle?.idordentrabajo"
+            (click)="abrirModalReasignarTipoOperacionDesdeDetalle()"></p-button>
+        </div>
                 <p-table   #dt2 [columns]="cols2" dataKey="idordentrabajo"
                 [style]="{width:'100%'}"
                 [rowsPerPageOptions]="[20,40]"
-                [value]="ordenes11"   selectionMode="multiple"
-               
+                [value]="ordenes11"   selectionMode="single"
+                [(selection)]="selectedOrdenDetalle"
                 responsive="true"
                 [rows]="20"  >
 
@@ -128,7 +133,7 @@
                 <td class="ui-resizable-column" style="text-align:center;"> {{rowData.peso }}</td>
                 <td class="ui-resizable-column" style="text-align:center;"> 
 
-                    <p-button icon="pi pi-paperclip" severity="warning" (click)="verOt(rowData.idOrdenTrabajo)" size="small" ></p-button>
+                    <p-button icon="pi pi-paperclip" severity="warning" (click)="verOt(rowData.idordentrabajo)" size="small" ></p-button>
                 </td>
 
 

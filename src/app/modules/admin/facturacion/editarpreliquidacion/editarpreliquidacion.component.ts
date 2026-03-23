@@ -16,7 +16,7 @@ import { InputNumberModule } from 'primeng/inputnumber';
 import { InputTextareaModule } from 'primeng/inputtextarea';
 import { TooltipModule } from 'primeng/tooltip';
 import { FacturacionService } from '../facturacion.service';
-import { PreliquidacionDetalle, OrdenPreliquidacion, AgregarCargoRequest, PendientePreliquidacion, OrdenTrabajoPreliquidacionResult } from '../facturacion.types';
+import { PreliquidacionDetalle, OrdenPreliquidacion, AgregarCargoRequest, OrdenTrabajoRecargoUpdateDto, PendientePreliquidacion, OrdenTrabajoPreliquidacionResult } from '../facturacion.types';
 import { MantenimientoService } from '../../mantenimiento/mantenimiento.service';
 import { User } from 'app/core/user/user.types';
 
@@ -62,11 +62,12 @@ export class EditarpreliquidacionComponent implements OnInit {
   // Para agregar cargos
   displayAgregarCargo: boolean = false;
   ordenSeleccionadaParaCargo: OrdenTrabajoPreliquidacionResult | null = null;
-  cargoModel: any = {
-    concepto: '',
-    monto: 0,
-    descripcion: ''
-  };
+  cargoModel: any = { monto: 0 };
+
+  /** Recargo vía PUT ActualizarRecargoOrdenTrabajo */
+  displayEditarRecargo = false;
+  ordenParaRecargo: OrdenTrabajoPreliquidacionResult | null = null;
+  recargoModel = 0;
 
   cols: any[] = [];
   user: User;
@@ -98,6 +99,7 @@ export class EditarpreliquidacionComponent implements OnInit {
 
   inicializarColumnas(): void {
     this.cols = [
+      { field: 'acciones', header: 'Acciones', width: '120px' },
       { field: 'numcp', header: 'Nro OT', width: '120px' },
       { field: 'fecharegistro', header: 'Fecha Registro', width: '130px' },
       { field: 'destinatario', header: 'Destinatario', width: '200px' },
@@ -109,8 +111,7 @@ export class EditarpreliquidacionComponent implements OnInit {
       { field: 'subtotal', header: 'Subtotal', width: '120px' },
       { field: 'recargo', header: 'Recargo', width: '120px' },
       { field: 'igv', header: 'IGV', width: '120px' },
-      { field: 'total', header: 'Total', width: '120px' },
-      { field: 'acciones', header: 'Acciones', width: '150px' }
+      { field: 'total', header: 'Total', width: '120px' }
     ];
   }
 
@@ -124,12 +125,13 @@ export class EditarpreliquidacionComponent implements OnInit {
         
         // Obtener el idcliente de la primera orden si existe
         const idCliente = ordenes.length > 0 ? ordenes[0].idcliente : undefined;
+        const numeropreliquidacion = ordenes.length > 0 ? ordenes[0].numeropreliquidacion : undefined;
         
         // Inicializar el detalle de la preliquidación con los datos disponibles
         this.preliquidacion = {
           idpreliquidacion: this.idpreliquidacion,
           idcliente: idCliente,
-          numeropreliquidacion: `PREL-${this.idpreliquidacion}` // Placeholder hasta tener endpoint correcto
+          numeropreliquidacion: numeropreliquidacion // Placeholder hasta tener endpoint correcto
         };
         
         this.loading = false;
@@ -266,22 +268,62 @@ export class EditarpreliquidacionComponent implements OnInit {
     });
   }
 
+  abrirEditarRecargo(orden: OrdenTrabajoPreliquidacionResult): void {
+    this.ordenParaRecargo = orden;
+    this.recargoModel = orden.recargo ?? 0;
+    this.displayEditarRecargo = true;
+  }
+
+  actualizarRecargo(): void {
+    if (!this.ordenParaRecargo) {
+      this.messageService.add({
+        severity: 'warn',
+        summary: 'Validación',
+        detail: 'Debe seleccionar una orden de trabajo'
+      });
+      return;
+    }
+
+    const dto: OrdenTrabajoRecargoUpdateDto = {
+      IdOrdenTrabajo: this.ordenParaRecargo.idordentrabajo,
+      Recargo: this.recargoModel
+    };
+
+    this.loading = true;
+    this.facturacionService.actualizarRecargoOrdenTrabajo(dto).subscribe({
+      next: (response: any) => {
+        this.messageService.add({
+          severity: 'success',
+          summary: 'Recargo actualizado',
+          detail: response?.message || 'Recargo actualizado correctamente'
+        });
+        this.displayEditarRecargo = false;
+        this.cargarPreliquidacion();
+      },
+      error: (error) => {
+        console.error('Error al actualizar recargo:', error);
+        this.messageService.add({
+          severity: 'error',
+          summary: 'Error',
+          detail: error.error?.message || 'No se pudo actualizar el recargo'
+        });
+        this.loading = false;
+      }
+    });
+  }
+
   abrirAgregarCargo(orden: OrdenTrabajoPreliquidacionResult): void {
     this.ordenSeleccionadaParaCargo = orden;
-    this.cargoModel = {
-      concepto: '',
-      monto: 0,
-      descripcion: ''
-    };
+    this.cargoModel = { monto: 0 };
     this.displayAgregarCargo = true;
   }
 
   agregarCargo(): void {
-    if (!this.cargoModel.concepto || !this.cargoModel.monto || this.cargoModel.monto <= 0) {
+    if (!this.cargoModel.monto || this.cargoModel.monto <= 0) {
       this.messageService.add({
         severity: 'warn',
         summary: 'Validación',
-        detail: 'Debe completar el concepto y el monto válido'
+        detail: 'Debe ingresar un monto válido'
       });
       return;
     }
@@ -292,9 +334,9 @@ export class EditarpreliquidacionComponent implements OnInit {
 
     const request: AgregarCargoRequest = {
       idordentrabajo: this.ordenSeleccionadaParaCargo.idordentrabajo,
-      concepto: this.cargoModel.concepto,
+      concepto: '',
       monto: this.cargoModel.monto,
-      descripcion: this.cargoModel.descripcion
+      descripcion: ''
     };
 
     this.loading = true;

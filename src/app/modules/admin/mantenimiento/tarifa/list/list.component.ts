@@ -473,7 +473,8 @@ export class ListComponent implements OnInit {
       return;
     }
 
-    import('xlsx').then((xlsx) => {
+    import('xlsx').then((xlsx: any) => {
+      const XLSX: any = xlsx?.default ?? xlsx;
       const exportData = this.tarifas.map(tarifa => ({
         'Cliente': tarifa.razonsocial || '-',
         'Origen - Departamento': tarifa.origendepartamento || '-',
@@ -487,7 +488,6 @@ export class ListComponent implements OnInit {
         'Cobrar Por': tarifa.conceptos || '-',
         'Tipo Unidad': tarifa.tipounidad || '-',
         'Base': tarifa.montobase || 0,
-        'Peso Volumen': tarifa.pesovolumen || 0,
         'Mínimo': tarifa.minimo || 0,
         'Desde': tarifa.desde || 0,
         'Hasta': tarifa.hasta || 0,
@@ -495,9 +495,9 @@ export class ListComponent implements OnInit {
         'Adicional': tarifa.adicional || 0
       }));
 
-      const worksheet = xlsx.utils.json_to_sheet(exportData);
+      const worksheet = XLSX.utils.json_to_sheet(exportData);
       const workbook = { Sheets: { 'Tarifas': worksheet }, SheetNames: ['Tarifas'] };
-      const excelBuffer: any = xlsx.write(workbook, { bookType: 'xlsx', type: 'array' });
+      const excelBuffer: any = XLSX.write(workbook, { bookType: 'xlsx', type: 'array' });
       this.saveAsExcelFile(excelBuffer, 'Tarifas');
     });
   }

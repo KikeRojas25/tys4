@@ -29,6 +29,7 @@ export interface Tarifa {
   autoserv?: boolean;
   val?: boolean;
   conceptos?: string;
+  idconceptocobro?: number;
   idtipounidad?: number;
   tipounidad?: string;
   idtipotransporte?: number;
@@ -42,6 +43,7 @@ export interface Tarifa {
   hasta?: number;
   precio?: number;
   adicional?: number;
+  consideraPesoVolumetrico?: boolean;
   
   // Campos legacy para compatibilidad
   idTarifa?: number;

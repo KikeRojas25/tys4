@@ -1,89 +1,75 @@
+<p-toast></p-toast>
+<p-confirmDialog></p-confirmDialog>
 
-<div class="p-fluid">
+<div class="p-2">
+  <div class="grid grid-cols-1 md:grid-cols-2 gap-3">
+    <div class="field flex flex-col">
+      <label class="block text-sm font-medium text-gray-700 mb-1">Placa</label>
+      <input type="text" pInputText [(ngModel)]="model.placa" placeholder="eje. A6Q330" maxlength="6" />
+    </div>
 
-  <div class="p-field">
-      <label for="placa">Placa</label>
-
-      <input type="text" pInputText id="placa"
-      [(ngModel)]="model.placa"
-      placeholder="eje. A6Q330"
-      maxlength="6" />
-  </div>
-
-  <div class="p-field">
-      <label for="marca">Marca</label>
-      <p-dropdown [options]="marcas" 
-      [(ngModel)]="model.idMarca" 
-      appendTo="body" 
-      [filter]="true"
-      class="w-full"
-      placeholder="Seleccione marca">
-
-      <ng-template let-item pTemplate="selectedItem">
-        <span style="vertical-align:left;">{{item.label}}</span>
-    </ng-template>
-
-
-      </p-dropdown>
-  </div>
-
-  <div class="p-field">
-      <label for="tipoVehiculo">Tipo Vehículo</label>
-      <p-dropdown 
-      name="tiposVehiculo"
-      [options]="tiposVehiculo" 
-      [(ngModel)]="model.idTipo"
-      appendTo="body" 
-      [filter]="true"
-      class="w-full"
-      placeholder="Seleccione tipo">
-       
-          <ng-template let-item pTemplate="selectedItem">
-            <span style="vertical-align:left;">{{item.label}}</span>
-        </ng-template>
-
-
-      </p-dropdown>
-  </div>
-
-  <div class="p-field">
-      <label for="cargaUtil">Carga Útil (Toneladas)</label>
-      <p-inputNumber [(ngModel)]="model.cargaUtil" mode="decimal" [minFractionDigits]="2" [maxFractionDigits]="2" placeholder="Ej: 12.50"></p-inputNumber>
-  </div>
-
-  <div class="p-field">
-      <label for="pesoBruto">Peso Bruto (Toneladas)</label>
-      <p-inputNumber [(ngModel)]="model.pesoBruto" mode="decimal" [minFractionDigits]="2" [maxFractionDigits]="2" placeholder="Ej: 20.75"></p-inputNumber>
-  </div>
-
-  <div class="p-field">
-      <label for="proveedor">Proveedor</label>
+    <div class="field flex flex-col">
+      <label class="block text-sm font-medium text-gray-700 mb-1">Proveedor (Transportista)</label>
       <p-dropdown
-      name="proveedores"
-      [options]="proveedores"
-      [(ngModel)]="model.idProveedor"
-      placeholder="Seleccione proveedor"
-      [virtualScroll]="true"
-      [filter]="true"
-      class="w-full"
-      [virtualScrollItemSize]="30" 
-      [showClear]="true"
-      appendTo="body"
-      [loading]="cargandoProveedores"
-  >
-      <ng-template let-item pTemplate="selectedItem">
-        <span style="vertical-align:left;">{{item.label}}</span>
-    </ng-template>
-
-      
+        [options]="proveedores"
+        [(ngModel)]="model.idProveedor"
+        placeholder="Seleccione proveedor"
+        [virtualScroll]="true"
+        [filter]="true"
+        class="w-full"
+        [virtualScrollItemSize]="30"
+        [showClear]="true"
+        appendTo="body"
+        [loading]="cargandoProveedores">
+        <ng-template let-item pTemplate="selectedItem">
+          <span>{{item.label}}</span>
+        </ng-template>
       </p-dropdown>
+    </div>
+
+    <div class="field flex flex-col">
+      <label class="block text-sm font-medium text-gray-700 mb-1">Marca</label>
+      <p-dropdown
+        [options]="marcas"
+        [(ngModel)]="model.idMarca"
+        appendTo="body"
+        [filter]="true"
+        class="w-full"
+        placeholder="Seleccione marca">
+        <ng-template let-item pTemplate="selectedItem">
+          <span>{{item.label}}</span>
+        </ng-template>
+      </p-dropdown>
+    </div>
+
+    <div class="field flex flex-col">
+      <label class="block text-sm font-medium text-gray-700 mb-1">Tipo Vehículo</label>
+      <p-dropdown
+        [options]="tiposVehiculo"
+        [(ngModel)]="model.idTipo"
+        appendTo="body"
+        [filter]="true"
+        class="w-full"
+        placeholder="Seleccione tipo">
+        <ng-template let-item pTemplate="selectedItem">
+          <span>{{item.label}}</span>
+        </ng-template>
+      </p-dropdown>
+    </div>
+
+    <div class="field flex flex-col">
+      <label class="block text-sm font-medium text-gray-700 mb-1">Carga Útil (Toneladas)</label>
+      <p-inputNumber [(ngModel)]="model.cargaUtil" mode="decimal" [minFractionDigits]="2" [maxFractionDigits]="2" placeholder="Ej: 12.50"></p-inputNumber>
+    </div>
+
+    <div class="field flex flex-col">
+      <label class="block text-sm font-medium text-gray-700 mb-1">Peso Bruto (Toneladas)</label>
+      <p-inputNumber [(ngModel)]="model.pesoBruto" mode="decimal" [minFractionDigits]="2" [maxFractionDigits]="2" placeholder="Ej: 20.75"></p-inputNumber>
+    </div>
+  </div>
+
+  <div class="flex justify-end gap-2 mt-4">
+    <button pButton type="button" label="Cancelar" class="p-button-secondary" icon="pi pi-times" (click)="cerrarModal()"></button>
+    <button pButton type="button" label="Guardar" icon="pi pi-check" (click)="actualizarVehiculo()"></button>
   </div>
 </div>
-
-  <p-button label="Guardar" icon="pi pi-check" (onClick)="actualizarVehiculo()"></p-button>
-  <p-button label="Cancelar" icon="pi pi-times" (onClick)="cerrarModal()" class="p-button-secondary"></p-button>
-
-  
-
-<p-confirmDialog />
-<p-toast />

@@ -19,10 +19,19 @@ export interface User {
     usr_str_red: string;
     idestacionorigen? : number;
     estrafico?: boolean;
+    esalmacen?: boolean;
     idclientes: string;
     
     usr_str_nombre: string;
     usr_str_apellidos: string;
     idequipo: number;
     
+}
+
+export interface UserForUpdateDto {
+    Id: number;
+    Nombres: string;
+    Apellidos: string;
+    Email: string;
+    clientesids: string[];
 }

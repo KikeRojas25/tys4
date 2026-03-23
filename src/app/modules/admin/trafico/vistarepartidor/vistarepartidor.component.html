@@ -1,7 +1,7 @@
 <div class="flex flex-col flex-auto min-w-0">
-  <div class="flex flex-col sm:flex-row flex-0 sm:items-center sm:justify-between p-6 sm:py-8 sm:px-10 border-b bg-card dark:bg-transparent">
+  <div class="flex flex-col sm:flex-row flex-0 sm:items-center sm:justify-between p-3 sm:py-4 sm:px-6 border-b bg-card dark:bg-transparent">
     <div class="flex-1 min-w-0">
-      <div class="flex flex-wrap items-center font-medium">
+      <div class="flex flex-wrap items-center font-medium text-sm">
         <div>
           <a class="whitespace-nowrap text-primary-500">TMS</a>
         </div>
@@ -14,15 +14,15 @@
           <a class="ml-1 text-primary-500" [routerLink]="['/trafico/integrado']">Módulo Integrado</a>
         </div>
       </div>
-      <div class="mt-2">
-        <h2 class="text-3xl md:text-4xl font-extrabold tracking-tight leading-7 sm:leading-10 truncate"> Vista por Proveedor de reparto  </h2>
+      <div class="mt-1">
+        <h2 class="text-lg md:text-xl font-extrabold tracking-tight leading-5 sm:leading-7 truncate"> Vista por Proveedor de reparto  </h2>
       </div>
     </div>
   </div>
-  <div class="bg-primary text-white p-4 rounded-t-lg">
-    <div class="grid grid-cols-3 gap-4 p-4 bg-gray-100 rounded-lg shadow">
-    <h3 class="text-lg text-gray-700 uppercase">Repartidor: {{ repartidor.nombre }}</h3>
-    <div class="flex items-center space-x-6 text-base text-gray-700 uppercase">
+  <div class="bg-primary text-white p-2 rounded-t-lg">
+    <div class="grid grid-cols-3 gap-2 p-2 bg-gray-100 rounded-lg shadow">
+    <h3 class="text-xs text-gray-700 uppercase">Repartidor: {{ repartidor.nombre }}</h3>
+    <div class="flex items-center space-x-4 text-xs text-gray-700 uppercase">
       <span>Dirección: {{ repartidor.direccion }}</span>
       <!-- <span>Teléfono: {{ repartidor.telefono }}</span> -->
       <span>Provincia: {{ repartidor.provincia }}</span>
@@ -30,9 +30,9 @@
   </div>
 </div>
   
-  <div class="text-white p-4 rounded-t-lg">
+  <div class="text-white p-2 rounded-t-lg">
 
-<p-tabView class="mt-4">
+<p-tabView class="mt-2" [style]="{'font-size': '0.875rem'}">
 
   <p-tabPanel>
 
@@ -48,6 +48,7 @@
        <button class="btn-danger btn" pButton label="Reasignar " icon="pi pi-exchange"
                 iconPos="left" (click)="asignarTipoOperacion()"></button>
       <button   class='btn-primary btn mr-2' pButton iconPos="left" label="Refrescar"    (click)="reloadDetalles()"  type="button"></button>
+      <button   class='btn-success btn mr-2' pButton iconPos="left" label="Copiar para WhatsApp" icon="pi pi-whatsapp"    (click)="copiarDatosWhatsApp('Pend. Recepción')"  type="button"></button>
     </div>
 
 
@@ -111,16 +112,29 @@
       <button   class='btn-danger btn mr-2' pButton iconPos="left" label="Actualizar Estado"   (click)="cambiarEstadoRecojo()"  type="button"></button>
       <!-- <button   class='btn-primary btn mr-2' pButton iconPos="left" label="Reprogramar Arribos"    (click)="reprogramarArribos()"  type="button"></button>
       <button   class='btn-primary btn mr-2' pButton iconPos="left" label="Cambio de Recursos"    (click)="cambiarTipoOperacion()"  type="button"></button> -->
+      <button class='btn-warning btn mr-2'
+              pButton
+              iconPos="left"
+              label="Cambiar repartidor"
+              icon="pi pi-user-edit"
+              type="button"
+              [disabled]="!selectedOrdenRecojo?.idordentrabajo"
+              (click)="abrirModalReasignarRepartidor()">
+      </button>
       <button   class='btn-primary btn mr-2' pButton iconPos="left" label="Refrescar"    (click)="reloadDetalles()"  type="button"></button>
+      <button   class='btn-success btn mr-2' pButton iconPos="left" label="Copiar para WhatsApp" icon="pi pi-whatsapp"    (click)="copiarDatosWhatsApp('Pend. Recojo')"  type="button"></button>
     </div>
 
 
         <p-table  [columns]="cols3" selectionMode="single"
-        [style]="{width:'100%'}"  dataKey="idManifiesto"
+        [style]="{width:'100%'}"  dataKey="idordentrabajo"
         [rowsPerPageOptions]="[50,100,200,400]"
-        [value]="despachos" #dt [paginator]="true"
-        [(selection)]="selectedManifiestoRecojo"
-        [rows]="50"  [responsive]="true" >
+        [value]="ordenesRecojo" #dt [paginator]="true"
+        [(selection)]="selectedOrdenRecojo"
+        [rows]="50"  [responsive]="true"
+        [scrollable]="true"
+        scrollHeight="70vh"
+        [tableStyle]="{ 'min-width': '140rem' }">
 
 
           <ng-template pTemplate="colgroup" let-columns>
@@ -140,25 +154,29 @@
             </tr>
         </ng-template>
 
-      <ng-template pTemplate="body" let-rowData  let-index="rowIndex">
+      <ng-template pTemplate="body" let-rowData>
         <tr [pSelectableRow]="rowData">
-
-          <td class="ui-resizable-column" style="background-color: #d15f4a; color: aliceblue; text-align:center;" > {{ rowData.numHojaRuta    }}   </td>
-          <td class="ui-resizable-column" style="background-color: #d15f4a; color: aliceblue; text-align:center;" > {{ rowData.numManifiesto    }}   </td>
-          <td class="ui-resizable-column" style="text-align:center;" > {{ rowData.destino    }}   </td>
-
-          <td class="ui-resizable-column" style="text-align:center;"> {{rowData.agencia   }}</td>
-          <td class="ui-resizable-column" style="text-align:center;"> {{rowData.remitente   }}</td>
-          <td class="ui-resizable-column" style="text-align:center;"> {{rowData.consignadoagencia  }}</td>
-
-          <td class="ui-resizable-column" style="text-align:center;"> {{rowData.fechaDespacho  | date: 'dd/MM/yyyy' }}</td>
-          <td class="ui-resizable-column" style="text-align:center;"> {{ rowData.claveagencia   }}</td>
-          <td class="ui-resizable-column" style="text-align:center;"> {{ rowData. nroremito   }}</td>
-          <td class="ui-resizable-column" style="text-align:center;"> S/. {{ rowData.costoenvio  | number:'1.0-2'  }}</td>
-
-           <td class="ui-resizable-column" style="text-align:left;">
-            <p-button  severity="success"  title='Ver' icon="fa fa-search" (click)='verEventos(rowData.idManifiesto);'>  </p-button>
-        </td> 
+          <td class="ui-resizable-column" style="background-color: #d15f4a; color: aliceblue; text-align:center;">
+            {{ rowData.numcp }}
+          </td>
+          <td class="ui-resizable-column" style="text-align:center;">{{ rowData.estado }}</td>
+          <td class="ui-resizable-column" style="text-align:left;">{{ rowData.razonsocial }}</td>
+          <td class="ui-resizable-column" style="text-align:left;">{{ rowData.origen }}</td>
+          <td class="ui-resizable-column" style="text-align:center;">{{ rowData.puntorecojo }}</td>
+          <td class="ui-resizable-column" style="text-align:right;">{{ rowData.peso | number:'1.2-2' }}</td>
+          <td class="ui-resizable-column" style="text-align:right;">{{ rowData.bulto }}</td>
+          <td class="ui-resizable-column" style="text-align:right;">{{ rowData.pesovol | number:'1.2-2' }}</td>
+          <td class="ui-resizable-column" style="text-align:right;">{{ rowData.volumen | number:'1.2-2' }}</td>
+          <td class="ui-resizable-column" style="text-align:left;">{{ rowData.cliente }}</td>
+          <td class="ui-resizable-column" style="text-align:center;">{{ rowData.fecharegistro | date:'dd/MM/yyyy' }}</td>
+          <td class="ui-resizable-column" style="text-align:center;">{{ rowData.fechahoracita | date:'dd/MM/yyyy HH:mm' }}</td>
+          <td class="ui-resizable-column" style="text-align:center;">{{ rowData.fechahoracitareal | date:'dd/MM/yyyy HH:mm' }}</td>
+          <td class="ui-resizable-column" style="text-align:left;">
+            <div class="flex gap-1">
+              <p-button severity="success" title="Ver" icon="fa fa-search" (click)="vertracking(rowData.idordentrabajo);"></p-button>
+              <p-button icon="pi pi-plus" severity="info" size="small" title="Crear OTR" (click)="irANuevaOTRDesdeRecojo(rowData)"></p-button>
+            </div>
+          </td>
         </tr>
       </ng-template>
       </p-table>
@@ -169,13 +187,14 @@
 
   <p-tabPanel>
       <ng-template pTemplate="header">
-     Ordenes en Reparto
+     O.T. en Reparto
       <p-badge [value]="totalReparto" severity="info" class="ml-1"></p-badge>
     </ng-template>
 
     <div class="row mb-2">
       <button   class='btn-danger btn mr-2' pButton iconPos="left" label="Actualizar Estado"   (click)="modalEntregarOT()"  type="button"></button>
       <!-- <button   class='btn-secondary btn mr-2' pButton iconPos="left" label="Actualizar ETA"   (click)="modalActualizarETA()"  type="button"></button> -->
+      <button   class='btn-success btn mr-2' pButton iconPos="left" label="Copiar para WhatsApp" icon="pi pi-whatsapp"    (click)="copiarDatosWhatsApp('O.T. en Reparto')"  type="button"></button>
     </div>
 
 
@@ -233,6 +252,10 @@
       <p-badge [value]="totalRecabarCargo" severity="info" class="ml-1"></p-badge>
     </ng-template>
    
+    <div class="row mb-2">
+      <button   class='btn-success btn mr-2' pButton iconPos="left" label="Copiar para WhatsApp" icon="pi pi-whatsapp"    (click)="copiarDatosWhatsApp('Pend. Recabar Cargo')"  type="button"></button>
+    </div>
+
     <p-table  [columns]="cols2" selectionMode="single"
     [style]="{width:'100%'}"  dataKey="idordentrabajo"
     [rowsPerPageOptions]="[50,100,200,400]"
@@ -285,6 +308,10 @@
       <p-badge [value]="totalEnviarCargo" severity="info" class="ml-1"></p-badge>
     </ng-template>
     
+    <div class="row mb-2">
+      <button   class='btn-success btn mr-2' pButton iconPos="left" label="Copiar para WhatsApp" icon="pi pi-whatsapp"    (click)="copiarDatosWhatsApp('Pend. Envio Cargo')"  type="button"></button>
+    </div>
+
     <p-table  [columns]="cols2" selectionMode="single"
     [style]="{width:'100%'}"  dataKey="idordentrabajo"
     [rowsPerPageOptions]="[50,100,200,400]"
@@ -339,6 +366,9 @@
       <p-badge [value]="totalObservadas" severity="info" class="ml-1"></p-badge>
     </ng-template>
 
+    <div class="row mb-2">
+      <button   class='btn-success btn mr-2' pButton iconPos="left" label="Copiar para WhatsApp" icon="pi pi-whatsapp"    (click)="copiarDatosWhatsApp('Observadas')"  type="button"></button>
+    </div>
 
     <p-table  [columns]="cols2" selectionMode="single"
     [style]="{width:'100%'}"  dataKey="idordentrabajo"
@@ -377,10 +407,74 @@
       <td class="ui-resizable-column" style="text-align:center;" > {{ rowData.peso    }}   </td>
       <td class="ui-resizable-column" style="background-color: #FFA000; color:black; text-align:center;">  {{rowData.tipoentrega   }}   </td>
          <td class="ui-resizable-column" style="text-align:center;"> 
-        <p-button icon="pi pi-paperclip" severity="warning" (click)="verOt(rowData.idordentrabajo)" size="small" ></p-button>
+        <div class="flex gap-1">
+          <p-button icon="pi pi-paperclip" severity="warning" (click)="verOt(rowData.idordentrabajo)" size="small" title="Ver OT"></p-button>
+          <p-button
+            [icon]="esEstadoParcial(rowData) ? 'pi pi-plus' : 'pi pi-refresh'"
+            severity="info"
+            (click)="accionOTRDesdeObservadas(rowData)"
+            size="small"
+            [title]="esEstadoParcial(rowData) ? 'Crear OTR (retorno parcial)' : 'Generar OTR logística inversa'">
+          </p-button>
+        </div>
       </td>
     </tr>
     </ng-template>
+    </p-table>
+
+  </p-tabPanel>
+
+  <p-tabPanel>
+    <ng-template pTemplate="header">
+      Pend. Despacho
+      <p-badge [value]="totalPendientesDespacho" severity="info" class="ml-1"></p-badge>
+    </ng-template>
+
+    <div class="row mb-2">
+      <button class='btn-primary btn mr-2' pButton iconPos="left" label="Refrescar" (click)="reloadDetalles()" type="button"></button>
+      <button   class='btn-success btn mr-2' pButton iconPos="left" label="Copiar para WhatsApp" icon="pi pi-whatsapp"    (click)="copiarDatosWhatsApp('Pend. Despacho')"  type="button"></button>
+    </div>
+
+    <p-table [columns]="cols6" selectionMode="single"
+      [style]="{width:'100%'}" dataKey="idordentrabajo"
+      [rowsPerPageOptions]="[50,100,200,400]"
+      [value]="ordenes6" #dt [paginator]="true"
+      [(selection)]="SelectedOrdenTransporte"
+      [rows]="50" [responsive]="true">
+
+      <ng-template pTemplate="colgroup" let-columns>
+        <colgroup>
+          <col *ngFor="let col of columns" [ngStyle]="{'width': col.width}">
+        </colgroup>
+      </ng-template>
+
+      <ng-template pTemplate="header" let-columns>
+        <tr>
+          <th [ngStyle]="{'width': col.width}" *ngFor="let col of columns" pResizableColumn [pSortableColumn]="col.field">
+            {{col.header}}
+          </th>
+        </tr>
+      </ng-template>
+
+      <ng-template pTemplate="body" let-rowData let-index="rowIndex">
+        <tr [pSelectableRow]="rowData">
+          <td class="ui-resizable-column" style="background-color: #2ba512; color: aliceblue; text-align:center;"> {{ rowData.numCp }} </td>
+          <td class="ui-resizable-column" style="background-color: #2ba512; color: aliceblue; text-align:center;"> {{ rowData.numCpOtOriginal }} </td>
+          <td class="ui-resizable-column" style="text-align:center;"> {{ rowData.fechaRegistro | date:'dd/MM/yyyy' }} </td>
+          <td class="ui-resizable-column" style="text-align:center;"> {{rowData.cliente }} </td>
+          <td class="ui-resizable-column" style="text-align:center;"> {{rowData.destino }} </td>
+          <td class="ui-resizable-column" style="text-align:center;"> {{ rowData.fechaentregareparto | date:'dd/MM/yyyy HH:mm' }} </td>
+          <td class="ui-resizable-column" style="text-align:center;"> {{ rowData.bulto }} </td>
+          <td class="ui-resizable-column" style="text-align:center;"> {{ rowData.peso }} </td>
+          <td class="ui-resizable-column" style="background-color: #FFA000; color:black; text-align:center;"> {{rowData.estado }} </td>
+          <td class="ui-resizable-column" style="text-align:center;"> 
+            <div class="flex gap-1">
+              <p-button icon="pi pi-paperclip" severity="warning" (click)="verOt(rowData.idordentrabajo)" size="small" title="Ver OT"></p-button>
+              <p-button icon="pi pi-file" severity="info" (click)="generarManifiestoVirtual(rowData.numCp)" size="small" title="Generar Manifiesto Virtual"></p-button>
+            </div>
+          </td>
+        </tr>
+      </ng-template>
     </p-table>
 
   </p-tabPanel>
@@ -456,4 +550,5 @@
 </p-dialog>
 
 
-<p-toast />
+<p-toast />
+<p-confirmDialog />

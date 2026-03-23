@@ -1,0 +1,229 @@
+<div class="flex flex-col flex-auto min-w-0 bg-gray-50">
+  <p-toast />
+
+  <!-- Header -->
+  <div class="flex flex-col sm:flex-row flex-0 sm:items-center sm:justify-between p-2 sm:py-8 sm:px-10 border-b border-gray-200 bg-white shadow-sm">
+    <div class="flex-1 min-w-0">
+      <div class="flex flex-wrap items-center font-medium text-sm text-gray-600">
+        <div>
+          <a class="whitespace-nowrap text-gray-700 hover:text-gray-900">TMS</a>
+        </div>
+        <div class="flex items-center ml-1 whitespace-nowrap">
+          <mat-icon class="fuse-horizontal-navigation-item-icon text-gray-400" [svgIcon]="'heroicons_solid:chevron-right'"></mat-icon>
+          <a [routerLink]="['/seguimientoot/integradocomercial']" class="ml-1 text-gray-700 hover:text-gray-900 cursor-pointer">Integrado comercial</a>
+        </div>
+        <div class="flex items-center ml-1 whitespace-nowrap">
+          <mat-icon class="fuse-horizontal-navigation-item-icon text-gray-400" [svgIcon]="'heroicons_solid:chevron-right'"></mat-icon>
+          <span class="ml-1 text-gray-500">Detalle OTs por cliente</span>
+        </div>
+      </div>
+      <div class="mt-2 flex items-center gap-4">
+        <h2 class="text-3xl md:text-4xl font-semibold tracking-tight leading-7 sm:leading-10 truncate text-gray-900">
+          {{ clienteNombre || 'Cliente' }}
+        </h2>
+        <button pButton type="button" icon="pi pi-arrow-left" label="Volver" (click)="volver()"
+          class="px-4 py-2 text-sm font-medium text-gray-700 bg-white border border-gray-300 hover:bg-gray-50 rounded-md"></button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Filtros mínimos -->
+  <div class="p-4 bg-white border-b border-gray-200">
+    <div class="flex flex-wrap gap-4 items-end">
+      <div class="flex flex-col">
+        <label class="mb-1 text-sm font-medium text-gray-700">Fecha inicio</label>
+        <p-calendar [(ngModel)]="dateInicio" baseZIndex="100" appendTo="body"
+          dateFormat="dd/mm/yy" [style]="{'width':'180px'}">
+        </p-calendar>
+      </div>
+      <div class="flex flex-col">
+        <label class="mb-1 text-sm font-medium text-gray-700">Fecha fin</label>
+        <p-calendar [(ngModel)]="dateFin" baseZIndex="100" appendTo="body"
+          dateFormat="dd/mm/yy" [style]="{'width':'180px'}">
+        </p-calendar>
+      </div>
+      <button pButton type="button" icon="pi pi-search" label="Buscar" (click)="buscar()" [loading]="loading"
+        class="px-4 py-2 text-sm font-medium"></button>
+    </div>
+  </div>
+
+  <!-- Tabla -->
+  <div class="flex flex-col min-w-0 p-4">
+    <div class="bg-white rounded-lg shadow-sm border border-gray-200 overflow-hidden">
+      <div class="p-4">
+        <p-table
+          [value]="ordenes"
+          [paginator]="true"
+          [rows]="40"
+          [rowsPerPageOptions]="[40, 80, 160, 320]"
+          [columns]="cols"
+          scrollHeight="75vh"
+          [resizableColumns]="true"
+          [tableStyle]="{ 'table-layout': 'fixed', 'width': '100%' }"
+          [scrollable]="true"
+          [loading]="loading"
+          [styleClass]="'custom-table'"
+          class="w-full">
+
+          <ng-template pTemplate="colgroup" let-columns>
+            <colgroup>
+              <col *ngFor="let col of cols" [style.width]="col.width">
+            </colgroup>
+          </ng-template>
+
+          <ng-template pTemplate="header" let-columns>
+            <tr class="bg-gray-800 text-white">
+              <th *ngFor="let col of cols" [pSortableColumn]="col.field"
+                class="px-4 py-3 text-sm font-semibold text-gray-100 border-b border-gray-700 text-center">
+                {{ col.header }}
+              </th>
+            </tr>
+          </ng-template>
+
+          <ng-template pTemplate="body" let-rowData>
+            <tr class="border-b border-gray-100 hover:bg-gray-50 transition-colors duration-150">
+              <td class="text-center px-2 py-2">
+                <div class="flex gap-1 justify-center items-center">
+                  <button pButton class="action-btn action-btn-info" icon="pi pi-download"
+                    title="Ver Fotos" (click)="verarchivos(rowData.idordentrabajo)"></button>
+                  <button pButton class="action-btn action-btn-success" icon="pi pi-search"
+                    title="Ver Tracking" (click)="vertracking(rowData.idordentrabajo)"></button>
+                </div>
+              </td>
+              <td class="px-4 py-3 text-left text-sm">
+                <div class="flex flex-col gap-0.5">
+                  <span class="text-gray-800 font-medium">{{ rowData.provincia }}</span>
+                  <span class="text-gray-500 text-xs">{{ rowData.destinatario }}</span>
+                </div>
+              </td>
+              <td class="px-4 py-3 text-center">
+                <a class="text-amber-700 hover:text-amber-900 font-semibold cursor-pointer underline"
+                  (click)="verot(rowData.idordentrabajo)">{{ rowData.numcp }}</a>
+              </td>
+              <td class="text-center px-4 py-3 text-gray-700 text-sm">{{ rowData.fecharecojo | date:'dd/MM/yyyy' }}</td>
+              <td class="text-center px-4 py-3 text-gray-700 text-sm">{{ rowData.fechadespacho | date:'dd/MM/yyyy' }}</td>
+              <td class="text-center px-4 py-3 text-gray-700 text-sm">{{ rowData.fechaentrega | date:'dd/MM/yyyy' }}</td>
+              <td class="text-center px-4 py-3 text-gray-700 text-sm word-wrap">{{ rowData.estacionorigen }}</td>
+              <td class="text-center px-4 py-3">
+                <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium"
+                  [ngClass]="{
+                    'bg-gray-100 text-gray-800': rowData.estado === 'Registrado',
+                    'bg-amber-100 text-amber-800': rowData.estado === 'Programado',
+                    'bg-green-100 text-green-800': rowData.estado === 'Entregado',
+                    'bg-blue-100 text-blue-800': rowData.estado === 'En Ruta' || rowData.estado === 'En Reparto'
+                  }">
+                  {{ rowData.estado }}
+                </span>
+              </td>
+              <td class="text-center px-4 py-3 text-gray-700 text-sm">{{ rowData.subestado }}</td>
+              <td class="text-center px-4 py-3 text-gray-700 text-sm">{{ rowData.origen }}</td>
+              <td class="text-center px-4 py-3 text-gray-700 text-sm">{{ rowData.subtotal }}</td>
+              <td class="text-center px-4 py-3 text-gray-700 text-sm">{{ rowData.nummanifiesto }}</td>
+              <td class="text-center px-4 py-3 text-gray-700 text-sm">{{ rowData.numhojaruta }}</td>
+              <td class="text-center px-4 py-3 text-gray-700 text-sm">{{ rowData.cantidad }}</td>
+              <td class="text-center px-4 py-3 text-gray-700 text-sm">{{ rowData.peso | number:'1.0-0' }}</td>
+              <td class="text-center px-4 py-3 text-gray-700 text-sm">{{ rowData.pesovol | number:'1.0-0' }}</td>
+            </tr>
+          </ng-template>
+
+          <ng-template pTemplate="emptymessage">
+            <tr>
+              <td [attr.colspan]="cols.length" class="text-center py-12 text-gray-500">
+                No hay órdenes de transporte para este cliente en el rango de fechas seleccionado.
+              </td>
+            </tr>
+          </ng-template>
+        </p-table>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Modal Tracking OTs -->
+<p-dialog header="Tracking OTs" [modal]="true" [(visible)]="dialoglifecycle" [style]="{ width: '80rem' }">
+  <div class="p-4">
+    <p-table [value]="events" class="text-sm w-full">
+      <ng-template pTemplate="header">
+        <tr>
+          <th>Evento</th>
+          <th>Fecha registro</th>
+          <th>Fecha evento</th>
+          <th>Usuario registro</th>
+          <th style="width: 120px;">Acción</th>
+        </tr>
+      </ng-template>
+      <ng-template pTemplate="body" let-event>
+        <tr>
+          <td>
+            <span
+              class="badge-simulation"
+              [ngStyle]="{
+                'background-color': event.dateEvent ? '#17a2b8' : '#ffc107',
+                'color': event.dateEvent ? 'white' : 'black'
+              }"
+              style="display: inline-block; padding: 0.2rem 0.5rem; border-radius: 1rem; text-align: center;">
+              {{ event.status || 'Sin Estado' }}
+            </span>
+          </td>
+          <td>
+            {{ event.dateEvent ? (event.dateRegister ? (event.dateRegister | date:'dd/MM/yyyy HH:mm') : 'Sin dato') : 'Sin dato' }}
+          </td>
+          <td>
+            {{ event.dateEvent ? (event.dateEvent | date:'dd/MM/yyyy HH:mm') : 'Sin evento' }}
+          </td>
+          <td>
+            {{ event.dateEvent ? (event.user || 'Sin dato') : 'Sin dato' }}
+          </td>
+          <td class="text-center">
+            <button pButton type="button" icon="pi pi-cog" label="Ver" class="p-button-sm"
+              (click)="openEventAction(event)">
+            </button>
+          </td>
+        </tr>
+      </ng-template>
+    </p-table>
+
+    <p-dialog
+      [(visible)]="actionDialogVisible"
+      [modal]="true"
+      [closable]="true"
+      [dismissableMask]="true"
+      [style]="{ width: '40rem' }"
+      [header]="currentAction?.title || 'Acción'">
+      <ng-container [ngSwitch]="currentAction?.type">
+        <div *ngSwitchCase="'ot-creada'" class="space-y-2">
+          <p class="text-sm text-gray-700">Se creó la OT {{ ordenTransporte?.numcp }}.</p>
+          <button pButton label="Ver datos básicos" icon="pi pi-search" (click)="verot(ordenTransporte?.idordentrabajo); actionDialogVisible=false" class="p-button-text"></button>
+        </div>
+        <div *ngSwitchCase="'ot-planificada'" class="space-y-2">
+          <p class="text-sm text-gray-700">La OT fue planificada. Puedes revisar asignaciones.</p>
+        </div>
+        <div *ngSwitchCase="'manifiesto-hr'" class="space-y-2">
+          <p class="text-sm">Manifiesto: <b>{{ ordenTransporte?.nummanifiesto || '—' }}</b></p>
+          <p class="text-sm">Hoja de Ruta: <b>{{ ordenTransporte?.numhojaruta || '—' }}</b></p>
+          <button pButton label="Ver Manifiesto" icon="pi pi-external-link" class="p-button-sm"
+            (click)="vernummanifiesto(currentAction?.payload?.row?.nummanifiesto || ordenTransporte?.nummanifiesto)"></button>
+        </div>
+        <div *ngSwitchCase="'ot-despachada'" class="space-y-2">
+          <p class="text-sm">La OT fue despachada el <b>{{ ordenTransporte?.fechadespacho | date:'dd/MM/yyyy HH:mm' }}</b>.</p>
+        </div>
+        <div *ngSwitchCase="'en-zona'" class="space-y-2">
+          <p class="text-sm">Ingreso a zona el <b>{{ ordenTransporte?.fechaenzona | date:'dd/MM/yyyy HH:mm' }}</b>.</p>
+        </div>
+        <div *ngSwitchCase="'en-reparto'" class="space-y-2">
+          <p class="text-sm">La OT está en reparto desde <b>{{ ordenTransporte?.fechaentregareparto | date:'dd/MM/yyyy HH:mm' }}</b>.</p>
+        </div>
+        <div *ngSwitchCase="'entrega-ok'" class="space-y-2">
+          <p class="text-sm">Entregada el <b>{{ ordenTransporte?.fechaentrega | date:'dd/MM/yyyy HH:mm' }}</b>.</p>
+          <p-button label="" size="small" title="Ver Fotos" icon="pi pi-download" (click)="verarchivos(ordenTransporte?.idordentrabajo)"></p-button>
+        </div>
+        <div *ngSwitchDefault class="text-sm text-gray-600">
+          No hay una acción configurada para este estado.
+        </div>
+      </ng-container>
+      <ng-template pTemplate="footer">
+        <button pButton label="Cerrar" class="p-button-text" (click)="actionDialogVisible=false"></button>
+      </ng-template>
+    </p-dialog>
+  </div>
+</p-dialog>

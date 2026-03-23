@@ -1,0 +1,105 @@
+<div class="flex flex-col flex-auto min-w-0 bg-gray-50">
+  <!-- Header -->
+  <div class="flex flex-col sm:flex-row flex-0 sm:items-center sm:justify-between p-2 sm:py-8 sm:px-10 border-b border-gray-200 bg-white shadow-sm">
+    <div class="flex-1 min-w-0">
+      <div class="flex flex-wrap items-center font-medium text-sm text-gray-600">
+        <div>
+          <a class="whitespace-nowrap text-gray-700 hover:text-gray-900">TMS</a>
+        </div>
+        <div class="flex items-center ml-1 whitespace-nowrap">
+          <mat-icon class="fuse-horizontal-navigation-item-icon text-gray-400" [svgIcon]="'heroicons_solid:chevron-right'"></mat-icon>
+          <a class="ml-1 text-gray-700 hover:text-gray-900">Mantenimiento</a>
+        </div>
+      </div>
+      <div class="mt-2">
+        <h2 class="text-3xl md:text-4xl font-semibold tracking-tight leading-7 sm:leading-10 truncate text-gray-900">Editar proveedor</h2>
+        <p class="text-sm text-amber-700 mt-1.5">Actualización de proveedor</p>
+      </div>
+    </div>
+  </div>
+
+  <p-toast />
+  <p-confirmDialog />
+
+  <div class="main-content container-fluid p-2">
+    <form [formGroup]="form" (ngSubmit)="guardar()">
+      <p-panel header="Datos del proveedor" class="w-full mb-3 custom-header-panel">
+        <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+
+          <div class="field flex flex-col">
+            <label>Tipo Proveedor (*)</label>
+            <p-dropdown
+              [options]="tipos"
+              formControlName="tipoId"
+              appendTo="body"
+              [filter]="true"
+              placeholder="Seleccione un tipo"
+              class="input-form-field"
+              [style]="{'width':'100%'}">
+              <ng-template let-item pTemplate="selectedItem">
+                <span>{{item.label}}</span>
+              </ng-template>
+            </p-dropdown>
+            <div *ngIf="form.get('tipoId')?.invalid && form.get('tipoId')?.touched" class="alert-danger">
+              <div>Requiere seleccionar un tipo.</div>
+            </div>
+          </div>
+
+          <div class="field flex flex-col">
+            <label>RUC (*)</label>
+            <input pInputText formControlName="ruc" [style]="{'width':'100%'}" placeholder="Ingrese RUC" autocomplete="off" />
+            <div *ngIf="form.get('ruc')?.invalid && form.get('ruc')?.touched" class="alert-danger">
+              <div>Requiere ingresar un RUC válido.</div>
+            </div>
+          </div>
+
+          <div class="field flex flex-col md:col-span-3">
+            <label>Razón Social (*)</label>
+            <input pInputText formControlName="razonSocial" [style]="{'width':'100%'}" placeholder="Ingrese razón social" autocomplete="off" />
+            <div *ngIf="form.get('razonSocial')?.invalid && form.get('razonSocial')?.touched" class="alert-danger">
+              <div>Requiere ingresar la razón social.</div>
+            </div>
+          </div>
+
+          <div class="field flex flex-col md:col-span-3">
+            <label>Dirección (*)</label>
+            <input pInputText formControlName="direccion" [style]="{'width':'100%'}" placeholder="Ingrese dirección" autocomplete="off" />
+            <div *ngIf="form.get('direccion')?.invalid && form.get('direccion')?.touched" class="alert-danger">
+              <div>Requiere ingresar la dirección.</div>
+            </div>
+          </div>
+
+          <div class="field flex flex-col">
+            <label>Teléfono</label>
+            <input pInputText formControlName="telefono" [style]="{'width':'100%'}" placeholder="Ingrese teléfono" autocomplete="off" />
+          </div>
+
+          <div class="field flex flex-col" *ngIf="form.get('tipoId')?.value === 21514">
+            <label>Provincia repartidor (*)</label>
+            <p-dropdown
+              [options]="provinciasRepartidor"
+              formControlName="idProvinciaRepartidor"
+              appendTo="body"
+              [filter]="true"
+              placeholder="Seleccione provincia"
+              class="input-form-field"
+              [style]="{'width':'100%'}">
+              <ng-template let-item pTemplate="selectedItem">
+                <span>{{item.label}}</span>
+              </ng-template>
+            </p-dropdown>
+            <div *ngIf="form.get('idProvinciaRepartidor')?.invalid && form.get('idProvinciaRepartidor')?.touched" class="alert-danger">
+              <div>Requiere seleccionar una provincia para el repartidor.</div>
+            </div>
+          </div>
+        </div>
+      </p-panel>
+
+      <div class="flex justify-end gap-2 mt-2">
+        <button pButton type="submit" label="Actualizar" icon="pi pi-check" [disabled]="loading"></button>
+        <button pButton type="button" label="Cancelar" class="p-button-secondary" icon="pi pi-times" (click)="cancelar()"></button>
+      </div>
+    </form>
+  </div>
+</div>
+

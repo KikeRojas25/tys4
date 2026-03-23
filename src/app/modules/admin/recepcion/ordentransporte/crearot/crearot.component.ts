@@ -295,6 +295,12 @@ export class CrearotComponent implements OnInit {
 
     if (this.form.valid) {
      
+      // Transformar guiasGrr a formato que espera el backend (List<GuiaGrrDto>)
+      const guiasRemitenteDto = this.guiasGrr.map(guia => ({
+        nroGrr: guia.nroGrr,
+        nroDocumento: guia.nroDocumento || ''
+      }));
+
       // Implementa la lógica de registro aquí.
       this.model = { 
         ...this.form.value, // Asignar todos los valores del formulario al modelo
@@ -302,7 +308,8 @@ export class CrearotComponent implements OnInit {
         tipoorden: 1,
         idestacionorigen: this.user.idestacionorigen,
         idusuarioregistro: this.user.id,
-        etiquetas: [...this.etiquetas] // Agregar las etiquetas actualizadas al modelo  
+        etiquetas: [...this.etiquetas], // Agregar las etiquetas actualizadas al modelo
+        guiasremitente: guiasRemitenteDto // Enviar como List<GuiaGrrDto>
     };
 
 
@@ -539,6 +546,7 @@ else {
     
     const [prefix, initialNumber] = this.model.guiaInicial.split('-');
     const start = parseInt(initialNumber, 10);
+    const numeroLength = initialNumber.length; // Longitud original del número (incluyendo ceros)
 
     if (isNaN(start)) {
       this.messageService.add({
@@ -554,15 +562,21 @@ else {
 
     // Generar las guías en la nueva tabla
     for (let i = 0; i < this.model.cantidadguias; i++) {
-      const nroGrr = `${prefix}-${start + i}`;
-      this.guias.push(nroGrr);
+      // Mantener el formato exacto con ceros a la izquierda
+      const numeroFormateado = String(start + i).padStart(numeroLength, '0');
+      const nroGrr = `${prefix}-${numeroFormateado}`;
       
-      // Agregar a la tabla editable
-      this.guiasGrr.push({
-        nroGrr: nroGrr,
-        nroDocumento: '',
-        editando: false
-      });
+      // Evitar duplicados
+      if (!this.guias.includes(nroGrr)) {
+        this.guias.push(nroGrr);
+        
+        // Agregar a la tabla editable
+        this.guiasGrr.push({
+          nroGrr: nroGrr,
+          nroDocumento: '',
+          editando: false
+        });
+      }
     }
 
     this.mostrarTablaGuias = true;

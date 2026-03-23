@@ -134,6 +134,7 @@ export class ListpreliquidacionesComponent implements OnInit {
       { field: 'numerocomprobante', header: 'Nro Comprobante', width: '150px' },
       { field: 'tipocomprobantepago', header: 'Tipo Comprobante', width: '150px' },
       { field: 'cliente', header: 'Cliente', width: '200px' },
+      { field: 'estado', header: 'Estado', width: '200px' },
       { field: 'fechaemision', header: 'Fecha Emisión', width: '130px' },
       { field: 'totalbulto', header: 'Total Bultos', width: '120px' },
       { field: 'totalpeso', header: 'Total Peso', width: '120px' },

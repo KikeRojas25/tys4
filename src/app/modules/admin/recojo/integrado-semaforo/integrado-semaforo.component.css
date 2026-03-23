@@ -1,0 +1,146 @@
+/* Tabla integrado semáforo - basada en integrado comercial */
+
+::ng-deep .tabla-integrado-semaforo {
+  border-collapse: separate;
+  border-spacing: 0;
+}
+
+::ng-deep .tabla-integrado-semaforo .p-datatable-scrollable-header {
+  position: sticky !important;
+  top: 0 !important;
+  z-index: 10 !important;
+}
+
+::ng-deep .tabla-integrado-semaforo .p-datatable-thead > tr > th {
+  border: none !important;
+  position: sticky !important;
+  top: 0 !important;
+  z-index: 10 !important;
+  font-weight: 600 !important;
+  font-size: 0.8rem !important;
+  padding: 0.6rem 0.5rem !important;
+}
+
+::ng-deep .tabla-integrado-semaforo .p-datatable-tbody > tr > td {
+  padding: 0.6rem 0.5rem !important;
+  font-size: 0.875rem !important;
+  vertical-align: middle !important;
+}
+
+::ng-deep .tabla-integrado-semaforo .p-datatable-tbody > tr {
+  border-bottom: 1px solid #e5e7eb;
+  transition: background-color 0.15s ease;
+}
+
+::ng-deep .tabla-integrado-semaforo .p-datatable-tbody > tr:hover {
+  background-color: #f9fafb !important;
+}
+
+::ng-deep .tabla-integrado-semaforo .col-cliente {
+  white-space: normal !important;
+  word-wrap: break-word !important;
+  min-width: 180px;
+}
+
+::ng-deep .tabla-integrado-semaforo .col-cliente a {
+  text-decoration: none;
+}
+
+::ng-deep .tabla-integrado-semaforo .col-cliente a:hover {
+  text-decoration: underline;
+}
+
+/* Semáforo - badges con colores */
+.badge-semaforo {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-width: 2rem;
+  height: 2rem;
+  padding: 0 0.5rem;
+  border-radius: 0.5rem;
+  font-weight: 700;
+  font-size: 1rem;
+}
+
+.badge-verde {
+  background-color: #c8e6c9;
+  color: #1b5e20;
+  border: 1px solid #81c784;
+}
+
+.badge-amarillo {
+  background-color: #fff9c4;
+  color: #f57f17;
+  border: 1px solid #ffee58;
+}
+
+.badge-rojo {
+  background-color: #ffcdd2;
+  color: #b71c1c;
+  border: 1px solid #e57373;
+}
+
+.badge-observadas {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-width: 2rem;
+  height: 2rem;
+  padding: 0 0.5rem;
+  border-radius: 0.5rem;
+  font-weight: 700;
+  font-size: 1rem;
+  background-color: #ffebee;
+  color: #790E00;
+  border: 1px solid #ef9a9a;
+}
+
+/* Enlaces clickeables en badges */
+.badge-link {
+  text-decoration: none;
+  cursor: pointer;
+  transition: opacity 0.15s, transform 0.15s;
+}
+
+.badge-link:hover {
+  opacity: 0.9;
+  transform: scale(1.05);
+  text-decoration: none;
+}
+
+/* Celdas semáforo - fondo suave */
+.celda-semaforo.celda-verde {
+  background-color: rgba(76, 175, 80, 0.08);
+}
+
+.celda-semaforo.celda-amarillo {
+  background-color: rgba(249, 168, 37, 0.12);
+}
+
+.celda-semaforo.celda-rojo {
+  background-color: rgba(198, 40, 40, 0.08);
+}
+
+.celda-observadas {
+  background-color: rgba(121, 14, 0, 0.06);
+}
+
+/* Iconos en header */
+.semaforo-icon {
+  width: 1.25rem;
+  height: 1.25rem;
+  vertical-align: middle;
+}
+
+.semaforo-verde {
+  color: #fff;
+}
+
+.semaforo-amarillo {
+  color: #fff;
+}
+
+.semaforo-rojo {
+  color: #fff;
+}

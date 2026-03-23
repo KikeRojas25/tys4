@@ -209,3 +209,25 @@ export interface OrdenRecojo {
   horaSalida?: string;               // time(7)
   km?: number;                       // decimal(12,2)
 }
+
+export interface OrdenTransporteProviderRecojoResult {
+  idordentrabajo: number;
+  numCp?: string;
+  idEstado: number;
+  estado?: string;
+  razonSocial?: string;
+  fechaRegistro?: string | Date | null;
+  puntoRecojo?: string;
+  destino?: string;
+  origen?: string;
+  numHojaRuta?: string;
+  peso: number;
+  bulto: number;
+  pesoVol: number;
+  volumen: number;
+  cliente?: string;
+  fechaHoraCita?: string | Date | null;
+  fechaHoraCitaFin?: string | Date | null;
+  fechaHoraCitaReal?: string | Date | null;
+  fechaHoraCitaFinReal?: string | Date | null;
+}

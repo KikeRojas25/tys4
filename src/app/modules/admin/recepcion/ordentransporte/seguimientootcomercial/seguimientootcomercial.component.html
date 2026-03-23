@@ -1,0 +1,550 @@
+<div class="flex flex-col flex-auto min-w-0 bg-gray-50">
+  <!-- Header -->
+  <div class="flex flex-col sm:flex-row flex-0 sm:items-center sm:justify-between p-2 sm:py-8 sm:px-10 border-b border-gray-200 bg-white shadow-sm">
+    <div class="flex-1 min-w-0">
+      <div class="flex flex-wrap items-center font-medium text-sm text-gray-600">
+        <div>
+          <a class="whitespace-nowrap text-gray-700 hover:text-gray-900">TMS</a>
+        </div>
+        <div class="flex items-center ml-1 whitespace-nowrap">
+          <mat-icon class="fuse-horizontal-navigation-item-icon text-gray-400" [svgIcon]="'heroicons_solid:chevron-right'"></mat-icon>
+          <a class="ml-1 text-gray-700 hover:text-gray-900">Recepción</a>
+        </div>
+      </div>
+      <div class="mt-2">
+        <h2 class="text-3xl md:text-4xl font-semibold tracking-tight leading-7 sm:leading-10 truncate text-gray-900">Seguimiento de Orden de Transporte</h2>
+        <p class="text-sm text-amber-700 mt-1.5">Gestión y seguimiento de órdenes de transporte</p>
+      </div>
+    </div>
+  </div>
+
+  <p-toast />
+
+  <!-- Contenido Principal -->
+  <div class="main-content container-fluid p-2">
+    <!-- Filtros de Búsqueda -->
+    <div class="bg-white rounded-lg shadow-sm border border-gray-200 mb-2 overflow-hidden">
+      <!-- <div class="bg-gray-800 text-white px-6 py-4 border-b border-gray-700">
+        <h3 class="text-lg font-semibold text-gray-100">Filtros de Búsqueda</h3>
+        <p class="text-sm text-amber-300 mt-0.5">Seleccione los criterios para buscar órdenes de transporte</p>
+      </div> -->
+      <div class="p-2">
+        <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-5 gap-2">
+          <!-- Cliente -->
+          <div class="flex flex-col">
+            <label class="mb-1">Cliente:</label>
+            <p-dropdown name="clientes"   
+                        [options]="clientes" [(ngModel)]="model.idcliente"
+                        scrollHeight="30vh" class="input-form-field"
+                        appendTo="body"
+                        [virtualScroll]="true" itemSize="30" 
+                        [style]="{'width':'100%'}" [resetFilterOnHide]="false" 
+                        [filter]="true">
+              <ng-template let-item pTemplate="selectedItem">
+                <span>{{item.label}}</span>
+              </ng-template>
+            </p-dropdown>
+          </div>
+
+          <!-- Inicio -->
+          <div class="flex flex-col">
+            <label class="mb-1">Fecha de Inicio:</label>
+            <p-calendar [(ngModel)]="dateInicio" baseZIndex="100" appendTo="body"
+                        dateFormat="dd/mm/yy" placeholder="Seleccione una fecha"
+                        [style]="{'width':'100%'}">
+            </p-calendar>
+          </div>
+
+          <!-- Fin -->
+          <div class="flex flex-col">
+            <label class="mb-1">Fecha de Final:</label>
+            <p-calendar [(ngModel)]="dateFin" baseZIndex="100" appendTo="body"    
+                        dateFormat="dd/mm/yy" placeholder="Seleccione una fecha"
+                        [style]="{'width':'100%'}">
+            </p-calendar>
+          </div>
+
+        
+
+          <!-- Nro OT -->
+          <div class="flex flex-col">
+            <label class="mb-1">Nro OT:</label>
+            <input pInputText [(ngModel)]="model.numcp" 
+                   [style]="{'width':'100%'}" placeholder="Ingrese Nro OT"
+                   (keyup.enter)="buscar()" />
+          </div>
+
+          <!-- Nro Manifiesto -->
+          <div class="flex flex-col">
+            <label class="mb-1">Nro Manifiesto:</label>
+            <input pInputText [(ngModel)]="model.nummanifiesto" 
+                   [style]="{'width':'100%'}" placeholder="Ingrese Manifiesto"
+                   (keyup.enter)="buscar()" />
+          </div>
+
+          <!-- Nro HR -->
+          <div class="flex flex-col">
+            <label class="mb-1">Nro HR:</label>
+            <input pInputText [(ngModel)]="model.numhojaruta" 
+                   [style]="{'width':'100%'}" placeholder="Ingrese HR"
+                   (keyup.enter)="buscar()" />
+          </div>
+
+            <!-- Estado (opcional si se requiere) -->
+            <div class="flex flex-col">
+              <label class="mb-1">Estado:</label>
+              <p-dropdown name="estados" [options]="estados"  appendTo="body"
+                          [(ngModel)]="model.idestado" scrollHeight="20vh" 
+                          [style]="{'width':'100%'}" filter="false"
+                          (onChange)="onChangeEstado()">
+                <ng-template let-item pTemplate="selectedItem">
+                  <span>{{item.label}}</span>
+                </ng-template>
+              </p-dropdown>
+            </div>
+
+              <!-- Sub-Estado (solo visible cuando estado es "Entregado") -->
+          <div class="flex flex-col" >
+            <label class="mb-1">Sub-Estado:</label>
+            <p-dropdown name="subestados" [options]="subestados"  appendTo="body"
+                        [(ngModel)]="model.idsubestado" scrollHeight="20vh" 
+                        [style]="{'width':'100%'}" filter="false"
+                        (onChange)="onChangeSubEstado()">
+              <ng-template let-item pTemplate="selectedItem">
+                <span>{{item.label}}</span>
+              </ng-template>
+            </p-dropdown>
+          </div>
+
+          <!-- Agrupar por -->
+          <div class="flex flex-col">
+            <label class="mb-1">Agrupar por:</label>
+            <p-dropdown name="agrupacion" [options]="opcionesAgrupacion" appendTo="body"
+                        [(ngModel)]="groupByField" [style]="{'width':'100%'}"
+                        (onChange)="onChangeAgrupacion()">
+              <ng-template let-item pTemplate="selectedItem">
+                <span>{{ item.label }}</span>
+              </ng-template>
+            </p-dropdown>
+          </div>
+     
+
+        <!-- Botones -->
+        <div class="flex flex-col mt-4">
+          <button 
+            class="px-4 py-2.5 text-sm font-medium text-white bg-gray-700 hover:bg-gray-600 rounded-md shadow-sm transition-all duration-150" 
+            pButton 
+            label="Buscar" 
+            icon="pi pi-search"
+            iconPos="left" 
+            (click)="buscar()">
+          </button>
+          </div>
+          <div class="flex flex-col mt-4">
+          <button 
+            class="px-4 py-2.5 text-sm font-medium text-gray-700 bg-white border border-gray-300 hover:bg-gray-50 rounded-md shadow-sm transition-all duration-150" 
+            pButton 
+            label="EXCEL" 
+            icon="pi pi-file-excel"
+            iconPos="left">
+          </button>
+        </div>      
+      </div>
+    </div>
+  </div>
+
+    <!-- Tabla de Órdenes de Transporte -->
+    <div class="bg-white rounded-lg shadow-sm border border-gray-200 overflow-hidden">
+      <!-- <div class="bg-gray-800 text-white px-6 py-4 border-b border-gray-700">
+        <h3 class="text-lg font-semibold text-gray-100">Órdenes de Transporte</h3>
+        <p class="text-sm text-amber-300 mt-1.5">Lista de órdenes de transporte encontradas</p>
+      </div> -->
+      <div class="p-6">
+        <p-table 
+          [value]="ordenesParaGrilla" 
+          [paginator]="!groupByField" 
+          [rows]="60" 
+          [rowsPerPageOptions]="[60,120,320]" 
+          [columns]="cols" 
+          scrollHeight="80vh"
+          [resizableColumns]="true" 
+          [tableStyle]="{ 'table-layout': 'fixed', 'width': '100%' }"
+          [scrollable]="true" 
+          [selection]="selected" 
+          selectionMode="multiple" 
+          [(selection)]="selected"
+          [styleClass]="'custom-table'"
+          [rowGroupMode]="groupByField ? 'subheader' : null"
+          [groupRowsBy]="groupByField || undefined"
+          class="w-full">
+
+        <!-- Column Definitions -->
+        <ng-template pTemplate="colgroup" let-columns>
+          <colgroup>
+            <col *ngFor="let col of columns" [style.width]="col.width">
+          </colgroup>
+        </ng-template>
+
+        <!-- Table Header -->
+        <ng-template pTemplate="header" let-columns>
+          <tr class="bg-gray-800 text-white">
+            <th style="white-space: normal; word-wrap: break-word;" *ngFor="let col of columns; let i = index" [pSortableColumn]="col.field" 
+                [ngClass]="{'text-left': i === 1, 'text-left': i !== 1}" 
+                class="px-4 py-3 text-sm font-semibold text-gray-100 border-b border-gray-700">
+              {{ col.header }}
+            </th>
+          </tr>
+        </ng-template>
+
+        <!-- Group Header (cuando hay agrupación) -->
+        <ng-template pTemplate="groupheader" let-rowData let-rowIndex="rowIndex">
+          <tr class="group-header-row">
+            <td [attr.colspan]="cols.length" class="group-header-cell">
+              <button
+                type="button"
+                pButton
+                pRipple
+                class="p-button-text p-button-rounded p-button-plain mr-2"
+                [icon]="isGroupExpanded(groupByField === 'provinciaDisplay' ? rowData.provinciaDisplay : rowData.destino) ? 'pi pi-chevron-down' : 'pi pi-chevron-right'"
+                (click)="toggleGroup(groupByField === 'provinciaDisplay' ? rowData.provinciaDisplay : rowData.destino)">
+              </button>
+              <span class="font-semibold text-gray-800">{{ groupByField === 'provinciaDisplay' ? rowData.provinciaDisplay : rowData.destino }}</span>
+            </td>
+          </tr>
+        </ng-template>
+
+        <!-- Table Body -->
+        <ng-template pTemplate="body" let-rowData let-columns="columns">
+          <!-- Fila colapsada: mostrar "Ver X items" con botón expandir -->
+          <tr *ngIf="rowData._groupCollapsed" class="border-b border-gray-100 hover:bg-gray-50 transition-colors duration-150 group-collapsed-row">
+            <td [attr.colspan]="cols.length" class="px-4 py-2 text-gray-500 text-sm">
+              <button
+                type="button"
+                pButton
+                pRipple
+                class="p-button-text p-button-rounded p-button-plain mr-2"
+                icon="pi pi-chevron-right"
+                (click)="toggleGroup(groupByField === 'provinciaDisplay' ? rowData.provinciaDisplay : rowData.destino)">
+              </button>
+              {{ rowData._groupCount }} {{ rowData._groupCount === 1 ? 'item' : 'items' }} — clic para expandir
+            </td>
+          </tr>
+          <!-- Fila normal -->
+          <tr *ngIf="!rowData._groupCollapsed" [pSelectableRow]="rowData" class="border-b border-gray-100 hover:bg-gray-50 transition-colors duration-150">
+            <!-- Acción -->
+
+            
+            <td class="text-center px-2 py-2">
+              <div class="flex gap-1 justify-center items-center">
+                <!-- Ver Fotos - Azul (Info) -->
+                <button 
+                  pButton 
+                  class="action-btn action-btn-info" 
+                  icon="pi pi-download"
+                  title="Ver Fotos" 
+                  (click)="verarchivos(rowData.idordentrabajo)">
+                </button>
+                
+                <!-- Editar Confirmación - Amarillo (Warning) -->
+                <button 
+                  *ngIf="rowData?.estado === 'Entregado' && estrafico === true"  
+                  pButton 
+                  class="action-btn action-btn-warning" 
+                  icon="pi pi-book" 
+                  title="Editar Confirmación" 
+                  (click)="editarConfirm(rowData.idordentrabajo)">
+                </button>
+                
+                <!-- Eliminar Fotos - Rojo (Danger) -->
+                <button 
+                  *ngIf="estrafico === true"  
+                  pButton 
+                  class="action-btn action-btn-danger" 
+                  icon="pi pi-camera" 
+                  title="Eliminar Fotos" 
+                  (click)="eliminarFotos(rowData.idordentrabajo)">
+                </button>
+
+                <!-- Ver Tracking - Verde (Success) -->
+                <button 
+                  pButton 
+                  class="action-btn action-btn-success" 
+                  icon="pi pi-search" 
+                  title="Ver Tracking" 
+                  (click)="vertracking(rowData.idordentrabajo)">
+                </button>
+              </div>
+            </td>
+
+            <!-- Destino / Destinatario (primer campo después de acciones, alineado a la izquierda) -->
+            <td class="col-destino px-4 py-3" style="text-align: left;">
+              <div class="flex flex-col gap-0.5 items-start text-left">
+                <span class="cell-primary text-gray-800 font-medium text-sm">{{ rowData.provincia }}</span>
+                <span class="cell-primary text-gray-800 font-medium text-sm">{{ rowData.usuarioequipo }}</span>
+                <span class="cell-secondary text-gray-500 text-xs">{{ rowData.destinatario }}</span>
+              </div>
+            </td>
+            <!-- OT / Cliente (flexible multi-línea) -->
+            <td class="px-4 py-3">
+              <div class="flex flex-col gap-0.5 text-left">
+                <a class="cell-primary text-amber-700 hover:text-amber-900 font-semibold cursor-pointer underline" (click)="verot(rowData.idordentrabajo)">
+                  {{ rowData.numcp }}
+                </a>
+                <span class="cell-secondary text-gray-500 text-xs">{{ rowData.razonsocial }}</span>
+              </div>
+            </td>
+            <td class="px-4 py-3">
+              <div class="flex flex-col gap-0.5 text-center text-sm">
+                <span class="cell-primary text-gray-700">{{ rowData.fecharecojo | date:'dd/MM/yyyy' }}</span>
+                <span class="cell-secondary text-gray-500 text-xs">Recojo</span>
+              </div>
+            </td>
+            <td class="px-4 py-3">
+              <div class="flex flex-col gap-0.5 text-center text-sm">
+                <span class="cell-primary text-gray-700">{{ rowData.fechadespacho | date:'dd/MM/yyyy' }}</span>
+                <span class="cell-secondary text-gray-500 text-xs">Despacho</span>
+              </div>
+            </td>
+            <td class="px-4 py-3">
+              <div class="flex flex-col gap-0.5 text-center text-sm">
+                <span class="cell-primary text-gray-700">{{ rowData.fechaentrega | date:'dd/MM/yyyy' }}</span>
+                <span class="cell-secondary text-gray-500 text-xs">Entrega</span>
+              </div>
+            </td>
+            <td class="px-4 py-3 text-gray-700 text-sm word-wrap">{{ rowData.estacionorigen }}</td>
+            
+            <td class="text-center px-4 py-3" [ngClass]="rowData.estado == 'Registrado' ? 'very-old-car' : (rowData.estado == 'Programado' ? 'old-car' : '')">
+              <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium"
+                    [ngClass]="{
+                      'bg-gray-100 text-gray-800': rowData.estado === 'Registrado',
+                      'bg-amber-100 text-amber-800': rowData.estado === 'Programado',
+                      'bg-green-100 text-green-800': rowData.estado === 'Entregado'
+                    }">
+                {{ rowData.estado }}
+              </span>
+            </td>
+            <td class="text-center px-4 py-3">
+              <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium word-wrap"
+                    [ngClass]="{
+                      'bg-red-100 text-red-800': rowData.subestado === 'Pendiente de Cargo',
+                      'bg-blue-100 text-blue-800': rowData.subestado && rowData.subestado !== 'Pendiente de Cargo',
+                      'bg-gray-100 text-gray-600': !rowData.subestado
+                    }">
+                {{ rowData.subestado || '—' }}
+              </span>
+            </td>
+            <td class="text-center px-4 py-3 text-gray-700 text-sm word-wrap">
+              {{ rowData.tipoentrega }}
+            </td>
+        
+            <td class="text-center px-4 py-3 text-gray-700 text-sm word-wrap">{{ rowData.origen }}</td>
+
+            <td class="text-center px-4 py-3">
+              <div class="flex flex-col gap-0.5">
+                <span class="cell-primary text-amber-700 font-semibold">S/. {{ rowData.subtotal | number:'1.0-2' }}</span>
+              </div>
+            </td>
+            <td class="text-center px-4 py-3">
+              <a class="text-amber-700 hover:text-amber-900 cursor-pointer underline text-sm" (click)="vermanifiesto(rowData.idManifiesto)">
+                {{ rowData.nummanifiesto }}
+              </a>
+            </td>
+            <td class="text-center px-4 py-3">
+              <a class="text-amber-700 hover:text-amber-900 cursor-pointer underline text-sm" (click)="verhojaruta(rowData.idDespacho)">
+                {{ rowData.numhojaruta }}
+              </a>
+            </td>
+          
+            <td class="text-center px-4 py-3">
+              <div class="flex flex-col gap-0.5">
+                <span class="cell-primary text-gray-700 font-medium">{{ rowData.bulto }}</span>
+                <span class="cell-secondary text-gray-500 text-xs">bultos</span>
+              </div>
+            </td>
+            <td class="text-center px-4 py-3">
+              <div class="flex flex-col gap-0.5">
+                <span class="cell-primary text-amber-700 font-semibold">{{ rowData.peso | number:'1.0-2' }}</span>
+                <span class="cell-secondary text-gray-500 text-xs">kg</span>
+              </div>
+            </td>
+            <td class="text-center px-4 py-3">
+              <div class="flex flex-col gap-0.5">
+                <span class="cell-primary text-amber-700 font-semibold">{{ rowData.pesovol | number:'1.0-2' }}</span>
+                <span class="cell-secondary text-gray-500 text-xs">m³</span>
+              </div>
+            </td>
+          </tr>
+        </ng-template>
+      </p-table>
+      </div>
+    </div>
+  </div>
+</div>
+<p-dialog header="Tracking OTs" [modal]="true" [(visible)]="dialoglifecycle" [style]="{ width: '80rem' }">
+  <div class="p-4">
+    <!-- ... tu encabezado informativo tal cual ... -->
+
+    <!-- 🟨 Tabla de eventos -->
+    <p-table [value]="events" class="text-sm w-full">
+      <ng-template pTemplate="header">
+        <tr>
+          <th>Evento</th>
+          <th>Fecha registro</th>
+          <th>Fecha evento</th>
+          <th>Usuario registro</th>
+         
+          <th style="width: 120px;">Acción</th>  <!-- ✅ nueva columna -->
+        </tr>
+      </ng-template>
+
+      <ng-template pTemplate="body" let-event>
+        <tr>
+            <td>
+            <span 
+              class="badge-simulation"
+              [ngStyle]="{
+                'background-color': event.dateEvent ? '#17a2b8' : '#ffc107',
+                'color': event.dateEvent ? 'white' : 'black'
+              }"
+              style="display: inline-block; padding: 0.2rem 0.5rem; border-radius: 1rem; text-align: center;">
+              {{ event.status || 'Sin Estado' }}
+            </span>
+          </td>
+          <td>
+            {{ event.dateEvent ? (event.dateRegister ? (event.dateRegister | date:'dd/MM/yyyy HH:mm') : 'Sin dato') : 'Sin dato' }}
+          </td>
+          <td>
+            {{ event.dateEvent ? (event.dateEvent | date:'dd/MM/yyyy HH:mm' ) : 'Sin evento' }}
+          </td>
+          <td>
+            {{ event.dateEvent ? (event.user || 'Sin dato') : 'Sin dato' }}
+          </td>
+       
+          <!-- ✅ botón que abre el diálogo contextual -->
+          <td class="text-center">
+            <button pButton type="button"
+                    icon="pi pi-cog"
+                    label="Ver"
+                    class="p-button-sm"
+                    (click)="openEventAction(event)">
+            </button>
+          </td>
+        </tr>
+      </ng-template>
+    </p-table>
+
+    <!-- ✅ Diálogo de acciones por evento -->
+    <p-dialog
+      [(visible)]="actionDialogVisible"
+      [modal]="true"
+      [closable]="true"
+      [dismissableMask]="true"
+      [style]="{ width: '40rem' }"
+      [header]="currentAction?.title || 'Acción'">
+
+      <ng-container [ngSwitch]="currentAction?.type">
+
+        <!-- OT creada -->
+        <div *ngSwitchCase="'ot-creada'" class="space-y-2">
+          <p class="text-sm text-gray-700">Se creó la OT {{ ordenTransporte?.numcp }}.</p>
+          <button pButton label="Ver datos básicos" icon="pi pi-search" (click)="verot(ordenTransporte.idordentrabajo)" class="p-button-text"></button>
+        </div>
+
+        <!-- OT planificada -->
+        <div *ngSwitchCase="'ot-planificada'" class="space-y-2">
+          <p class="text-sm text-gray-700">La OT fue planificada. Puedes revisar asignaciones.</p>
+          <button pButton label="Ver planificación" icon="pi pi-calendar" (click)="executeAction('view-plan')" class="p-button-text"></button>
+        </div>
+
+        <!-- Manifiesto / HR Generado -->
+        <div *ngSwitchCase="'manifiesto-hr'" class="space-y-2">
+          <p class="text-sm">Manifiesto: <b>{{ ordenTransporte?.nummanifiesto || '—' }}</b></p>
+          <p class="text-sm">Hoja de Ruta: <b>{{ ordenTransporte?.numhojaruta || '—' }}</b></p>
+          <div class="flex gap-2">
+            <!-- ✅ Botón que llama directo a tu método -->
+            <button 
+              pButton 
+              label="Ver Manifiesto" 
+              icon="pi pi-external-link" 
+              class="p-button-sm" 
+              (click)="vernummanifiesto(currentAction?.payload?.row?.nummanifiesto || ordenTransporte?.nummanifiesto)">
+            </button>
+         
+
+
+          </div>
+        </div>
+
+        <!-- OT Despachada -->
+        <div *ngSwitchCase="'ot-despachada'" class="space-y-2">
+          <p class="text-sm">La OT fue despachada el <b>{{ ordenTransporte?.fechadespacho | date:'dd/MM/yyyy HH:mm' }}</b>.</p>
+          <button pButton label="Ver tracking de despacho" icon="pi pi-truck" (click)="executeAction('view-despacho')" class="p-button-text"></button>
+        </div>
+
+        <!-- En Zona -->
+        <div *ngSwitchCase="'en-zona'" class="space-y-2">
+          <p class="text-sm">Ingreso a zona el <b>{{ ordenTransporte?.fechaenzona | date:'dd/MM/yyyy HH:mm' }}</b>.</p>
+          <button pButton label="Ver mapa" icon="pi pi-map" (click)="executeAction('open-map')" class="p-button-text"></button>
+        </div>
+
+        <!-- En Reparto -->
+        <div *ngSwitchCase="'en-reparto'" class="space-y-2">
+          <p class="text-sm">La OT está en reparto desde <b>{{ ordenTransporte?.fechaentregareparto | date:'dd/MM/yyyy HH:mm' }}</b>.</p>
+          <button pButton label="Contactar repartidor" icon="pi pi-phone" (click)="executeAction('contact-driver')" class="p-button-text"></button>
+        </div>
+
+        <!-- Entrega conforme -->
+        <div *ngSwitchCase="'entrega-ok'" class="space-y-2">
+          <p class="text-sm">Entregada el <b>{{ ordenTransporte?.fechaentrega | date:'dd/MM/yyyy HH:mm' }}</b>.</p>
+          <div class="flex gap-2">
+            <p-button  label=""   size="small" title='Ver Fotos' icon='pi pi-download'  (click)='verarchivos(ordenTransporte?.idordentrabajo);' > </p-button>
+              
+            <button pButton label="Ver constancia" icon="pi pi-file" (click)="executeAction('open-pod')" class="p-button-sm"></button>
+            <button pButton label="Descargar evidencia" icon="pi pi-download" (click)="executeAction('download-evidence')" class="p-button-sm p-button-secondary"></button>
+          </div>
+        </div>
+
+        <!-- Sin mapeo -->
+        <div *ngSwitchDefault class="text-sm text-gray-600">
+          No hay una acción configurada para este estado.
+        </div>
+      </ng-container>
+
+      <ng-template pTemplate="footer">
+        <button pButton label="Cerrar" class="p-button-text" (click)="actionDialogVisible=false"></button>
+      </ng-template>
+    </p-dialog>
+  </div>
+</p-dialog>
+
+
+
+<p-dialog header="Editar Confirmación" [modal]="true" [(visible)]="dialogConfirm" [style]="{ width: '45rem', height: '350px' }">
+  <div class="field flex flex-col">
+      <label for="fechaentrega">Fecha de entrega :</label>
+      <p-calendar id="fechaentrega" name="fechaentrega" appendTo="body" [(ngModel)]="model.fechaentrega" required 
+          [iconDisplay]="'input'" [showIcon]="true" inputId="icondisplay"></p-calendar>
+      <div *ngIf="!model.fechaentrega" class="alert-danger">
+          <div>Requiere seleccionar una fecha de entrega.</div>
+      </div>
+  </div>
+
+  <div class="field flex flex-col">
+      <label for="horaentrega">Hora de entrega (*) :</label>
+      <p-inputMask id="horaentrega" name="horaentrega" [(ngModel)]="model.horaentrega" mask="99:99" required></p-inputMask>
+      <div *ngIf="!model.horaentrega" class="alert-danger">
+          <div>Requiere ingresar la hora de entrega.</div>
+      </div>
+  </div>
+  <div class="flex justify-end mt-4">
+    <p-button label="Guardar" icon="pi pi-check" (click)="saveConfirm()"></p-button>
+    <p-button label="Desconfirmar"  severity="danger"   icon="pi pi-times-circle" (click)="unConfirm() "></p-button>
+    <p-button label="Cancelar" icon="pi pi-times" class="p-button-secondary ml-2" (click)="dialogConfirm = false"></p-button>
+</div>
+
+</p-dialog>
+
+
+<p-toast />
+
+<p-confirmDialog />

@@ -34,6 +34,7 @@ export interface OrdenTransporte {
 
     razonsocial?: string;
     destino?: string;
+    provincia?: string;
     remitente?: string;
     destinatario?: string;
     tipotransporte?: string;

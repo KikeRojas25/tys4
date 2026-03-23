@@ -1,0 +1,141 @@
+<p-toast></p-toast>
+
+<div class="flex flex-col flex-auto min-w-0 bg-gray-50">
+  <!-- Header -->
+  <div *ngIf="!isModal" class="flex flex-col sm:flex-row flex-0 sm:items-center sm:justify-between p-3 sm:py-5 sm:px-6 border-b border-gray-200 bg-white">
+    <div class="flex-1 min-w-0">
+      <div class="flex flex-wrap items-center font-medium text-sm text-gray-600">
+        <div>
+          <a class="whitespace-nowrap text-gray-700 hover:text-gray-900">TMS</a>
+        </div>
+        <div class="flex items-center ml-1 whitespace-nowrap">
+          <mat-icon class="fuse-horizontal-navigation-item-icon text-gray-400" [svgIcon]="'heroicons_solid:chevron-right'"></mat-icon>
+          <span class="ml-1 text-gray-500">Compras</span>
+        </div>
+        <div class="flex items-center ml-1 whitespace-nowrap">
+          <mat-icon class="fuse-horizontal-navigation-item-icon text-gray-400" [svgIcon]="'heroicons_solid:chevron-right'"></mat-icon>
+          <span class="ml-1 text-gray-500">Liquidación Caja Chica</span>
+        </div>
+        <div class="flex items-center ml-1 whitespace-nowrap">
+          <mat-icon class="fuse-horizontal-navigation-item-icon text-gray-400" [svgIcon]="'heroicons_solid:chevron-right'"></mat-icon>
+          <span class="ml-1 text-gray-500">Detalle</span>
+        </div>
+      </div>
+      <div class="mt-2">
+        <h2 class="text-xl md:text-2xl font-medium tracking-tight leading-6 truncate text-gray-900">
+          Detalle de liquidación
+        </h2>
+      </div>
+    </div>
+
+    <div class="flex items-center gap-2 mt-4 sm:mt-0">
+      <button pButton type="button" icon="pi pi-arrow-left" label="Volver" (click)="volver()"
+              class="px-3 py-2 text-xs font-medium text-gray-700 bg-white border border-gray-300 hover:bg-gray-50 rounded transition-all duration-150">
+      </button>
+      <button pButton type="button" icon="pi pi-pencil" label="Editar" (click)="editar()"
+              [disabled]="!liquidacion"
+              class="px-3 py-2 text-xs font-medium text-white bg-gray-900 hover:bg-gray-800 rounded transition-all duration-150">
+      </button>
+    </div>
+  </div>
+
+  <!-- Contenido -->
+  <div class="main-content container-fluid p-3">
+    <div class="bg-white rounded-md border border-gray-200 overflow-hidden">
+      <div class="p-3">
+        <div *ngIf="!liquidacion && !loading" class="text-gray-700">No hay información para mostrar.</div>
+
+        <!-- Cabecera compacta -->
+        <div *ngIf="liquidacion" class="grid grid-cols-1 md:grid-cols-6 gap-3">
+          <div class="md:col-span-2">
+            <div class="text-xs text-gray-500">Número</div>
+            <div class="text-sm font-semibold text-gray-900">{{ liquidacion.numeroliquidacion }}</div>
+          </div>
+          <div class="md:col-span-2">
+            <div class="text-xs text-gray-500">Fecha liquidación</div>
+            <div class="text-sm font-semibold text-gray-900">{{ liquidacion.fechaliquidacion | date:'dd/MM/yyyy' }}</div>
+          </div>
+          <div class="md:col-span-1">
+            <div class="text-xs text-gray-500">Concepto</div>
+            <div class="text-sm font-semibold text-gray-900">{{ conceptoLabel }}</div>
+          </div>
+          <div class="md:col-span-1">
+            <div class="text-xs text-gray-500">Monto</div>
+            <div class="text-sm font-semibold text-gray-900">{{ liquidacion.monto | number:'1.2-2' }}</div>
+          </div>
+          <div class="md:col-span-2">
+            <div class="text-xs text-gray-500">Tipo transferencia</div>
+            <div class="text-sm font-semibold text-gray-900">{{ tipoTransferenciaLabel }}</div>
+          </div>
+          <div class="md:col-span-2">
+            <div class="text-xs text-gray-500">Destinatario transferencia</div>
+            <div class="text-sm font-semibold text-gray-900">{{ liquidacion.destinatariotransferencia }}</div>
+          </div>
+          <div class="md:col-span-1">
+            <div class="text-xs text-gray-500">Cuenta transferencia</div>
+            <div class="text-sm font-semibold text-gray-900">{{ liquidacion.cuentatransferencia }}</div>
+          </div>
+          <div class="md:col-span-1">
+            <div class="text-xs text-gray-500">N° operación</div>
+            <div class="text-sm font-semibold text-gray-900">{{ liquidacion.numerooperacion }}</div>
+          </div>
+          <div class="md:col-span-3">
+            <div class="text-xs text-gray-500">N° Comprobante</div>
+            <div class="text-sm font-semibold text-gray-900">{{ liquidacion.numerocomprobante }}</div>
+          </div>
+          <div class="md:col-span-3" *ngIf="liquidacion?.observaciones || liquidacion?.observacion">
+            <div class="text-xs text-gray-500">Observación</div>
+            <div class="text-sm font-semibold text-gray-900 whitespace-pre-line">{{ liquidacion.observaciones || liquidacion.observacion }}</div>
+          </div>
+          <div class="md:col-span-3">
+            <div class="text-xs text-gray-500">Fecha registro</div>
+            <div class="text-sm font-semibold text-gray-900">{{ liquidacion.fecharegistro | date:'dd/MM/yyyy HH:mm' }}</div>
+          </div>
+        </div>
+
+        <div class="mt-3">
+          <div class="flex items-center justify-between mb-2">
+            <h3 class="text-sm font-semibold text-gray-900">OTs</h3>
+            <div class="flex items-center gap-2">
+              <button pButton type="button" icon="pi pi-pencil" label="Editar" (click)="editar()"
+                      [disabled]="!liquidacion"
+                      class="px-3 py-2 text-xs font-medium text-white bg-gray-900 hover:bg-gray-800 rounded transition-all duration-150">
+              </button>
+              <button pButton type="button" icon="pi pi-times" label="Cerrar" (click)="volver()"
+                      class="px-3 py-2 text-xs font-medium text-gray-700 bg-white border border-gray-300 hover:bg-gray-50 rounded transition-all duration-150">
+              </button>
+            </div>
+          </div>
+
+          <p-table
+            [value]="liquidacion?.detalles || []"
+            [loading]="loading"
+            [scrollable]="true"
+            scrollHeight="55vh"
+            [tableStyle]="{ 'width': '100%' }"
+            [styleClass]="'custom-table-lite compact-ot-table'">
+            <ng-template pTemplate="header">
+              <tr class="bg-gray-100">
+                <th class="text-center px-2 py-2 text-xs font-semibold text-gray-800">ID</th>
+                <th class="text-center px-2 py-2 text-xs font-semibold text-gray-800">Manifiesto</th>
+                <th class="text-center px-2 py-2 text-xs font-semibold text-gray-800">OT</th>
+                <th class="text-center px-2 py-2 text-xs font-semibold text-gray-800">Monto</th>
+              </tr>
+            </ng-template>
+            <ng-template pTemplate="body" let-d>
+              <tr class="border-b border-gray-100">
+                <td class="text-center px-2 py-2 text-xs text-gray-700">{{ d.idliquidaciondetalle }}</td>
+                <td class="text-center px-2 py-2 text-xs text-gray-700">{{ d.idmanifiesto }}</td>
+                <td class="text-center px-2 py-2 text-xs text-gray-700">{{ d.idordentransporte }}</td>
+                <td class="text-center px-2 py-2 text-xs">
+                  <span class="font-semibold text-gray-900">{{ d.monto | number:'1.2-2' }}</span>
+                </td>
+              </tr>
+            </ng-template>
+          </p-table>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+

@@ -1,7 +1,6 @@
 import { CommonModule } from '@angular/common';
 import { Component, OnInit } from '@angular/core';
 import { FormsModule } from '@angular/forms';
-import { MatIcon } from '@angular/material/icon';
 
 import { MessageService, ConfirmationService, SelectItem } from 'primeng/api';
 import { ButtonModule } from 'primeng/button';
@@ -37,7 +36,6 @@ import { forkJoin } from 'rxjs';
             ToastModule,
             CalendarModule,
             ConfirmDialogModule,
-            MatIcon,
             IconFieldModule,
             InputIconModule,
             InputMaskModule ,
@@ -144,7 +142,7 @@ export class EditComponent implements OnInit {
    });
    }
    obtenerVehiculo(id: number) {
-    this.mantenimientoService.getVehiculoById(id).subscribe({
+    this.mantenimientoService.vehiculoGetById(id).subscribe({
       next: (data) => {
 
         console.log('Vehículo:', data);
@@ -167,6 +165,9 @@ export class EditComponent implements OnInit {
 
 
     this.model.idVehiculo = this.config.data?.vehiculoId;
+    if (this.model?.placa) {
+      this.model.placa = String(this.model.placa).toUpperCase().trim();
+    }
     this.confirmationService.confirm({
       message: '¿Está seguro que desea actualizar el vehículo?',
       header: 'Actualizar',
@@ -175,12 +176,12 @@ export class EditComponent implements OnInit {
 
 
 
-    this.mantenimientoService.actualizarVehiculo(this.model.idVehiculo, this.model).subscribe({
+    this.mantenimientoService.vehiculoActualizar(this.model.idVehiculo, this.model).subscribe({
       next: (res) => {
         this.messageService.add({
           severity: 'success',
           summary: 'Actualización exitosa',
-          detail: res.message
+          detail: res?.message ?? 'Vehículo actualizado correctamente.'
         });
         this.ref?.close(true); // Cierra modal y notifica que se actualizó
 
@@ -188,10 +189,10 @@ export class EditComponent implements OnInit {
         
       },
       error: (err) => {
-        const mensaje = err.error?.message || 'Error al actualizar vehículo';
+        const mensaje = err?.error?.message || 'Error al actualizar vehículo';
         this.messageService.add({
-          severity: 'error',
-          summary: 'Error',
+          severity: err?.status === 409 ? 'warn' : 'error',
+          summary: 'Vehículo',
           detail: mensaje
         });
       }

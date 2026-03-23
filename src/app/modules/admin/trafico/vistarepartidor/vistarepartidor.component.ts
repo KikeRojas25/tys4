@@ -2,22 +2,24 @@ import { CommonModule } from '@angular/common';
 import { Component, OnInit } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { MatIcon } from '@angular/material/icon';
-import { ActivatedRoute, RouterModule } from '@angular/router';
+import { ActivatedRoute, Router, RouterModule } from '@angular/router';
 import { TraficoService } from '../trafico.service';
 import { TabViewModule } from 'primeng/tabview';
-import { Manifiesto, User } from '../trafico.types';
+import { Manifiesto, OrdenTransporteProviderRecojoResult, User } from '../trafico.types';
 import { TableModule } from 'primeng/table';
 import { ButtonModule } from 'primeng/button';
 import { DialogModule } from 'primeng/dialog';
 import { CambiarEstadoModalComponent } from '../vistamanifiestos/modalcambiarestado';
 import { DialogService, DynamicDialogRef } from 'primeng/dynamicdialog';
-import { MessageService } from 'primeng/api';
+import { ConfirmationService, MessageService } from 'primeng/api';
 import { ToastModule } from 'primeng/toast';
+import { ConfirmDialogModule } from 'primeng/confirmdialog';
 import { EntregarOtModalComponent } from './modalentregarOT';
 import { OrdenTransporte } from '../../recepcion/ordentransporte/ordentransporte.types';
 import { BadgeModule } from 'primeng/badge';
 import { AsignartipooperacionComponent } from '../../planning/porprovincia/asignartipooperacion/asignartipooperacion.component';
 import { AsignartipooperacionRutaComponent } from './asignartipooperacion/asignartipooperacionruta.component';
+import { ModalReasignarRepartidorComponent } from './modal-reasignar-repartidor.component';
 
 @Component({
   selector: 'app-vistarepartidor',
@@ -34,12 +36,14 @@ import { AsignartipooperacionRutaComponent } from './asignartipooperacion/asigna
     ButtonModule,
     DialogModule,
     ToastModule,
-    BadgeModule
+    BadgeModule,
+    ConfirmDialogModule
     
   ],
   providers: [
     DialogService ,
-    MessageService 
+    MessageService,
+    ConfirmationService
   ]
 })
 export class VistarepartidorComponent implements OnInit {
@@ -47,15 +51,20 @@ export class VistarepartidorComponent implements OnInit {
   repartidor: any = {};
   idproveedor: any;
   iddepartamento: any;
+  idprovincia: number | null = null;
   cols1: any[];
   cols3: any[];
   cols4: any[];
   despachos: Manifiesto[] = [];
+  // Se mapea a la misma estructura de las otras pestañas (numcp, fecharegistro, razonsocial, etc.)
+  ordenesRecojo: any[] = [];
   user: User ;
   model: any = {};
   despachos1: any[] = [];
   ordenes: any[] = [];
   cols2: any[];
+
+  cols6: any[];
 
   ref: DynamicDialogRef;
 
@@ -63,6 +72,7 @@ export class VistarepartidorComponent implements OnInit {
   ordenes3: OrdenTransporte[] = [];
   ordenes4: OrdenTransporte[] = [];
   ordenes5: OrdenTransporte[] = [];
+  ordenes6: OrdenTransporte[] = [];
 
   selectedOrdenes: OrdenTransporte[] = [];
 
@@ -73,15 +83,19 @@ export class VistarepartidorComponent implements OnInit {
   totalRecabarCargo: number = 0;
   totalEnviarCargo: number = 0;
   totalObservadas: number = 0;
+  totalPendientesDespacho: number = 0;
 
   selectedManifiesto: any = {};
   selectedManifiestoRecojo: any = {};
   SelectedOrdenTransporte?: OrdenTransporte | undefined;
+  selectedOrdenRecojo: any | null = null;
 
   constructor( private traficoService: TraficoService,
     private activatedRoute: ActivatedRoute,
+    private router: Router,
     public dialogService: DialogService,
-    private messageService: MessageService
+    private messageService: MessageService,
+    private confirmationService: ConfirmationService
   ) { }
 
   ngOnInit() {
@@ -95,18 +109,18 @@ export class VistarepartidorComponent implements OnInit {
     {header: 'TIPO OP', field: 'tipooperacion'  ,  width: '100px'  },
     {header: 'BULTOS', field: 'bulto'  , width: '60px'   },
     {header: 'PESO', field: 'peso'  ,  width: '30px'  },
-    {header: 'ACCIONES', field: 'acciones'  ,  width: '30px'  },
+    {header: 'ACC.', field: 'acciones'  ,  width: '30px'  },
   
   ];
 
   this.cols2 = [
     { field: 'numcp', header: 'N° OT',  width: '40px'},
-    {header: 'FECHA RECOJO', field: 'fecharegistro'  , width: '60px'   },
+    {header: 'F. REC.', field: 'fecharegistro'  , width: '60px'   },
     {header: 'CLIENTE', field: 'razonsocial'  ,  width: '180px'  },
-    {header: 'DESTINATARIO', field: 'destinatario'  , width: '180px'   },
+    {header: 'DEST.', field: 'destinatario'  , width: '180px'   },
 
 
-    {header: 'F. ENTREGA REPARTIDOR', field: 'fecha_estado_actual'  ,  width: '90px'  },
+    {header: 'F. ENT.', field: 'fecha_estado_actual'  ,  width: '90px'  },
     // {header: 'F. ENTREGA COMPROMETIDA', field: 'fechaentrega'  , width: '90px'   },
     // {header: 'Dif. Fechas', field: 'diferencia_fechas'  ,  width: '20px'  },
 
@@ -120,17 +134,20 @@ export class VistarepartidorComponent implements OnInit {
 
  this.cols3 = [
 
-  { field: 'numhojaruta', header: 'HR',  width: '120px'},
-  { field: 'nummanifiesto', header: 'Manifiesto',  width: '120px'},
-  {header: 'Destino', field: 'provincia'  , width: '200px'   },
-  {header: 'Agencia', field: 'agencia'  ,  width: '70px'  },
-  {header: 'Remitente', field: 'agenremi'  ,  width: '70px'  },
-  {header: 'Consignado', field: 'agendesti'  ,  width: '70px'  },
-  {header: 'Fecha Despacho', field: 'fecha_estado_actual'  ,  width: '70px'  },
-  {header: 'Clave', field: 'diferencia_fechas'  ,  width: '120px'  },
-  {header: 'Remito', field: 'peso'  ,  width: '30px'  },
-  {header: 'Costo', field: 'peso'  ,  width: '30px'  },
-  {header: 'Acciones', field: 'acciones'  ,  width: '30px'  }
+  { field: 'numcp', header: 'OT',  width: '90px' },
+  { field: 'estado', header: 'Estado', width: '120px' },
+  { field: 'razonsocial', header: 'Razón Social', width: '220px' },
+  { field: 'origen', header: 'Origen', width: '180px' },
+  { field: 'puntorecojo', header: 'Punto Recojo', width: '90px' },
+  { field: 'peso', header: 'Peso', width: '90px' },
+  { field: 'bulto', header: 'Bulto', width: '80px' },
+  { field: 'pesovol', header: 'PesoVol', width: '90px' },
+  { field: 'volumen', header: 'Volumen', width: '90px' },
+  { field: 'cliente', header: 'Cliente', width: '180px' },
+  { field: 'fecharegistro', header: 'F. Reg.', width: '140px' },
+  { field: 'fechahoracita', header: 'Cita Prog.', width: '160px' },
+  { field: 'fechahoracitareal', header: 'Cita Real', width: '160px' },
+  { header: 'Acc.', field: 'acciones', width: '70px' }
 
 ];
 
@@ -142,17 +159,54 @@ this.cols4 = [
   {header: 'Placa', field: 'agencia'  ,  width: '70px'  },
   {header: 'Proveedor', field: 'agenremi'  ,  width: '70px'  },
   {header: 'Chofer', field: 'agendesti'  ,  width: '70px'  },
-  {header: 'Fecha Despacho', field: 'fecha_estado_actual'  ,  width: '70px'  },
-  {header: 'Acciones', field: 'acciones'  ,  width: '30px'  }
+  {header: 'F. DESP.', field: 'fecha_estado_actual'  ,  width: '70px'  },
+  {header: 'Acc.', field: 'acciones'  ,  width: '30px'  }
 
 ];
 
 
+this.cols6 = [
+  { field: 'numcp', header: 'N° OTR',  width: '40px'},
+  { field: 'numcp', header: 'N° OT Original',  width: '40px'},
+  {header: 'F. REC.', field: 'fecharegistro'  , width: '60px'   },
+  {header: 'CLIENTE', field: 'razonsocial'  ,  width: '180px'  },
+  {header: 'DEST.', field: 'destinatario'  , width: '180px'   },
 
-    this.idproveedor  = this.activatedRoute.snapshot.params['id'];
 
-    this.iddepartamento  = this.activatedRoute.snapshot.params['uid'];
+  {header: 'F. ENT.', field: 'fecha_estado_actual'  ,  width: '90px'  },
+  // {header: 'F. ENTREGA COMPROMETIDA', field: 'fechaentrega'  , width: '90px'   },
+  // {header: 'Dif. Fechas', field: 'diferencia_fechas'  ,  width: '20px'  },
 
+  {header: 'BULTOS', field: 'bulto'  , width: '30px'   },
+  {header: 'PESO', field: 'peso'  ,  width: '30px'  },
+  {header: 'ESTADO', field: 'destino'  ,  width: '30px'  },
+  {header: 'ACCIONES', field: 'acciones'  ,  width: '20px'  },
+
+];
+
+    // Ruta: /trafico/vistarepartidor/:idproveedor/:iddepartamento/:idprovincia
+    // Fallback por compatibilidad (antes estaba como :id/:uid)
+    const idprovParam =
+      this.activatedRoute.snapshot.params['idproveedor'] ??
+      this.activatedRoute.snapshot.params['id'];
+    const iddepParam =
+      this.activatedRoute.snapshot.params['iddepartamento'] ??
+      this.activatedRoute.snapshot.params['uid'];
+
+
+    const idprovParsed = Number(idprovParam);
+    const iddepParsed = Number(iddepParam);
+
+
+
+
+    this.idproveedor = Number.isFinite(idprovParsed) ? idprovParsed : idprovParam;
+    this.iddepartamento = Number.isFinite(iddepParsed) ? iddepParsed : iddepParam;
+
+
+
+
+    console.log('idprovincia', this.idprovincia);
 
     this.user = JSON.parse(localStorage.getItem('user'));
     this.model.idusuariocreacion = this.user.usr_int_id;
@@ -164,46 +218,113 @@ this.cols4 = [
   }
   reloadDetalles() {
 
-    
+    // Limpiar ordenes5 antes de cargar nuevos datos para evitar duplicados
+    this.ordenes5 = [];
 
     this.traficoService.getAllManifiestosForProvider(this.idproveedor, 11,  this.iddepartamento ).subscribe(x=> {
       this.despachos1 = x; 
       this.totalRecepcion = x.length;
     });
 
-    this.traficoService.getAllManifiestosForProviderRecojo (this.idproveedor, this.iddepartamento).subscribe(list => {
-      this.despachos = list;
-      this.totalRecojo = list.length;
+    this.traficoService.getAllOTsForProviderRecojo(this.idproveedor, this.iddepartamento).subscribe((list: OrdenTransporteProviderRecojoResult[]) => {
+      const mapped = (list ?? []).map((x) => ({
+        idordentrabajo: x.idordentrabajo,
+        numcp: x.numCp,
+        idestado: x.idEstado,
+        estado: x.estado,
+        razonsocial: x.razonSocial,
+        fecharegistro: x.fechaRegistro,
+        puntorecojo: x.puntoRecojo,
+        origen: x.origen,
+        numhojaruta: x.numHojaRuta,
+        peso: x.peso,
+        bulto: x.bulto,
+        pesovol: x.pesoVol,
+        volumen: x.volumen,
+        cliente: x.cliente,
+        fechahoracita: x.fechaHoraCita,
+        fechahoracitafin: x.fechaHoraCitaFin,
+        fechahoracitareal: x.fechaHoraCitaReal,
+        fechahoracitafinreal: x.fechaHoraCitaFinReal,
+      }));
+      this.ordenesRecojo = mapped;
+      this.totalRecojo = mapped.length;
+
+      console.log('ordenesRecojo', this.ordenesRecojo);
     });
 
-    this.traficoService.getAllOrdersxRepartidor(this.idproveedor, 13).subscribe(x => {
+    this.traficoService.getAllOrdersxRepartidor(this.idproveedor, 13, this.iddepartamento).subscribe(x => {
       this.ordenes2 = x; 
       this.totalReparto = x.length;
     });
 
-      this.traficoService.getAllOrdersxRepartidor(this.idproveedor, 34).subscribe(x => {
+      this.traficoService.getAllOrdersxRepartidor(this.idproveedor, 34, this.iddepartamento).subscribe(x => {
       
         this.ordenes3 = x;
         this.totalRecabarCargo = x.length;
 
       const conTipoEntrega = x.filter(o => o.tipoentrega !== null);
-      this.ordenes5 = [...(this.ordenes5 || []), ...conTipoEntrega];
+      this.ordenes5 = [...this.ordenes5, ...conTipoEntrega];
 
        this.totalObservadas = this.ordenes5.length;
 
     });
 
-    this.traficoService.getAllOrdersxRepartidor(this.idproveedor, 35).subscribe(x => {
+    this.traficoService.getAllOrdersxRepartidor(this.idproveedor, 35, this.iddepartamento).subscribe(x => {
       this.ordenes4 = x;
       this.totalEnviarCargo = x.length;
       const conTipoEntrega = x.filter(o => o.tipoentrega !== null);
-      this.ordenes5 = [...(this.ordenes5 || []), ...conTipoEntrega];
+      this.ordenes5 = [...this.ordenes5, ...conTipoEntrega];
 
       this.totalObservadas = this.ordenes5.length;
 
      
     });
 
+
+      this.traficoService.getAllOrdersxRepartidor(this.idproveedor, 38, this.iddepartamento).subscribe(x => {
+      const conTipoEntrega = x.filter(o => o.tipoentrega !== null && (o as any).idotvinculada === null);
+      this.ordenes5 = conTipoEntrega; // Reemplaza, no acumula
+      this.totalObservadas = this.ordenes5.length;
+
+
+     
+    });
+
+
+
+    
+
+
+    this.traficoService.getOTRsLogisticaInversaxProveedor(this.idproveedor, this.iddepartamento).subscribe({
+      next: (response) => {
+        if (response.success && response.data) {
+          this.ordenes6 = response.data;
+          this.totalPendientesDespacho = response.count || response.data.length;
+
+
+
+           console.log('ordenes6', this.ordenes6);
+
+
+
+        } else {
+          this.ordenes6 = [];
+          this.totalPendientesDespacho = 0;
+
+         
+
+         
+
+
+        }
+      },
+      error: (error) => {
+        console.error('Error al cargar OTRs de logística inversa:', error);
+        this.ordenes6 = [];
+        this.totalPendientesDespacho = 0;
+      }
+    });
 
     this.traficoService.getProveedor(this.idproveedor).subscribe( resp => {
 
@@ -307,6 +428,7 @@ this.cols4 = [
 modalEntregarOT() {
 
   const idorden = this.SelectedOrdenTransporte.idordentrabajo;
+  const numcp = this.SelectedOrdenTransporte.numcp;
   
   
   const ref = this.dialogService.open(EntregarOtModalComponent, {
@@ -314,7 +436,7 @@ modalEntregarOT() {
     width: '50%',
     height: '550px',
     contentStyle: {'height': '550px', overflow: 'auto',  },
-    data : { idorden }
+    data : { idorden, numcp }
   });
   ref.onClose.subscribe(() => {
   
@@ -332,6 +454,389 @@ modalEntregarOT() {
     const url = `http://104.36.166.65/webreports/ot.aspx?idorden=${idOrdenTrabajo}`;
     window.open(url, '_blank');
 }
+
+  esEstadoParcial(rowData: any): boolean {
+    const tipoEntrega = String(rowData?.tipoentrega ?? '').trim();
+    return tipoEntrega.toLowerCase().includes('parcial');
+  }
+
+  accionOTRDesdeObservadas(rowData: any) {
+    const idRaw = rowData?.idordentrabajo ?? rowData?.idOrdenTrabajo;
+    const idotvinculada = Number(idRaw);
+
+    if (!Number.isFinite(idotvinculada) || idotvinculada <= 0) {
+      this.messageService.add({
+        severity: 'warn',
+        summary: 'Crear OTR',
+        detail: 'No se pudo obtener el ID de la OT para vincularla.'
+      });
+      return;
+    }
+
+    if (this.esEstadoParcial(rowData)) {
+      this.router.navigate(['/trafico/nuevaotr'], {
+        queryParams: { idotvinculada, idproveedor: this.idproveedor }
+      });
+      return;
+    }
+
+    // Default: mantener la generación automática actual (rechazados / no entrega, etc.)
+    this.generarOTRLogisticaInversa(idotvinculada);
+  }
+
+  irANuevaOTRDesdeRecojo(rowData: any) {
+    const idotvinculada = rowData?.idordentrabajo;
+    if (!idotvinculada) {
+      this.messageService.add({
+        severity: 'warn',
+        summary: 'Crear OTR',
+        detail: 'No se pudo obtener el ID de la OR para vincularla.'
+      });
+      return;
+    }
+
+    this.router.navigate(['/trafico/nuevaotr'], {
+      // Enviar también el proveedor para que el endpoint pueda generar la OTR vinculada
+      queryParams: { idotvinculada, idproveedor: this.idproveedor }
+    });
+  }
+
+  abrirModalReasignarRepartidor(): void {
+    const row = this.selectedOrdenRecojo;
+    const idordentrabajo = Number(row?.idordentrabajo);
+    if (!Number.isFinite(idordentrabajo) || idordentrabajo <= 0) {
+      this.messageService.add({
+        severity: 'warn',
+        summary: 'Pend. Recojo',
+        detail: 'Seleccione una OT para cambiar de repartidor.',
+      });
+      return;
+    }
+
+    const numcp = String(row?.numcp ?? '').trim();
+
+    const ref = this.dialogService.open(ModalReasignarRepartidorComponent, {
+      header: `Cambiar repartidor${numcp ? ' - ' + numcp : ''}`,
+      width: '520px',
+      contentStyle: { overflow: 'auto' },
+      baseZIndex: 10000,
+      data: { idordentrabajo, numcp },
+    });
+
+    ref.onClose.subscribe((result: any) => {
+      if (result?.success) {
+        this.messageService.add({
+          severity: 'success',
+          summary: 'Pend. Recojo',
+          detail: result?.message ?? 'Repartidor reasignado correctamente.',
+        });
+        this.selectedOrdenRecojo = null;
+        this.reloadDetalles();
+      }
+    });
+  }
+
+  generarManifiestoVirtual(numcp: string) {
+    if (!numcp) {
+      this.messageService.add({
+        severity: 'warn',
+        summary: 'Manifiesto Virtual',
+        detail: 'No se pudo obtener el número de OTR'
+      });
+      return;
+    }
+
+    // Navegar a la ruta del manifiesto virtual con el número de OTR como parámetro
+    this.router.navigate(['/seguimiento/manifiestovirtual', numcp]);
+  }
+
+  copiarDatosWhatsApp(tipoTab: string) {
+    let textoFormateado = '';
+    const fecha = new Date().toLocaleDateString('es-PE', { day: '2-digit', month: '2-digit', year: 'numeric' });
+    
+    textoFormateado += `📋 *REPORTE - ${tipoTab}*\n`;
+    textoFormateado += `Fecha: ${fecha}\n`;
+    textoFormateado += `Repartidor: ${this.repartidor.nombre || 'N/A'}\n`;
+    textoFormateado += `────────────────────\n\n`;
+
+    switch(tipoTab) {
+      case 'Pend. Recepción':
+        textoFormateado += this.formatearDatosRecepcion();
+        break;
+      case 'Pend. Recojo':
+        textoFormateado += this.formatearDatosRecojo();
+        break;
+      case 'O.T. en Reparto':
+        textoFormateado += this.formatearDatosReparto();
+        break;
+      case 'Pend. Recabar Cargo':
+        textoFormateado += this.formatearDatosRecabarCargo();
+        break;
+      case 'Pend. Envio Cargo':
+        textoFormateado += this.formatearDatosEnviarCargo();
+        break;
+      case 'Observadas':
+        textoFormateado += this.formatearDatosObservadas();
+        break;
+      case 'Pend. Despacho':
+        textoFormateado += this.formatearDatosPendientesDespacho();
+        break;
+      default:
+        textoFormateado += 'No hay datos disponibles';
+    }
+
+    this.copiarAlPortapapeles(textoFormateado);
+  }
+
+  formatearDatosRecepcion(): string {
+    if (!this.despachos1 || this.despachos1.length === 0) {
+      return 'No hay datos de recepción pendientes.\n';
+    }
+
+    let texto = `*Total: ${this.despachos1.length} registro(s)*\n\n`;
+    this.despachos1.forEach((item, index) => {
+      texto += `${index + 1}. *HR:* ${item.numHojaRuta || 'N/A'}\n`;
+      texto += `   *Manifiesto:* ${item.numManifiesto || 'N/A'}\n`;
+      texto += `   *Destino:* ${item.destino || 'N/A'}\n`;
+      texto += `   *Placa:* ${item.placa || 'N/A'}\n`;
+      texto += `   *Proveedor:* ${item.proveedor || 'N/A'}\n`;
+      texto += `   *Chofer:* ${item.chofer || 'N/A'}\n`;
+      texto += `   *F. Despacho:* ${item.fechaDespacho ? new Date(item.fechaDespacho).toLocaleDateString('es-PE') : 'N/A'}\n`;
+      texto += `\n`;
+    });
+    return texto;
+  }
+
+  formatearDatosRecojo(): string {
+    if (!this.despachos || this.despachos.length === 0) {
+      return 'No hay datos de recojo pendientes.\n';
+    }
+
+    let texto = `*Total: ${this.despachos.length} registro(s)*\n\n`;
+    this.despachos.forEach((item: any, index) => {
+      texto += `${index + 1}. *HR:* ${item.numHojaRuta || 'N/A'}\n`;
+      texto += `   *Manifiesto:* ${item.numManifiesto || 'N/A'}\n`;
+      texto += `   *Destino:* ${item.destino || 'N/A'}\n`;
+      texto += `   *Agencia:* ${item.agencia || 'N/A'}\n`;
+      texto += `   *Remitente:* ${item.remitente || 'N/A'}\n`;
+      texto += `   *Consignado:* ${item.consignadoagencia || 'N/A'}\n`;
+      texto += `   *F. Despacho:* ${item.fechaDespacho ? new Date(item.fechaDespacho).toLocaleDateString('es-PE') : 'N/A'}\n`;
+      texto += `   *Clave:* ${item.claveagencia || 'N/A'}\n`;
+      texto += `   *Remito:* ${item.nroremito || 'N/A'}\n`;
+      texto += `   *Costo:* S/. ${item.costoenvio || '0.00'}\n`;
+      texto += `\n`;
+    });
+    return texto;
+  }
+
+  formatearDatosReparto(): string {
+    if (!this.ordenes2 || this.ordenes2.length === 0) {
+      return 'No hay órdenes en reparto.\n';
+    }
+
+    let texto = `*Total: ${this.ordenes2.length} orden(es)*\n\n`;
+    this.ordenes2.forEach((item, index) => {
+      texto += `${index + 1}. *N° OT:* ${item.numcp || 'N/A'}\n`;
+      texto += `   *F. Recojo:* ${item.fecharegistro ? new Date(item.fecharegistro).toLocaleDateString('es-PE') : 'N/A'}\n`;
+      texto += `   *Cliente:* ${item.razonsocial || 'N/A'}\n`;
+      texto += `   *Destinatario:* ${item.destinatario || 'N/A'}\n`;
+      texto += `   *F. Entrega:* ${item.fechaentregareparto ? new Date(item.fechaentregareparto).toLocaleDateString('es-PE', { day: '2-digit', month: '2-digit', year: 'numeric', hour: '2-digit', minute: '2-digit' }) : 'N/A'}\n`;
+      texto += `   *Bultos:* ${item.bulto || '0'}\n`;
+      texto += `   *Peso:* ${item.peso || '0'} kg\n`;
+      texto += `   *Estado:* ${item.estado || 'N/A'}\n`;
+      texto += `\n`;
+    });
+    return texto;
+  }
+
+  formatearDatosRecabarCargo(): string {
+    if (!this.ordenes3 || this.ordenes3.length === 0) {
+      return 'No hay órdenes pendientes de recabar cargo.\n';
+    }
+
+    let texto = `*Total: ${this.ordenes3.length} orden(es)*\n\n`;
+    this.ordenes3.forEach((item, index) => {
+      texto += `${index + 1}. *N° OT:* ${item.numcp || 'N/A'}\n`;
+      texto += `   *F. Recojo:* ${item.fecharegistro ? new Date(item.fecharegistro).toLocaleDateString('es-PE') : 'N/A'}\n`;
+      texto += `   *Cliente:* ${item.razonsocial || 'N/A'}\n`;
+      texto += `   *Destinatario:* ${item.destinatario || 'N/A'}\n`;
+      texto += `   *F. Entrega:* ${item.fechaentregareparto ? new Date(item.fechaentregareparto).toLocaleDateString('es-PE', { day: '2-digit', month: '2-digit', year: 'numeric', hour: '2-digit', minute: '2-digit' }) : 'N/A'}\n`;
+      texto += `   *Bultos:* ${item.bulto || '0'}\n`;
+      texto += `   *Peso:* ${item.peso || '0'} kg\n`;
+      texto += `   *Estado:* ${item.estado || 'N/A'}\n`;
+      texto += `\n`;
+    });
+    return texto;
+  }
+
+  formatearDatosEnviarCargo(): string {
+    if (!this.ordenes4 || this.ordenes4.length === 0) {
+      return 'No hay órdenes pendientes de enviar cargo.\n';
+    }
+
+    let texto = `*Total: ${this.ordenes4.length} orden(es)*\n\n`;
+    this.ordenes4.forEach((item, index) => {
+      texto += `${index + 1}. *N° OT:* ${item.numcp || 'N/A'}\n`;
+      texto += `   *F. Recojo:* ${item.fecharegistro ? new Date(item.fecharegistro).toLocaleDateString('es-PE') : 'N/A'}\n`;
+      texto += `   *Cliente:* ${item.razonsocial || 'N/A'}\n`;
+      texto += `   *Destinatario:* ${item.destinatario || 'N/A'}\n`;
+      texto += `   *F. Entrega:* ${item.fechaentregareparto ? new Date(item.fechaentregareparto).toLocaleDateString('es-PE', { day: '2-digit', month: '2-digit', year: 'numeric', hour: '2-digit', minute: '2-digit' }) : 'N/A'}\n`;
+      texto += `   *Bultos:* ${item.bulto || '0'}\n`;
+      texto += `   *Peso:* ${item.peso || '0'} kg\n`;
+      texto += `   *Estado:* ${item.estado || 'N/A'}\n`;
+      texto += `\n`;
+    });
+    return texto;
+  }
+
+  formatearDatosObservadas(): string {
+    if (!this.ordenes5 || this.ordenes5.length === 0) {
+      return 'No hay órdenes observadas.\n';
+    }
+
+    let texto = `*Total: ${this.ordenes5.length} orden(es)*\n\n`;
+    this.ordenes5.forEach((item, index) => {
+      texto += `${index + 1}. *N° OT:* ${item.numcp || 'N/A'}\n`;
+      texto += `   *F. Recojo:* ${item.fecharegistro ? new Date(item.fecharegistro).toLocaleDateString('es-PE') : 'N/A'}\n`;
+      texto += `   *Cliente:* ${item.razonsocial || 'N/A'}\n`;
+      texto += `   *Destinatario:* ${item.destinatario || 'N/A'}\n`;
+      texto += `   *F. Entrega:* ${item.fechaentregareparto ? new Date(item.fechaentregareparto).toLocaleDateString('es-PE', { day: '2-digit', month: '2-digit', year: 'numeric', hour: '2-digit', minute: '2-digit' }) : 'N/A'}\n`;
+      texto += `   *Bultos:* ${item.bulto || '0'}\n`;
+      texto += `   *Peso:* ${item.peso || '0'} kg\n`;
+      texto += `   *Tipo Entrega:* ${item.tipoentrega || 'N/A'}\n`;
+      texto += `\n`;
+    });
+    return texto;
+  }
+
+  formatearDatosPendientesDespacho(): string {
+    if (!this.ordenes6 || this.ordenes6.length === 0) {
+      return 'No hay OTRs pendientes de despacho.\n';
+    }
+
+    let texto = `*Total: ${this.ordenes6.length} OTR(s)*\n\n`;
+    this.ordenes6.forEach((item: any, index) => {
+      texto += `${index + 1}. *N° OTR:* ${item.numCp || item.numcp || 'N/A'}\n`;
+      texto += `   *N° OT Original:* ${item.numCpOtOriginal || item.numcpOtOriginal || 'N/A'}\n`;
+      texto += `   *F. Recojo:* ${item.fecharegistro ? new Date(item.fecharegistro).toLocaleDateString('es-PE') : 'N/A'}\n`;
+      texto += `   *Cliente:* ${item.razonsocial || 'N/A'}\n`;
+      texto += `   *Destinatario:* ${item.destinatario || 'N/A'}\n`;
+      texto += `   *F. Entrega:* ${item.fechaentregareparto ? new Date(item.fechaentregareparto).toLocaleDateString('es-PE', { day: '2-digit', month: '2-digit', year: 'numeric', hour: '2-digit', minute: '2-digit' }) : 'N/A'}\n`;
+      texto += `   *Bultos:* ${item.bulto || '0'}\n`;
+      texto += `   *Peso:* ${item.peso || '0'} kg\n`;
+      texto += `   *Estado:* ${item.estado || 'N/A'}\n`;
+      texto += `\n`;
+    });
+    return texto;
+  }
+
+  copiarAlPortapapeles(texto: string) {
+    if (navigator.clipboard && navigator.clipboard.writeText) {
+      navigator.clipboard.writeText(texto).then(() => {
+        this.messageService.add({
+          severity: 'success',
+          summary: 'Copiado',
+          detail: 'Los datos han sido copiados al portapapeles. Puedes pegarlos en WhatsApp.'
+        });
+      }).catch(err => {
+        console.error('Error al copiar:', err);
+        this.copiarFallback(texto);
+      });
+    } else {
+      this.copiarFallback(texto);
+    }
+  }
+
+  copiarFallback(texto: string) {
+    const textarea = document.createElement('textarea');
+    textarea.value = texto;
+    textarea.style.position = 'fixed';
+    textarea.style.left = '-999999px';
+    document.body.appendChild(textarea);
+    textarea.select();
+    try {
+      document.execCommand('copy');
+      this.messageService.add({
+        severity: 'success',
+        summary: 'Copiado',
+        detail: 'Los datos han sido copiados al portapapeles. Puedes pegarlos en WhatsApp.'
+      });
+    } catch (err) {
+      console.error('Error al copiar:', err);
+      this.messageService.add({
+        severity: 'error',
+        summary: 'Error',
+        detail: 'No se pudo copiar al portapapeles. Por favor, copia manualmente.'
+      });
+    } finally {
+      document.body.removeChild(textarea);
+    }
+  }
+
+  generarOTRLogisticaInversa(idOrdenTrabajo: number) {
+    if (!idOrdenTrabajo) {
+      this.messageService.add({
+        severity: 'warn',
+        summary: 'Generar OTR',
+        detail: 'No se pudo obtener el ID de la orden de trabajo'
+      });
+      return;
+    }
+
+    // Obtener el usuario del localStorage si no está inicializado
+    if (!this.user) {
+      this.user = JSON.parse(localStorage.getItem('user'));
+    }
+
+    const idUsuario = this.user?.id;
+    if (!idUsuario) {
+      this.messageService.add({
+        severity: 'warn',
+        summary: 'Generar OTR',
+        detail: 'No se pudo obtener el ID del usuario'
+      });
+      return;
+    }
+
+    // Mostrar diálogo de confirmación
+    this.confirmationService.confirm({
+      message: '¿Está seguro que desea generar una OTR de logística inversa?',
+      header: 'Confirmar Generación',
+      icon: 'pi pi-exclamation-triangle',
+      acceptLabel: 'Sí',
+      rejectLabel: 'No',
+      accept: () => {
+        this.traficoService.generarOTRLogisticaInversa(idOrdenTrabajo, idUsuario).subscribe({
+          next: (response) => {
+            if (response.success) {
+              const numcpOTR = response.otrLogisticaInversa?.numcp || 'N/A';
+              this.messageService.add({
+                severity: 'success',
+                summary: 'OTR Generada',
+                detail: `Se ha generado una OTR de logística inversa correctamente. Número: ${numcpOTR}`
+              });
+              // Recargar los detalles después de generar la OTR
+              this.reloadDetalles();
+            } else {
+              this.messageService.add({
+                severity: 'error',
+                summary: 'Generar OTR',
+                detail: response.message || 'Error al generar la OTR de logística inversa'
+              });
+            }
+          },
+          error: (error) => {
+            console.error('Error al generar OTR:', error);
+            this.messageService.add({
+              severity: 'error',
+              summary: 'Generar OTR',
+              detail: error.error?.message || 'Error al generar la OTR de logística inversa'
+            });
+          }
+        });
+      }
+    });
+  }
  asignarTipoOperacion() {
   if (!this.selectedManifiesto || !this.selectedManifiesto.idManifiesto) {
     this.messageService.add({

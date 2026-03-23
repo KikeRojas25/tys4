@@ -406,7 +406,8 @@ onRowEditCancel(order: OrdenTransporte, index: number) {
   delete this.ordenes[order.idordentrabajo];
 }
 exportExcel() {
-  import('xlsx').then(xlsx => {
+  import('xlsx').then((xlsx: any) => {
+    const XLSX: any = xlsx?.default ?? xlsx;
 
     const exportData = this.ordenes.map(orden => ({
       OT: orden.numcp,
@@ -465,7 +466,7 @@ exportExcel() {
 
     
 
-      const worksheet = xlsx.utils.json_to_sheet( exportData );
+      const worksheet = XLSX.utils.json_to_sheet( exportData );
 
       // 👇 Establecer ancho de columnas (medido en número de caracteres)
       worksheet['!cols'] = [
@@ -488,7 +489,7 @@ exportExcel() {
 
       const headerKeys = Object.keys(exportData[0]);
       headerKeys.forEach((key, index) => {
-        const cellRef = xlsx.utils.encode_cell({ r: 0, c: index });
+        const cellRef = XLSX.utils.encode_cell({ r: 0, c: index });
         if (worksheet[cellRef]) {
           worksheet[cellRef].s = {
             font: { bold: true, color: { rgb: "FFFFFF" } },
@@ -503,7 +504,7 @@ exportExcel() {
         SheetNames: ['data']
       };
   
-      const excelBuffer: any = xlsx.write(workbook, {
+      const excelBuffer: any = XLSX.write(workbook, {
         bookType: 'xlsx',
         type: 'array',
         cellStyles: true 

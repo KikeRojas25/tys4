@@ -130,20 +130,21 @@ export class ListpendientesComponent implements OnInit {
     this.cols = [
       { field: 'numcp', header: 'Nro OT', width: '120px' },
       { field: 'fecharegistro', header: 'Fecha Registro', width: '130px' },
-      
-      { field: 'destinatario', header: 'Destinatario', width: '200px' },
+      { field: 'remitente', header: 'Remitente', width: '130px' },
+      { field: 'destinatario', header: 'Destinatario', width: '130px' },
       { field: 'origen', header: 'Origen', width: '150px' },
       { field: 'destino', header: 'Destino', width: '150px' },
       { field: 'modotransporte', header: 'Modo', width: '100px' },
-      { field: 'tipooperacion', header: 'Tipo Op.', width: '100px' },
+      // { field: 'tipooperacion', header: 'Tipo Op.', width: '100px' },
       { field: 'peso', header: 'Peso', width: '100px' },
       { field: 'volumen', header: 'Volumen', width: '100px' },
       { field: 'bulto', header: 'Bultos', width: '80px' },
-      // { field: 'tarifa', header: 'Tarifa', width: '100px' },
+            { field: 'pesovol', header: 'Peso Vol', width: '120px' },
+     { field: 'tarifa', header: 'Tarifa', width: '100px' },
       { field: 'subtotal', header: 'Subtotal', width: '100px' },
-      { field: 'igv', header: 'IGV', width: '100px' },
-      { field: 'total', header: 'Total', width: '100px' },
-      { field: 'guiatransportista', header: 'Guía', width: '120px' }
+    
+      { field: 'recargo', header: 'Recargo', width: '100px' },
+
     ];
   }
 

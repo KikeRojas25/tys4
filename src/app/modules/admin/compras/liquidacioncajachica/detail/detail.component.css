@@ -1,0 +1,29 @@
+/* Estilo compacto para tabla de detalle (similar al modal de agregar/editar) */
+
+:host ::ng-deep .compact-ot-table .p-datatable-thead > tr > th {
+  border: none !important;
+  background: #f3f4f6 !important; /* gray-100 */
+  color: #111827 !important; /* gray-900 */
+  font-size: 12px !important;
+  font-weight: 600 !important;
+  padding: 8px 10px !important;
+}
+
+:host ::ng-deep .compact-ot-table .p-datatable-tbody > tr > td {
+  font-size: 12px !important;
+  color: #374151 !important; /* gray-700 */
+  padding: 8px 10px !important;
+  border-color: #e5e7eb !important; /* gray-200 */
+}
+
+:host ::ng-deep .compact-ot-table .p-datatable-tbody > tr:hover > td {
+  background: #f9fafb !important; /* gray-50 */
+}
+
+/* Header sticky dentro del scroll para ver muchos registros */
+:host ::ng-deep .compact-ot-table .p-datatable-scrollable-header {
+  position: sticky !important;
+  top: 0 !important;
+  z-index: 2 !important;
+}
+

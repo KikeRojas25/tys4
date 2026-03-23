@@ -8,6 +8,43 @@ export const defaultNavigation: FuseNavigationItem[] = [
         type : 'basic',
         icon : 'heroicons_outline:chart-pie',
         link : '/example'
+    },
+    {
+        id   : 'comercial',
+        title: 'Comercial',
+        type : 'aside',
+        icon : 'heroicons_outline:briefcase',
+        children: [
+            {
+                id   : 'leadtimes',
+                title: 'Lead Times',
+                type : 'basic',
+                icon : 'heroicons_outline:clock',
+                link : '/comercial/leadtimes'
+            }
+        ]
+    },
+    {
+        id   : 'compras',
+        title: 'Compras',
+        type : 'aside',
+        icon : 'heroicons_outline:shopping-cart',
+        children: [
+            {
+                id   : 'liquidacioncajachica',
+                title: 'Liquidación Caja Chica',
+                type : 'basic',
+                icon : 'heroicons_outline:currency-dollar',
+                link : '/compras/liquidacioncajachica'
+            },
+            {
+                id   : 'masterliquidaciones',
+                title: 'Master Liquidaciones',
+                type : 'basic',
+                icon : 'heroicons_outline:clipboard-document-list',
+                link : '/compras/master-liquidaciones'
+            }
+        ]
     }
 ];
 export const compactNavigation: FuseNavigationItem[] = [
@@ -17,6 +54,43 @@ export const compactNavigation: FuseNavigationItem[] = [
         type : 'basic',
         icon : 'heroicons_outline:chart-pie',
         link : '/example'
+    },
+    {
+        id   : 'comercial',
+        title: 'Comercial',
+        type : 'aside',
+        icon : 'heroicons_outline:briefcase',
+        children: [
+            {
+                id   : 'leadtimes',
+                title: 'Lead Times',
+                type : 'basic',
+                icon : 'heroicons_outline:clock',
+                link : '/comercial/leadtimes'
+            }
+        ]
+    },
+    {
+        id   : 'compras',
+        title: 'Compras',
+        type : 'aside',
+        icon : 'heroicons_outline:shopping-cart',
+        children: [
+            {
+                id   : 'liquidacioncajachica',
+                title: 'Liquidación Caja Chica',
+                type : 'basic',
+                icon : 'heroicons_outline:currency-dollar',
+                link : '/compras/liquidacioncajachica'
+            },
+            {
+                id   : 'masterliquidaciones',
+                title: 'Master Liquidaciones',
+                type : 'basic',
+                icon : 'heroicons_outline:clipboard-document-list',
+                link : '/compras/master-liquidaciones'
+            }
+        ]
     }
 ];
 export const futuristicNavigation: FuseNavigationItem[] = [
@@ -26,6 +100,43 @@ export const futuristicNavigation: FuseNavigationItem[] = [
         type : 'basic',
         icon : 'heroicons_outline:chart-pie',
         link : '/example'
+    },
+    {
+        id   : 'comercial',
+        title: 'Comercial',
+        type : 'aside',
+        icon : 'heroicons_outline:briefcase',
+        children: [
+            {
+                id   : 'leadtimes',
+                title: 'Lead Times',
+                type : 'basic',
+                icon : 'heroicons_outline:clock',
+                link : '/comercial/leadtimes'
+            }
+        ]
+    },
+    {
+        id   : 'compras',
+        title: 'Compras',
+        type : 'aside',
+        icon : 'heroicons_outline:shopping-cart',
+        children: [
+            {
+                id   : 'liquidacioncajachica',
+                title: 'Liquidación Caja Chica',
+                type : 'basic',
+                icon : 'heroicons_outline:currency-dollar',
+                link : '/compras/liquidacioncajachica'
+            },
+            {
+                id   : 'masterliquidaciones',
+                title: 'Master Liquidaciones',
+                type : 'basic',
+                icon : 'heroicons_outline:clipboard-document-list',
+                link : '/compras/master-liquidaciones'
+            }
+        ]
     }
 ];
 export const horizontalNavigation: FuseNavigationItem[] = [
@@ -35,5 +146,42 @@ export const horizontalNavigation: FuseNavigationItem[] = [
         type : 'basic',
         icon : 'heroicons_outline:chart-pie',
         link : '/example'
+    },
+    {
+        id   : 'comercial',
+        title: 'Comercial',
+        type : 'aside',
+        icon : 'heroicons_outline:briefcase',
+        children: [
+            {
+                id   : 'leadtimes',
+                title: 'Lead Times',
+                type : 'basic',
+                icon : 'heroicons_outline:clock',
+                link : '/comercial/leadtimes'
+            }
+        ]
+    },
+    {
+        id   : 'compras',
+        title: 'Compras',
+        type : 'aside',
+        icon : 'heroicons_outline:shopping-cart',
+        children: [
+            {
+                id   : 'liquidacioncajachica',
+                title: 'Liquidación Caja Chica',
+                type : 'basic',
+                icon : 'heroicons_outline:currency-dollar',
+                link : '/compras/liquidacioncajachica'
+            },
+            {
+                id   : 'masterliquidaciones',
+                title: 'Master Liquidaciones',
+                type : 'basic',
+                icon : 'heroicons_outline:clipboard-document-list',
+                link : '/compras/master-liquidaciones'
+            }
+        ]
     }
 ];

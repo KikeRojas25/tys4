@@ -2,8 +2,35 @@ export interface Proveedor {
     idProveedor: number;
     ruc: string;
     razonSocial: string;
-    distrito : string;
+    distrito?: string;
+
+    // Campos CRUD (según ProveedorController)
+    activo?: boolean;
+    direccion?: string | null;
+    tipoId?: number | null;
+    idDepartamento?: number | null;
+    idProvincia?: number | null;
+    idProvinciaRepartidor?: number | null;
+    telefono?: string | null;
+
+    // Campos de presentación (cuando el API devuelve joins/labels)
+    tipo?: string | null;
+    departamento?: string | null;
+    provincia?: string | null;
+    provinciaRepartidor?: string | null;
+    ubigeo?: string | null;
   }
+
+export interface ProveedorForCreateDto {
+  razonSocial: string;
+  ruc: string;
+  direccion?: string | null;
+  tipoId: number;
+  idDepartamento: number | null;
+  idProvincia: number | null;
+  idProvinciaRepartidor?: number | null;
+  telefono?: string | null;
+}
 
   export interface InsertarPrecintoRequest {
     precinto: string;

@@ -1,0 +1,27 @@
+.action-btn {
+  min-width: 2rem;
+  padding: 0.35rem;
+}
+
+.action-btn-info {
+  background-color: #03a9f4 !important;
+  border-color: #03a9f4 !important;
+  color: white !important;
+}
+
+.action-btn-primary {
+  background-color: #2196f3 !important;
+  border-color: #2196f3 !important;
+  color: white !important;
+}
+
+.action-btn-success {
+  background-color: #4caf50 !important;
+  border-color: #4caf50 !important;
+  color: white !important;
+}
+
+.word-wrap {
+  word-wrap: break-word;
+  white-space: normal;
+}

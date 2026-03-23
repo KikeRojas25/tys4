@@ -196,10 +196,6 @@ this.reloadDetalles();
 
 
 
-planificar(){
-
-}
-
 generar(idcarga: number) {
 
   const ref = this.dialogService.open(AsignarPlacaComponent, {
@@ -254,12 +250,6 @@ agregarEtapa(despacho: any) {
   this.router.navigate(['/planning/despachos-generados'], {
     queryParams: { idcarga: despacho.idcarga }
   });
-}
-
-verOT(idordentrabajo: number){
-
-  this.router.navigate(['/seguimiento/verorden', idordentrabajo]);
-
 }
 
 desasignarOT(idordentrabajo: number){

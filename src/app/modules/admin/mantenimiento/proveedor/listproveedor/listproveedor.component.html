@@ -1,74 +1,137 @@
-<div class="flex flex-col flex-auto min-w-0">
-  <div class="flex flex-col sm:flex-row flex-0 sm:items-center sm:justify-between p-6 sm:py-8 sm:px-10 border-b bg-card dark:bg-transparent">
+<div class="flex flex-col flex-auto min-w-0 bg-gray-50">
+  <!-- Header -->
+  <div class="flex flex-col sm:flex-row flex-0 sm:items-center sm:justify-between p-2 sm:py-8 sm:px-10 border-b border-gray-200 bg-white shadow-sm">
     <div class="flex-1 min-w-0">
-      <div class="flex flex-wrap items-center font-medium">
+      <div class="flex flex-wrap items-center font-medium text-sm text-gray-600">
         <div>
-          <a class="whitespace-nowrap text-primary-500">TMS</a>
+          <a class="whitespace-nowrap text-gray-700 hover:text-gray-900">TMS</a>
         </div>
         <div class="flex items-center ml-1 whitespace-nowrap">
-          <mat-icon class="fuse-horizontal-navigation-item-icon" [svgIcon]="'heroicons_solid:chevron-right'"></mat-icon>
-          <a class="ml-1 text-primary-500">Mantenimiento</a>
+          <mat-icon class="fuse-horizontal-navigation-item-icon text-gray-400" [svgIcon]="'heroicons_solid:chevron-right'"></mat-icon>
+          <a class="ml-1 text-gray-700 hover:text-gray-900">Mantenimiento</a>
         </div>
-        <!-- <div class="flex items-center ml-1 whitespace-nowrap">
-          <mat-icon class="fuse-horizontal-navigation-item-icon" [svgIcon]="'heroicons_solid:chevron-right'"></mat-icon>
-          <a class="ml-1 text-primary-500" [routerLink]="['/trafico/integrado']">Proveedo</a>
-        </div> -->
       </div>
       <div class="mt-2">
-        <h2 class="text-3xl md:text-4xl font-extrabold tracking-tight leading-7 sm:leading-10 truncate"> Listado de proveedores  </h2>
+        <h2 class="text-3xl md:text-4xl font-semibold tracking-tight leading-7 sm:leading-10 truncate text-gray-900">Listado de proveedores</h2>
+        <p class="text-sm text-amber-700 mt-1.5">Gestión de proveedores (crear, editar, eliminar)</p>
       </div>
     </div>
   </div>
 
-  <div class="flex flex-col p-6 sm:py-8 sm:px-10 border-b bg-card dark:bg-transparent">
+  <p-toast />
+  <p-confirmDialog />
 
-    <div class="button-group mb-4">
-      <p-button  label="Nuevo proveedor" icon="fa fa-paper-plane" (onClick)="nuevo()">
-     
-      </p-button>
-    
+  <!-- Contenido -->
+  <div class="main-content container-fluid p-2">
 
+    <!-- Filtros -->
+    <div class="bg-white rounded-lg shadow-sm border border-gray-200 mb-2 overflow-hidden">
+      <div class="p-2">
+        <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-6 gap-2">
+          <div class="flex flex-col lg:col-span-3">
+            <label class="mb-1">Criterio:</label>
+            <input pInputText [(ngModel)]="model.criterio" [style]="{'width':'100%'}" placeholder="Razón social / RUC / dirección" (keyup.enter)="buscar()" />
+          </div>
 
+          <div class="flex flex-col lg:col-span-2">
+            <label class="mb-1">Tipo:</label>
+            <p-dropdown
+              name="tipo"
+              [options]="tipos"
+              [(ngModel)]="model.tipoId"
+              [style]="{'width':'100%'}"
+              appendTo="body"
+              [filter]="true"
+              placeholder="Seleccione un tipo">
+              <ng-template let-item pTemplate="selectedItem">
+                <span>{{item.label}}</span>
+              </ng-template>
+            </p-dropdown>
+          </div>
 
+          <div class="flex flex-col mt-4">
+            <button
+              class="px-4 py-2.5 text-sm font-medium text-white bg-gray-700 hover:bg-gray-600 rounded-md shadow-sm transition-all duration-150"
+              pButton
+              label="Buscar"
+              icon="pi pi-search"
+              iconPos="left"
+              (click)="buscar()">
+            </button>
+          </div>
 
+          <div class="flex flex-col mt-4">
+            <button
+              class="px-4 py-2.5 text-sm font-medium text-gray-700 bg-white border border-gray-300 hover:bg-gray-50 rounded-md shadow-sm transition-all duration-150"
+              pButton
+              label="Nuevo"
+              icon="pi pi-plus"
+              iconPos="left"
+              (click)="nuevo()">
+            </button>
+          </div>
+        </div>
+      </div>
     </div>
-  <div class="flex flex-col min-w-0 w-full">
-    <div class="p-1">
-     
 
+    <!-- Tabla -->
+    <div class="bg-white rounded-lg shadow-sm border border-gray-200 overflow-hidden">
+      <div class="p-6">
+        <p-table
+          [value]="provedores"
+          [paginator]="true"
+          [rows]="20"
+          [rowsPerPageOptions]="[20,40,60,120]"
+          [columns]="cols"
+          scrollHeight="75vh"
+          [resizableColumns]="true"
+          [tableStyle]="{ 'table-layout': 'fixed', 'width': '100%' }"
+          [scrollable]="true"
+          [loading]="loading"
+          [styleClass]="'custom-table'"
+          class="w-full">
 
-        <p-table [columns]="cols" [value]="provedores" 
-        class="w-full" [paginator]="true" [rows]="10" 
-        [tableStyle]="{ 'table-layout': 'fixed', 'width': '100%' }"
-            selectionMode="single" >
+          <ng-template pTemplate="colgroup" let-columns>
+            <colgroup>
+              <col *ngFor="let col of columns" [style.width]="col.width">
+            </colgroup>
+          </ng-template>
+
           <ng-template pTemplate="header" let-columns>
-            <tr>
-                <th [ngStyle]="{'width': col.width}" *ngFor="let col of columns" pResizableColumn [pSortableColumn]="col.field">
-                    {{col.header}}
-                    <p-sortIcon [field]="col.field" ariaLabel="Activate to sort" ariaLabelDesc="Activate to sort in descending order" ariaLabelAsc="Activate to sort in ascending order"></p-sortIcon>
-                </th>
+            <tr class="bg-gray-800 text-white">
+              <th *ngFor="let col of columns"
+                  class="text-center px-4 py-3 text-sm font-semibold text-gray-100 border-b border-gray-700">
+                {{ col.header }}
+              </th>
             </tr>
-        </ng-template>
+          </ng-template>
 
-      <ng-template pTemplate="body" let-rowData let-columns="columns">
-      <tr [pSelectableRow]="rowData">
+          <ng-template pTemplate="body" let-rowData>
+            <tr class="border-b border-gray-100 hover:bg-gray-50 transition-colors duration-150">
+              <td class="text-center px-2 py-2">
+                <div class="flex gap-1 justify-center items-center">
+                  <button pButton class="action-btn action-btn-primary" icon="pi pi-pencil" title="Editar" (click)="editar(rowData.idProveedor || rowData.idproveedor)"></button>
+                  <button pButton class="action-btn action-btn-danger" icon="pi pi-trash" title="Eliminar" (click)="eliminar(rowData.idProveedor || rowData.idproveedor)"></button>
+                </div>
+              </td>
+              <td class="text-center px-4 py-3 text-gray-700 text-sm">{{ rowData.tipo || rowData.tipoId }}</td>
+              <td class="text-left px-4 py-3 text-gray-700 text-sm word-wrap">{{ rowData.razonSocial }}</td>
+              <td class="text-center px-4 py-3 text-gray-700 text-sm">{{ rowData.ruc }}</td>
+              <td class="text-left px-4 py-3 text-gray-700 text-sm word-wrap">{{ rowData.direccion }}</td>
+              <td class="text-left px-4 py-3 text-gray-700 text-sm word-wrap">{{ rowData.ubigeo || (rowData.departamento ? (rowData.departamento + ' - ' + rowData.provincia) : '') }}</td>
+              <td class="text-center px-4 py-3 text-gray-700 text-sm">{{ rowData.telefono }}</td>
+            </tr>
+          </ng-template>
 
-          <!-- <td class="ui-resizable-column"> {{rowData.id }}</td> -->
-          <td class="ui-resizable-column">
-       
-              <p-button size="small" severity="danger"   icon="fa fa-trash"></p-button>
-              <p-button  size="small" severity="secondary"   icon="fa fa-edit"></p-button>
-        </td>
-          <td style="text-align: left;" class="ui-resizable-column"> {{rowData.tipo}}</td>
-          <td style="text-align: left;" class="word-wrap ui-resizable-column"> {{rowData.razonSocial}}</td>
-          <td style="text-align: left;" class="ui-resizable-column"> {{rowData.ruc}}</td>
-          <td style="text-align: left;" class="ui-resizable-column"> {{rowData.direccion}}</td>
-          <td style="text-align: left;" class="ui-resizable-column"> {{rowData.ubigeo}}</td>
-          <td style="text-align: left;" class="ui-resizable-column"> {{rowData.telefono}}</td>
-         
-      </tr>
-      </ng-template>
-      </p-table>
+          <ng-template pTemplate="emptymessage">
+            <tr>
+              <td colspan="7" class="text-center p-4">
+                <span class="text-gray-600">No hay proveedores para mostrar</span>
+              </td>
+            </tr>
+          </ng-template>
+        </p-table>
+      </div>
     </div>
   </div>
 </div>

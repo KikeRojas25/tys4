@@ -2,8 +2,9 @@ import { CommonModule } from '@angular/common';
 import { Component, OnInit } from '@angular/core';
 import { FormBuilder, FormGroup, FormsModule, ReactiveFormsModule, Validators } from '@angular/forms';
 import { MatIconModule } from '@angular/material/icon';
-import { MessageService, SelectItem } from 'primeng/api';
+import { ConfirmationService, MessageService, SelectItem } from 'primeng/api';
 import { ButtonModule } from 'primeng/button';
+import { ConfirmDialogModule } from 'primeng/confirmdialog';
 import { DropdownModule } from 'primeng/dropdown';
 import { DynamicDialogConfig, DynamicDialogRef } from 'primeng/dynamicdialog';
 import { InputTextModule } from 'primeng/inputtext';
@@ -16,7 +17,6 @@ import { Tarifa } from '../tarifa.types';
 interface RangoTarifa {
   idtarifa?: number;
   montobase?: number;
-  pesovolumen?: number;
   minimo?: number;
   desde?: number;
   hasta?: number;
@@ -40,6 +40,7 @@ interface GuiaGRR {
     ReactiveFormsModule,
     MatIconModule,
     ButtonModule,
+    ConfirmDialogModule,
     DropdownModule,
     InputTextModule,
     TableModule,
@@ -47,7 +48,8 @@ interface GuiaGRR {
     CheckboxModule
   ],
   templateUrl: './new.component.html',
-  styleUrls: ['./new.component.css']
+  styleUrls: ['./new.component.css'],
+  providers: [ConfirmationService]
 })
 export class NewComponent implements OnInit {
   tarifaForm: FormGroup;
@@ -56,6 +58,7 @@ export class NewComponent implements OnInit {
 
   // Dropdowns
   clientes: SelectItem[] = [];
+  centrosCosto: SelectItem[] = [];
   departamentosOrigen: SelectItem[] = [];
   provinciasOrigen: SelectItem[] = [];
   distritosOrigen: SelectItem[] = [];
@@ -77,16 +80,20 @@ export class NewComponent implements OnInit {
 
   // Variable para guardar el valor de fórmula que se debe establecer después de cargar las opciones
   idformulaPendiente: number | null = null;
+  // Variable para setear centro de costo luego de cargar opciones
+  idCentroCostoPendiente: number | null = null;
 
   constructor(
     private fb: FormBuilder,
     private mantenimientoService: MantenimientoService,
     private messageService: MessageService,
+    private confirmationService: ConfirmationService,
     public ref: DynamicDialogRef,
     public config: DynamicDialogConfig
   ) {
     this.tarifaForm = this.fb.group({
       idcliente: [null, Validators.required],
+      idcentrocosto: [null],
       idorigendepartamento: [null],
       idorigenprovincia: [null],
       idorigendistrito: [null],
@@ -96,7 +103,7 @@ export class NewComponent implements OnInit {
       idformula: [null],
       idtipotransporte: [null],
       idtipounidad: [null],
-      conceptos: [null],
+      idconceptocobro: [null],
       consideraPesoVolumetrico: [false]
     });
   }
@@ -212,7 +219,7 @@ export class NewComponent implements OnInit {
     this.mantenimientoService.getValorTabla(5).subscribe({
       next: (valores) => {
         this.conceptosCobro = valores.map(v => ({
-          value: v.valor,
+          value: v.idValorTabla,
           label: v.valor
         }));
       }
@@ -220,6 +227,13 @@ export class NewComponent implements OnInit {
   }
 
   configurarCascadas(): void {
+    // Centro de costo depende del cliente seleccionado
+    this.tarifaForm.get('idcliente')?.valueChanges.subscribe((idCliente) => {
+      // al cambiar cliente, limpiar selección y recargar lista
+      this.tarifaForm.patchValue({ idcentrocosto: null }, { emitEvent: false });
+      this.cargarCentroCosto(idCliente);
+    });
+
     // Cascada Origen
     this.tarifaForm.get('idorigendepartamento')?.valueChanges.subscribe(idDep => {
       this.cargarProvinciasOrigen(idDep);
@@ -236,6 +250,38 @@ export class NewComponent implements OnInit {
 
     this.tarifaForm.get('idprovinciadestino')?.valueChanges.subscribe(idProv => {
       this.cargarDistritosDestino(idProv);
+    });
+  }
+
+  private cargarCentroCosto(idCliente: any): void {
+    const id = Number(idCliente);
+    if (!Number.isFinite(id) || id <= 0) {
+      this.centrosCosto = [];
+      return;
+    }
+
+    this.mantenimientoService.getAllCentroCosto(id).subscribe({
+      next: (resp: any[]) => {
+        this.centrosCosto = (resp ?? [])
+          .map((x: any) => ({
+            value: Number(x?.idCentroCosto ?? x?.IdCentroCosto ?? x?.idcentrocosto),
+            label: String(x?.centroCostoNombre ?? x?.CentroCostoNombre ?? x?.nombre ?? '').trim()
+          }))
+          .filter((i: any) => Number.isFinite(Number(i.value)) && !!i.label);
+
+        if (this.idCentroCostoPendiente !== null) {
+          this.tarifaForm.patchValue({ idcentrocosto: this.idCentroCostoPendiente });
+          this.idCentroCostoPendiente = null;
+        }
+      },
+      error: () => {
+        this.centrosCosto = [];
+        this.messageService.add({
+          severity: 'error',
+          summary: 'Error',
+          detail: 'No se pudieron cargar los centros de costo'
+        });
+      }
     });
   }
 
@@ -330,7 +376,6 @@ export class NewComponent implements OnInit {
   agregarRango(): void {
     this.rangos.push({
       montobase: 0,
-      pesovolumen: 0,
       minimo: 0,
       desde: 0,
       hasta: 0,
@@ -340,7 +385,49 @@ export class NewComponent implements OnInit {
   }
 
   eliminarRango(index: number): void {
-    this.rangos.splice(index, 1);
+    const rango = this.rangos?.[index];
+    if (!rango) return;
+
+    this.confirmationService.confirm({
+      message: '¿Está seguro de eliminar esta tarifa?',
+      header: 'Confirmar eliminación',
+      icon: 'pi pi-exclamation-triangle',
+      acceptLabel: 'Sí, eliminar',
+      rejectLabel: 'Cancelar',
+      accept: () => {
+        const idTarifa = rango.idtarifa;
+
+        // Si aún no existe en BD, solo quitar del arreglo
+        if (!idTarifa) {
+          this.rangos.splice(index, 1);
+          this.messageService.add({
+            severity: 'success',
+            summary: 'Éxito',
+            detail: 'Rango eliminado correctamente'
+          });
+          return;
+        }
+
+        // Si existe en BD, llamar al endpoint DELETE
+        this.mantenimientoService.eliminarTarifa(idTarifa).subscribe({
+          next: () => {
+            this.rangos.splice(index, 1);
+            this.messageService.add({
+              severity: 'success',
+              summary: 'Éxito',
+              detail: `Tarifa con ID ${idTarifa} eliminada`
+            });
+          },
+          error: () => {
+            this.messageService.add({
+              severity: 'error',
+              summary: 'Error',
+              detail: 'No se pudo eliminar la tarifa'
+            });
+          }
+        });
+      }
+    });
   }
 
   cargarTarifasParaEdicion(tarifas: Tarifa[]): void {
@@ -357,13 +444,19 @@ export class NewComponent implements OnInit {
     // Cargar datos básicos primero
     this.tarifaForm.patchValue({
       idcliente: primeraTarifa.idcliente,
+      idcentrocosto: (primeraTarifa as any)?.idcentrocosto ?? (primeraTarifa as any)?.idCentroCosto ?? (primeraTarifa as any)?.IdCentroCosto ?? null,
       idorigendepartamento: primeraTarifa.idorigendepartamento,
       iddepartamentodestino: primeraTarifa.iddepartamentodestino,
       idtipotransporte: primeraTarifa.idtipotransporte,
       idtipounidad: primeraTarifa.idtipounidad,
-      conceptos: primeraTarifa.conceptos,
-      consideraPesoVolumetrico: (primeraTarifa as any).consideraPesoVolumetrico || false
+      idconceptocobro: primeraTarifa.idconceptocobro,
+      consideraPesoVolumetrico: primeraTarifa.consideraPesoVolumetrico || false
     });
+
+    // Cargar centros de costo para el cliente (y setear el valor si viene en edición)
+    const cc = Number((primeraTarifa as any)?.idcentrocosto ?? (primeraTarifa as any)?.idCentroCosto ?? (primeraTarifa as any)?.IdCentroCosto);
+    this.idCentroCostoPendiente = Number.isFinite(cc) ? cc : null;
+    this.cargarCentroCosto(primeraTarifa.idcliente);
 
     // Si las fórmulas ya están cargadas, establecer el valor inmediatamente
     if (this.formulas.length > 0 && this.idformulaPendiente !== null) {
@@ -393,7 +486,6 @@ export class NewComponent implements OnInit {
     this.rangos = tarifas.map(tarifa => ({
       idtarifa: tarifa.idtarifa, // Guardar el ID para poder actualizar
       montobase: tarifa.montobase,
-      pesovolumen: tarifa.pesovolumen || tarifa.pesoVolumen,
       minimo: tarifa.minimo,
       desde: tarifa.desde,
       hasta: tarifa.hasta,
@@ -411,13 +503,18 @@ export class NewComponent implements OnInit {
     // Cargar datos básicos primero
     this.tarifaForm.patchValue({
       idcliente: tarifa.idcliente,
+      idcentrocosto: (tarifa as any)?.idcentrocosto ?? (tarifa as any)?.idCentroCosto ?? (tarifa as any)?.IdCentroCosto ?? null,
       idorigendepartamento: tarifa.idorigendepartamento,
       iddepartamentodestino: tarifa.iddepartamentodestino,
       idtipotransporte: tarifa.idtipotransporte,
       idtipounidad: tarifa.idtipounidad,
-      conceptos: tarifa.conceptos,
-      consideraPesoVolumetrico: (tarifa as any).consideraPesoVolumetrico || false
+      idconceptocobro: tarifa.idconceptocobro,
+      consideraPesoVolumetrico: tarifa.consideraPesoVolumetrico || false
     });
+
+    const cc = Number((tarifa as any)?.idcentrocosto ?? (tarifa as any)?.idCentroCosto ?? (tarifa as any)?.IdCentroCosto);
+    this.idCentroCostoPendiente = Number.isFinite(cc) ? cc : null;
+    this.cargarCentroCosto(tarifa.idcliente);
 
     // Si las fórmulas ya están cargadas, establecer el valor inmediatamente
     if (this.formulas.length > 0 && this.idformulaPendiente !== null) {
@@ -448,7 +545,6 @@ export class NewComponent implements OnInit {
       this.rangos = [{
         idtarifa: tarifa.idtarifa, // Guardar el ID para poder actualizar
         montobase: tarifa.montobase,
-        pesovolumen: tarifa.pesovolumen || tarifa.pesoVolumen,
         minimo: tarifa.minimo,
         desde: tarifa.desde,
         hasta: tarifa.hasta,

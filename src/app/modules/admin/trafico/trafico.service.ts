@@ -11,6 +11,7 @@ import {
     HojaRuta,
     Manifiesto,
     ManifiestoReporte,
+    OrdenTransporteProviderRecojoResult,
     OrdenRecojo,
     Proveedor,
 } from './trafico.types';
@@ -35,6 +36,7 @@ export class TraficoService {
     public jwtHelper = new JwtHelperService();
     private decodedToken: any;
     private baseUrl = environment.baseUrl + '/api/Trafico/';
+    private baseOrdenUrl = environment.baseUrl + '/api/Orden/';
     private baseGeneralUrl = environment.baseUrl + '/api/Mantenimiento/';
 
     constructor() {}
@@ -59,6 +61,13 @@ export class TraficoService {
         const idequipo = model.idequipo ? model.idequipo : ''; // Si model.idequipo es null, usar una cadena vacía
         return this._httpClient.get<HojaRuta[]>(
             `${this.baseUrl}ListarDespachosxDepartamentoxEstacion?idequipo=${idequipo}`,
+            httpOptions
+        );
+    }
+
+    GetPendienteRecepcionPorEstacion(): Observable<any[]> {
+        return this._httpClient.get<any[]>(
+            `${this.baseOrdenUrl}getPendienteRecepcionPorEstacion`,
             httpOptions
         );
     }
@@ -125,6 +134,10 @@ export class TraficoService {
         return this._httpClient.put(`${this.baseUrl}actualizar-orden-recojo`, orden);
         }
 
+    actualizarManifiestoTroncal(dto: { IdManifiesto: number; IdVehiculo?: number | null; IdTipoOperacion?: number | null }): Observable<any> {
+        return this._httpClient.put(`${this.baseUrl}actualizar-manifiesto-troncal`, dto, httpOptions);
+    }
+
     getAllManifiestosForProviderRecojo(
         IdProveedor: number,
         IdDepartamento: number
@@ -135,8 +148,18 @@ export class TraficoService {
         );
     }
 
-    getAllOrdersxRepartidor(idrepartidor: number, idestado: number) {
-        const param = '?idrepartidor=' + idrepartidor + '&idestado=' + idestado;
+    getAllOTsForProviderRecojo(
+        IdProveedor: number,
+        IdDepartamento: number
+    ): Observable<OrdenTransporteProviderRecojoResult[]> {
+        return this._httpClient.get<OrdenTransporteProviderRecojoResult[]>(
+            `${this.baseUrl}getAllOTsForProviderRecojo?IdProveedor=${IdProveedor}&IdDepartamento=${IdDepartamento}`,
+            httpOptions
+        );
+    }
+
+    getAllOrdersxRepartidor(idrepartidor: number, idestado: number, iddepartamento: number) {
+        const param = '?idrepartidor=' + idrepartidor + '&idestado=' + idestado + '&idprovincia=' + iddepartamento;
         return this._httpClient.get<OrdenTransporte[]>(
             this.baseUrl + 'getAllOrdersxRepartidor' + param,
             httpOptions
@@ -168,8 +191,8 @@ export class TraficoService {
         );
     }
 
-    getProveedorxDireccion(IdDestino: number) {
-        const param = '?IdDestino=' + IdDestino;
+    getProveedorxDireccion(iddistrito: number) {
+        const param = '?iddistrito=' + iddistrito;
         return this._httpClient.get<any>(
             `${this.baseUrl}GetProveedoresxDistrito${param}`,
             httpOptions
@@ -230,6 +253,29 @@ export class TraficoService {
         const estadosParam = Array.isArray(estados) ? estados.join(',') : estados.toString();
         return this._httpClient.get<any[]>(
             `${this.baseUrl}ObtenerOrdenTrabajoDetallePorEstacionEstado?idestacion=${idestacion}&estados=${estadosParam}`,
+            httpOptions
+        );
+    }
+
+    generarOTRLogisticaInversa(idOrdenTrabajo: number, idUsuario: number): Observable<any> {
+        const request = {
+            idOrdenTrabajo: idOrdenTrabajo,
+            idUsuario: idUsuario
+        };
+        return this._httpClient.post<any>(
+            `${this.baseUrl}GenerarOTRLogisticaInversa`,
+            request,
+            httpOptions
+        );
+    }
+
+    getOTRsLogisticaInversaxProveedor(idProveedor: number, iddepartamento?: number): Observable<any> {
+        let param = `?idProveedor=${idProveedor}`;
+        if (iddepartamento !== null && iddepartamento !== undefined) {
+            param += `&iddepartamento=${iddepartamento}`;
+        }
+        return this._httpClient.get<any>(
+            `${this.baseUrl}GetOTRsLogisticaInversaxProveedor${param}`,
             httpOptions
         );
     }

@@ -1,5 +1,6 @@
 <!-- Modal para crear/editar tarifa -->
 <div class="p-4">
+  <p-confirmDialog />
   <form [formGroup]="tarifaForm">
     <!-- Sección 1: Datos del Cliente -->
     <div class="mb-4">
@@ -30,6 +31,28 @@
           <small class="text-red-500 mt-1" *ngIf="tarifaForm.get('idcliente')?.invalid && tarifaForm.get('idcliente')?.touched">
             El cliente es requerido
           </small>
+        </div>
+
+        <div class="flex flex-col">
+          <label class="mb-1 text-sm font-medium text-gray-700">Centro de costo:</label>
+          <p-dropdown
+            formControlName="idcentrocosto"
+            [options]="centrosCosto"
+            placeholder="Seleccione un centro de costo"
+            scrollHeight="30vh"
+            class="input-form-field"
+            appendTo="body"
+            [virtualScroll]="true"
+            itemSize="30"
+            [style]="{'width':'100%'}"
+            [resetFilterOnHide]="false"
+            [filter]="true"
+            [showClear]="true"
+            [disabled]="!tarifaForm.value.idcliente">
+            <ng-template let-item pTemplate="selectedItem">
+              <span>{{item.label}}</span>
+            </ng-template>
+          </p-dropdown>
         </div>
       </div>
     </div>
@@ -266,7 +289,7 @@
         <div class="flex flex-col">
           <label class="mb-1 text-sm font-medium text-gray-700">Cobrar Por:</label>
           <p-dropdown 
-            formControlName="conceptos"
+            formControlName="idconceptocobro"
             [options]="conceptosCobro"
             placeholder="Seleccione"
             scrollHeight="30vh"
@@ -327,7 +350,6 @@
           <ng-template pTemplate="header">
             <tr class="bg-gray-800 text-white">
               <th class="text-center px-3 py-2 text-sm font-semibold">Base</th>
-              <th class="text-center px-3 py-2 text-sm font-semibold">Peso Vol.</th>
               <th class="text-center px-3 py-2 text-sm font-semibold">Mínimo</th>
               <th class="text-center px-3 py-2 text-sm font-semibold">Desde</th>
               <th class="text-center px-3 py-2 text-sm font-semibold">Hasta</th>
@@ -344,16 +366,6 @@
                   type="number" 
                   pInputText 
                   [(ngModel)]="rango.montobase" 
-                  [ngModelOptions]="{standalone: true}"
-                  class="w-full p-2 text-sm border border-gray-300 rounded"
-                  placeholder="0.00"
-                  step="0.01">
-              </td>
-              <td class="px-2 py-2">
-                <input 
-                  type="number" 
-                  pInputText 
-                  [(ngModel)]="rango.pesovolumen" 
                   [ngModelOptions]="{standalone: true}"
                   class="w-full p-2 text-sm border border-gray-300 rounded"
                   placeholder="0.00"
@@ -424,7 +436,7 @@
 
           <ng-template pTemplate="emptymessage">
             <tr>
-              <td colspan="8" class="text-center p-4">
+              <td colspan="7" class="text-center p-4">
                 <div class="flex flex-col items-center justify-center">
                   <mat-icon class="text-gray-400 mb-2" style="font-size: 48px; width: 48px; height: 48px;">
                     inbox

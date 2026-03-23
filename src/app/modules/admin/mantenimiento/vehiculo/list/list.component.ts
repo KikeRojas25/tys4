@@ -57,9 +57,10 @@ import { EditComponent } from '../edit/edit.component';
 export class ListComponent implements OnInit {
 
   proveedores: SelectItem[] = [];
-  model: any = {};
+  model: any = { placa: '', idProveedor: null };
   vehiculos: any = [];
   cargandoProveedores = false;
+  loading = false;
   mostrarModal: boolean = false;
   marcas: SelectItem[] = [];
   tiposVehiculo:SelectItem[] = [];
@@ -78,7 +79,8 @@ export class ListComponent implements OnInit {
 
   ngOnInit() {
     this.cargandoProveedores = true;
-    this.mantenimientoService.getProveedores('', 21514).subscribe({
+    // Solo transportistas (21513) para asignación de vehículos
+    this.mantenimientoService.getProveedores('', 21513).subscribe({
       next: (data) => {
 
      
@@ -105,18 +107,27 @@ export class ListComponent implements OnInit {
 
   buscar() {
 
+    this.validarPlaca();
+    this.loading = true;
+    const placa = (this.model.placa || '').trim();
+    const idProv = this.model.idProveedor ?? null;
 
-    this.mantenimientoService.GetAllVehiculos(this.model).subscribe({
+    this.mantenimientoService.vehiculoGetAll(placa === '' ? null : placa, idProv).subscribe({
       next: (data) => {
         this.vehiculos = data;
 
         console.log('vehiculos', this.vehiculos);
     },
     error: (err) => {
-        console.error('Error al cargar proveedores', err);
+        console.error('Error al listar vehículos', err);
+        this.messageService.add({
+          severity: 'error',
+          summary: 'Vehículos',
+          detail: err?.error?.message ?? 'No se pudo listar vehículos.',
+        });
     },
     complete: () => {
-        this.cargandoProveedores = false;
+        this.loading = false;
     } 
   
   
@@ -177,15 +188,22 @@ console.log('vehiculoselected', id);
       icon: 'pi pi-exclamation-triangle',
       accept: () => {
 
-      this.mantenimientoService.eliminarVehiculo(id).subscribe({
+      this.mantenimientoService.vehiculoEliminar(id).subscribe({
         next: (res) => {
-          
-          
+          this.messageService.add({
+            severity: 'success',
+            summary: 'Vehículos',
+            detail: res?.message ?? 'Vehículo eliminado correctamente.',
+          });
           this.buscar(); // refresca la lista
         },
         error: (err) => {
           console.error('Error al eliminar', err);
-          alert('Error al eliminar el vehículo');
+          this.messageService.add({
+            severity: 'error',
+            summary: 'Vehículos',
+            detail: err?.error?.message ?? 'Error al eliminar el vehículo.',
+          });
         }
       });
      },
@@ -196,14 +214,20 @@ console.log('vehiculoselected', id);
 }
   validarPlaca() {
     // Convertir a mayúsculas
-    this.model.placa = this.model.placa.toUpperCase();
+    if (!this.model.placa) return;
+    this.model.placa = String(this.model.placa).toUpperCase();
 
     // Expresión regular para formato correcto (1 letra inicial + 5 caracteres alfanuméricos)
     const placaRegex = /^[A-Z]{1}[A-Z0-9]{5}$/;
 
-    if (!placaRegex.test(this.model.placa)) {
-        alert('La placa debe tener el formato: A6Q330 (1 letra inicial y 5 caracteres alfanuméricos).');
-        this.model.placa = ''; // Limpiar input si no es válido
+    // Validar solo si ingresaron algo
+    if (this.model.placa && !placaRegex.test(this.model.placa)) {
+      this.messageService.add({
+        severity: 'warn',
+        summary: 'Placa inválida',
+        detail: 'La placa debe tener el formato: A6Q330 (1 letra inicial y 5 caracteres alfanuméricos).',
+      });
+      this.model.placa = ''; // Limpiar input si no es válido
     }
 }
 

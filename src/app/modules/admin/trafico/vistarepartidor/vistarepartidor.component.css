@@ -1,0 +1,27 @@
+/* Reducir tamaño de las pestañas de PrimeNG */
+::ng-deep .p-tabview .p-tabview-nav li .p-tabview-nav-link {
+  padding: 0.5rem 0.75rem !important;
+  font-size: 0.875rem !important;
+}
+
+::ng-deep .p-tabview .p-tabview-nav {
+  font-size: 0.875rem !important;
+}
+
+::ng-deep .p-tabview .p-tabview-nav li {
+  margin-right: 0.25rem !important;
+}
+
+::ng-deep .p-tabview .p-tabview-panels {
+  padding: 0.75rem !important;
+}
+
+/* Reducir tamaño de badges en las pestañas */
+::ng-deep .p-tabview .p-tabview-nav li .p-badge {
+  font-size: 0.75rem !important;
+  min-width: 1.25rem !important;
+  height: 1.25rem !important;
+  line-height: 1.25rem !important;
+  margin-left: 0.25rem !important;
+}
+

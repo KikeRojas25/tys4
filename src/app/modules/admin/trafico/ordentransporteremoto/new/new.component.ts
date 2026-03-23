@@ -20,6 +20,13 @@ import { PanelModule } from 'primeng/panel';
 import { TableModule } from 'primeng/table';
 import { ToastModule } from 'primeng/toast';
 
+interface GuiaGRR {
+  idguia?: number;
+  nroGrr: string;
+  nroDocumento: string;
+  editando?: boolean;
+}
+
 @Component({
   selector: 'app-new',
   templateUrl: './new.component.html',
@@ -54,7 +61,11 @@ export class NewComponent implements OnInit {
   es: any;
   public loading = false;
   model: any = {};
+  // Cuando se crea una OTR vinculada, el backend requiere el proveedor
+  idproveedor: number | null = null;
   guias: string[] = [];
+  guiasGrr: GuiaGRR[] = [];
+  mostrarTablaGuias = true;
   etiquetas: any[] = [];
   tipos = [
     { label: 'Paleta', value: 1 },
@@ -79,6 +90,8 @@ export class NewComponent implements OnInit {
   user: User ;
   IdNuevaOrden = 0;
   idordentrabajo: number;
+  idotvinculada: number | null = null;
+  private ordenVinculadaPrecarga: any | null = null;
   values: string[] = [];
   modeltemp : any = {};
   form: FormGroup;
@@ -101,6 +114,16 @@ export class NewComponent implements OnInit {
 
 
   ngOnInit() {
+    const idotvinculadaParam = this.activatedRoute.snapshot.queryParamMap.get('idotvinculada');
+    if (idotvinculadaParam) {
+      const parsed = Number(idotvinculadaParam);
+      this.idotvinculada = Number.isFinite(parsed) ? parsed : null;
+    }
+    const idproveedorParam = this.activatedRoute.snapshot.queryParamMap.get('idproveedor');
+    if (idproveedorParam) {
+      const parsed = Number(idproveedorParam);
+      this.idproveedor = Number.isFinite(parsed) ? parsed : null;
+    }
 
     this.form = this.fb.group({
       idcliente: [null, Validators.required],
@@ -150,6 +173,9 @@ export class NewComponent implements OnInit {
    // Cargar los combos.
     this.cargarDropDows();
 
+    // Si la OTR se está creando desde una OR vinculada, preseleccionar datos.
+    this.precargarDesdeOrdenVinculada();
+
 
     //this.idordentrabajo  = this.activatedRoute.snapshot.params["uid"];
     //console.log( this.activatedRoute.snapshot.params["uid"], 'params');
@@ -165,6 +191,104 @@ export class NewComponent implements OnInit {
 
 
 
+  }
+
+  private precargarDesdeOrdenVinculada() {
+    if (!this.idotvinculada) return;
+
+    this.ordenTransporteService.getOrden(this.idotvinculada).subscribe({
+      next: (resp: any) => {
+        const orden = resp?.ordenTransporte ?? resp;
+        if (!orden) return;
+        this.ordenVinculadaPrecarga = orden;
+        // Fallback: si no vino en querystring, intentar tomarlo de la OR vinculada
+        if (!this.idproveedor) {
+          const idp = Number(orden?.idproveedor);
+          this.idproveedor = Number.isFinite(idp) ? idp : this.idproveedor;
+        }
+        this.aplicarPrecargaDesdeOrdenVinculada();
+      },
+      error: (error) => {
+        console.error('No se pudo precargar OR vinculada:', error);
+        this.messageService.add({
+          severity: 'warn',
+          summary: 'Preselección',
+          detail: 'No se pudo precargar la OR vinculada. Puede completar la OTR manualmente.'
+        });
+      }
+    });
+  }
+
+  private obtenerDestinoVillaElSalvadorId(): number | null {
+    const match = (this.ubigeos ?? []).find((u) =>
+      String(u?.label ?? '').toUpperCase().includes('VILLA EL SALVADOR')
+    );
+    const value = match?.value;
+    return Number.isFinite(Number(value)) ? Number(value) : (value ?? null);
+  }
+
+  private aplicarPrecargaDesdeOrdenVinculada() {
+    if (!this.ordenVinculadaPrecarga) return;
+    // Necesitamos los combos cargados para poder preseleccionar y que los dropdowns muestren el label
+    if (!this.ubigeos || this.ubigeos.length === 0) return;
+    if (!this.clientes || this.clientes.length === 0) return;
+
+    const orden = this.ordenVinculadaPrecarga;
+
+    const idcliente = orden?.idcliente ?? null;
+    const idorigen = orden?.idorigen ?? null;
+    const puntopartida = orden?.puntopartida ?? '';
+    const puntollegada = orden?.puntollegada ?? '';
+
+    // Destino: en estos casos siempre es Villa El Salvador
+    let iddestino = this.obtenerDestinoVillaElSalvadorId();
+    if (!iddestino) {
+      iddestino = orden?.iddestino ?? null;
+      this.messageService.add({
+        severity: 'warn',
+        summary: 'Preselección',
+        detail: 'No se encontró "Villa El Salvador" en el listado de destinos. Se usará el destino de la OR.'
+      });
+    }
+
+    // Fecha/hora: preferir fecharecojo; si no, caer a fechacita/fechahoracita
+    const fechaBaseRaw =
+      orden?.fecharecojo ??
+      orden?.fechacita ??
+      orden?.fechahoracita ??
+      null;
+
+    const fechaBase = fechaBaseRaw ? new Date(fechaBaseRaw) : null;
+    const horarecojoRaw: string | null = orden?.horarecojo ?? null;
+    const horarecojo =
+      horarecojoRaw
+        ? String(horarecojoRaw).slice(0, 5)
+        : fechaBase
+          ? `${String(fechaBase.getHours()).padStart(2, '0')}:${String(fechaBase.getMinutes()).padStart(2, '0')}`
+          : null;
+
+    this.form.patchValue({
+      idcliente,
+      idorigen,
+      iddestino,
+      puntopartida,
+      puntollegada,
+      fecharecojo: fechaBase,
+      horarecojo
+    });
+
+    // Setear remitente/destinatario igual al cliente, pero mantener editables.
+    if (idcliente) {
+      this.cargarDestinatario();
+      this.mismoremitente = false;
+      this.mismodestinatario = false;
+    } else {
+      // Si no hay cliente, al menos recalcular combos dependientes si aplica
+      this.cargarFormula();
+    }
+
+    // Evitar re-aplicar
+    this.ordenVinculadaPrecarga = null;
   }
 
   cargarDropDows() {
@@ -191,6 +315,9 @@ export class NewComponent implements OnInit {
         resp.forEach(element => {
           this.clientes.push({ value: element.idCliente ,  label : element.razonSocial});
         });
+
+        // Si ya se obtuvo la OR vinculada (y ya tenemos ubigeos), aplicar precarga ahora.
+        this.aplicarPrecargaDesdeOrdenVinculada();
 
         // this.model.idcliente = this.modeltemp.idcliente;
         // this.model.idremitente =  this.modeltemp.idcliente ;
@@ -237,6 +364,9 @@ export class NewComponent implements OnInit {
     this.model.idorigen =   this.modeltemp.idorigen;
     this.model.iddestino =   this.modeltemp.iddestino;
 
+    // Si ya se obtuvo la OR vinculada, aplicar precarga ahora que ya tenemos ubigeos.
+    this.aplicarPrecargaDesdeOrdenVinculada();
+
   });
 
 
@@ -259,14 +389,22 @@ export class NewComponent implements OnInit {
 
     if (this.form.valid) {
       console.log(this.form.value);
-      // Implementa la lógica de registro aquí.
+      
+      // Transformar guiasGrr a formato que espera el backend (List<GuiaGrrDto>)
+      const guiasRemitenteDto = this.guiasGrr.map(guia => ({
+        nroGrr: guia.nroGrr,
+        nroDocumento: guia.nroDocumento || ''
+      }));
 
+      // Implementa la lógica de registro aquí.
       this.model = { 
         ...this.form.value, // Asignar todos los valores del formulario al modelo
         responsablecomercialid: this.user.id,
         tipoorden: 3,
         idusuarioregistro: this.user.id,
-    
+        idotvinculada: this.idotvinculada,
+        ...(this.idotvinculada && this.idproveedor ? { idproveedor: this.idproveedor } : {}),
+        guiasremitente: guiasRemitenteDto // Enviar como List<GuiaGrrDto>
     };
 
 
@@ -326,7 +464,9 @@ else {
       ...this.form.value, // Asignar todos los valores del formulario al modelo
       responsablecomercialid: this.user.id,
       tipoorden: 3,
-      idusuarioregistro: this.user.id
+      idusuarioregistro: this.user.id,
+      idotvinculada: this.idotvinculada,
+      ...(this.idotvinculada && this.idproveedor ? { idproveedor: this.idproveedor } : {})
   };
 
   
@@ -436,15 +576,70 @@ else {
     this.dialogGrr = true;
   }
   generarGrr(){
+    if (!this.model.cantidadguias || this.model.cantidadguias <= 0) {
+      this.messageService.add({
+        severity: 'warn',
+        summary: 'Advertencia',
+        detail: 'Ingrese una cantidad válida de guías a generar'
+      });
+      return;
+    }
 
+    if (!this.model.guiaInicial) {
+      this.messageService.add({
+        severity: 'warn',
+        summary: 'Advertencia',
+        detail: 'Ingrese el número de GRR inicial'
+      });
+      return;
+    }
     
     const [prefix, initialNumber] = this.model.guiaInicial.split('-');
     const start = parseInt(initialNumber, 10);
+    const numeroLength = initialNumber.length; // Longitud original del número (incluyendo ceros)
 
-    this.guias = [];
-    for (let i = 0; i < this.model.cantidadguias; i++) {
-      this.guias.push(`${prefix}-${start + i}`);
+    if (isNaN(start)) {
+      this.messageService.add({
+        severity: 'warn',
+        summary: 'Advertencia',
+        detail: 'El formato del GRR inicial debe ser: PREFIJO-NUMERO (ej: GRR-001)'
+      });
+      return;
     }
+
+    // Generar las guías en el array de strings (para mantener compatibilidad)
+    this.guias = [...this.guias];
+
+    // Generar las guías en la nueva tabla
+    for (let i = 0; i < this.model.cantidadguias; i++) {
+      // Mantener el formato exacto con ceros a la izquierda
+      const numeroFormateado = String(start + i).padStart(numeroLength, '0');
+      const nroGrr = `${prefix}-${numeroFormateado}`;
+      
+      // Evitar duplicados
+      if (!this.guias.includes(nroGrr)) {
+        this.guias.push(nroGrr);
+        
+        // Agregar a la tabla editable
+        this.guiasGrr.push({
+          nroGrr: nroGrr,
+          nroDocumento: '',
+          editando: false
+        });
+      }
+    }
+
+    this.mostrarTablaGuias = true;
+    this.dialogGrr = false;
+
+    this.messageService.add({
+      severity: 'success',
+      summary: 'Éxito',
+      detail: `Se generaron ${this.model.cantidadguias} guías GRR`
+    });
+
+    // Actualizar el formControl con las guías
+    this.form.patchValue({ guiasremitente: this.guias });
   }
 
   agregaretiqueta() {
@@ -460,6 +655,75 @@ else {
     this.etiquetas.push({ idtipo: this.model.idtipoetiqueta, tipo: this.model.etiqueta , cantidad: this.model.cantidadetiqueta  });
   }
 
+  // ===== MÉTODOS PARA TABLA DE GUÍAS GRR =====
+  
+  toggleTablaGuias(): void {
+    this.mostrarTablaGuias = !this.mostrarTablaGuias;
+  }
 
+  editarGuiaGrr(guia: GuiaGRR): void {
+    // Desactivar edición en todas las guías
+    this.guiasGrr.forEach(g => g.editando = false);
+    // Activar edición en la guía seleccionada
+    guia.editando = true;
+  }
+
+  actualizarGuiaGrr(guia: GuiaGRR): void {
+    if (!guia.nroGrr || guia.nroGrr.trim() === '') {
+      this.messageService.add({
+        severity: 'warn',
+        summary: 'Advertencia',
+        detail: 'El número de GRR no puede estar vacío'
+      });
+      return;
+    }
+
+    // Desactivar modo edición
+    guia.editando = false;
+
+    // Actualizar el array de guías (para mantener sincronizado con el control chips)
+    this.actualizarArrayGuias();
+
+    this.messageService.add({
+      severity: 'success',
+      summary: 'Éxito',
+      detail: 'Guía actualizada correctamente'
+    });
+  }
+
+  cancelarEdicionGuiaGrr(guia: GuiaGRR): void {
+    guia.editando = false;
+  }
+
+  eliminarGuiaGrr(index: number): void {
+    if (index >= 0 && index < this.guiasGrr.length) {
+      this.guiasGrr.splice(index, 1);
+      this.actualizarArrayGuias();
+      
+      this.messageService.add({
+        severity: 'success',
+        summary: 'Éxito',
+        detail: 'Guía eliminada correctamente'
+      });
+    }
+  }
+
+  limpiarTodasLasGuiasGrr(): void {
+    this.guiasGrr = [];
+    this.guias = [];
+    this.form.patchValue({ guiasremitente: [] });
+    
+    this.messageService.add({
+      severity: 'success',
+      summary: 'Éxito',
+      detail: 'Todas las guías han sido eliminadas'
+    });
+  }
+
+  private actualizarArrayGuias(): void {
+    // Mantener sincronizado el array de guías con la tabla
+    this.guias = this.guiasGrr.map(g => g.nroGrr);
+    this.form.patchValue({ guiasremitente: this.guias });
+  }
 
 }

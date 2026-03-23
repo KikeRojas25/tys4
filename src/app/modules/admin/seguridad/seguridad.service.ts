@@ -42,7 +42,7 @@ get(param?: any): Observable<User[]> {
 }
 
 getUser(id: any): Observable<User> {
-  return this._httpClient.get<User>(`${this.baseUrlUser} ${id}`).pipe(
+  return this._httpClient.get<User>(`${this.baseUrlUser}${id}`).pipe(
       tap((user: User) => {
           this._user.next(user); 
       })

@@ -1,0 +1,295 @@
+<p-toast></p-toast>
+
+<div class="flex flex-col flex-auto min-w-0 bg-gray-50">
+  <!-- Header -->
+  <div class="flex flex-col sm:flex-row flex-0 sm:items-center sm:justify-between p-3 sm:py-5 sm:px-6 border-b border-gray-200 bg-white">
+    <div class="flex-1 min-w-0">
+      <div class="flex flex-wrap items-center font-medium text-sm text-gray-600">
+        <div>
+          <a class="whitespace-nowrap text-gray-700 hover:text-gray-900">TMS</a>
+        </div>
+        <div class="flex items-center ml-1 whitespace-nowrap">
+          <mat-icon class="fuse-horizontal-navigation-item-icon text-gray-400" [svgIcon]="'heroicons_solid:chevron-right'"></mat-icon>
+          <span class="ml-1 text-gray-500">Compras</span>
+        </div>
+        <div class="flex items-center ml-1 whitespace-nowrap">
+          <mat-icon class="fuse-horizontal-navigation-item-icon text-gray-400" [svgIcon]="'heroicons_solid:chevron-right'"></mat-icon>
+          <span class="ml-1 text-gray-500">Liquidación Caja Chica</span>
+        </div>
+      </div>
+      <div class="mt-2">
+        <h2 class="text-xl md:text-2xl font-medium tracking-tight leading-6 truncate text-gray-900">
+          Liquidaciones de Caja Chica
+        </h2>
+      </div>
+    </div>
+
+    <div class="flex items-center gap-2 mt-4 sm:mt-0">
+      <button pButton type="button" icon="pi pi-refresh" label="Actualizar" (click)="load()"
+              class="px-3 py-2 text-xs font-medium text-gray-700 bg-white border border-gray-300 hover:bg-gray-50 rounded transition-all duration-150">
+      </button>
+      <button pButton type="button" icon="pi pi-file-excel" label="Excel" (click)="exportExcel()"
+              [disabled]="loading || !liquidaciones || liquidaciones.length === 0"
+              class="px-3 py-2 text-xs font-medium text-green-700 bg-white border border-green-300 hover:bg-green-50 rounded transition-all duration-150">
+      </button>
+      <button pButton type="button" icon="pi pi-file-excel" label="Excel (Det. Liquidados)" (click)="exportExcelDetallesLiquidados()"
+              [disabled]="loading"
+              class="px-3 py-2 text-xs font-medium text-green-700 bg-white border border-green-300 hover:bg-green-50 rounded transition-all duration-150">
+      </button>
+      <button pButton type="button" icon="pi pi-file-pdf" label="PDF" (click)="exportPdf()"
+              [disabled]="loading || !liquidaciones || liquidaciones.length === 0"
+              class="px-3 py-2 text-xs font-medium text-red-700 bg-white border border-red-300 hover:bg-red-50 rounded transition-all duration-150">
+      </button>
+      <button pButton type="button" icon="pi pi-plus" label="Nueva" (click)="nueva()"
+              class="px-3 py-2 text-xs font-medium text-white bg-gray-900 hover:bg-gray-800 rounded transition-all duration-150">
+      </button>
+    </div>
+  </div>
+
+  <!-- Contenido -->
+  <div class="main-content container-fluid p-3">
+    <div class="bg-white rounded-md border border-gray-200 overflow-hidden">
+      <div class="px-3 py-2 border-b border-gray-100 bg-gray-50 flex flex-col gap-2">
+        <!-- Filtros -->
+        <div class="grid grid-cols-1 md:grid-cols-12 gap-2 items-end">
+          <div class="md:col-span-3">
+            <label class="block text-xs font-medium text-gray-700 mb-1">Fecha inicio</label>
+            <p-calendar [(ngModel)]="filtros.fechaInicio" [ngModelOptions]="{ standalone: true }"
+                        dateFormat="dd/mm/yy" class="w-full"></p-calendar>
+          </div>
+          <div class="md:col-span-3">
+            <label class="block text-xs font-medium text-gray-700 mb-1">Fecha fin</label>
+            <p-calendar [(ngModel)]="filtros.fechaFin" [ngModelOptions]="{ standalone: true }"
+                        dateFormat="dd/mm/yy" class="w-full"></p-calendar>
+          </div>
+          <div class="md:col-span-4">
+            <label class="block text-xs font-medium text-gray-700 mb-1">Estado</label>
+            <p-dropdown
+              [options]="estadoOptions"
+              [(ngModel)]="filtros.estado"
+              [ngModelOptions]="{ standalone: true }"
+              class="w-full"
+              placeholder="Seleccione"
+              (onChange)="aplicarFiltroEstado()">
+            </p-dropdown>
+          </div>
+          <div class="md:col-span-2 flex gap-2 justify-end">
+            <button pButton type="button" icon="pi pi-search" label="Buscar" (click)="buscar()"
+                    [disabled]="loading"
+                    class="px-3 py-2 text-xs font-medium text-white bg-gray-900 hover:bg-gray-800 rounded transition-all duration-150">
+            </button>
+            <button pButton type="button" icon="pi pi-filter-slash" label="Limpiar" (click)="limpiarFiltros()"
+                    [disabled]="loading"
+                    class="px-3 py-2 text-xs font-medium text-gray-700 bg-white border border-gray-300 hover:bg-gray-50 rounded transition-all duration-150">
+            </button>
+          </div>
+        </div>
+
+        <!-- Totales -->
+        <div class="text-xs text-gray-700">
+          <span class="font-medium">Registros:</span>
+          <span class="ml-1">{{ totalRegistros }}</span>
+        </div>
+        <div class="text-xs text-gray-700">
+          <span class="font-medium">Total monto:</span>
+          <span class="ml-1 font-semibold text-gray-900">{{ totalMonto | number:'1.2-2' }}</span>
+        </div>
+      </div>
+      <div class="p-2">
+        <p-table
+          [columns]="cols"
+          [value]="liquidaciones"
+          dataKey="idliquidacion"
+          [(selection)]="selectedLiquidaciones"
+          selectionMode="multiple"
+          (onRowSelect)="onRowSelect()"
+          (onRowUnselect)="onRowUnselect()"
+          [paginator]="true"
+          [rows]="20"
+          [rowsPerPageOptions]="[20,40,60,120]"
+          scrollHeight="75vh"
+          [resizableColumns]="true"
+          [tableStyle]="{ 'table-layout': 'fixed', 'width': '100%' }"
+          [scrollable]="true"
+          [loading]="loading"
+          [styleClass]="'custom-table'"
+          class="w-full">
+
+          <ng-template pTemplate="colgroup" let-columns>
+            <colgroup>
+              <col style="width: 50px">
+              <col *ngFor="let col of columns" [style.width]="col.width">
+            </colgroup>
+          </ng-template>
+
+          <ng-template pTemplate="header" let-columns>
+            <tr class="bg-gray-800 text-white">
+              <th class="text-center px-2 py-3">
+                <p-tableHeaderCheckbox></p-tableHeaderCheckbox>
+              </th>
+              <th style="white-space: normal; word-wrap: break-word;"
+                  *ngFor="let col of columns"
+                  class="text-center px-4 py-3 text-sm font-semibold text-gray-100 border-b border-gray-700">
+                {{ col.header }}
+              </th>
+            </tr>
+          </ng-template>
+
+          <ng-template pTemplate="body" let-rowData>
+            <tr class="border-b border-gray-100 hover:bg-gray-50 transition-colors duration-150"
+                [ngClass]="{ 'opacity-60': isRowLiquidado(rowData) }">
+              <td class="text-center px-2 py-2">
+                <p-tableCheckbox [value]="rowData" [disabled]="isRowLiquidado(rowData)"></p-tableCheckbox>
+              </td>
+              <td class="text-center px-2 py-2">
+                <div class="flex gap-1 justify-center items-center">
+                  <button pButton icon="pi pi-eye" class="action-btn action-btn-neutral"
+                          (click)="detalle(rowData.idliquidacion)" title="Ver detalle"></button>
+                  <button pButton icon="pi pi-pencil" class="action-btn action-btn-primary"
+                          (click)="editar(rowData.idliquidacion)" title="Editar"></button>
+                  <button pButton icon="pi pi-trash" class="action-btn action-btn-danger"
+                          (click)="eliminar(rowData.idliquidacion)" title="Eliminar"></button>
+                </div>
+              </td>
+
+              <td class="text-center px-4 py-3">
+                <a class="text-amber-700 hover:text-amber-900 font-semibold cursor-pointer underline"
+                   (click)="detalle(rowData.idliquidacion)">
+                  {{ rowData.numeroliquidacion }}
+                </a>
+                <span *ngIf="isRowLiquidado(rowData)"
+                      class="ml-2 inline-flex items-center px-2 py-0.5 rounded-full text-xs font-semibold bg-green-100 text-green-800">
+                  Liquidado
+                </span>
+              </td>
+              <td class="text-center px-4 py-3 text-gray-700 text-sm">{{ rowData.numcp || rowData.numCp || rowData.NUMCP }}</td>
+              <td class="text-center px-4 py-3 text-gray-700 text-sm">{{ rowData.fechaliquidacion | date:'dd/MM/yyyy' }}</td>
+              <td class="text-center px-4 py-3 text-gray-700 text-sm">{{ rowData.usuarioregistro }}</td>
+              <td class="text-center px-4 py-3 text-gray-700 text-sm">{{ rowData.concepto || getConceptoLabel(rowData.idconcepto) }}</td>
+              <td class="text-center px-4 py-3 text-gray-700 text-sm">{{ rowData.tipotransferencia || getTipoTransferenciaLabel(rowData.idtipotransferencia) }}</td>
+              <td class="text-center px-4 py-3 text-gray-700 text-sm">{{ rowData.destinatariotransferencia }}</td>
+              <td class="text-center px-4 py-3 text-gray-700 text-sm">{{ rowData.cuentatransferencia }}</td>
+              <td class="text-center px-4 py-3 text-gray-700 text-sm">{{ rowData.numerooperacion }}</td>
+              <td class="text-center px-4 py-3">
+                <span class="text-amber-700 font-semibold">{{ rowData.monto | number:'1.2-2' }}</span>
+              </td>
+              <td class="text-center px-4 py-3 text-gray-700 text-sm">{{ rowData.numerocomprobante }}</td>
+              <td class="text-center px-4 py-3 text-gray-700 text-sm">{{ rowData.tipocomprobante }}</td>
+              <td class="text-center px-4 py-3 text-gray-700 text-sm">{{ rowData.razonsocialdocumento }}</td>
+              <td class="text-center px-4 py-3 text-gray-700 text-sm">{{ rowData.provinciadestino }}</td>
+              <td class="text-center px-4 py-3 text-gray-700 text-sm whitespace-pre-line">{{ rowData.observaciones || rowData.observacion }}</td>
+              <td class="text-center px-4 py-3 text-gray-700 text-sm">{{ rowData.fecharegistro | date:'dd/MM/yyyy HH:mm' }}</td>
+            </tr>
+          </ng-template>
+        </p-table>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Panel flotante de selección -->
+<div *ngIf="selectedCount > 0"
+     class="fixed bottom-4 right-4 z-50 bg-white border border-gray-200 shadow-lg rounded-lg p-3 w-[320px]">
+  <div class="flex items-start justify-between gap-3">
+    <div>
+      <div class="text-xs text-gray-500">Seleccionadas</div>
+      <div class="text-sm font-semibold text-gray-900">{{ selectedCount }}</div>
+    </div>
+    <button pButton type="button" icon="pi pi-times" class="p-button-text p-button-sm"
+            (click)="limpiarSeleccion()" title="Limpiar selección"></button>
+  </div>
+
+  <div class="mt-2">
+    <div class="text-xs text-gray-500">Total monto</div>
+    <div class="text-lg font-semibold text-gray-900">S/ {{ selectedTotalMonto | number:'1.2-2' }}</div>
+  </div>
+
+  <div class="mt-3 flex items-center justify-end gap-2">
+    <button pButton type="button" label="Liquidar" icon="pi pi-check"
+            (click)="abrirLiquidarModal()"
+            class="px-3 py-2 text-xs font-medium text-white bg-gray-900 hover:bg-gray-800 rounded transition-all duration-150">
+    </button>
+  </div>
+</div>
+
+<!-- Modal de liquidación -->
+<p-dialog
+  [(visible)]="showLiquidarModal"
+  [modal]="true"
+  [dismissableMask]="true"
+  [draggable]="false"
+  [resizable]="false"
+  [style]="{ width: '1000px' }"
+  header="Liquidar liquidaciones">
+
+  <div class="grid grid-cols-1 md:grid-cols-3 gap-3 mb-3">
+    <div class="bg-gray-50 border border-gray-200 rounded-md p-3">
+      <div class="text-xs text-gray-500">Seleccionadas</div>
+      <div class="text-lg font-semibold text-gray-900">{{ selectedCount }}</div>
+    </div>
+    <div class="bg-gray-50 border border-gray-200 rounded-md p-3 md:col-span-2">
+      <div class="text-xs text-gray-500">Total monto</div>
+      <div class="text-lg font-semibold text-gray-900">S/ {{ selectedTotalMonto | number:'1.2-2' }}</div>
+    </div>
+  </div>
+
+  <p-table
+    [value]="selectedLiquidaciones"
+    [scrollable]="true"
+    scrollHeight="45vh"
+    [tableStyle]="{ 'width': '100%' }"
+    [styleClass]="'custom-table-lite'">
+    <ng-template pTemplate="header">
+      <tr class="bg-gray-100">
+        <th class="text-center px-2 py-2 text-xs font-semibold text-gray-800">#</th>
+        <th class="text-center px-2 py-2 text-xs font-semibold text-gray-800">NUM OT</th>
+        <th class="text-center px-2 py-2 text-xs font-semibold text-gray-800">F. LIQ.</th>
+        <th class="text-center px-2 py-2 text-xs font-semibold text-gray-800">CONCEPTO</th>
+        <th class="text-center px-2 py-2 text-xs font-semibold text-gray-800">MONTO</th>
+        <th class="text-center px-2 py-2 text-xs font-semibold text-gray-800">COMP.</th>
+        <th class="text-center px-2 py-2 text-xs font-semibold text-gray-800">TIPO COMP.</th>
+        <th class="text-center px-2 py-2 text-xs font-semibold text-gray-800">RZ. SOCIAL DOC.</th>
+      </tr>
+    </ng-template>
+    <ng-template pTemplate="body" let-row>
+      <tr class="border-b border-gray-100">
+        <td class="text-center px-2 py-2 text-xs text-gray-700">{{ row.numeroliquidacion }}</td>
+        <td class="text-center px-2 py-2 text-xs text-gray-700">{{ row.numcp || row.numCp || row.NUMCP }}</td>
+        <td class="text-center px-2 py-2 text-xs text-gray-700">{{ row.fechaliquidacion | date:'dd/MM/yyyy' }}</td>
+        <td class="text-center px-2 py-2 text-xs text-gray-700">{{ getConceptoLabel(row.idconcepto) }}</td>
+        <td class="text-center px-2 py-2 text-xs">
+          <span class="font-semibold text-gray-900">{{ row.monto | number:'1.2-2' }}</span>
+        </td>
+        <td class="text-center px-2 py-2 text-xs text-gray-700">{{ row.numerocomprobante }}</td>
+        <td class="text-center px-2 py-2 text-xs text-gray-700">{{ row.tipocomprobante }}</td>
+        <td class="text-center px-2 py-2 text-xs text-gray-700">{{ row.razonsocialdocumento }}</td>
+      </tr>
+    </ng-template>
+    <ng-template pTemplate="emptymessage">
+      <tr>
+        <td colspan="5" class="text-center p-3 text-gray-600 text-xs">No hay seleccionados.</td>
+      </tr>
+    </ng-template>
+  </p-table>
+
+  <ng-template pTemplate="footer">
+    <div class="flex items-center justify-end gap-2">
+      <button pButton type="button" label="Descargar PDF" icon="pi pi-file-pdf"
+              (click)="exportPdfSelected()"
+              class="px-3 py-2 text-xs font-medium text-red-700 bg-white border border-red-300 hover:bg-red-50 rounded transition-all duration-150">
+      </button>
+      <button pButton type="button" label="Cerrar" icon="pi pi-times"
+              (click)="cerrarLiquidarModal()"
+              class="px-3 py-2 text-xs font-medium text-gray-700 bg-white border border-gray-300 hover:bg-gray-50 rounded transition-all duration-150">
+      </button>
+      <button pButton type="button" label="Liquidar" icon="pi pi-check"
+              (click)="liquidarDesdeModal()"
+              [disabled]="loading || selectedCount === 0"
+              class="px-3 py-2 text-xs font-medium text-white bg-gray-900 hover:bg-gray-800 rounded transition-all duration-150">
+      </button>
+    </div>
+  </ng-template>
+</p-dialog>
+
+<p-confirmDialog header="Confirmación" icon="pi pi-exclamation-triangle"></p-confirmDialog>
+

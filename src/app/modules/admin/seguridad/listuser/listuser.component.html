@@ -72,6 +72,7 @@
             <!-- <p-button size="small" severity="secondary" icon="fa fa-pencil" (click)="editarUsuario(usuario.usr_int_id)"></p-button>
             <p-button size="small" icon="fa fa-trash" (click)="eliminarUsuario(usuario.usr_int_id)"></p-button> -->
             <p-button size="small" icon="fa fa-user-o" (click)="verRolesUsuario(usuario.usr_int_id)"></p-button>
+            <p-button size="small" icon="fa fa-building-o" (click)="abrirModalClientes(usuario)" class="p-ml-1"></p-button>
           </td>
         </tr>
       </ng-template>
@@ -135,7 +136,53 @@
   </div>
 </p-dialog>
 
+<!-- Modal Actualizar clientes vinculados -->
+<p-dialog
+  header="Actualizar clientes vinculados"
+  [(visible)]="dialogClientesVisible"
+  [modal]="true"
+  [style]="{ width: '450px' }"
+  [draggable]="false"
+  [resizable]="false"
+>
+  <div *ngIf="usuarioParaClientes" class="flex flex-col gap-4">
+    <div class="text-sm text-gray-700">
+      <strong>Usuario:</strong> {{ usuarioParaClientes.usr_str_nombre }} {{ usuarioParaClientes.usr_str_apellidos }}
+    </div>
 
+    <div>
+      <label for="clientes" class="block text-sm font-medium text-gray-700 mb-1">Clientes vinculados</label>
+      <p-multiSelect
+        id="clientes"
+        [options]="clientesParaSelect"
+        [(ngModel)]="clientesSeleccionados"
+        optionLabel="label"
+        optionValue="value"
+        appendTo="body"
+        [filter]="true"
+        placeholder="Seleccione uno o más clientes (ninguno para desvincular todos)"
+        [style]="{ width: '100%' }"
+      >
+      </p-multiSelect>
+      <p class="text-xs text-gray-500 mt-1">Puede seleccionar ninguno, uno o varios clientes.</p>
+    </div>
+
+    <div class="flex justify-end gap-3 mt-4">
+      <p-button
+        label="Cancelar"
+        icon="pi pi-times"
+        class="p-button-text"
+        (click)="dialogClientesVisible = false"
+      ></p-button>
+      <p-button
+        label="Guardar"
+        icon="pi pi-check"
+        class="p-button-success"
+        (click)="guardarClientesUsuario()"
+      ></p-button>
+    </div>
+  </div>
+</p-dialog>
 
 <p-dialog [(visible)]="displayDialog" header="Asignar Roles" [modal]="true" [closable]="false">
   <div class="p-fluid">

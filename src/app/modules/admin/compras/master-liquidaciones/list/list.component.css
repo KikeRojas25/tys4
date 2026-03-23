@@ -1,0 +1,20 @@
+.action-btn {
+  width: 34px;
+  height: 34px;
+  padding: 0 !important;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 8px;
+}
+
+.action-btn-neutral {
+  background: #ffffff;
+  border: 1px solid #e5e7eb;
+  color: #374151;
+}
+
+.action-btn-neutral:hover {
+  background: #f9fafb;
+}
+

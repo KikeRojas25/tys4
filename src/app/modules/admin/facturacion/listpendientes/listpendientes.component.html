@@ -149,8 +149,8 @@
           [value]="filteredPendientes"
           [loading]="loading"
           [paginator]="true"
-          [rows]="20"
-          [rowsPerPageOptions]="[20,40,60,120]"
+          [rows]="100"
+          [rowsPerPageOptions]="[100,500,1000,1500]"
           [columns]="cols"
           scrollHeight="70vh"
           [resizableColumns]="true"
@@ -206,6 +206,9 @@
 
               <!-- Remitente -->
             
+           <td class="text-center px-4 py-3">
+                <span class="text-gray-700 text-sm"> {{ rowData.remitente  }}</span>
+              </td>
 
               <!-- Destinatario -->
               <td class="text-center px-4 py-3 text-gray-700 text-sm word-wrap">{{ rowData.destinatario }}</td>
@@ -219,8 +222,8 @@
               <!-- Modo Transporte -->
               <td class="text-center px-4 py-3 text-gray-700 text-sm">{{ rowData.modotransporte }}</td>
 
-              <!-- Tipo Operación -->
-              <td class="text-center px-4 py-3 text-gray-700 text-sm">{{ rowData.tipooperacion }}</td>
+              <!-- Tipo Operación
+              <td class="text-center px-4 py-3 text-gray-700 text-sm">{{ rowData.tipooperacion }}</td> -->
 
               <!-- Peso -->
               <td class="text-center px-4 py-3">
@@ -237,28 +240,23 @@
               <!-- Bultos -->
               <td class="text-center px-4 py-3 text-gray-700 text-sm">{{ rowData.bulto }}</td>
 
-              <!-- Tarifa
+             <td class="text-center px-4 py-3 text-gray-700 text-sm">{{ rowData.pesovol  | number:'1.2-2'}}</td>  
+              
               <td class="text-center px-4 py-3">
                 <span class="text-gray-700 text-sm">S/. {{ rowData.tarifa | number:'1.2-2' }}</span>
-              </td> -->
+              </td>
 
               <!-- Subtotal -->
               <td class="text-center px-4 py-3">
                 <span class="text-amber-700 text-sm font-semibold">S/. {{ rowData.subtotal | number:'1.2-2' }}</span>
               </td>
 
-              <!-- IGV -->
+    
               <td class="text-center px-4 py-3">
-                <span class="text-gray-700 text-sm">S/. {{ rowData.igv | number:'1.2-2' }}</span>
+                <span class="text-amber-700 text-sm font-bold">S/. {{ rowData.recargo | number:'1.2-2' }}</span>
               </td>
 
-              <!-- Total -->
-              <td class="text-center px-4 py-3">
-                <span class="text-amber-700 text-sm font-bold">S/. {{ rowData.total | number:'1.2-2' }}</span>
-              </td>
 
-              <!-- Guía Transportista -->
-              <td class="text-center px-4 py-3 text-gray-700 text-sm">{{ rowData.guiatransportista }}</td>
             </tr>
           </ng-template>
 

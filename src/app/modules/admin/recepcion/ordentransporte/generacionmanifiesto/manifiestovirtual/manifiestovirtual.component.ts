@@ -247,6 +247,10 @@ export class ManifiestovirtualComponent implements OnInit {
       this.messageService.add({ severity: 'info', summary: 'No puede continuar', detail: 'Seleccione un Tipo de Operación' });
       return;
     }
+    if (this.model.idtipoOperacion === 123 && (this.model.fechallegada === undefined || this.model.fechallegada === null)) {
+      this.messageService.add({ severity: 'info', summary: 'No puede continuar', detail: 'Ingrese una Fecha de llegada' });
+      return;
+    }
 
   // Validar origen
   if (this.model.idorigen === undefined || this.model.idorigen === null) {
@@ -271,6 +275,9 @@ export class ManifiestovirtualComponent implements OnInit {
     const tipoOperacionLabel = this.tiposoperacion.find(item => item.value === this.model.idtipoOperacion)?.label || 'Sin datos';
     // Formatear la fecha
     const fechaEnvioFormateada = this.datePipe.transform(this.model.fechasalida, 'dd/MM/yyyy') || 'Sin datos';
+    const fechaLlegadaFormateada = this.model.fechallegada
+      ? (this.datePipe.transform(this.model.fechallegada, 'dd/MM/yyyy') || 'Sin datos')
+      : 'Sin datos';
 
       // Buscar el label correspondiente al origen
   const origenLabel = this.ubigeo.find(item => item.value === this.model.idorigen)?.label || 'Sin datos';
@@ -287,6 +294,7 @@ export class ManifiestovirtualComponent implements OnInit {
       Hoja de Ruta: ${this.model.numHojaRuta || 'Nueva Hoja de Ruta'}
       Tipo de Operación: ${tipoOperacionLabel}
       Fecha de Envío: ${fechaEnvioFormateada || 'Sin datos'}
+      Fecha de Llegada: ${fechaLlegadaFormateada || 'Sin datos'}
       Origen: ${origenLabel|| 'Sin datos'}
       Destino: ${destinoLabel || 'Sin datos'}
 

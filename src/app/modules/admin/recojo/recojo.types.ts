@@ -288,3 +288,36 @@ export interface Usuario {
   idcliente?: number;
   idproveedor?: number;
 }
+
+export interface IntegradoSemaforoPorClienteResult {
+  idcliente: number;
+  cliente: string | null;
+  cantidad_atiempo: number;
+  cantidad_porvencer: number;
+  cantidad_fueratiempo: number;
+  cantidad_observadas: number;
+}
+
+export interface IntegradoComercialPorClienteResult {
+  idcliente: number;
+  cliente: string | null;
+  idprovincia: number;
+  provincia: string | null;
+  cantidad: number;
+  peso: number;
+  bulto: number;
+  cantidad_recepcion: number;
+  cantidad_recojo: number;
+  cantidad_enreparto: number;
+  cantidad_recabarcargo: number;
+  cantidad_enviocargo: number;
+  peso_recepcion: number;
+  peso_enreparto: number;
+  peso_recabarcargo: number;
+  peso_enviocargo: number;
+  bulto_recepcion: number;
+  bulto_enreparto: number;
+  bulto_recabarcargo: number;
+  bulto_enviocargo: number;
+  cantidad_observadas: number;
+}

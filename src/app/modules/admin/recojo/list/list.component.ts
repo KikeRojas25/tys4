@@ -250,7 +250,8 @@ export class listarOrdenRecojoComponent implements OnInit {
       return;
     }
 
-    import('xlsx').then((xlsx) => {
+    import('xlsx').then((xlsx: any) => {
+      const XLSX: any = xlsx?.default ?? xlsx;
       const exportData = this.ordenes.map((orden: any) => ({
         OR: orden.numcp || '',
         Cliente: orden.razonsocial || '',
@@ -285,7 +286,7 @@ export class listarOrdenRecojoComponent implements OnInit {
         Responsable: orden.responsable || '',
       }));
 
-      const worksheet = xlsx.utils.json_to_sheet(exportData);
+      const worksheet = XLSX.utils.json_to_sheet(exportData);
 
       // Establecer ancho de columnas
       const columnWidths = [
@@ -306,7 +307,7 @@ export class listarOrdenRecojoComponent implements OnInit {
       worksheet['!cols'] = columnWidths;
 
       const workbook = { Sheets: { data: worksheet }, SheetNames: ['data'] };
-      const excelBuffer: any = xlsx.write(workbook, { bookType: 'xlsx', type: 'array' });
+      const excelBuffer: any = XLSX.write(workbook, { bookType: 'xlsx', type: 'array' });
       this.saveAsExcelFile(excelBuffer, 'ListadoRecojos');
     });
   }
@@ -316,7 +317,23 @@ export class listarOrdenRecojoComponent implements OnInit {
       const EXCEL_TYPE = 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet;charset=UTF-8';
       const EXCEL_EXTENSION = '.xlsx';
       const data: Blob = new Blob([buffer], { type: EXCEL_TYPE });
-      FileSaver.saveAs(data, `${fileName}_${new Date().getTime()}${EXCEL_EXTENSION}`);
+      // En producción (build optimizado), `import('file-saver')` puede exponer `saveAs`
+      // en `module.default` (o incluso `default.default`). Normalizamos para ambos casos.
+      const saver: any =
+        (FileSaver as any)?.saveAs
+          ? FileSaver
+          : (FileSaver as any)?.default?.saveAs
+            ? (FileSaver as any).default
+            : (FileSaver as any)?.default?.default?.saveAs
+              ? (FileSaver as any).default.default
+              : null;
+
+      if (!saver?.saveAs) {
+        console.error('No se encontró saveAs en file-saver (export inesperado).', FileSaver);
+        return;
+      }
+
+      saver.saveAs(data, `${fileName}_${new Date().getTime()}${EXCEL_EXTENSION}`);
     });
   }
 

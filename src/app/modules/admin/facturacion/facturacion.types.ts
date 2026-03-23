@@ -127,6 +127,11 @@ export interface AgregarCargoRequest {
     descripcion?: string;
 }
 
+export interface OrdenTrabajoRecargoUpdateDto {
+    IdOrdenTrabajo: number;
+    Recargo: number;
+}
+
 export interface OrdenTrabajoPreliquidacionResult {
     fecharegistro: Date | string;
     idordentrabajo: number;
@@ -145,6 +150,7 @@ export interface OrdenTrabajoPreliquidacionResult {
     base1?: number;
     total?: number;
     idcliente: number;
+    numeropreliquidacion: string;
     recargo?: number;
     igv?: number;
     guiatransportista: string;

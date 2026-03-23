@@ -203,6 +203,16 @@ eliminar(model: any): Observable<OrdenTransporte> {
   return this._httpClient.post<OrdenTransporte>(this.baseUrlOrden + 'DeleteOrdenTransporte', model, httpOptions);
 }
 
+reasignarProveedor(idordentrabajo: number, idproveedor: number): Observable<any> {
+  const idOt = Number(idordentrabajo);
+  const idProv = Number(idproveedor);
+  return this._httpClient.put(
+    `${this.baseUrlOrden}ReasignarProveedor/${idOt}`,
+    idProv,
+    httpOptions
+  );
+}
+
 
 
 
@@ -328,6 +338,13 @@ AsignarOtsCarga(idprovincia: string, idcarga: number) {
         clienteId: clienteId.toString(),
         origenId: origenId.toString()
       }
+    });
+  }
+
+  obtenerOrdenTrabajoTracking(numcp: string): Observable<any[]> {
+    return this._httpClient.get<any[]>(`${this.baseUrlOrden}ObtenerOrdenTrabajoTracking`, {
+      params: { numcp: numcp?.trim() || '' },
+      ...httpOptions
     });
   }
 

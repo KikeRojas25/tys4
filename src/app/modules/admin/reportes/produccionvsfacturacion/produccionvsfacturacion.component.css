@@ -1,0 +1,48 @@
+/* Estilos para el combo de año compacto */
+::ng-deep .filter-control-compact {
+  width: 100% !important;
+  max-width: 100% !important;
+  display: block !important;
+}
+
+::ng-deep .filter-control-compact .p-dropdown {
+  height: 32px !important;
+  min-height: 32px !important;
+  max-height: 32px !important;
+  width: 100% !important;
+  max-width: 100% !important;
+  font-size: 11px !important;
+}
+
+::ng-deep .filter-control-compact .p-dropdown .p-dropdown-label-container {
+  width: 100% !important;
+  max-width: 100% !important;
+  overflow: hidden !important;
+  flex: 1 1 auto !important;
+}
+
+::ng-deep .filter-control-compact .p-dropdown .p-dropdown-label {
+  font-size: 11px !important;
+  padding: 4px 8px !important;
+  line-height: 1.2 !important;
+  overflow: hidden !important;
+  text-overflow: ellipsis !important;
+  white-space: nowrap !important;
+  max-width: 100% !important;
+}
+
+::ng-deep .filter-control-compact .p-dropdown .p-dropdown-trigger {
+  width: 28px !important;
+  height: 28px !important;
+}
+
+::ng-deep .filter-control-compact .p-dropdown .p-dropdown-trigger-icon {
+  font-size: 12px !important;
+}
+
+::ng-deep .filter-control-compact .p-dropdown-panel .p-dropdown-items .p-dropdown-item {
+  font-size: 11px !important;
+  padding: 6px 8px !important;
+  line-height: 1.2 !important;
+}
+

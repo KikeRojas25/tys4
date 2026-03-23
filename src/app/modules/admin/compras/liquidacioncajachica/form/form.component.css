@@ -1,0 +1,84 @@
+/* Estilo compacto y minimalista (tipo consola admin). */
+
+/* NOTE:
+   PrimeNG themes suelen tener reglas muy específicas para thead/th.
+   Por eso aquí forzamos estilos a TODOS los p-table dentro del componente. */
+
+/* ---- Inputs compactos (solo dentro del componente) ---- */
+:host ::ng-deep .p-inputtext,
+:host ::ng-deep .p-dropdown,
+:host ::ng-deep .p-inputnumber,
+:host ::ng-deep .p-calendar {
+  font-size: 12px !important;
+}
+
+:host ::ng-deep .p-inputtext,
+:host ::ng-deep .p-inputnumber-input,
+:host ::ng-deep .p-calendar .p-inputtext {
+  padding: 6px 10px !important;
+  height: 34px !important;
+}
+
+:host ::ng-deep .p-dropdown {
+  height: 34px !important;
+}
+
+:host ::ng-deep .p-dropdown .p-dropdown-label {
+  padding: 6px 10px !important;
+}
+
+/* ---- Tablas PrimeNG (quitar azul del theme y hacerlo gris) ---- */
+:host ::ng-deep .p-datatable .p-datatable-thead,
+:host ::ng-deep .p-datatable .p-datatable-thead > tr,
+:host ::ng-deep .p-datatable .p-datatable-thead > tr > th {
+  background: #f3f4f6 !important; /* gray-100 */
+  background-color: #f3f4f6 !important;
+  color: #111827 !important; /* gray-900 */
+  border: none !important;
+  box-shadow: none !important;
+}
+
+:host ::ng-deep .p-datatable .p-datatable-thead > tr > th {
+  font-size: 12px !important;
+  font-weight: 600 !important;
+  padding: 8px 10px !important;
+}
+
+:host ::ng-deep .p-datatable .p-datatable-tbody > tr > td {
+  font-size: 12px !important;
+  color: #374151 !important; /* gray-700 */
+  padding: 8px 10px !important;
+  border-color: #e5e7eb !important; /* gray-200 */
+}
+
+:host ::ng-deep .p-datatable .p-datatable-tbody > tr:hover > td {
+  background: #f9fafb !important; /* gray-50 */
+}
+
+/* ---- Botón de acción (gris, minimal) ---- */
+.action-btn {
+  width: 26px !important;
+  height: 26px !important;
+  padding: 0 !important;
+  border-radius: 6px !important;
+  display: inline-flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+  border: 1px solid #e5e7eb !important; /* gray-200 */
+  background-color: #f9fafb !important; /* gray-50 */
+  color: #374151 !important; /* gray-700 */
+}
+
+.action-btn:hover {
+  background-color: #f3f4f6 !important; /* gray-100 */
+}
+
+.action-btn-danger {
+  background-color: #f9fafb !important;
+  color: #374151 !important;
+}
+
+.action-btn-danger:hover {
+  background-color: #f3f4f6 !important; /* gray-100 */
+}
+

@@ -14,10 +14,16 @@ import { OrdenTransporteService } from '../../recepcion/ordentransporte/ordentra
 import { ConfirmDialogModule } from 'primeng/confirmdialog';
 import { ToastModule } from 'primeng/toast';
 import { User } from '../trafico.types';
+import { UploadModalComponent } from '../../recepcion/ordentransporte/seguimientoot/modal.upload';
+import { FileModalComponent } from '../../recepcion/ordentransporte/seguimientoot/modalfiles';
 
 @Component({
   template: `
     <form [formGroup]="form" class="w-full p-6 bg-white rounded-lg shadow-md">
+      <div *ngIf="numcp" class="mb-4 text-sm text-gray-600">
+        OT: <span class="font-semibold">{{ numcp }}</span>
+      </div>
+
       <!-- Tipo Entrega -->
       <div class="mb-4">
         <label class="block text-sm font-medium text-gray-700 mb-1">Tipo Entrega:</label>
@@ -32,6 +38,25 @@ import { User } from '../trafico.types';
           *ngIf="form.get('tipoentrega')?.invalid && form.get('tipoentrega')?.touched"
           class="text-red-500">
           El tipo de entrega es obligatorio.
+        </small>
+      </div>
+
+      <!-- Subestado / Incidencia (dependiente de Tipo Entrega) -->
+      <div class="mb-4" *ngIf="showSubestado">
+        <label class="block text-sm font-medium text-gray-700 mb-1">Subestado / Incidencia:</label>
+        <p-dropdown
+          [options]="getSubestados(form.get('tipoentrega')?.value)"
+          formControlName="subestado"
+          placeholder="Seleccione subestado"
+          optionLabel="label"
+          optionValue="value"
+          scrollHeight="40vh"
+          [style]="{ width: '100%' }">
+        </p-dropdown>
+        <small
+          *ngIf="form.get('subestado')?.invalid && form.get('subestado')?.touched"
+          class="text-red-500">
+          Debe seleccionar un subestado para este tipo de entrega.
         </small>
       </div>
 
@@ -67,62 +92,35 @@ import { User } from '../trafico.types';
         </div>
       </div>
 
-      <!-- DNI y Persona Entrega -->
-      <div class="grid grid-cols-1 md:grid-cols-2 gap-4 mb-4">
-        <div>
-          <label class="block text-sm font-medium text-gray-700 mb-1">DNI Entrega:</label>
-          <input
-            pInputText
-            formControlName="dnientrega"
-            class="w-full border border-gray-300 rounded-md p-2 focus:ring-blue-500 focus:border-blue-500">
-          <small
-            *ngIf="form.get('dnientrega')?.invalid && form.get('dnientrega')?.touched"
-            class="text-red-500">
-            El DNI debe contener solo números y al menos 8 caracteres.
-          </small>
-        </div>
-        <div>
-          <label class="block text-sm font-medium text-gray-700 mb-1">Persona Entrega:</label>
-          <input
-            pInputText
-            formControlName="personaentrega"
-            class="w-full border border-gray-300 rounded-md p-2 focus:ring-blue-500 focus:border-blue-500">
-          <small
-            *ngIf="form.get('personaentrega')?.invalid && form.get('personaentrega')?.touched"
-            class="text-red-500">
-            El nombre de la persona es obligatorio.
-          </small>
-        </div>
-      </div>
-
-      <!-- Cargo Pendiente -->
-      <div class="mb-4">
-        <label class="block text-sm font-medium text-gray-700 mb-1">Cargo Pendiente:</label>
-        <p-checkbox formControlName="cargopendiente"  binary="true"></p-checkbox>
-      </div>
-
-      <!-- Observación -->
-      <div class="mb-4">
-        <label class="block text-sm font-medium text-gray-700 mb-1">Observación:</label>
-        <textarea
-          formControlName="observacion_enreparto"
-          rows="5"
-          cols="30"
-          autoResize="true"
-          placeholder="Escribe aquí..."
-          class="w-full border border-gray-300 rounded-md p-2 focus:ring-blue-500 focus:border-blue-500">
-        </textarea>
-      </div>
-
       <!-- Botón Confirmar Entrega -->
       <div class="mt-6">
-        <button
-          class="w-full md:w-auto bg-red-500 hover:bg-red-600 text-white font-bold py-2 px-4 rounded shadow"
-          pButton
-          [disabled]="form.invalid"
-          label="Confirmar Entrega"
-          (click)="entregarOT()">
-        </button>
+        <div class="flex flex-col md:flex-row gap-2 md:items-center">
+          <button
+            class="w-full md:w-auto bg-red-500 hover:bg-red-600 text-white font-bold py-2 px-4 rounded shadow"
+            pButton
+            [disabled]="form.invalid"
+            label="Confirmar Entrega"
+            (click)="entregarOT()">
+          </button>
+
+          <button
+            type="button"
+            class="w-full md:w-auto"
+            pButton
+            icon="pi pi-upload"
+            label="Subir fotos"
+            (click)="subirFotos()">
+          </button>
+
+          <button
+            type="button"
+            class="w-full md:w-auto"
+            pButton
+            icon="pi pi-images"
+            label="Ver fotos"
+            (click)="verFotos()">
+          </button>
+        </div>
       </div>
     </form>
     <p-confirmDialog header="Confirmación" icon="pi pi-exclamation-triangle"></p-confirmDialog>
@@ -153,6 +151,10 @@ export class EntregarOtModalComponent implements OnInit {
   form: FormGroup;
   statuses: SelectItem[] = [];
   user: User;
+  numcp?: string;
+
+  showSubestado = false;
+  subestadosPorTipo: { [key: string]: any[] } = {};
 
   constructor(
     private fb: FormBuilder,
@@ -161,16 +163,19 @@ export class EntregarOtModalComponent implements OnInit {
     private messageService: MessageService,
     public config: DynamicDialogConfig,
     private confirmationService: ConfirmationService,
+    private dialogService: DialogService,
   ) {}
 
   ngOnInit() {
     // Inicializa el formulario reactivo
   
     this.user = JSON.parse(localStorage.getItem('user'));
+    this.numcp = this.config?.data?.numcp;
 
 
     this.form = this.fb.group({
       tipoentrega: ['', Validators.required],
+      subestado: [''],
       fechaentrega: ['', Validators.required],
       horaentrega: [
         '',
@@ -179,21 +184,105 @@ export class EntregarOtModalComponent implements OnInit {
           Validators.pattern(/^([01]\d|2[0-3]):([0-5]\d)$/),
         ],
       ],
-      dnientrega: [
-        '',
-        [Validators.required, Validators.minLength(8), Validators.pattern(/^\d+$/)],
-      ],
-      personaentrega: ['', Validators.required],
-      cargopendiente: [false],
-      observacion_enreparto: [''],
     });
 
     // Opciones para el dropdown
     this.statuses = [
-      { label: 'Entrega Conforme', value: 5 },
-      { label: 'Rechazo Parcial', value: 11 },
-      { label: 'Rechazo Total', value: 12 },
+      { label: 'Entrega Perfecta', value: 'Entrega Perfecta' },
+      { label: 'Entrega Sin Cargo', value: 'Entrega Sin Cargo' },
+      { label: 'Rechazo Parcial', value: 'Rechazo Parcial' },
+      { label: 'No Entrega', value: 'No Entrega' },
     ];
+
+    // Subestados por tipo (mismo set que confirmarentregas)
+    this.subestadosPorTipo = {
+      'Entrega Perfecta': [{ label: 'Entrega Perfecta', value: 'Entrega Perfecta' }],
+      'Entrega Sin Cargo': [{ label: 'Entrega Perfecta', value: 'Entrega Perfecta' }],
+      'Rechazo Parcial': [
+        { label: 'Mercadería parcial faltante', value: 'Parcial_Faltante' },
+        { label: 'Mercadería parcial dañada', value: 'Parcial_Danada' },
+        { label: 'Cliente no quiere recibir total pedido', value: 'Cliente_No_Recibe_Total' }
+      ],
+      'No Entrega': [
+        { label: 'Dirección no existente', value: 'Direccion_No_Existe' },
+        { label: 'Local cerrado', value: 'Local_Cerrado' },
+        { label: 'Cliente rechazó total del pedido', value: 'Cliente_Rechazo_Total' }
+      ]
+    };
+
+    // Validación dinámica de subestado según el tipo
+    this.form.get('tipoentrega')?.valueChanges.subscribe((tipo: string) => {
+      const requiereSubestado = this.tipoRequiereSubestado(tipo);
+      this.showSubestado = requiereSubestado;
+
+      const subCtrl = this.form.get('subestado');
+      if (!subCtrl) return;
+
+      if (requiereSubestado) {
+        subCtrl.setValidators([Validators.required]);
+      } else {
+        subCtrl.clearValidators();
+        subCtrl.setValue('');
+      }
+      subCtrl.updateValueAndValidity({ emitEvent: false });
+    });
+  }
+
+  tipoRequiereSubestado(tipo: string): boolean {
+    return tipo === 'Rechazo Parcial' || tipo === 'No Entrega';
+  }
+
+  getSubestados(tipoEntrega: string): any[] {
+    return this.subestadosPorTipo[tipoEntrega] || [];
+  }
+
+  getIdSubestado(subestado: string): number {
+    switch (subestado) {
+      case 'Parcial_Faltante':
+        return 1;
+      case 'Parcial_Danada':
+        return 2;
+      case 'Cliente_No_Recibe_Total':
+        return 3;
+      case 'Direccion_No_Existe':
+        return 1;
+      case 'Local_Cerrado':
+        return 2;
+      case 'Cliente_Rechazo_Total':
+        return 3;
+      default:
+        return 0;
+    }
+  }
+
+  getIdTipoEntrega(tipoentrega: string): number {
+    if (tipoentrega === 'Entrega Perfecta') return 5;
+    if (tipoentrega === 'Entrega Sin Cargo') return 5;
+    if (tipoentrega === 'Rechazo Parcial') return 11;
+    if (tipoentrega === 'No Entrega') return 10;
+    return 0;
+  }
+
+  subirFotos(): void {
+    const idorden = this.config?.data?.idorden;
+    if (!idorden) return;
+
+    this.dialogService.open(UploadModalComponent, {
+      header: 'Cargar Fotos',
+      width: '70%',
+      data: { id: idorden },
+    });
+  }
+
+  verFotos(): void {
+    const idorden = this.config?.data?.idorden;
+    if (!idorden) return;
+
+    this.dialogService.open(FileModalComponent, {
+      header: 'Visor Fotos',
+      width: '30%',
+      data: { id: idorden },
+    });
   }
 
   entregarOT() {
@@ -211,9 +300,16 @@ export class EntregarOtModalComponent implements OnInit {
       message: '¿Esta seguro que desea confirmar la entrega?',
     accept: () => {
         const entregaData = this.form.value;
+
+        // Campos base
         entregaData.idordentrabajo = this.config.data.idorden;
-        entregaData.idUsuarioEntrega= this.user.id;
-        entregaData.idtipoentrega = entregaData.tipoentrega;
+        entregaData.idusuarioentrega = this.user.id;
+        // compat (por si algún endpoint/DTO espera esta variante)
+        entregaData.idUsuarioEntrega = this.user.id;
+
+        // Mapeos según pantalla confirmarentregas
+        entregaData.idtipoentrega = this.getIdTipoEntrega(entregaData.tipoentrega);
+        entregaData.IncidenciaEntregaId = this.getIdSubestado(entregaData.subestado);
 
         this.ordenService.confirmar_entrega(entregaData).subscribe({
           next: () => {
@@ -227,7 +323,7 @@ export class EntregarOtModalComponent implements OnInit {
           error: (err) => {
             this.messageService.add({
               severity: 'error',
-              detail: 'Error al confirmar la entrega: ' + err.message,
+              detail: 'Error al confirmar la entrega: ' + (err?.error || err?.message || 'No se pudo confirmar.'),
               summary: 'Error',
             });
           },

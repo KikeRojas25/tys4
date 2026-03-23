@@ -1,0 +1,151 @@
+<!-- Pantalla Principal -->
+<div class="flex flex-col flex-auto min-w-0">
+  <!-- Header -->
+  <div class="flex flex-col sm:flex-row flex-0 sm:items-center sm:justify-between p-6 sm:py-8 sm:px-10 border-b bg-card dark:bg-transparent">
+    <div class="flex-1 min-w-0">
+      <div class="flex flex-wrap items-center font-medium">
+        <div>
+          <a class="whitespace-nowrap text-primary-500">TMS</a>
+        </div>
+        <div class="flex items-center ml-1 whitespace-nowrap">
+          <mat-icon class="fuse-horizontal-navigation-item-icon" [svgIcon]="'heroicons_solid:chevron-right'"></mat-icon>
+          <a class="ml-1 text-primary-500">Seguimiento OT</a>
+        </div>
+        <div class="flex items-center ml-1 whitespace-nowrap">
+          <mat-icon class="fuse-horizontal-navigation-item-icon text-gray-400" [svgIcon]="'heroicons_solid:chevron-right'"></mat-icon>
+          <span class="ml-1 text-gray-500">Integrado comercial</span>
+        </div>
+      </div>
+      <div class="mt-2">
+        <h2 class="text-3xl md:text-4xl font-extrabold tracking-tight leading-7 sm:leading-10 truncate">Integrado comercial</h2>
+      </div>
+    </div>
+    <div class="mt-4 sm:mt-0 flex gap-2">
+      <button pButton type="button" icon="pi pi-signal" label="Vista semáforo" class="p-button-outlined p-button-secondary"
+        [routerLink]="['/seguimientoot/integrado-semaforo']"></button>
+      <button pButton type="button" icon="pi pi-refresh" label="Actualizar" (click)="reload()" [loading]="loading"
+        class="px-4 py-2 text-sm font-medium"></button>
+    </div>
+  </div>
+
+  <!-- Contenido Principal -->
+  <div class="flex flex-col min-w-0 w-full p-6">
+    <p-panel [showHeader]="false">
+      <p-table
+        [columns]="cols"
+        [value]="ordenes"
+        dataKey="_rowKey"
+        [loading]="loading"
+        [tableStyle]="{ 'table-layout': 'fixed', 'width': '100%' }"
+        scrollable="true"
+        [scrollHeight]="'600px'"
+        [rows]="100"
+        [responsive]="true"
+        class="tabla-integrado-comercial"
+        styleClass="p-datatable-striped">
+
+        <ng-template pTemplate="colgroup" let-columns>
+          <colgroup>
+            <col *ngFor="let col of columns" [style.width]="col.width">
+          </colgroup>
+        </ng-template>
+
+        <ng-template pTemplate="header" let-columns>
+          <tr>
+            <th colspan="1" style="text-align: center; color: white; background-color: #374151;">GENERAL</th>
+            <!-- <th colspan="1">PROVINCIA - tal vez la usemos luego</th> -->
+            <th colspan="3" style="text-align: center; color: white; background-color: #fbc02d;">RECEPCIÓN</th>
+            <th colspan="3" style="text-align: center; color: white; background-color: #03A9F4;">ENTREGA</th>
+            <th colspan="3" style="text-align: center; color: white; background-color: #B3E5FC;">RECABAR CARGOS</th>
+            <th colspan="3" style="text-align: center; color: white; background-color: #00796B;">ENVIAR CARGOS</th>
+            <th colspan="1" style="text-align: center; color: white; background-color: #790E00;">OBSERVADAS</th>
+          </tr>
+          <tr>
+            <th *ngFor="let col of columns" [ngStyle]="{'width': col.width}" [pSortableColumn]="col.field" class="col-header-icon">
+              <i *ngIf="col.icon" [class]="col.icon" [title]="col.header"></i>
+              <span *ngIf="!col.icon">{{ col.header }}</span>
+            </th>
+          </tr>
+        </ng-template>
+
+        <ng-template pTemplate="body" let-rowData>
+          <tr>
+            <td class="text-left font-medium col-cliente">
+              <a [routerLink]="['/seguimientoot/detalleotcliente']"
+                 [queryParams]="{idcliente: rowData.idcliente, cliente: rowData.cliente}"
+                 class="text-primary-600 hover:text-primary-800 hover:underline cursor-pointer">
+                {{ rowData.cliente || '—' }}
+              </a>
+            </td>
+
+            <!-- RECEPCIÓN -->
+            <td class="text-center">
+              <a *ngIf="(rowData.cantidad_recepcion || 0) > 0"
+                 (click)="verDetalleOT(rowData.idcliente, 'recepcion', 'Recepción - ' + (rowData.cliente || ''))"
+                 class="text-blue-600 hover:text-blue-800 underline cursor-pointer">
+                {{ rowData.cantidad_recepcion }}
+              </a>
+              <span *ngIf="!(rowData.cantidad_recepcion || 0)">{{ rowData.cantidad_recepcion || 0 }}</span>
+            </td>
+            <td class="text-center">{{ rowData.peso_recepcion | number:'1.0-0' }}</td>
+            <td class="text-center">{{ rowData.bulto_recepcion }}</td>
+
+            <!-- ENTREGA -->
+            <td class="text-center">
+              <a *ngIf="(rowData.cantidad_enreparto || 0) > 0"
+                 (click)="verDetalleOT(rowData.idcliente, 'enreparto', 'Entrega - ' + (rowData.cliente || ''))"
+                 class="text-blue-600 hover:text-blue-800 underline cursor-pointer">
+                {{ rowData.cantidad_enreparto }}
+              </a>
+              <span *ngIf="!(rowData.cantidad_enreparto || 0)">{{ rowData.cantidad_enreparto || 0 }}</span>
+            </td>
+            <td class="text-center">{{ rowData.peso_enreparto | number:'1.0-0' }}</td>
+            <td class="text-center">{{ rowData.bulto_enreparto }}</td>
+
+            <!-- RECABAR CARGOS -->
+            <td class="text-center">
+              <a *ngIf="(rowData.cantidad_recabarcargo || 0) > 0"
+                 (click)="verDetalleOT(rowData.idcliente, 'recabarcargo', 'Recabar Cargos - ' + (rowData.cliente || ''))"
+                 class="text-blue-600 hover:text-blue-800 underline cursor-pointer">
+                {{ rowData.cantidad_recabarcargo }}
+              </a>
+              <span *ngIf="!(rowData.cantidad_recabarcargo || 0)">{{ rowData.cantidad_recabarcargo || 0 }}</span>
+            </td>
+            <td class="text-center">{{ rowData.peso_recabarcargo | number:'1.0-0' }}</td>
+            <td class="text-center">{{ rowData.bulto_recabarcargo }}</td>
+
+            <!-- ENVIAR CARGOS -->
+            <td class="text-center">
+              <a *ngIf="(rowData.cantidad_enviocargo || 0) > 0"
+                 (click)="verDetalleOT(rowData.idcliente, 'enviocargo', 'Enviar Cargos - ' + (rowData.cliente || ''))"
+                 class="text-blue-600 hover:text-blue-800 underline cursor-pointer">
+                {{ rowData.cantidad_enviocargo }}
+              </a>
+              <span *ngIf="!(rowData.cantidad_enviocargo || 0)">{{ rowData.cantidad_enviocargo || 0 }}</span>
+            </td>
+            <td class="text-center">{{ rowData.peso_enviocargo | number:'1.0-0' }}</td>
+            <td class="text-center">{{ rowData.bulto_enviocargo }}</td>
+
+            <!-- OBSERVADAS -->
+            <td class="text-center">
+              <a *ngIf="(rowData.cantidad_observadas || 0) > 0"
+                 (click)="verDetalleOT(rowData.idcliente, 'observadas', 'Observadas - ' + (rowData.cliente || ''))"
+                 class="text-blue-600 hover:text-blue-800 underline cursor-pointer">
+                {{ rowData.cantidad_observadas }}
+              </a>
+              <span *ngIf="!(rowData.cantidad_observadas || 0)">{{ rowData.cantidad_observadas || 0 }}</span>
+            </td>
+          </tr>
+        </ng-template>
+
+        <ng-template pTemplate="emptymessage">
+          <tr>
+            <td [attr.colspan]="cols.length" class="text-center py-8 text-gray-500">
+              No hay datos para mostrar.
+            </td>
+          </tr>
+        </ng-template>
+      </p-table>
+    </p-panel>
+  </div>
+</div>

@@ -1,0 +1,4 @@
+/* Tarjeta de tipo seleccionable */
+:host ::ng-deep .cursor-pointer {
+  cursor: pointer;
+}

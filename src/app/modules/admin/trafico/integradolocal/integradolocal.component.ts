@@ -138,11 +138,14 @@ export class IntegradolocalComponent implements OnInit {
     verDetalle(idhojaruta: number) {
         this.router.navigate(['/trafico/vistamanifiestolocal', idhojaruta]);
     }
-    verRepartidor(idproveedor: number, iddepartamento: number) {
-        this.router.navigate([
-            '/trafico/vistarepartidor',
-            idproveedor,
-            iddepartamento,
-        ]);
+    verRepartidor(idproveedor: number, iddepartamento: number, idprovincia?: number) {
+        const idprovParsed = Number(idprovincia);
+        if (Number.isFinite(idprovParsed) && idprovParsed > 0) {
+            this.router.navigate(['/trafico/vistarepartidor', idproveedor, iddepartamento, idprovParsed]);
+            return;
+        }
+
+        // Fallback (si no vino idprovincia válido)
+        this.router.navigate(['/trafico/vistarepartidor', idproveedor, iddepartamento]);
     }
 }

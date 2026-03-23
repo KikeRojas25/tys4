@@ -1,0 +1,134 @@
+<!-- Pantalla Principal -->
+<div class="flex flex-col flex-auto min-w-0">
+  <!-- Header -->
+  <div class="flex flex-col sm:flex-row flex-0 sm:items-center sm:justify-between p-6 sm:py-8 sm:px-10 border-b bg-card dark:bg-transparent">
+    <div class="flex-1 min-w-0">
+      <div class="flex flex-wrap items-center font-medium">
+        <div>
+          <a [routerLink]="['/seguimientoot/integradocomercial']" class="whitespace-nowrap text-primary-500 cursor-pointer hover:underline">TMS</a>
+        </div>
+        <div class="flex items-center ml-1 whitespace-nowrap">
+          <mat-icon class="fuse-horizontal-navigation-item-icon" [svgIcon]="'heroicons_solid:chevron-right'"></mat-icon>
+          <a [routerLink]="['/seguimientoot/integradocomercial']" class="ml-1 text-primary-500 cursor-pointer hover:underline">Seguimiento OT</a>
+        </div>
+        <div class="flex items-center ml-1 whitespace-nowrap">
+          <mat-icon class="fuse-horizontal-navigation-item-icon text-gray-400" [svgIcon]="'heroicons_solid:chevron-right'"></mat-icon>
+          <span class="ml-1 text-gray-500">Integrado semáforo</span>
+        </div>
+      </div>
+      <div class="mt-2">
+        <h2 class="text-3xl md:text-4xl font-extrabold tracking-tight leading-7 sm:leading-10 truncate">Integrado semáforo por cliente</h2>
+        <p class="text-sm text-amber-700 mt-1">Órdenes a tiempo, por vencer, fuera de tiempo y observadas</p>
+      </div>
+    </div>
+    <div class="mt-4 sm:mt-0 flex gap-2">
+      <button pButton type="button" icon="pi pi-arrow-left" label="Integrado comercial" (click)="irIntegradoComercial()"
+        class="p-button-outlined p-button-secondary"></button>
+      <button pButton type="button" icon="pi pi-refresh" label="Actualizar" (click)="reload()" [loading]="loading"
+        class="px-4 py-2 text-sm font-medium"></button>
+    </div>
+  </div>
+
+  <!-- Contenido Principal -->
+  <div class="flex flex-col min-w-0 w-full p-6">
+    <p-panel [showHeader]="false">
+      <p-table
+        [value]="ordenes"
+        dataKey="idcliente"
+        [loading]="loading"
+        [tableStyle]="{ 'table-layout': 'fixed', 'width': '100%' }"
+        scrollable="true"
+        [scrollHeight]="'600px'"
+        [responsive]="true"
+        class="tabla-integrado-semaforo"
+        styleClass="p-datatable-striped">
+
+        <ng-template pTemplate="header">
+          <tr>
+            <th style="text-align: left; color: white; background-color: #374151; min-width: 200px;">CLIENTE</th>
+            <th colspan="3" style="text-align: center; color: white; background-color: #4caf50;">SEMÁFORO</th>
+            <th style="text-align: center; color: white; background-color: #790E00;">OBSERVADAS</th>
+          </tr>
+          <tr>
+            <th style="text-align: left; color: white; background-color: #374151;"></th>
+            <th style="text-align: center; color: white; background-color: #2e7d32; width: 100px;" title="Órdenes entregadas a tiempo">
+              <mat-icon class="semaforo-icon semaforo-verde" [svgIcon]="'heroicons_solid:check-circle'"></mat-icon>
+              <span class="ml-1">A tiempo</span>
+            </th>
+            <th style="text-align: center; color: white; background-color: #f9a825; width: 100px;" title="Órdenes por vencer">
+              <mat-icon class="semaforo-icon semaforo-amarillo" [svgIcon]="'heroicons_solid:clock'"></mat-icon>
+              <span class="ml-1">Fuera de tiempo</span>
+            </th>
+            <th style="text-align: center; color: white; background-color: #c62828; width: 100px;" title="Órdenes fuera de tiempo">
+              <mat-icon class="semaforo-icon semaforo-rojo" [svgIcon]="'heroicons_solid:x-circle'"></mat-icon>
+              <span class="ml-1">Plazo vencido</span>
+            </th>
+            <th style="text-align: center; color: white; background-color: #790E00; width: 100px;" title="Entregas parciales o rechazadas">
+              <mat-icon [svgIcon]="'heroicons_solid:exclamation-triangle'"></mat-icon>
+              <span class="ml-1">Observadas</span>
+            </th>
+          </tr>
+        </ng-template>
+
+        <ng-template pTemplate="body" let-rowData>
+          <tr>
+            <td class="text-left font-medium col-cliente">
+              <a (click)="verDetalle(rowData.idcliente)"
+                 class="text-primary-600 hover:text-primary-800 hover:underline cursor-pointer">
+                {{ rowData.cliente || '—' }}
+              </a>
+            </td>
+
+            <!-- A tiempo (verde) -->
+            <td class="text-center celda-semaforo celda-verde">
+              <a *ngIf="(rowData.cantidad_atiempo || 0) > 0"
+                 (click)="verDetalleOT(rowData, 'atiempo', 'A tiempo - ' + (rowData.cliente || ''))"
+                 class="badge-semaforo badge-verde badge-link cursor-pointer">
+                {{ rowData.cantidad_atiempo }}
+              </a>
+              <span *ngIf="!(rowData.cantidad_atiempo || 0)" class="badge-semaforo badge-verde">{{ rowData.cantidad_atiempo || 0 }}</span>
+            </td>
+
+            <!-- Por vencer (amarillo) -->
+            <td class="text-center celda-semaforo celda-amarillo">
+              <a *ngIf="(rowData.cantidad_porvencer || 0) > 0"
+                 (click)="verDetalleOT(rowData, 'porvencer', 'Por vencer - ' + (rowData.cliente || ''))"
+                 class="badge-semaforo badge-amarillo badge-link cursor-pointer">
+                {{ rowData.cantidad_porvencer }}
+              </a>
+              <span *ngIf="!(rowData.cantidad_porvencer || 0)" class="badge-semaforo badge-amarillo">{{ rowData.cantidad_porvencer || 0 }}</span>
+            </td>
+
+            <!-- Fuera de tiempo (rojo) -->
+            <td class="text-center celda-semaforo celda-rojo">
+              <a *ngIf="(rowData.cantidad_fueratiempo || 0) > 0"
+                 (click)="verDetalleOT(rowData, 'fueratiempo', 'Fuera de tiempo - ' + (rowData.cliente || ''))"
+                 class="badge-semaforo badge-rojo badge-link cursor-pointer">
+                {{ rowData.cantidad_fueratiempo }}
+              </a>
+              <span *ngIf="!(rowData.cantidad_fueratiempo || 0)" class="badge-semaforo badge-rojo">{{ rowData.cantidad_fueratiempo || 0 }}</span>
+            </td>
+
+            <!-- Observadas -->
+            <td class="text-center celda-observadas">
+              <a *ngIf="(rowData.cantidad_observadas || 0) > 0"
+                 (click)="verDetalleOT(rowData, 'observadas', 'Observadas - ' + (rowData.cliente || ''))"
+                 class="badge-observadas badge-link cursor-pointer">
+                {{ rowData.cantidad_observadas }}
+              </a>
+              <span *ngIf="!(rowData.cantidad_observadas || 0)" class="badge-observadas">{{ rowData.cantidad_observadas || 0 }}</span>
+            </td>
+          </tr>
+        </ng-template>
+
+        <ng-template pTemplate="emptymessage">
+          <tr>
+            <td colspan="5" class="text-center py-8 text-gray-500">
+              No hay datos para mostrar.
+            </td>
+          </tr>
+        </ng-template>
+      </p-table>
+    </p-panel>
+  </div>
+</div>

@@ -78,9 +78,10 @@ interface OrdenTrabajoDetalle {
                 <ng-template pTemplate="body" let-rowData>
                     <tr>
                         <td class="text-center">{{ rowData.numcp }}</td>
-                        <td class="text-left">{{ rowData.destino_departamento || '-' }}</td>
-                        <td class="text-left">{{ rowData.destino_provincia || '-' }}</td>
-                        <td class="text-left">{{ rowData.destino_distrito || '-' }}</td>
+                       
+                        <td class="text-left">{{ rowData.destino_provincia }}</td>
+                        <td class="text-left">{{ rowData.cliente }}</td>
+                        
                         <td class="text-center">{{ rowData.peso | number:'1.0-2' }}</td>
                         <td class="text-center">{{ rowData.bulto }}</td>
                         <td class="text-center">{{ formatFecha(rowData.fecharegistro) }}</td>
@@ -127,9 +128,8 @@ export class ModalOtEstacionComponent implements OnInit {
     ngOnInit() {
         this.cols = [
             { field: 'numcp', header: 'Número OT', width: '120px' },
-            { field: 'destino_departamento', header: 'Destino - Departamento', width: '150px' },
             { field: 'destino_provincia', header: 'Destino - Provincia', width: '150px' },
-            { field: 'destino_distrito', header: 'Destino - Distrito', width: '150px' },
+            { field: 'cliente', header: 'Cliente', width: '150px' },
             { field: 'peso', header: 'Peso', width: '100px' },
             { field: 'bulto', header: 'Bultos', width: '100px' },
             { field: 'fecharegistro', header: 'Fecha Registro', width: '150px' },
@@ -175,7 +175,8 @@ export class ModalOtEstacionComponent implements OnInit {
             return;
         }
 
-        import('xlsx').then((xlsx) => {
+        import('xlsx').then((xlsx: any) => {
+            const XLSX: any = xlsx?.default ?? xlsx;
             const exportData = this.ordenesFiltradas.map(ot => ({
                 'Número OT': ot.numcp,
                 'Destino - Departamento': ot.destino_departamento || '-',
@@ -189,9 +190,9 @@ export class ModalOtEstacionComponent implements OnInit {
                 'Estado': ot.estado || '-'
             }));
 
-            const worksheet = xlsx.utils.json_to_sheet(exportData);
+            const worksheet = XLSX.utils.json_to_sheet(exportData);
             const workbook = { Sheets: { data: worksheet }, SheetNames: ['data'] };
-            const excelBuffer: any = xlsx.write(workbook, { bookType: 'xlsx', type: 'array' });
+            const excelBuffer: any = XLSX.write(workbook, { bookType: 'xlsx', type: 'array' });
             this.saveAsExcelFile(excelBuffer, 'OrdenesTrabajo');
         });
     }

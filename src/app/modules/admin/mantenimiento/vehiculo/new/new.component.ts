@@ -1,7 +1,6 @@
 import { CommonModule } from '@angular/common';
 import { Component, OnInit } from '@angular/core';
 import { FormsModule } from '@angular/forms';
-import { MatIcon } from '@angular/material/icon';
 
 import { MessageService, ConfirmationService, SelectItem } from 'primeng/api';
 import { ButtonModule } from 'primeng/button';
@@ -37,7 +36,6 @@ import { MantenimientoService } from '../../mantenimiento.service';
           ToastModule,
           CalendarModule,
           ConfirmDialogModule,
-          MatIcon,
           IconFieldModule,
           InputIconModule,
           InputMaskModule ,
@@ -86,7 +84,8 @@ export class NewComponent implements OnInit {
         });
   }
   cargarDropdownProveedores() {
-    this.mantenimientoService.getProveedores('', 21514).subscribe({
+    this.cargandoProveedores = true;
+    this.mantenimientoService.getProveedores('', 21513).subscribe({
       next: (data) => {
 
      
@@ -109,8 +108,9 @@ export class NewComponent implements OnInit {
   });
   }
   guardarVehiculo() {
-
-
+    if (this.model?.placa) {
+      this.model.placa = String(this.model.placa).toUpperCase().trim();
+    }
 
     this.confirmationService.confirm({
       message: '¿Está seguro que desea guardar el vehículo?',
@@ -118,17 +118,21 @@ export class NewComponent implements OnInit {
       icon: 'pi pi-exclamation-triangle',
       accept: () => {
     
-                this.mantenimientoService.guardarVehiculo(this.model).subscribe({
+                this.mantenimientoService.vehiculoRegistrar(this.model).subscribe({
                   next: (data) => {
-                    this.messageService.add({severity:'success', summary:'Vehículo registrado', detail:'El vehículo se ha registrado correctamente'});
-                    this.ref?.close();
+                    this.messageService.add({
+                      severity:'success',
+                      summary:'Vehículo',
+                      detail: data?.message ?? 'El vehículo se ha registrado correctamente'
+                    });
+                    this.ref?.close(true);
                 },
                 error: err => {
                   // Captura el mensaje del backend
-                  const mensaje = err.error?.message || 'Error inesperado';
+                  const mensaje = err?.error?.message || 'Error inesperado';
                   this.messageService.add({
-                    severity: 'error',
-                    summary: 'Error',
+                    severity: err?.status === 409 ? 'warn' : 'error',
+                    summary: 'Vehículo',
                     detail: mensaje
                   });
                 }

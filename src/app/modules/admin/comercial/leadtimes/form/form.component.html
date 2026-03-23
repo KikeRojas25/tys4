@@ -1,0 +1,100 @@
+<p-toast />
+<form [formGroup]="form" class="flex flex-col gap-4">
+  <div class="flex flex-col">
+    <label class="mb-1">Cliente <span class="text-red-500">*</span></label>
+    <p-dropdown
+      formControlName="idCliente"
+      [options]="clientes"
+      placeholder="Seleccione un cliente"
+      scrollHeight="30vh"
+      appendTo="body"
+      [filter]="true"
+      [showClear]="true"
+      [style]="{'width':'100%'}"
+      [disabled]="esEdicion">
+    </p-dropdown>
+  </div>
+
+  <div class="grid grid-cols-2 gap-4">
+    <div class="flex flex-col">
+      <label class="mb-1">Origen - Dept</label>
+      <p-dropdown
+        formControlName="idOrigenDepartamento"
+        [options]="departamentosOrigen"
+        placeholder="Seleccione"
+        appendTo="body"
+        [style]="{'width':'100%'}"
+        [showClear]="true">
+      </p-dropdown>
+    </div>
+    <div class="flex flex-col">
+      <label class="mb-1">Origen - Prov <span class="text-red-500">*</span></label>
+      <p-dropdown
+        formControlName="idOrigenProvincia"
+        [options]="provinciasOrigen"
+        placeholder="Seleccione"
+        appendTo="body"
+        [style]="{'width':'100%'}"
+        [showClear]="true"
+        [disabled]="!form.value.idOrigenDepartamento">
+      </p-dropdown>
+    </div>
+  </div>
+
+  <div class="grid grid-cols-2 gap-4">
+    <div class="flex flex-col">
+      <label class="mb-1">Destino - Dept</label>
+      <p-dropdown
+        formControlName="idDestinoDepartamento"
+        [options]="departamentosDestino"
+        placeholder="Seleccione"
+        appendTo="body"
+        [style]="{'width':'100%'}"
+        [showClear]="true">
+      </p-dropdown>
+    </div>
+    <div class="flex flex-col">
+      <label class="mb-1">Destino - Prov <span class="text-red-500">*</span></label>
+      <p-dropdown
+        formControlName="idDestinoProvincia"
+        [options]="provinciasDestino"
+        placeholder="Seleccione"
+        appendTo="body"
+        [style]="{'width':'100%'}"
+        [showClear]="true"
+        [disabled]="!form.value.idDestinoDepartamento">
+      </p-dropdown>
+    </div>
+  </div>
+
+  <div class="flex flex-col">
+    <label class="mb-1">Horas <span class="text-red-500">*</span></label>
+    <p-inputNumber
+      formControlName="horas"
+      [min]="1"
+      [max]="999"
+      [showButtons]="true"
+      [style]="{'width':'100%'}"
+      placeholder="Ej: 8">
+    </p-inputNumber>
+  </div>
+
+  <div class="flex justify-end gap-2 pt-4 border-t">
+    <button
+      pButton
+      label="Cancelar"
+      type="button"
+      class="p-button-secondary"
+      (click)="cancelar()">
+    </button>
+    <button
+      pButton
+      label="Guardar"
+      type="button"
+      icon="pi pi-check"
+      [loading]="loading"
+      [disabled]="loading"
+      (click)="guardar()">
+    </button>
+  </div>
+</form>

@@ -258,7 +258,12 @@ guardar(): void {
       this.loading = true;
 
       const payload = {
-        ...this.model,
+        // No enviar repartidor (se retiró de new/edit)
+        // eslint-disable-next-line @typescript-eslint/no-unused-vars
+        ...(((() => {
+          const { idrepartidor, repartidor, ...modelSinRepartidor } = (this.model ?? {}) as any;
+          return modelSinRepartidor;
+        })()) as any),
         idcliente: Number(this.model.idcliente),
         idorigen: Number(this.model.idorigen),
         idtipounidad: Number(this.model.idtipounidad),

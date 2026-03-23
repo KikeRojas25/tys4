@@ -40,8 +40,32 @@ export class NavigationMockApi {
         // -----------------------------------------------------------------------------------------------------
         this._fuseMockApiService.onGet('api/common/navigation').reply(() => {
             this._compactNavigation = [];
-            const menu = JSON.parse(localStorage.getItem('menu'));
+            let menu: any[] = [];
+            try {
+                const raw = localStorage.getItem('menu');
+                menu = raw ? JSON.parse(raw) : [];
+            }
+            catch {
+                menu = [];
+            }
+            if ( !Array.isArray(menu) )
+            {
+                menu = [];
+            }
 
+            // Fallback: si no hay menú en localStorage, usamos la navegación por defecto (útil para desarrollo)
+            if ( menu.length === 0 )
+            {
+                return [
+                    200,
+                    {
+                        compact   : cloneDeep(this._defaultNavigation),
+                        default   : cloneDeep(this._defaultNavigation),
+                        futuristic: cloneDeep(this._defaultNavigation),
+                        horizontal: cloneDeep(this._defaultNavigation)
+                    }
+                ];
+            }
 
                 menu.forEach((resp) => {
                     this._compactNavigation.push({

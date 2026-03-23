@@ -210,6 +210,18 @@
         <!-- Campos para distribución por agencia: Peso, Bultos, Precio, Consignado, Agencia -->
         <div *ngIf="model.idtipoOperacion === 123" class="grid grid-cols-1 lg:grid-cols-2 gap-4 col-span-1 lg:col-span-3 w-full">
           <div class="field flex flex-col">
+            <label class="block mb-1">Fecha de llegada: (*)</label>
+            <p-calendar
+              appendto="body"
+              [(ngModel)]="model.fechallegada"
+              basezindex="100"
+              [style]="{'width':'100%'}"
+              name="fechallegada"
+              dateformat="dd/mm/yy"
+              class="w-full">
+            </p-calendar>
+          </div>
+          <div class="field flex flex-col">
             <label class="block mb-1">Peso:</label>
             <p-inputNumber  [(ngModel)]="model.pesoagencia"  inputId="minmaxfraction" 
             mode="decimal"  class="form-control w-full"

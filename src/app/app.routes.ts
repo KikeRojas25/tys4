@@ -110,7 +110,14 @@ export const appRoutes: Route[] = [
                                           .then(m => m.VistamanifiestoLocalComponent)
                   },
                   {
-                    path: 'vistarepartidor/:id/:uid',
+                    // :idproveedor = primer segmento, :iddepartamento = segundo segmento
+                    path: 'vistarepartidor/:idproveedor/:iddepartamento/:idprovincia',
+                    loadComponent: () => import('./modules/admin/trafico/vistarepartidor/vistarepartidor.component')
+                                          .then(m => m.VistarepartidorComponent)
+                  },
+                  {
+                    // Compatibilidad: ruta antigua sin idprovincia
+                    path: 'vistarepartidor/:idproveedor/:iddepartamento',
                     loadComponent: () => import('./modules/admin/trafico/vistarepartidor/vistarepartidor.component')
                                           .then(m => m.VistarepartidorComponent)
                   },
@@ -162,6 +169,26 @@ export const appRoutes: Route[] = [
                                           .then(m => m.SeguimientootComponent)
                   },
                   {
+                    path: 'listadoordentransportecomercial',
+                    loadComponent: () => import('./modules/admin/recepcion/ordentransporte/seguimientootcomercial/seguimientootcomercial.component')
+                                          .then(m => m.SeguimientootcomercialComponent)
+                  },
+                  {
+                    path: 'detalleotcliente',
+                    loadComponent: () => import('./modules/admin/recepcion/ordentransporte/detalleotcliente/detalleotcliente.component')
+                                          .then(m => m.DetalleotclienteComponent)
+                  },
+                  {
+                    path: 'integradocomercial',
+                    loadComponent: () => import('./modules/admin/recojo/integrado/integrado.component')
+                                          .then(m => m.IntegradoComponent)
+                  },
+                  {
+                    path: 'integrado-semaforo',
+                    loadComponent: () => import('./modules/admin/recojo/integrado-semaforo/integrado-semaforo.component')
+                                          .then(m => m.IntegradoSemaforoComponent)
+                  },
+                  {
                     path: 'confirmarentregas',
                     loadComponent: () => import('./modules/admin/trafico/confirmarentrega/confirmarentrega.component')
                                           .then(m => m.ConfirmarentregaComponent)
@@ -175,6 +202,11 @@ export const appRoutes: Route[] = [
                     path: 'detalleot/:uid',
                     loadComponent: () => import('./modules/admin/recepcion/ordentransporte/detalleot/detalleot.component')
                                           .then(m => m.DetalleotComponent)
+                  },
+                  {
+                    path: 'trackingot',
+                    loadComponent: () => import('./modules/admin/reportes/trackingot/trackingot.component')
+                                          .then(m => m.TrackingotComponent)
                   }
                  
                 ]
@@ -259,6 +291,31 @@ export const appRoutes: Route[] = [
               },
 
               {
+                path: 'comercial',
+                loadComponent: () => import('./modules/admin/comercial/comercial.component')
+                                      .then(m => m.ComercialComponent),
+                children: [
+                  {
+                    path: 'leadtimes',
+                    loadComponent: () => import('./modules/admin/comercial/leadtimes/leadtimes.component')
+                                          .then(m => m.LeadtimesComponent),
+                    children: [
+                      {
+                        path: '',
+                        pathMatch: 'full',
+                        loadComponent: () => import('./modules/admin/comercial/leadtimes/list/list.component')
+                                              .then(m => m.ListComponent)
+                      }
+                    ]
+                  },
+                  {
+                    path: 'registro-citas',
+                    loadComponent: () => import('./modules/admin/comercial/registro-citas/registro-citas.component')
+                                          .then(m => m.RegistroCitasComponent)
+                  }
+                ]
+              },
+              {
                  path : 'reportes', 
                  loadComponent: () => import('./modules/admin/reportes/reportes.component')
                  .then(m => m.ReportesComponent),
@@ -283,8 +340,77 @@ export const appRoutes: Route[] = [
                     loadComponent: () => import('./modules/admin/reportes/generaltrafico/generaltrafico.component')
                                           .then(m => m.GeneraltraficoComponent)
                   },
+                  {
+                    path: 'reporteproduccionvsfacturacion',
+                    loadComponent: () => import('./modules/admin/reportes/produccionvsfacturacion/produccionvsfacturacion.component')
+                                          .then(m => m.ProduccionvsfacturacionComponent)
+                  },
+                  {
+                    path: 'reporteproducxcliente',
+                    loadComponent: () => import('./modules/admin/reportes/produccioncliente/produccioncliente.component')
+                                          .then(m => m.ProduccionclienteComponent)
+                  },
+                  {
+                    path: 'incidenciassinseguimiento',
+                    loadComponent: () => import('./modules/admin/reportes/incidenciassinseguimiento/incidenciassinseguimiento.component')
+                                          .then(m => m.IncidenciassinseguimientoComponent)
+                  },
+                  {
+                    path: 'reportevalorizadohr',
+                    loadComponent: () => import('./modules/admin/reportes/reportevalorizadohr/reportevalorizadohr.component')
+                                          .then(m => m.ReportevalorizadohrComponent)
+                  },
                  ]
               } ,
+              {
+                path: 'compras',
+                loadComponent: () => import('./modules/admin/compras/compras.component')
+                                      .then(m => m.ComprasComponent),
+                children: [
+                  {
+                    path: 'liquidacioncajachica',
+                    loadComponent: () => import('./modules/admin/compras/liquidacioncajachica/liquidacioncajachica.component')
+                                          .then(m => m.LiquidacionCajaChicaComponent),
+                    children: [
+                      {
+                        path: '',
+                        pathMatch: 'full',
+                        loadComponent: () => import('./modules/admin/compras/liquidacioncajachica/list/list.component')
+                                              .then(m => m.LiquidacionCajaChicaListComponent)
+                      },
+                      {
+                        path: 'nueva',
+                        loadComponent: () => import('./modules/admin/compras/liquidacioncajachica/form/form.component')
+                                              .then(m => m.LiquidacionCajaChicaFormComponent)
+                      },
+                      {
+                        path: 'editar/:id',
+                        loadComponent: () => import('./modules/admin/compras/liquidacioncajachica/form/form.component')
+                                              .then(m => m.LiquidacionCajaChicaFormComponent)
+                      },
+                      {
+                        path: 'detalle/:id',
+                        loadComponent: () => import('./modules/admin/compras/liquidacioncajachica/detail/detail.component')
+                                              .then(m => m.LiquidacionCajaChicaDetailComponent)
+                      }
+                    ]
+                  }
+                  ,
+                  {
+                    path: 'master-liquidaciones',
+                    loadComponent: () => import('./modules/admin/compras/master-liquidaciones/master-liquidaciones.component')
+                                          .then(m => m.MasterLiquidacionesComponent),
+                    children: [
+                      {
+                        path: '',
+                        pathMatch: 'full',
+                        loadComponent: () => import('./modules/admin/compras/master-liquidaciones/list/list.component')
+                                              .then(m => m.MasterLiquidacionesListComponent)
+                      }
+                    ]
+                  }
+                ]
+              },
               {
                 path: 'planning',
                 loadComponent: () => import('./modules/admin/planning/planning.component')
@@ -377,6 +503,11 @@ export const appRoutes: Route[] = [
                     path: 'nuevoproveedor',
                     loadComponent: () => import('./modules/admin/mantenimiento/proveedor/newproveedor/newproveedor.component')
                                           .then(m => m.NewproveedorComponent)
+                  },
+                  {
+                    path: 'editarproveedor/:id',
+                    loadComponent: () => import('./modules/admin/mantenimiento/proveedor/editproveedor/editproveedor.component')
+                                          .then(m => m.EditproveedorComponent)
                   },
                   
                   {

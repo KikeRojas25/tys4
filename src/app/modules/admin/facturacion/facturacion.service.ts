@@ -2,7 +2,7 @@ import { HttpClient, HttpHeaders } from '@angular/common/http';
 import { inject, Injectable } from '@angular/core';
 import { environment } from 'environments/environment';
 import { Observable, ReplaySubject, tap } from 'rxjs';
-import { Factura, PendientePreliquidacion, ListarPreliquidacionResult, PreliquidacionDetalle, OrdenPreliquidacion, AgregarCargoRequest, OrdenTrabajoPreliquidacionResult, ComprobanteForCreateDto, ComprobanteResult, ComprobanteConDetallesResult } from './facturacion.types';
+import { Factura, PendientePreliquidacion, ListarPreliquidacionResult, PreliquidacionDetalle, OrdenPreliquidacion, AgregarCargoRequest, OrdenTrabajoRecargoUpdateDto, OrdenTrabajoPreliquidacionResult, ComprobanteForCreateDto, ComprobanteResult, ComprobanteConDetallesResult } from './facturacion.types';
 
 const httpOptions = {
   headers: new HttpHeaders({
@@ -196,6 +196,11 @@ export class FacturacionService {
   // Agregar cargo a orden
   agregarCargoAOrden(request: AgregarCargoRequest): Observable<any> {
     return this._httpClient.post(`${this.baseUrl}AgregarCargoOrden`, request, httpOptions);
+  }
+
+  /** PUT api/Facturacion/ActualizarRecargoOrdenTrabajo — body: IdOrdenTrabajo, Recargo */
+  actualizarRecargoOrdenTrabajo(dto: OrdenTrabajoRecargoUpdateDto): Observable<any> {
+    return this._httpClient.put(`${this.baseUrl}ActualizarRecargoOrdenTrabajo`, dto, httpOptions);
   }
 
   // Actualizar preliquidación

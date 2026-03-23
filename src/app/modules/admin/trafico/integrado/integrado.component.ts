@@ -13,6 +13,7 @@ import { DialogService, DynamicDialogRef } from 'primeng/dynamicdialog';
 import { TraficoService } from '../trafico.service';
 import { User } from '../trafico.types';
 import { ModalOtEstacionComponent } from './modal-ot-estacion.component';
+import { catchError, forkJoin, of } from 'rxjs';
 declare var $: any;
 
 @Component({
@@ -155,14 +156,38 @@ export class IntegradoComponent implements OnInit {
             .VerDespachosxDepartamentoxProveedor(this.model)
             .subscribe((list) => {
                 this.ordenes2 = list;
+                console.log('ordenes2', this.ordenes2);
+            });
+     
+
+        // ordenes3 = base (por estación) + recepcion (lógica separada)
+        forkJoin({
+            base: this.traficoService.VerDespachosxDepartamentoxEstacion(this.model),
+            recepcion: this.traficoService.GetPendienteRecepcionPorEstacion().pipe(
+                catchError(() => of([] as any[]))
+            ),
+        }).subscribe(({ base, recepcion }) => {
+            const recepcionMap = new Map<number, any>();
+            (recepcion ?? []).forEach((r: any) => {
+                // El endpoint nuevo viene como idEstacion (camelCase), el resto usa idestacion.
+                const key = Number(r?.idestacion ?? r?.idEstacion);
+                if (Number.isFinite(key)) recepcionMap.set(key, r);
             });
 
-
-             this.traficoService
-            .VerDespachosxDepartamentoxEstacion(this.model)
-            .subscribe((list) => {
-                this.ordenes3 = list;
+            this.ordenes3 = (base ?? []).map((row: any) => {
+                const key = Number(row?.idestacion);
+                const r = Number.isFinite(key) ? recepcionMap.get(key) : undefined;
+                return {
+                    ...row,
+                    // Reemplazar solo métricas de recepción con el endpoint nuevo (fallback 0)
+                    cantidad_recepcion: r?.cantidad_recepcion ?? 0,
+                    peso_recepcion: r?.peso_recepcion ?? 0,
+                    bulto_recepcion: r?.bulto_recepcion ?? 0,
+                };
             });
+
+            console.log({ recepcion, ordenes3: this.ordenes3 }, 'merge-recepcion');
+        });
     }
 
     verHojaRuta(idDespacho: number): void {
@@ -187,11 +212,10 @@ export class IntegradoComponent implements OnInit {
         this.router.navigate(['/trafico/vistamanifiesto', idhojaruta]);
     }
     verRepartidor(idproveedor: number, iddepartamento: number) {
-        this.router.navigate([
-            '/trafico/vistarepartidor',
-            idproveedor,
-            iddepartamento,
-        ]);
+        
+            this.router.navigate(['/trafico/vistarepartidor', idproveedor, iddepartamento]);
+
+
     }
 
     verDetalleOT(idestacion: number, tipoColumna: string, titulo: string) {

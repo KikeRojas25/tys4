@@ -38,6 +38,9 @@ export class AsignartipooperacionRutaComponent implements OnInit {
   estaciones: SelectItem[] = [];
   agencias: SelectItem[] = [];
   repartidores: SelectItem[] = [];
+  transportistas: SelectItem[] = [];
+  vehiculos: any[] = [];
+  vehiculosOptions: SelectItem[] = [];
   proveedoresDestino: SelectItem[] = [];
   ubigeoDestino: SelectItem[] = [];
   direcciones: any[] = [];
@@ -98,9 +101,36 @@ export class AsignartipooperacionRutaComponent implements OnInit {
       });
     });
 
-
+    this.mantenimientoService.getProveedores("", 21513).subscribe(resp => {
+      resp.forEach(element => {
+        this.transportistas.push({ value: element.idProveedor ,  label : element.razonSocial  +   ' - '   +    element.ruc});
+      });
+    });
 
   }
+
+  cargarVehiculosTransportista(): void {
+    const idProveedor = Number(this.model.idtransportista);
+    this.vehiculos = [];
+    this.vehiculosOptions = [];
+    this.model.idvehiculo = null;
+    if (!Number.isFinite(idProveedor) || idProveedor <= 0) return;
+
+    this.mantenimientoService.vehiculoGetAll(null, idProveedor).subscribe({
+      next: (resp) => {
+        this.vehiculos = resp ?? [];
+        this.vehiculosOptions = this.vehiculos.map(v => ({
+          value: v.idVehiculo ?? v.idvehiculo,
+          label: `${v.placa || ''} - ${v.marca || ''} ${v.tipoVehiculo || ''}`.trim()
+        }));
+      },
+      error: () => {
+        this.vehiculos = [];
+        this.vehiculosOptions = [];
+      }
+    });
+  }
+
   cancelar() {
     this.ref.close({ cancelado: true });
   }
@@ -134,6 +164,28 @@ export class AsignartipooperacionRutaComponent implements OnInit {
       if(this.model.idagencia === undefined)   {
        
           return;
+      }
+    }
+
+    if(this.model.idtipooperacion === 25085) {
+      if(this.model.idtransportista === undefined) {
+        this.messageService.add({ severity: 'warn', summary: 'Transbordo', detail: 'Debe seleccionar un transportista.' });
+        return;
+      }
+      const idManifiesto = this.config.data?.idManifiesto;
+      if (idManifiesto != null && Number.isFinite(Number(idManifiesto))) {
+        const dto = {
+          IdManifiesto: Number(idManifiesto),
+          IdVehiculo: this.model.idvehiculo ?? null,
+          IdTipoOperacion: 25085
+        };
+        this.traficoService.actualizarManifiestoTroncal(dto).subscribe({
+          next: (x) => this.ref.close(x),
+          error: (err) => {
+            this.messageService.add({ severity: 'error', summary: 'Transbordo', detail: err?.error?.message || 'Error al actualizar manifiesto troncal.' });
+          }
+        });
+        return;
       }
     }
 

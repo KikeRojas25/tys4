@@ -82,6 +82,22 @@ select.ng-invalid.ng-touched {
   border-bottom: 2px solid #cccccc53;
 
 }
+
+/* Columna destino alineada a la izquierda (seguimientootcomercial) - ahora es la 2ª columna */
+.p-datatable.custom-table td.col-destino,
+.p-datatable.custom-table .p-datatable-tbody > tr > td.col-destino,
+.p-datatable.custom-table .p-datatable-tbody > tr > td:nth-child(2),
+.p-datatable.custom-table .p-datatable-scrollable-body td.col-destino,
+.p-datatable.custom-table .p-datatable-scrollable-body td:nth-child(2),
+.p-datatable.custom-table .p-datatable-scrollable-body table tbody tr td.col-destino,
+.p-datatable.custom-table .p-datatable-scrollable-body table tbody tr td:nth-child(2) {
+  text-align: left !important;
+}
+.p-datatable.custom-table .p-datatable-thead > tr > th:nth-child(2),
+.p-datatable.custom-table .p-datatable-scrollable-header th:nth-child(2),
+.p-datatable.custom-table .p-datatable-scrollable-header table thead tr th:nth-child(2) {
+  text-align: left !important;
+}
  .p-datatable-tbody > tr.p-highlight > td {
   padding: 2px;
   font-size: 12px;

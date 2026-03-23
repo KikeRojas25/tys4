@@ -10,14 +10,17 @@ import { SeguridadService } from '../seguridad.service';
 import { ButtonModule } from 'primeng/button';
 import { ChipModule } from 'primeng/chip';
 import { InputTextModule } from 'primeng/inputtext';
-import { ConfirmationService, MessageService } from 'primeng/api';
+import { ConfirmationService, MessageService, SelectItem } from 'primeng/api';
 import { DialogService } from 'primeng/dynamicdialog';
 import { ConfirmDialogModule } from 'primeng/confirmdialog';
 import { ToastModule } from 'primeng/toast';
 import { PickListModule } from 'primeng/picklist';
 import { DialogModule } from 'primeng/dialog';
-import { throwIfEmpty } from 'rxjs';
-import { Dropdown, DropdownModule } from 'primeng/dropdown';
+import { DropdownModule } from 'primeng/dropdown';
+import { MultiSelectModule } from 'primeng/multiselect';
+
+import { MantenimientoService } from '../../mantenimiento/mantenimiento.service';
+import { UserForUpdateDto } from 'app/core/user/user.types';
 
 @Component({
   selector: 'app-listuser',
@@ -37,7 +40,8 @@ import { Dropdown, DropdownModule } from 'primeng/dropdown';
     ToastModule,
     PickListModule,
     DialogModule,
-    DropdownModule
+    DropdownModule,
+    MultiSelectModule
   ],
   providers: [
     DialogService,
@@ -59,7 +63,12 @@ export class ListuserComponent implements OnInit {
   dialogAsignarVisible = false;
   usuarioSeleccionado: any = null;
 
-listaEquipos = [
+  dialogClientesVisible = false;
+  usuarioParaClientes: User | null = null;
+  clientesParaSelect: SelectItem[] = [];
+  clientesSeleccionados: number[] = [];
+
+  listaEquipos = [
   { id: null, nombre: 'Sin equipo asignado' },
   { id: 21490, nombre: 'Operador 1' },
   { id: 21491, nombre: 'Operador 2' },
@@ -71,10 +80,12 @@ listaEquipos = [
 
 
 
-  constructor(private userService: SeguridadService,
+  constructor(
+    private userService: SeguridadService,
     private messageService: MessageService,
     private confirmationService: ConfirmationService,
-    private router: Router
+    private router: Router,
+    private mantenimientoService: MantenimientoService
   ) {}
 
   ngOnInit() {
@@ -211,6 +222,74 @@ guardarCambioEquipo() {
 
   saveRoles() {
     
+  }
+
+  abrirModalClientes(usuario: User) {
+    this.usuarioParaClientes = usuario;
+    this.clientesSeleccionados = this.parsearIdClientes(usuario.idclientes);
+    this.mantenimientoService.getAllClientes('', 2, true).subscribe({
+      next: (clientes) => {
+        this.clientesParaSelect = clientes.map(c => ({
+          value: c.idCliente,
+          label: c.razonSocial
+        }));
+        this.dialogClientesVisible = true;
+      },
+      error: (err) => {
+        console.error('Error al cargar clientes:', err);
+        this.messageService.add({
+          severity: 'error',
+          summary: 'Error',
+          detail: 'No se pudieron cargar los clientes',
+          life: 3000
+        });
+      }
+    });
+  }
+
+  private parsearIdClientes(idclientes: string | null | undefined): number[] {
+    if (idclientes == null || idclientes === '') {
+      return [];
+    }
+    return idclientes
+      .split(',')
+      .map(s => Number(s.trim()))
+      .filter(n => !isNaN(n) && n > 0);
+  }
+
+  guardarClientesUsuario() {
+    if (!this.usuarioParaClientes) return;
+
+    const payload: UserForUpdateDto = {
+      Id: this.usuarioParaClientes.usr_int_id,
+      Nombres: this.usuarioParaClientes.usr_str_nombre ?? '',
+      Apellidos: this.usuarioParaClientes.usr_str_apellidos ?? '',
+      Email: this.usuarioParaClientes.email ?? '',
+      clientesids: this.clientesSeleccionados.map(id => String(id))
+    };
+
+    this.userService.updateUser(payload as any).subscribe({
+      next: () => {
+        this.messageService.add({
+          severity: 'success',
+          summary: 'Clientes actualizados',
+          detail: 'Los clientes vinculados al usuario se actualizaron correctamente.',
+          life: 3000
+        });
+        this.dialogClientesVisible = false;
+        this.usuarioParaClientes = null;
+        this.buscar();
+      },
+      error: (err) => {
+        console.error('Error al actualizar clientes:', err);
+        this.messageService.add({
+          severity: 'error',
+          summary: 'Error',
+          detail: 'No se pudieron actualizar los clientes. Intenta nuevamente.',
+          life: 3000
+        });
+      }
+    });
   }
 
 }
