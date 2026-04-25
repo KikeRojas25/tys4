@@ -151,6 +151,14 @@
   overflow: hidden !important;
 }
 
+::ng-deep .custom-table .p-datatable-tbody > tr.row-selected > td {
+  background-color: #fef3c7 !important;
+}
+
+::ng-deep .custom-table .p-datatable-tbody > tr.row-selected:hover > td {
+  background-color: #fde68a !important;
+}
+
 /* Estilos para checkboxes */
 ::ng-deep .custom-table .p-checkbox {
   width: 18px;

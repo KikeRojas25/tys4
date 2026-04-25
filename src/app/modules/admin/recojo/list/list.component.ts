@@ -11,6 +11,7 @@ import { ToastModule } from 'primeng/toast';
 import { ConfirmDialogModule } from 'primeng/confirmdialog';
 import { CalendarModule } from 'primeng/calendar';
 import { DropdownModule } from 'primeng/dropdown';
+import { TooltipModule } from 'primeng/tooltip';
 import { MatIconModule } from '@angular/material/icon';
 
 import { RecojoService } from '../recojo.service';
@@ -20,6 +21,7 @@ import { OrdenTransporte } from '../../recepcion/ordentransporte/ordentransporte
 import { User } from 'app/core/user/user.types';
 import { Usuario } from '../recojo.types';
 import { DetalleOrdenModalComponent } from './detalle-orden-modal.component';
+import { ModalSeleccionarProveedorComponent } from './modal-seleccionar-proveedor.component';
 import { forkJoin, of } from 'rxjs';
 
 @Component({
@@ -40,6 +42,7 @@ import { forkJoin, of } from 'rxjs';
     ToastModule,
     CalendarModule,
     DropdownModule,
+    TooltipModule,
   ],
   providers: [ConfirmationService, DialogService, MessageService],
 })
@@ -112,20 +115,23 @@ export class listarOrdenRecojoComponent implements OnInit {
   // ===========================
   private initColumnas(): void {
     this.cols = [
-      { header: 'ACC', field: '', width: '70px' },
+      { header: 'ACC', field: '', width: '90px' },
       { header: 'OR', field: 'numcp', width: '90px' },
-      { header: 'CLIENTE', field: 'razonsocial', width: '150px' },
+      { header: 'CLIENTE', field: 'razonsocial', width: '140px' },
       { header: 'F. REGISTRO', field: 'fecharegistro', width: '120px' },
       { header: 'F. CITA', field: 'fechahoracita', width: '120px' },
+      { header: 'PROVINCIA', field: 'provinciaorigen', width: '110px' },
       { header: 'ESTADO', field: 'estado', width: '120px' },
-      { header: 'CONTACTO', field: 'personarecojo', width: '120px' },
+      
       { header: 'PT. RECOJO', field: 'puntorecojo', width: '170px' },
       { header: 'CE. ACOPIO', field: 'centroacopio', width: '90px' },
       { header: 'BULTOS', field: 'bulto', width: '60px' },
       { header: 'PESO', field: 'peso', width: '60px' },
       { header: 'VOL', field: 'pesovol', width: '60px' },
+      { header: 'OTR', field: 'otauxiliar', width: '120px' },
       { header: 'OBSERVACIÓN', field: 'observaciones', width: '280px' },
       { header: 'RESPONSABLE', field: 'responsable', width: '150px' },
+      { header: 'PROVEEDOR', field: 'proveedor', width: '250px' },  
     ];
   }
 
@@ -189,6 +195,7 @@ export class listarOrdenRecojoComponent implements OnInit {
         this.clientes = [{ value: 0, label: 'TODOS LOS CLIENTES' }];
         resultados.clientes.forEach((c) => this.clientes.push({ value: c.idCliente, label: c.razonSocial }));
         this.model.idcliente = 0;
+        this.model.numcp = '';
 
         // Procesar ubigeo
         this.ubigeo = [{ value: 0, label: 'TODOS LOS DESTINOS' }];
@@ -359,6 +366,28 @@ export class listarOrdenRecojoComponent implements OnInit {
       data: { orden },
       baseZIndex: 10000,
       styleClass: 'detalle-orden-modal',
+    });
+  }
+
+  cambiarProveedor(rowData: any): void {
+    this.ref = this.dialogService.open(ModalSeleccionarProveedorComponent, {
+      header: `Cambiar Proveedor — ${rowData.numcp}`,
+      width: '560px',
+      closable: true,
+      modal: true,
+      dismissableMask: true,
+      data: { idordentrabajo: rowData.idordentrabajo },
+    });
+    this.ref.onClose.subscribe((result) => {
+      if (result?.proveedor) {
+        this.messageService.add({
+          severity: 'success',
+          summary: 'Proveedor actualizado',
+          detail: `Se asignó "${result.proveedor.razonSocial}" correctamente.`,
+          life: 3000,
+        });
+        this.buscar();
+      }
     });
   }
 

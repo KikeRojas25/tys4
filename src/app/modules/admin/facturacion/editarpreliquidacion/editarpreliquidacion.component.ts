@@ -102,16 +102,20 @@ export class EditarpreliquidacionComponent implements OnInit {
       { field: 'acciones', header: 'Acciones', width: '120px' },
       { field: 'numcp', header: 'Nro OT', width: '120px' },
       { field: 'fecharegistro', header: 'Fecha Registro', width: '130px' },
-      { field: 'destinatario', header: 'Destinatario', width: '200px' },
+      { field: 'remitente', header: 'Remitente', width: '130px' },
+      { field: 'destinatario', header: 'Destinatario', width: '130px' },
       { field: 'origen', header: 'Origen', width: '150px' },
       { field: 'destino', header: 'Destino', width: '150px' },
+      { field: 'modotransporte', header: 'Modo', width: '100px' },
       { field: 'peso', header: 'Peso', width: '100px' },
       { field: 'volumen', header: 'Volumen', width: '100px' },
-      { field: 'bulto', header: 'Bultos', width: '100px' },
-      { field: 'subtotal', header: 'Subtotal', width: '120px' },
-      { field: 'recargo', header: 'Recargo', width: '120px' },
-      { field: 'igv', header: 'IGV', width: '120px' },
-      { field: 'total', header: 'Total', width: '120px' }
+      { field: 'bulto', header: 'Bultos', width: '80px' },
+      { field: 'pesovol', header: 'Peso Vol', width: '120px' },
+      { field: 'tarifa', header: 'Tarifa', width: '100px' },
+      { field: 'montobase', header: 'Monto Base', width: '120px' },
+      { field: 'subtotal', header: 'Subtotal', width: '100px' },
+      { field: 'recargo', header: 'Recargo', width: '100px' },
+      { field: 'subtotalfinal', header: 'Subtotal Final', width: '120px' },
     ];
   }
 

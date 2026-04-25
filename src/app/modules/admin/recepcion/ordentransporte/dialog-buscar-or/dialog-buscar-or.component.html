@@ -1,0 +1,40 @@
+<p-table [value]="resultados" [paginator]="true" [rows]="10" styleClass="p-datatable-sm">
+  <ng-template pTemplate="header">
+    <tr>
+      <th>Número OR</th>
+      <th>Fecha/Hora Cita</th>
+      <ng-container *ngIf="tieneDetalleExtra">
+        <th>Provincia</th>
+        <th>Distrito</th>
+        <th>Estado</th>
+        <th>Peso</th>
+        <th>Bultos</th>
+      </ng-container>
+      <th></th>
+    </tr>
+  </ng-template>
+  <ng-template pTemplate="body" let-item>
+    <tr>
+      <td>{{ item.numcp }}</td>
+      <td>{{ item.fechahoracita ? (item.fechahoracita | date:'dd/MM/yyyy HH:mm') : '-' }}</td>
+      <ng-container *ngIf="tieneDetalleExtra">
+        <td>{{ item.provincia ?? '-' }}</td>
+        <td>{{ item.distrito ?? '-' }}</td>
+        <td>{{ item.estado ?? '-' }}</td>
+        <td>{{ item.peso != null ? item.peso : '-' }}</td>
+        <td>{{ item.bulto != null ? item.bulto : '-' }}</td>
+      </ng-container>
+      <td>
+        <button pButton label="Seleccionar" icon="pi pi-check"
+          class="p-button-sm p-button-success"
+          (click)="seleccionar(item)">
+        </button>
+      </td>
+    </tr>
+  </ng-template>
+  <ng-template pTemplate="emptymessage">
+    <tr>
+      <td [attr.colspan]="tieneDetalleExtra ? 8 : 3" class="text-center">No se encontraron coincidencias.</td>
+    </tr>
+  </ng-template>
+</p-table>

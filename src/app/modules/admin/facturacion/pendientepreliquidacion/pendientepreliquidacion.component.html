@@ -190,11 +190,7 @@
           [resizableColumns]="true"
           [tableStyle]="{ 'table-layout': 'fixed', 'width': '100%' }"
           [scrollable]="true"
-          [selection]="selected"
-          selectionMode="multiple"
-          [(selection)]="selected"
-          (onRowSelect)="onRowSelect($event)"
-          (onRowUnselect)="onRowUnselect($event)"
+          dataKey="idordentrabajo"
           [loading]="loading"
           [styleClass]="'custom-table'"
           class="w-full">
@@ -211,7 +207,7 @@
           <ng-template pTemplate="header" let-columns>
             <tr class="bg-gray-800 text-white">
               <th style="width: 60px" class="text-center px-2 py-3">
-                <p-tableHeaderCheckbox></p-tableHeaderCheckbox>
+                <input type="checkbox" [(ngModel)]="todosMarcados" (change)="seleccionarTodos()" style="width:16px;height:16px;cursor:pointer;" />
               </th>
               <th
                 *ngFor="let col of columns.slice(1)"
@@ -225,9 +221,9 @@
 
           <!-- Table Body -->
           <ng-template pTemplate="body" let-rowData let-columns="columns">
-            <tr [pSelectableRow]="rowData" class="border-b border-gray-100 hover:bg-gray-50 transition-colors duration-150">
-              <td style="width: 60px" class="text-center px-2">
-                <p-tableCheckbox [value]="rowData"></p-tableCheckbox>
+            <tr class="border-b border-gray-100 hover:bg-gray-50 transition-colors duration-150 cursor-pointer" (click)="toggleSeleccion(rowData)">
+              <td style="width: 60px; position: relative; z-index: 10;" class="text-center px-2" (click)="toggleSeleccion(rowData)">
+                <input type="checkbox" [checked]="rowData.selected" style="width:16px;height:16px;pointer-events:none;" />
               </td>
               <td class="text-center px-4 py-3">
                 <a class="text-amber-700 hover:text-amber-900 font-semibold cursor-pointer underline">

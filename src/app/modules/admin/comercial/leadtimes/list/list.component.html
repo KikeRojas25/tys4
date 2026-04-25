@@ -1,126 +1,151 @@
 <div class="flex flex-col flex-auto min-w-0 bg-gray-50">
-  <!-- Header con breadcrumb -->
-  <div class="flex flex-col sm:flex-row flex-0 sm:items-center sm:justify-between p-2 sm:py-8 sm:px-10 border-b border-gray-200 bg-white shadow-sm">
-    <div class="flex-1 min-w-0">
-      <div class="flex flex-wrap items-center font-medium text-sm text-gray-600">
-        <div>
-          <a class="whitespace-nowrap text-gray-700 hover:text-gray-900">TMS</a>
-        </div>
-        <div class="flex items-center ml-1 whitespace-nowrap">
-          <mat-icon class="fuse-horizontal-navigation-item-icon text-gray-400" [svgIcon]="'heroicons_solid:chevron-right'"></mat-icon>
-          <a class="ml-1 text-gray-700 hover:text-gray-900">Comercial</a>
-        </div>
-        <div class="flex items-center ml-1 whitespace-nowrap">
-          <mat-icon class="fuse-horizontal-navigation-item-icon text-gray-400" [svgIcon]="'heroicons_solid:chevron-right'"></mat-icon>
-          <a [routerLink]="['/comercial/leadtimes']" class="ml-1 text-gray-700 hover:text-gray-900">Lead Times</a>
-        </div>
+
+  <!-- Header -->
+  <div class="flex items-center justify-between px-8 py-5 border-b border-gray-200 bg-white">
+    <div>
+      <div class="flex items-center gap-1 text-xs text-gray-400 mb-1">
+        <span>{{ seccion }}</span>
+        <mat-icon class="text-gray-300" style="font-size:14px;width:14px;height:14px" [svgIcon]="'heroicons_solid:chevron-right'"></mat-icon>
+        <span class="text-gray-600 font-medium">{{ titulo }}</span>
       </div>
-      <div class="mt-2">
-        <h2 class="text-3xl md:text-4xl font-semibold tracking-tight leading-7 sm:leading-10 truncate text-gray-900">
-          Definición de Lead Times
-        </h2>
-        <p class="text-sm text-amber-700 mt-1.5">Tiempos de entrega en días por cliente y provincia destino</p>
-      </div>
+      <h2 class="text-xl font-semibold text-gray-800 leading-tight">{{ titulo }}</h2>
     </div>
   </div>
 
   <p-toast />
 
-  <div class="main-content container-fluid p-6">
-    <!-- Selector de cliente -->
-    <div class="bg-white rounded-lg shadow-sm border border-gray-200 p-6 mb-6">
-      <label class="block text-sm font-medium text-gray-700 mb-2">Seleccione el cliente</label>
-      <div class="flex flex-wrap gap-4 items-end">
-        <div class="flex flex-col min-w-[300px]">
-          <p-dropdown
-            [options]="clientes"
-            [(ngModel)]="idClienteSeleccionado"
-            (ngModelChange)="onClienteChange($event)"
-            placeholder="Seleccione un cliente"
-            optionLabel="label"
-            optionValue="value"
-            [filter]="true"
-            [showClear]="true"
-            [style]="{'width':'100%'}"
-            appendTo="body">
-          </p-dropdown>
-        </div>
-        <button
-          pButton
-          type="button"
-          label="Registro citas"
-          icon="pi pi-calendar-plus"
-          class="p-button-outlined p-button-secondary"
-          [routerLink]="['/comercial/registro-citas']">
+  <div class="p-4 flex flex-col gap-3">
+
+    <!-- Barra de control unificada -->
+    <div class="bg-white rounded-lg border border-gray-200 shadow-sm px-4 py-3 flex flex-wrap items-center gap-3">
+
+      <!-- Dropdown cliente (solo comercial) -->
+      <div *ngIf="isComercial" class="flex-shrink-0 min-w-[260px]">
+        <p-dropdown
+          [options]="clientes"
+          [(ngModel)]="idClienteSeleccionado"
+          (ngModelChange)="onClienteChange($event)"
+          placeholder="Seleccione cliente..."
+          optionLabel="label"
+          optionValue="value"
+          [filter]="true"
+          [showClear]="true"
+          [style]="{'width':'100%'}"
+          appendTo="body">
+        </p-dropdown>
+      </div>
+
+      <!-- Separador vertical -->
+      <div *ngIf="isComercial && idClienteSeleccionado" class="lt-sep"></div>
+
+      <!-- Buscador -->
+      <div class="lt-search flex-1 min-w-[200px]"
+           *ngIf="!isComercial || idClienteSeleccionado">
+        <i class="pi pi-search lt-search-icon"></i>
+        <input
+          type="text"
+          [(ngModel)]="filtro"
+          placeholder="Buscar departamento o provincia..."
+          class="lt-search-input" />
+        <button *ngIf="filtro" (click)="filtro=''" class="lt-search-clear">
+          <i class="pi pi-times"></i>
         </button>
       </div>
+
+      <!-- Checkbox solo vacíos -->
+      <label class="lt-check-label" *ngIf="!isComercial || idClienteSeleccionado">
+        <input type="checkbox" [(ngModel)]="soloVacios" class="lt-check" />
+        <span>Sin asignar</span>
+      </label>
+
+      <!-- Contador -->
+      <span class="lt-counter" *ngIf="!isComercial || idClienteSeleccionado">
+        <span class="font-semibold text-gray-700">{{ totalFiltradas }}</span>
+        <span class="text-gray-400 ml-1">{{ filtro ? 'resultados' : 'provincias' }}</span>
+      </span>
+
+      <!-- Spacer -->
+      <div class="flex-1"></div>
+
+      <!-- Botón guardar -->
+      <button
+        *ngIf="!isComercial || idClienteSeleccionado"
+        (click)="guardar()"
+        [disabled]="saving"
+        class="lt-btn-save">
+        <i class="pi" [ngClass]="saving ? 'pi-spin pi-spinner' : 'pi-check'"></i>
+        <span>{{ saving ? 'Guardando...' : 'Guardar' }}</span>
+      </button>
     </div>
 
-    <!-- Tabla editable: Provincias x Días -->
-    <div class="bg-white rounded-lg shadow-sm border border-gray-200 overflow-hidden" *ngIf="idClienteSeleccionado">
-      <div class="p-6">
-        <div class="flex justify-between items-center mb-4">
-          <p class="text-sm text-gray-600">Seleccione el tiempo en días que tarda en llegar a cada provincia</p>
-          <button
-            pButton
-            type="button"
-            label="Guardar"
-            icon="pi pi-check"
-            (click)="guardar()"
-            class="px-4 py-2 bg-amber-600 hover:bg-amber-500 text-white">
-          </button>
-        </div>
+    <!-- Tabla -->
+    <div class="bg-white rounded-lg border border-gray-200 shadow-sm overflow-hidden"
+         *ngIf="!isComercial || idClienteSeleccionado">
 
-        <p-table
-          [value]="tableRows"
-          [loading]="loading"
-          [styleClass]="'custom-table'"
-          class="w-full">
-          <ng-template pTemplate="header">
-            <tr class="bg-gray-800 text-white">
-              <th class="text-center align-middle px-4 py-3 text-sm font-semibold text-gray-100 border-b border-gray-700">Departamento</th>
-              <th class="text-center align-middle px-4 py-3 text-sm font-semibold text-gray-100 border-b border-gray-700">Provincia</th>
-              <th class="text-center align-middle px-4 py-3 text-sm font-semibold text-gray-100 border-b border-gray-700">Día 1</th>
-              <th class="text-center align-middle px-4 py-3 text-sm font-semibold text-gray-100 border-b border-gray-700">Día 2</th>
-              <th class="text-center align-middle px-4 py-3 text-sm font-semibold text-gray-100 border-b border-gray-700">Día 3</th>
-              <th class="text-center align-middle px-4 py-3 text-sm font-semibold text-gray-100 border-b border-gray-700">Día 4</th>
-              <th class="text-center align-middle px-4 py-3 text-sm font-semibold text-gray-100 border-b border-gray-700">Día 5</th>
-              <th class="text-center align-middle px-4 py-3 text-sm font-semibold text-gray-100 border-b border-gray-700">Día 6</th>
-            </tr>
-          </ng-template>
-          <ng-template pTemplate="body" let-row>
-            <tr class="border-b border-gray-100 hover:bg-gray-50 transition-colors">
-              <td *ngIf="row.isFirstInGroup"
-                  [attr.rowspan]="row.rowspan"
-                  class="text-center align-middle px-4 py-3 font-medium text-gray-600 bg-gray-50 border-r border-gray-200">
-                {{ row.provincia.departamento }}
-              </td>
-              <td class="text-center align-middle px-4 py-3 font-medium text-gray-800">{{ row.provincia.provincia }}</td>
-              <td *ngFor="let d of [1,2,3,4,5,6]"
-                  (click)="row.provincia.dias = d"
-                  class="celda-dia text-center align-middle px-4 py-4 cursor-pointer transition-colors min-w-[60px]"
-                  [class.celda-dia-seleccionada]="row.provincia.dias === d">
-                {{ d }}
-              </td>
-            </tr>
-          </ng-template>
-          <ng-template pTemplate="emptymessage">
+      <div class="overflow-x-auto">
+        <table class="lt-table w-full">
+          <thead>
             <tr>
-              <td colspan="8" class="text-center p-8">
-                <div class="flex flex-col items-center justify-center text-gray-500">
-                  <mat-icon class="text-gray-400 mb-2" style="font-size: 48px; width: 48px; height: 48px;">location_off</mat-icon>
-                  <span>Seleccione un cliente para ver las provincias</span>
-                </div>
+              <th class="lt-th lt-th-dept">Departamento</th>
+              <th class="lt-th lt-th-prov">Provincia</th>
+              <th class="lt-th lt-th-dia" *ngFor="let d of dias">{{ d }}</th>
+            </tr>
+          </thead>
+
+          <!-- Loading -->
+          <tbody *ngIf="loading">
+            <tr>
+              <td [attr.colspan]="2 + dias.length" class="text-center py-10 text-gray-400 text-sm">
+                <i class="pi pi-spin pi-spinner mr-2"></i> Cargando...
               </td>
             </tr>
-          </ng-template>
-        </p-table>
+          </tbody>
+
+          <!-- Datos -->
+          <tbody *ngIf="!loading">
+            <ng-container *ngFor="let tr of tableRows">
+              <tr class="lt-tr">
+
+                <!-- Departamento con rowspan -->
+                <td *ngIf="tr.isFirstInGroup"
+                    [attr.rowspan]="tr.rowspan"
+                    class="lt-td lt-td-dept">
+                  <span class="lt-dept-label">{{ tr.row.departamento }}</span>
+                </td>
+
+                <!-- Provincia -->
+                <td class="lt-td lt-td-prov">
+                  <span class="lt-prov-text" [innerHTML]="highlight(tr.row.provincia)"></span>
+                </td>
+
+                <!-- Días -->
+                <td *ngFor="let d of dias"
+                    (click)="seleccionarDia(tr.row, d)"
+                    class="lt-td lt-td-dia"
+                    [class.lt-dia-activo]="tr.row.dias === d"
+                    [class.lt-dia-vacio]="tr.row.dias !== d">
+                  <span class="lt-dia-badge">{{ d }}</span>
+                </td>
+              </tr>
+            </ng-container>
+
+            <!-- Sin resultados de búsqueda -->
+            <tr *ngIf="tableRows.length === 0 && filtro">
+              <td [attr.colspan]="2 + dias.length" class="text-center py-8 text-gray-400 text-sm">
+                <i class="pi pi-search mr-2"></i>Sin resultados para "<strong>{{ filtro }}</strong>"
+              </td>
+            </tr>
+          </tbody>
+        </table>
       </div>
     </div>
 
-    <div class="bg-white rounded-lg shadow-sm border border-gray-200 p-8 text-center text-gray-500" *ngIf="!idClienteSeleccionado">
-      <mat-icon style="font-size: 64px; width: 64px; height: 64px;">person_search</mat-icon>
-      <p class="mt-2">Seleccione un cliente para configurar los tiempos de entrega por provincia</p>
+    <!-- Empty state: sin cliente -->
+    <div *ngIf="isComercial && !idClienteSeleccionado"
+         class="bg-white rounded-lg border border-dashed border-gray-300 p-12 text-center text-gray-400">
+      <i class="pi pi-users" style="font-size:2rem"></i>
+      <p class="mt-3 text-sm">Seleccione un cliente para configurar sus tiempos de entrega</p>
     </div>
+
   </div>
 </div>

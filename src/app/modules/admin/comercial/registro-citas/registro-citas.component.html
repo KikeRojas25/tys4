@@ -11,7 +11,7 @@
       </div>
       <div class="mt-2">
         <h2 class="text-3xl md:text-4xl font-semibold tracking-tight leading-7 sm:leading-10 truncate text-gray-900">
-          Registro de citas, recojos, reclamos y consultas
+          Registro de citas y recojos
         </h2>
         <p class="text-sm text-amber-700 mt-1.5">Seleccione cliente, tipo de registro y complete los datos</p>
       </div>
@@ -19,9 +19,11 @@
   </div>
 
   <p-toast />
+  <p-confirmDialog />
 
   <div class="main-content container-fluid p-6">
-    <form [formGroup]="form" class="max-w-4xl">
+    <form [formGroup]="form" class="max-w-5xl">
+
       <!-- Paso 1: Cliente -->
       <div class="bg-white rounded-lg shadow-sm border border-gray-200 p-6 mb-6">
         <h3 class="text-lg font-semibold text-gray-800 mb-4 flex items-center">
@@ -51,15 +53,14 @@
           <mat-icon class="text-amber-600 mr-2" [svgIcon]="'heroicons_solid:clipboard-document-list'"></mat-icon>
           2. Seleccione el tipo de registro
         </h3>
-        <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+        <div class="grid grid-cols-1 sm:grid-cols-3 gap-4">
           <div
             *ngFor="let t of tipos"
             (click)="form.patchValue({ tipo: t.id })"
             class="cursor-pointer rounded-lg border-2 p-4 transition-all duration-150"
             [class.border-amber-500]="form.value.tipo === t.id"
             [class.bg-amber-50]="form.value.tipo === t.id"
-            [class.border-gray-200]="form.value.tipo !== t.id"
-            [class.hover:border-amber-300]="form.value.tipo !== t.id">
+            [class.border-gray-200]="form.value.tipo !== t.id">
             <div class="flex flex-col items-center text-center">
               <mat-icon class="mb-2" [svgIcon]="t.icon" [style.font-size.px]="32" [style.width.px]="32" [style.height.px]="32"></mat-icon>
               <span class="font-semibold text-gray-800">{{ t.label }}</span>
@@ -70,134 +71,471 @@
       </div>
 
       <!-- Paso 3: Contenido según tipo -->
-      <div class="bg-white rounded-lg shadow-sm border border-gray-200 p-6 mb-6" *ngIf="form.value.tipo">
-        <h3 class="text-lg font-semibold text-gray-800 mb-4 flex items-center">
-          <mat-icon class="text-amber-600 mr-2" [svgIcon]="'heroicons_solid:document-plus'"></mat-icon>
-          3. Complete los datos
-        </h3>
+      <ng-container *ngIf="form.value.tipo">
 
-        <!-- Cita: OTs pendientes + fecha/hora -->
+        <!-- ===== RECOJO ===== -->
+        <ng-container *ngIf="esRecojo">
+
+          <!-- Detalle del Servicio -->
+          <div class="bg-white rounded-2xl shadow-md border border-gray-200 mb-6">
+            <div class="bg-slate-100 px-4 py-2 border-b rounded-t-2xl">
+              <h3 class="text-gray-800 font-bold text-lg">Detalle del Servicio</h3>
+            </div>
+            <div class="p-6 grid grid-cols-1 md:grid-cols-3 gap-6">
+
+              <!-- Fecha de cita -->
+              <div>
+                <label class="block text-sm font-semibold text-gray-700 mb-1">Fecha de cita <span class="text-red-500">*</span></label>
+                <p-calendar formControlName="fechaCita" dateFormat="dd/mm/yy" [showIcon]="true"
+                  appendTo="body" [style]="{'width':'100%'}"></p-calendar>
+              </div>
+
+              <!-- Hora de cita -->
+              <div>
+                <label class="block text-sm font-semibold text-gray-700 mb-1">Hora de cita <span class="text-red-500">*</span></label>
+                <p-calendar formControlName="horaCita" [timeOnly]="true" hourFormat="24"
+                  appendTo="body" [style]="{'width':'100%'}"></p-calendar>
+              </div>
+
+              <!-- Origen -->
+              <div>
+                <label class="block text-sm font-semibold text-gray-700 mb-1">Origen <span class="text-red-500">*</span></label>
+                <p-dropdown formControlName="idorigen" [options]="ubigeo"
+                  optionLabel="label" optionValue="value" [filter]="true"
+                  placeholder="Seleccione origen" appendTo="body" [style]="{'width':'100%'}">
+                </p-dropdown>
+              </div>
+
+              <!-- Dirección de origen -->
+              <div>
+                <label class="block text-sm font-semibold text-gray-700 mb-1">Dirección de origen <span class="text-red-500">*</span></label>
+                <input pInputText formControlName="puntoOrigen" maxlength="100" class="w-full" />
+              </div>
+
+              <!-- Contacto -->
+              <div>
+                <label class="block text-sm font-semibold text-gray-700 mb-1">Contacto <span class="text-red-500">*</span></label>
+                <input pInputText formControlName="contacto" maxlength="40" class="w-full" />
+              </div>
+
+              <!-- Teléfono -->
+              <div>
+                <label class="block text-sm font-semibold text-gray-700 mb-1">Teléfono de contacto <span class="text-red-500">*</span></label>
+                <input pInputText formControlName="telefonoContacto" maxlength="10" class="w-full" />
+              </div>
+
+              <!-- Destino -->
+              <div>
+                <label class="block text-sm font-semibold text-gray-700 mb-1">Destino <span class="text-red-500">*</span></label>
+                <p-dropdown formControlName="iddestino" [options]="ubigeo"
+                  optionLabel="label" optionValue="value" [filter]="true"
+                  placeholder="Seleccione destino" appendTo="body" [style]="{'width':'100%'}">
+                </p-dropdown>
+              </div>
+
+              <!-- Dirección destino -->
+              <div>
+                <label class="block text-sm font-semibold text-gray-700 mb-1">Dirección de destino <span class="text-red-500">*</span></label>
+                <input pInputText formControlName="centroAcopio" maxlength="100" class="w-full" />
+              </div>
+
+              <!-- Observaciones -->
+              <div class="md:col-span-3">
+                <label class="block text-sm font-semibold text-gray-700 mb-1">Observación o referencias</label>
+                <textarea pInputTextarea formControlName="observaciones" rows="3" class="w-full"></textarea>
+              </div>
+
+            </div>
+          </div>
+
+          <!-- Destinos Finales -->
+          <div class="bg-white rounded-2xl shadow-md border border-gray-200 mb-6">
+            <div class="bg-slate-100 px-4 py-2 border-b rounded-t-2xl">
+              <h3 class="text-gray-800 font-bold text-lg">Destinos Finales de Entrega</h3>
+            </div>
+            <div class="p-6 grid grid-cols-1 md:grid-cols-4 gap-4">
+              <div class="flex flex-col">
+                <label class="text-sm font-semibold text-gray-700 mb-1">Destino final</label>
+                <p-dropdown [options]="ubigeo" [(ngModel)]="nuevoDestino.idDestinoFinal"
+                  [ngModelOptions]="{standalone: true}"
+                  [filter]="true" placeholder="Seleccione" appendTo="body" [style]="{'width':'100%'}">
+                </p-dropdown>
+              </div>
+              <div class="flex flex-col">
+                <label class="text-sm font-semibold text-gray-700 mb-1">Cantidad</label>
+                <input type="number" pInputText [(ngModel)]="nuevoDestino.cantidad"
+                  [ngModelOptions]="{standalone: true}" class="w-full" />
+              </div>
+              <div class="flex flex-col">
+                <label class="text-sm font-semibold text-gray-700 mb-1">Peso (kg)</label>
+                <input type="number" pInputText [(ngModel)]="nuevoDestino.peso"
+                  [ngModelOptions]="{standalone: true}" class="w-full" />
+              </div>
+              <div class="flex flex-col">
+                <label class="text-sm font-semibold text-gray-700 mb-1">Volumen (m³)</label>
+                <input type="number" pInputText [(ngModel)]="nuevoDestino.volumen"
+                  [ngModelOptions]="{standalone: true}" class="w-full" />
+              </div>
+              <div class="flex items-end">
+                <button pButton type="button" label="Agregar" icon="pi pi-plus"
+                  class="p-button-sm p-button-primary"
+                  (click)="agregarDestinoFinal()"></button>
+              </div>
+            </div>
+
+            <div class="px-6 pb-6" *ngIf="destinosFinales.length > 0">
+              <p-table [value]="destinosFinales" styleClass="p-datatable-sm p-datatable-gridlines">
+                <ng-template pTemplate="header">
+                  <tr class="bg-blue-700 text-white">
+                    <th>Destino final</th>
+                    <th class="text-center">Cantidad</th>
+                    <th class="text-center">Peso (kg)</th>
+                    <th class="text-center">Volumen (m³)</th>
+                    <th class="text-center">Acciones</th>
+                  </tr>
+                </ng-template>
+                <ng-template pTemplate="body" let-row let-i="rowIndex">
+                  <tr>
+                    <td>{{ row.nombreDestino }}</td>
+                    <td class="text-center">{{ row.cantidad || 0 }}</td>
+                    <td class="text-center">{{ row.peso || 0 }}</td>
+                    <td class="text-center">{{ row.volumen || 0 }}</td>
+                    <td class="text-center">
+                      <button pButton type="button" icon="pi pi-trash"
+                        class="p-button-rounded p-button-danger p-button-text p-button-sm"
+                        (click)="eliminarDestinoFinal(i)"></button>
+                    </td>
+                  </tr>
+                </ng-template>
+                <ng-template pTemplate="footer">
+                  <tr class="bg-green-100 font-semibold text-green-800">
+                    <td class="text-right pr-4">Totales:</td>
+                    <td class="text-center">{{ getTotal('cantidad') }}</td>
+                    <td class="text-center">{{ getTotal('peso') }}</td>
+                    <td class="text-center">{{ getTotal('volumen') }}</td>
+                    <td></td>
+                  </tr>
+                </ng-template>
+              </p-table>
+            </div>
+          </div>
+
+        </ng-container>
+
+        <!-- ===== CITA ===== -->
         <ng-container *ngIf="esCita">
-          <div class="mb-6">
-            <label class="block text-sm font-medium text-gray-700 mb-2">OTs pendientes - Haga clic en una fila para seleccionar</label>
-            <p-table
-              [value]="otsPendientes"
-              [loading]="loadingOTs"
-              dataKey="numcp"
-              selectionMode="single"
-              [(selection)]="selectedOT"
-              (onRowSelect)="onOTSelect($event)"
-              (onRowUnselect)="onOTUnselect()"
-              styleClass="p-datatable-sm p-datatable-striped">
+          <div class="bg-white rounded-lg shadow-sm border border-gray-200 p-6 mb-6">
+            <h3 class="text-lg font-semibold text-gray-800 mb-4 flex items-center">
+              <mat-icon class="text-amber-600 mr-2" [svgIcon]="'heroicons_solid:document-plus'"></mat-icon>
+              3. Complete los datos
+            </h3>
+            <div class="mb-6">
+              <div class="flex items-center justify-between mb-2">
+                <label class="text-sm font-medium text-gray-700">OTs pendientes — haga clic en una fila para seleccionar</label>
+                <span class="p-input-icon-left">
+                  <i class="pi pi-search"></i>
+                  <input pInputText type="text" [(ngModel)]="busquedaOT"
+                    [ngModelOptions]="{standalone: true}"
+                    placeholder="Buscar por N° OT, remitente, destinatario..."
+                    class="text-xs"
+                    [style]="{'width':'280px'}" />
+                </span>
+              </div>
+              <p-table [value]="otsFiltradas" [loading]="loadingOTs" dataKey="idordentrabajo"
+                selectionMode="single" [(selection)]="selectedOT"
+                (onRowSelect)="onOTSelect($event)" (onRowUnselect)="onOTUnselect()"
+                [paginator]="true" [rows]="8" [rowsPerPageOptions]="[8,15,30]"
+                styleClass="p-datatable-sm p-datatable-striped">
+                <ng-template pTemplate="header">
+                  <tr class="bg-blue-700 text-white">
+                    <th>N° OT</th>
+                    <th>Remitente</th>
+                    <th>Destinatario</th>
+                    <th>Origen</th>
+                    <th>Destino</th>
+                    <th class="text-center">Bultos</th>
+                    <th class="text-center">Peso</th>
+                    <th>Estado</th>
+                    <th>F. Registro</th>
+                  </tr>
+                </ng-template>
+                <ng-template pTemplate="body" let-row>
+                  <tr [pSelectableRow]="row" class="cursor-pointer hover:bg-amber-50">
+                    <td class="font-medium text-xs">{{ row.numcp }}</td>
+                    <td class="text-xs">{{ row.remitente }}</td>
+                    <td class="text-xs">{{ row.destinatario }}</td>
+                    <td class="text-xs">{{ row.origen }}</td>
+                    <td class="text-xs">{{ row.destino }}</td>
+                    <td class="text-center text-xs">{{ row.bulto }}</td>
+                    <td class="text-center text-xs">{{ row.peso }}</td>
+                    <td class="text-xs">{{ row.estado }}</td>
+                    <td class="text-xs">{{ row.fecharegistro | date:'dd/MM/yyyy' }}</td>
+                  </tr>
+                </ng-template>
+                <ng-template pTemplate="emptymessage">
+                  <tr><td colspan="9" class="text-center py-6 text-gray-500">No hay OTs pendientes para este cliente</td></tr>
+                </ng-template>
+              </p-table>
+            </div>
+
+            <!-- Datos de OT seleccionada -->
+            <div *ngIf="selectedOT" class="mb-6 bg-amber-50 border border-amber-200 rounded-lg p-4">
+              <h4 class="text-sm font-semibold text-amber-800 mb-3 flex items-center gap-1">
+                <i class="pi pi-check-circle"></i> OT seleccionada
+              </h4>
+              <div class="grid grid-cols-2 md:grid-cols-4 gap-3 text-xs">
+                <div><span class="font-semibold text-gray-600">N° OT:</span><p class="text-gray-900 mt-0.5">{{ selectedOT.numcp }}</p></div>
+                <div><span class="font-semibold text-gray-600">Remitente:</span><p class="text-gray-900 mt-0.5">{{ selectedOT.remitente }}</p></div>
+                <div><span class="font-semibold text-gray-600">Destinatario:</span><p class="text-gray-900 mt-0.5">{{ selectedOT.destinatario }}</p></div>
+                <div><span class="font-semibold text-gray-600">Estado:</span><p class="text-gray-900 mt-0.5">{{ selectedOT.estado }}</p></div>
+                <div><span class="font-semibold text-gray-600">Origen:</span><p class="text-gray-900 mt-0.5">{{ selectedOT.origen }}</p></div>
+                <div><span class="font-semibold text-gray-600">Destino:</span><p class="text-gray-900 mt-0.5">{{ selectedOT.destino }}</p></div>
+                <div><span class="font-semibold text-gray-600">Bultos:</span><p class="text-gray-900 mt-0.5">{{ selectedOT.bulto }}</p></div>
+                <div><span class="font-semibold text-gray-600">Peso:</span><p class="text-gray-900 mt-0.5">{{ selectedOT.peso }} kg</p></div>
+              </div>
+            </div>
+
+            <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+              <div class="flex flex-col">
+                <label class="mb-1 text-sm font-medium text-gray-700">Fecha de la cita <span class="text-red-500">*</span></label>
+                <p-calendar formControlName="fechaCita" dateFormat="dd/mm/yy" [showIcon]="true"
+                  appendTo="body" [style]="{'width':'100%'}"></p-calendar>
+              </div>
+              <div class="flex flex-col">
+                <label class="mb-1 text-sm font-medium text-gray-700">Hora de la cita <span class="text-red-500">*</span></label>
+                <p-calendar formControlName="horaCita" [timeOnly]="true" hourFormat="24"
+                  appendTo="body" [style]="{'width':'100%'}"></p-calendar>
+              </div>
+            </div>
+          </div>
+        </ng-container>
+
+        <!-- ===== INSTRUCCIÓN DE INCIDENCIAS ===== -->
+        <ng-container *ngIf="esIncidencia">
+
+          <!-- Sub-opciones principales -->
+          <div class="bg-white rounded-lg shadow-sm border border-gray-200 p-6 mb-4">
+            <h3 class="text-lg font-semibold text-gray-800 mb-4 flex items-center">
+              <mat-icon class="text-amber-600 mr-2" [svgIcon]="'heroicons_solid:exclamation-triangle'"></mat-icon>
+              3. Seleccione el área
+            </h3>
+            <div class="grid grid-cols-1 sm:grid-cols-3 gap-3">
+              <div *ngFor="let s of subtiposIncidencia"
+                (click)="seleccionarSubtipoIncidencia(s.id)"
+                class="cursor-pointer rounded-lg border-2 p-4 transition-all duration-150 flex flex-col items-center text-center"
+                [class.border-amber-500]="subtipoIncidencia === s.id"
+                [class.bg-amber-50]="subtipoIncidencia === s.id"
+                [class.border-gray-200]="subtipoIncidencia !== s.id">
+                <mat-icon class="mb-2" [svgIcon]="s.icon" [style.width.px]="28" [style.height.px]="28"></mat-icon>
+                <span class="font-semibold text-sm text-gray-800">{{ s.label }}</span>
+              </div>
+            </div>
+          </div>
+
+          <!-- PROGRAMACIÓN LOCAL → buscador OR -->
+          <div *ngIf="subtipoIncidencia === 'programacion-local'"
+               class="bg-white rounded-lg shadow-sm border border-gray-200 p-6 mb-4">
+            <h4 class="text-sm font-semibold text-gray-800 mb-3">Buscar Orden de Recojo (OR)</h4>
+            <div class="flex gap-2 mb-4">
+              <input pInputText [(ngModel)]="busquedaOR" [ngModelOptions]="{standalone:true}"
+                placeholder="Ingrese N° de OR..." class="text-sm flex-1"
+                (keyup.enter)="buscarOR()" />
+              <button pButton type="button" icon="pi pi-search" label="Buscar"
+                class="p-button-sm p-button-outlined" (click)="buscarOR()" [loading]="loadingOR"></button>
+            </div>
+            <p-table *ngIf="resultadosOR.length > 0" [value]="resultadosOR"
+              selectionMode="single" [(selection)]="orSeleccionada"
+              dataKey="idordenrecojo" styleClass="p-datatable-sm p-datatable-striped">
               <ng-template pTemplate="header">
                 <tr class="bg-blue-700 text-white">
-                  <th>Número OT</th>
-                  <th>Destino</th>
-                  <th>Peso</th>
-                  <th>Bultos</th>
-                  <th>Estado</th>
+                  <th>N° OR</th><th>Cliente</th><th>Origen</th><th>F. Cita</th><th>Estado</th>
                 </tr>
               </ng-template>
               <ng-template pTemplate="body" let-row>
-                <tr [pSelectableRow]="row" class="cursor-pointer hover:bg-amber-50 transition-colors border-b border-gray-100">
-                  <td class="font-medium">{{ row.numcp }}</td>
-                  <td>{{ row.destino }}</td>
-                  <td>{{ row.peso }}</td>
-                  <td>{{ row.bulto }}</td>
-                  <td>{{ row.estado }}</td>
-                </tr>
-              </ng-template>
-              <ng-template pTemplate="emptymessage">
-                <tr>
-                  <td colspan="5" class="text-center py-6 text-gray-500">No hay OTs pendientes para este cliente</td>
+                <tr [pSelectableRow]="row" class="cursor-pointer hover:bg-amber-50">
+                  <td class="text-xs font-medium">{{ row.numcp }}</td>
+                  <td class="text-xs">{{ row.cliente }}</td>
+                  <td class="text-xs">{{ row.origen }}</td>
+                  <td class="text-xs">{{ row.fechahoracita | date:'dd/MM/yyyy HH:mm' }}</td>
+                  <td class="text-xs">{{ row.estado }}</td>
                 </tr>
               </ng-template>
             </p-table>
-          </div>
-          <div class="grid grid-cols-1 sm:grid-cols-2 gap-4 mb-4">
-            <div class="flex flex-col">
-              <label class="mb-1 text-sm font-medium text-gray-700">Fecha de la cita <span class="text-red-500">*</span></label>
-              <p-calendar
-                formControlName="fechaCita"
-                dateFormat="dd/mm/yy"
-                [showIcon]="true"
-                appendTo="body"
-                placeholder="Seleccione fecha"
-                [style]="{'width':'100%'}">
-              </p-calendar>
+            <div *ngIf="orSeleccionada" class="mt-4 bg-amber-50 border border-amber-200 rounded-lg p-3 text-xs">
+              <p class="font-semibold text-amber-800 mb-2 flex items-center gap-1"><i class="pi pi-check-circle"></i> OR seleccionada</p>
+              <div class="grid grid-cols-2 md:grid-cols-3 gap-2">
+                <div><span class="font-semibold text-gray-600">N° OR:</span><p>{{ orSeleccionada.numcp }}</p></div>
+                <div><span class="font-semibold text-gray-600">Cliente:</span><p>{{ orSeleccionada.cliente }}</p></div>
+                <div><span class="font-semibold text-gray-600">Estado:</span><p>{{ orSeleccionada.estado }}</p></div>
+              </div>
             </div>
-            <div class="flex flex-col">
-              <label class="mb-1 text-sm font-medium text-gray-700">Hora de la cita <span class="text-red-500">*</span></label>
-              <p-calendar
-                formControlName="horaCita"
-                [timeOnly]="true"
-                hourFormat="24"
-                appendTo="body"
-                placeholder="Seleccione hora"
-                [style]="{'width':'100%'}">
-              </p-calendar>
+            <div class="mt-4">
+              <label class="block text-sm font-medium text-gray-700 mb-1">Observaciones / Instrucción</label>
+              <textarea pInputTextarea formControlName="observaciones" rows="3" class="w-full"
+                placeholder="Ingrese la instrucción..."></textarea>
             </div>
           </div>
+
+          <!-- PROGRAMACIÓN PROVINCIA → buscador OT -->
+          <div *ngIf="subtipoIncidencia === 'programacion-provincia'"
+               class="bg-white rounded-lg shadow-sm border border-gray-200 p-6 mb-4">
+            <h4 class="text-sm font-semibold text-gray-800 mb-3">Buscar Orden de Transporte (OT)</h4>
+            <div class="flex gap-2 mb-4">
+              <input pInputText [(ngModel)]="busquedaOTProv" [ngModelOptions]="{standalone:true}"
+                placeholder="Ingrese N° de OT..." class="text-sm flex-1"
+                (keyup.enter)="buscarOTProv()" />
+              <button pButton type="button" icon="pi pi-search" label="Buscar"
+                class="p-button-sm p-button-outlined" (click)="buscarOTProv()" [loading]="loadingOTProv"></button>
+            </div>
+            <p-table *ngIf="resultadosOTProv.length > 0" [value]="resultadosOTProv"
+              selectionMode="single" [(selection)]="otProvSeleccionada"
+              dataKey="idordentrabajo" styleClass="p-datatable-sm p-datatable-striped">
+              <ng-template pTemplate="header">
+                <tr class="bg-blue-700 text-white">
+                  <th>N° OT</th><th>Cliente</th><th>Destino</th><th>Bultos</th><th>Peso</th><th>Estado</th>
+                </tr>
+              </ng-template>
+              <ng-template pTemplate="body" let-row>
+                <tr [pSelectableRow]="row" class="cursor-pointer hover:bg-amber-50">
+                  <td class="text-xs font-medium">{{ row.numcp }}</td>
+                  <td class="text-xs">{{ row.cliente || row.razonsocial }}</td>
+                  <td class="text-xs">{{ row.destino || row.iddestino }}</td>
+                  <td class="text-center text-xs">{{ row.bulto }}</td>
+                  <td class="text-center text-xs">{{ row.peso }}</td>
+                  <td class="text-xs">{{ row.estado }}</td>
+                </tr>
+              </ng-template>
+            </p-table>
+            <div *ngIf="otProvSeleccionada" class="mt-4 bg-amber-50 border border-amber-200 rounded-lg p-3 text-xs">
+              <p class="font-semibold text-amber-800 mb-2 flex items-center gap-1"><i class="pi pi-check-circle"></i> OT seleccionada</p>
+              <div class="grid grid-cols-2 md:grid-cols-3 gap-2">
+                <div><span class="font-semibold text-gray-600">N° OT:</span><p>{{ otProvSeleccionada.numcp }}</p></div>
+                <div><span class="font-semibold text-gray-600">Cliente:</span><p>{{ otProvSeleccionada.cliente || otProvSeleccionada.razonsocial }}</p></div>
+                <div><span class="font-semibold text-gray-600">Estado:</span><p>{{ otProvSeleccionada.estado }}</p></div>
+              </div>
+            </div>
+            <div class="mt-4">
+              <label class="block text-sm font-medium text-gray-700 mb-1">Observaciones / Instrucción</label>
+              <textarea pInputTextarea formControlName="observaciones" rows="3" class="w-full"
+                placeholder="Ingrese la instrucción..."></textarea>
+            </div>
+          </div>
+
+          <!-- TRÁFICO → sub-opciones -->
+          <div *ngIf="subtipoIncidencia === 'trafico'"
+               class="bg-white rounded-lg shadow-sm border border-gray-200 p-6 mb-4">
+            <h4 class="text-sm font-semibold text-gray-800 mb-3">Seleccione el tipo de incidencia de tráfico</h4>
+            <div class="grid grid-cols-1 sm:grid-cols-2 gap-3 mb-4">
+              <div *ngFor="let t of subtiposTrafico"
+                (click)="subtipoTrafico = t.id"
+                class="cursor-pointer rounded-lg border-2 p-3 transition-all duration-150 flex items-center gap-2"
+                [class.border-amber-500]="subtipoTrafico === t.id"
+                [class.bg-amber-50]="subtipoTrafico === t.id"
+                [class.border-gray-200]="subtipoTrafico !== t.id">
+                <i class="pi pi-circle-fill text-xs"
+                   [class.text-amber-500]="subtipoTrafico === t.id"
+                   [class.text-gray-300]="subtipoTrafico !== t.id"></i>
+                <span class="text-sm font-medium text-gray-800">{{ t.label }}</span>
+              </div>
+            </div>
+            <div *ngIf="subtipoTrafico">
+              <label class="block text-sm font-medium text-gray-700 mb-1">Observaciones / Instrucción</label>
+              <textarea pInputTextarea formControlName="observaciones" rows="3" class="w-full"
+                placeholder="Ingrese la instrucción..."></textarea>
+            </div>
+          </div>
+
+          <!-- ALMACÉN → sub-opciones -->
+          <div *ngIf="subtipoIncidencia === 'almacen'"
+               class="bg-white rounded-lg shadow-sm border border-gray-200 p-6 mb-4">
+            <h4 class="text-sm font-semibold text-gray-800 mb-3">Seleccione el tipo de incidencia de almacén</h4>
+            <div class="grid grid-cols-1 sm:grid-cols-2 gap-3 mb-4">
+              <div *ngFor="let a of subtiposAlmacen"
+                (click)="subtipoAlmacen = a.id; busquedaOTProv = ''; resultadosOTProv = []; otProvSeleccionada = null"
+                class="cursor-pointer rounded-lg border-2 p-3 transition-all duration-150 flex items-start gap-2"
+                [class.border-amber-500]="subtipoAlmacen === a.id"
+                [class.bg-amber-50]="subtipoAlmacen === a.id"
+                [class.border-gray-200]="subtipoAlmacen !== a.id">
+                <i class="pi pi-circle-fill text-xs mt-1"
+                   [class.text-amber-500]="subtipoAlmacen === a.id"
+                   [class.text-gray-300]="subtipoAlmacen !== a.id"></i>
+                <span class="text-sm font-medium text-gray-800">{{ a.label }}</span>
+              </div>
+            </div>
+
+            <!-- Buscador OT para las últimas 2 opciones -->
+            <div *ngIf="subtipoAlmacen && (subtipoAlmacen === 'falta-ingreso' || subtipoAlmacen === 'faltante-carga')"
+                 class="space-y-4">
+              <div class="flex gap-2">
+                <input pInputText [(ngModel)]="busquedaOTProv" [ngModelOptions]="{standalone:true}"
+                       placeholder="Buscar OT por número, remitente o destino..."
+                       class="flex-1 text-sm" (keyup.enter)="buscarOTProv()" />
+                <button pButton type="button" icon="pi pi-search" label="Buscar"
+                        [loading]="loadingOTProv" (click)="buscarOTProv()"
+                        class="bg-amber-600 hover:bg-amber-500 text-white border-0"></button>
+              </div>
+
+              <p-table *ngIf="resultadosOTProv.length > 0"
+                       [value]="resultadosOTProv"
+                       selectionMode="single"
+                       [(selection)]="otProvSeleccionada"
+                       dataKey="idordentrabajo"
+                       [paginator]="true" [rows]="6"
+                       styleClass="p-datatable-sm p-datatable-striped">
+                <ng-template pTemplate="header">
+                  <tr>
+                    <th>N° OT</th>
+                    <th>Remitente</th>
+                    <th>Destino</th>
+                    <th>Estado</th>
+                  </tr>
+                </ng-template>
+                <ng-template pTemplate="body" let-ot>
+                  <tr [pSelectableRow]="ot">
+                    <td class="text-xs font-medium">{{ ot.numcp }}</td>
+                    <td class="text-xs">{{ ot.remitente }}</td>
+                    <td class="text-xs">{{ ot.destino }}</td>
+                    <td class="text-xs">{{ ot.estado }}</td>
+                  </tr>
+                </ng-template>
+              </p-table>
+
+              <div *ngIf="otProvSeleccionada"
+                   class="bg-amber-50 border border-amber-300 rounded-lg p-4 flex flex-wrap gap-4 text-sm">
+                <div><span class="font-semibold text-gray-700">OT:</span> {{ otProvSeleccionada.numcp }}</div>
+                <div><span class="font-semibold text-gray-700">Remitente:</span> {{ otProvSeleccionada.remitente }}</div>
+                <div><span class="font-semibold text-gray-700">Destino:</span> {{ otProvSeleccionada.destino }}</div>
+                <div><span class="font-semibold text-gray-700">Origen:</span> {{ otProvSeleccionada.estacionorigen }}</div>
+              </div>
+
+              <div>
+                <label class="block text-sm font-medium text-gray-700 mb-1">Observaciones / Instrucción</label>
+                <textarea pInputTextarea formControlName="observaciones" rows="3" class="w-full"
+                  placeholder="Ingrese la instrucción..."></textarea>
+              </div>
+            </div>
+
+            <!-- Observaciones para opciones sin OT (error-despacho, error-digitacion) -->
+            <div *ngIf="subtipoAlmacen && subtipoAlmacen !== 'falta-ingreso' && subtipoAlmacen !== 'faltante-carga'">
+              <label class="block text-sm font-medium text-gray-700 mb-1">Observaciones / Instrucción</label>
+              <textarea pInputTextarea formControlName="observaciones" rows="3" class="w-full"
+                placeholder="Ingrese la instrucción..."></textarea>
+            </div>
+          </div>
+
         </ng-container>
 
-        <!-- Reclamo: tipo tipificado + observaciones -->
-        <ng-container *ngIf="esReclamo">
-          <div class="mb-4">
-            <label class="block text-sm font-medium text-gray-700 mb-2">Tipo de reclamo</label>
-            <div class="flex flex-wrap gap-2">
-              <button
-                *ngFor="let tr of tiposReclamo"
-                type="button"
-                (click)="form.patchValue({ tipoReclamo: tr.id })"
-                class="px-4 py-2 rounded-lg border-2 text-sm font-medium transition-all cursor-pointer"
-                [class.bg-amber-100]="form.value.tipoReclamo === tr.id"
-                [class.border-amber-500]="form.value.tipoReclamo === tr.id"
-                [class.text-amber-800]="form.value.tipoReclamo === tr.id"
-                [class.border-gray-200]="form.value.tipoReclamo !== tr.id"
-                [class.bg-white]="form.value.tipoReclamo !== tr.id"
-                [class.hover:border-amber-300]="form.value.tipoReclamo !== tr.id">
-                {{ tr.label }}
-              </button>
-            </div>
-          </div>
-          <div class="flex flex-col">
-            <label class="mb-1 text-sm font-medium text-gray-700">Detalle / Observaciones</label>
-            <textarea
-              pInputTextarea
-              formControlName="observaciones"
-              rows="4"
-              placeholder="Describa el reclamo con más detalle..."
-              class="w-full">
-            </textarea>
-          </div>
-        </ng-container>
-
-        <!-- Consulta, Recojo: observaciones -->
-        <div class="flex flex-col" *ngIf="!esCita && !esReclamo">
-          <label class="mb-1 text-sm font-medium text-gray-700">Observaciones</label>
-          <textarea
-            pInputTextarea
-            formControlName="observaciones"
-            rows="4"
-            placeholder="Ingrese las observaciones o detalles..."
-            class="w-full">
-          </textarea>
+        <!-- Botón Guardar -->
+        <div class="flex justify-end gap-2">
+          <button pButton type="button" label="Guardar" icon="pi pi-check"
+            [loading]="loading" [disabled]="loading"
+            (click)="guardar()"
+            class="px-4 py-2 bg-amber-600 hover:bg-amber-500 text-white">
+          </button>
         </div>
-      </div>
 
-      <!-- Botón Guardar -->
-      <div class="flex justify-end gap-2" *ngIf="form.value.tipo">
-        <button
-          pButton
-          type="button"
-          label="Guardar"
-          icon="pi pi-check"
-          [loading]="loading"
-          [disabled]="loading"
-          (click)="guardar()"
-          class="px-4 py-2 bg-amber-600 hover:bg-amber-500 text-white">
-        </button>
-      </div>
+      </ng-container>
+
     </form>
   </div>
 </div>

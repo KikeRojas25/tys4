@@ -22,24 +22,37 @@
     <div class="p-col-12 flex items-center gap-6 p-4">
       <!-- Campo de búsqueda con más margen -->
       <span class="p-input-icon-left">
-        <input type="text" pInputText placeholder="Buscar por nombre o DNI" [(ngModel)]="model.param" class="p-2"/>
+        <input type="text" pInputText placeholder="Buscar por nombre o usuario" [(ngModel)]="model.param" class="p-2"/>
       </span>
 
       <!-- Botón de Buscar -->
       <p-button label="Buscar" severity="primary" (onClick)="buscar()" class="p-button-sm p-2"></p-button>
 
-      <!-- Nuevo Botón -->
-      <!-- <p-button label="Nuevo Usuario" severity="secondary" (onClick)="nuevo()" class="p-button-sm p-ml-4 p-2"></p-button> -->
+      <!-- Nuevo Usuario -->
+      <p-button label="Nuevo Usuario" icon="pi pi-plus" severity="secondary" (onClick)="nuevo()" class="p-button-sm p-2"></p-button>
+
+      <!-- Check incluir bloqueados -->
+      <div class="flex items-center gap-2">
+        <p-checkbox
+          [(ngModel)]="mostrarBloqueados"
+          [binary]="true"
+          inputId="chkBloqueados"
+          (ngModelChange)="aplicarFiltros()">
+        </p-checkbox>
+        <label for="chkBloqueados" class="cursor-pointer text-sm text-gray-600 select-none">
+          Incluir bloqueados
+        </label>
+      </div>
     </div>
   </div>
 
   <!-- Tabla de usuarios -->
   <div class="p-grid p-justify-between p-align-center bg-card p-mb-6 p-ml-6 p-mr-6">
-    <p-table [value]="filteredUsers" [scrollable]="true" scrollHeight="400px"
-     selectionMode="single" dataKey="id" 
+    <p-table [value]="filteredUsers" [scrollable]="true" scrollHeight="650px"
+     selectionMode="single" dataKey="usr_int_id" 
      [paginator]="true"
-     [rows]="5"
-     [rowsPerPageOptions]="[5, 10, 20]"
+     [rows]="20"
+     [rowsPerPageOptions]="[20, 40, 60, 80, 100]"
       [tableStyle]="{ 'min-width': '50rem' }" >
       <!-- Cabecera de la tabla -->
       <ng-template pTemplate="header">
@@ -65,14 +78,34 @@
           <td>{{ getNombreEquipo(usuario.idequipo) }}</td>
           <td>{{ usuario.email }}</td>
           <td>
-            <p-chip *ngIf="usuario.estadoId === 1" label="Activo" class="p-chip-success"></p-chip>
-            <p-chip *ngIf="usuario.estadoId !== 1" label="Inactivo" class="p-chip-danger"></p-chip>
+            <p-chip *ngIf="!usuario.usr_int_bloqueado" label="Activo" class="p-chip-success"></p-chip>
+            <p-chip *ngIf="usuario.usr_int_bloqueado" label="Inactivo" class="p-chip-danger"></p-chip>
+            
           </td>
           <td>
             <!-- <p-button size="small" severity="secondary" icon="fa fa-pencil" (click)="editarUsuario(usuario.usr_int_id)"></p-button>
             <p-button size="small" icon="fa fa-trash" (click)="eliminarUsuario(usuario.usr_int_id)"></p-button> -->
-            <p-button size="small" icon="fa fa-user-o" (click)="verRolesUsuario(usuario.usr_int_id)"></p-button>
+            <p-button size="small" icon="pi pi-pencil" severity="secondary" pTooltip="Editar usuario" tooltipPosition="top" (click)="editarUsuario(usuario.usr_int_id)"></p-button>
+            <p-button size="small" icon="fa fa-user-o" (click)="verRolesUsuario(usuario.usr_int_id)" class="p-ml-1"></p-button>
             <p-button size="small" icon="fa fa-building-o" (click)="abrirModalClientes(usuario)" class="p-ml-1"></p-button>
+            <p-button
+              size="small"
+              icon="pi pi-key"
+              severity="secondary"
+              pTooltip="Cambiar contraseña"
+              tooltipPosition="top"
+              (click)="abrirCambiarPassword(usuario)"
+              class="p-ml-1">
+            </p-button>
+            <p-button
+              size="small"
+              [icon]="usuario.usr_int_bloqueado === 1 ? 'pi pi-lock-open' : 'pi pi-ban'"
+              [severity]="usuario.usr_int_bloqueado === 1 ? 'success' : 'danger'"
+              [pTooltip]="usuario.usr_int_bloqueado === 1 ? 'Desbloquear usuario' : 'Bloquear usuario'"
+              tooltipPosition="top"
+              (click)="bloquearUsuario(usuario)"
+              class="p-ml-1">
+            </p-button>
           </td>
         </tr>
       </ng-template>
@@ -180,6 +213,49 @@
         class="p-button-success"
         (click)="guardarClientesUsuario()"
       ></p-button>
+    </div>
+  </div>
+</p-dialog>
+
+<!-- Modal Cambiar Contraseña -->
+<p-dialog
+  header="Cambiar Contraseña"
+  [(visible)]="dialogCambiarPasswordVisible"
+  [modal]="true"
+  [style]="{ width: '380px' }"
+  [draggable]="false"
+  [resizable]="false"
+>
+  <div *ngIf="usuarioParaPassword" class="flex flex-col gap-4">
+    <div class="text-sm text-gray-700">
+      <strong>Usuario:</strong> {{ usuarioParaPassword.usr_str_nombre }} {{ usuarioParaPassword.usr_str_apellidos }}
+    </div>
+
+    <div class="flex flex-col gap-1">
+      <label class="text-sm font-medium text-gray-700">Nueva contraseña</label>
+      <input
+        pInputText
+        type="password"
+        [(ngModel)]="nuevaPassword"
+        placeholder="Mínimo 6 caracteres"
+        class="w-full"
+      />
+    </div>
+
+    <div class="flex flex-col gap-1">
+      <label class="text-sm font-medium text-gray-700">Confirmar contraseña</label>
+      <input
+        pInputText
+        type="password"
+        [(ngModel)]="confirmarPassword"
+        placeholder="Repita la contraseña"
+        class="w-full"
+      />
+    </div>
+
+    <div class="flex justify-end gap-3 mt-2">
+      <p-button label="Cancelar" icon="pi pi-times" class="p-button-text" (click)="dialogCambiarPasswordVisible = false"></p-button>
+      <p-button label="Guardar" icon="pi pi-check" class="p-button-success" (click)="guardarCambioPassword()"></p-button>
     </div>
   </div>
 </p-dialog>

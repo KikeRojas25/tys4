@@ -1,0 +1,212 @@
+<div class="flex flex-col flex-auto min-w-0 bg-gray-50">
+  <!-- Header -->
+  <div class="flex flex-col sm:flex-row flex-0 sm:items-center sm:justify-between p-2 sm:py-8 sm:px-10 border-b border-gray-200 bg-white shadow-sm">
+    <div class="flex-1 min-w-0">
+      <div class="flex flex-wrap items-center font-medium text-sm text-gray-600">
+        <div>
+          <a class="whitespace-nowrap text-gray-700 hover:text-gray-900">TMS</a>
+        </div>
+        <div class="flex items-center ml-1 whitespace-nowrap">
+          <mat-icon class="fuse-horizontal-navigation-item-icon text-gray-400" [svgIcon]="'heroicons_solid:chevron-right'"></mat-icon>
+          <a class="ml-1 text-gray-700 hover:text-gray-900">Planning</a>
+        </div>
+      </div>
+      <div class="mt-2">
+        <h2 class="text-3xl md:text-4xl font-semibold tracking-tight leading-7 sm:leading-10 truncate text-gray-900">Ver Estaciones</h2>
+        <p class="text-sm text-amber-700 mt-1.5">Resumen de órdenes por estación</p>
+      </div>
+    </div>
+    <div class="flex items-center gap-2 mt-4 sm:mt-0">
+      <button pButton type="button" icon="pi pi-refresh" label="Actualizar" (click)="reload()"
+              [disabled]="loading"
+              class="px-3 py-2 text-xs font-medium text-gray-700 bg-white border border-gray-300 hover:bg-gray-50 rounded transition-all duration-150">
+      </button>
+    </div>
+  </div>
+
+  <!-- Contenido -->
+  <div class="main-content container-fluid p-2">
+    <div class="bg-white rounded-lg shadow-sm border border-gray-200 overflow-hidden">
+      <div class="p-2">
+        <p-table
+          [value]="ordenes3"
+          sortField="estacion"
+          [loading]="loading"
+          [tableStyle]="{ 'table-layout': 'fixed', 'width': '100%' }"
+          scrollable="true"
+          [scrollHeight]="'75vh'"
+          [rows]="200"
+          [styleClass]="'custom-table'">
+
+          <ng-template pTemplate="header">
+            <tr>
+              <!-- Encabezados superiores -->
+              <th colspan="1" style="text-align:center; color:white; background-color:#1E88E5;">GENERAL</th>
+              <th colspan="2" style="text-align:center; color:white; background-color:#FBC02D;">PENDIENTE DE RECEPCIÓN</th>
+              <th colspan="1" style="text-align:center; color:white; background-color:#0288D1;">RECOJO</th>
+              <th colspan="3" style="text-align:center; color:white; background-color:#F57C00;">PENDIENTE DE PROGRAMAR</th>
+              <th colspan="3" style="text-align:center; color:white; background-color:#6A1B9A;">PENDIENTE DE DESPACHO</th>
+              <th colspan="3" style="text-align:center; color:white; background-color:#03A9F4;">ENTREGA (LOCAL)</th>
+              <th colspan="3" style="text-align:center; color:white; background-color:#B3E5FC;">RECABAR CARGOS</th>
+              <th colspan="3" style="text-align:center; color:white; background-color:#00796B;">ENVIAR CARGOS</th>
+            </tr>
+            <tr>
+              <th>Estación</th>
+              <th>Manifiestos</th>
+              <th>OTs</th>
+              <th>OTs</th>
+              <th>#OTs</th>
+              <th>Peso</th>
+              <th>Bultos</th>
+              <th>#OTs</th>
+              <th>Peso</th>
+              <th>Bultos</th>
+              <th>#OTs</th>
+              <th>Peso</th>
+              <th>Bultos</th>
+              <th>#OTs</th>
+              <th>Peso</th>
+              <th>Bultos</th>
+              <th>#OTs</th>
+              <th>Peso</th>
+              <th>Bultos</th>
+            </tr>
+          </ng-template>
+
+          <ng-template pTemplate="body" let-rowData>
+            <tr>
+              <!-- Estación -->
+              <td class="text-left">{{ rowData.estacion }}</td>
+
+              <!-- Recepción: Manifiestos -->
+              <td class="text-center">
+                <ng-container *ngIf="resumenRecepcionMap.get(rowData.idestacion) as r">
+                  <a *ngIf="r.cantidadManifiestos > 0"
+                    (click)="verDetalleManifiestosRecepcion(rowData)"
+                    class="text-blue-600 hover:text-blue-800 underline cursor-pointer">
+                    {{ r.cantidadManifiestos }}
+                  </a>
+                  <span *ngIf="!r.cantidadManifiestos || r.cantidadManifiestos === 0">0</span>
+                </ng-container>
+                <span *ngIf="!resumenRecepcionMap.get(rowData.idestacion)">0</span>
+              </td>
+
+              <!-- Recepción: OTs -->
+              <td class="text-center">
+                <ng-container *ngIf="resumenRecepcionMap.get(rowData.idestacion) as r">
+                  <a *ngIf="r.cantidadOTs > 0"
+                    (click)="verDetalleRecepcion(rowData)"
+                    class="text-blue-600 hover:text-blue-800 underline cursor-pointer">
+                    {{ r.cantidadOTs }}
+                  </a>
+                  <span *ngIf="!r.cantidadOTs || r.cantidadOTs === 0">0</span>
+                </ng-container>
+                <span *ngIf="!resumenRecepcionMap.get(rowData.idestacion)">0</span>
+              </td>
+
+              <!-- Recojo: OTs -->
+              <td class="text-center">
+                <ng-container *ngIf="resumenRecojoMap.get(rowData.idestacion) as r">
+                  <a *ngIf="r.cantidadOTs > 0"
+                    (click)="verDetalleRecojo(rowData)"
+                    class="text-blue-600 hover:text-blue-800 underline cursor-pointer">
+                    {{ r.cantidadOTs }}
+                  </a>
+                  <span *ngIf="!r.cantidadOTs || r.cantidadOTs === 0">0</span>
+                </ng-container>
+                <span *ngIf="!resumenRecojoMap.get(rowData.idestacion)">0</span>
+              </td>
+
+              <!-- Pendiente de Programar -->
+              <td class="text-center">
+                <a *ngIf="rowData.cantidad_pendiente_programar > 0"
+                  (click)="verDetalleOT(rowData.idestacion, 'pendiente_programar', 'Pendiente de Programar - ' + rowData.estacion)"
+                  class="text-blue-600 hover:text-blue-800 underline cursor-pointer">
+                  {{ rowData.cantidad_pendiente_programar }}
+                </a>
+                <span *ngIf="rowData.cantidad_pendiente_programar === 0 || !rowData.cantidad_pendiente_programar">{{ rowData.cantidad_pendiente_programar || 0 }}</span>
+              </td>
+              <td class="text-center">{{ rowData.peso_pendiente_programar }}</td>
+              <td class="text-center">{{ rowData.bulto_pendiente_programar }}</td>
+
+              <!-- Pendiente de Despacho -->
+              <td class="text-center">
+                <a *ngIf="rowData.cantidad_pendiente_despacho > 0"
+                  (click)="verDetalleOT(rowData.idestacion, 'pendiente_despacho', 'Pendiente de Despacho - ' + rowData.estacion)"
+                  class="text-blue-600 hover:text-blue-800 underline cursor-pointer">
+                  {{ rowData.cantidad_pendiente_despacho }}
+                </a>
+                <span *ngIf="rowData.cantidad_pendiente_despacho === 0 || !rowData.cantidad_pendiente_despacho">{{ rowData.cantidad_pendiente_despacho || 0 }}</span>
+              </td>
+              <td class="text-center">{{ rowData.peso_pendiente_despacho }}</td>
+              <td class="text-center">{{ rowData.bulto_pendiente_despacho }}</td>
+
+              <!-- Entrega (Local) -->
+              <td class="text-center">
+                <ng-container *ngIf="resumenEntregaLocalMap.get(rowData.idestacion) as r">
+                  <a *ngIf="r.cantidadOTs > 0"
+                    (click)="verDetalleEntregaLocal(rowData)"
+                    class="text-blue-600 hover:text-blue-800 underline cursor-pointer">
+                    {{ r.cantidadOTs }}
+                  </a>
+                  <span *ngIf="!r.cantidadOTs || r.cantidadOTs === 0">0</span>
+                </ng-container>
+                <span *ngIf="!resumenEntregaLocalMap.get(rowData.idestacion)">0</span>
+              </td>
+              <td class="text-center">
+                {{ (resumenEntregaLocalMap.get(rowData.idestacion))?.pesoTotal | number:'1.0-2' }}
+              </td>
+              <td class="text-center">
+                {{ (resumenEntregaLocalMap.get(rowData.idestacion))?.bultoTotal ?? 0 }}
+              </td>
+
+              <!-- Recabar Cargos -->
+              <td class="text-center">
+                <ng-container *ngIf="resumenPendienteCargoMap.get(rowData.idestacion) as r">
+                  <a *ngIf="r.cantidadOTs > 0"
+                    (click)="verDetallePendienteCargo(rowData)"
+                    class="text-blue-600 hover:text-blue-800 underline cursor-pointer">
+                    {{ r.cantidadOTs }}
+                  </a>
+                  <span *ngIf="!r.cantidadOTs || r.cantidadOTs === 0">0</span>
+                </ng-container>
+                <span *ngIf="!resumenPendienteCargoMap.get(rowData.idestacion)">0</span>
+              </td>
+              <td class="text-center">
+                {{ (resumenPendienteCargoMap.get(rowData.idestacion))?.totalPeso | number:'1.0-2' }}
+              </td>
+              <td class="text-center">
+                {{ (resumenPendienteCargoMap.get(rowData.idestacion))?.totalBultos ?? 0 }}
+              </td>
+
+              <!-- Enviar Cargos -->
+              <td class="text-center">
+                <ng-container *ngIf="resumenEnvioCargoMap.get(rowData.idestacion) as r">
+                  <a *ngIf="r.cantidadOTs > 0"
+                    (click)="verDetalleEnvioCargo(rowData)"
+                    class="text-blue-600 hover:text-blue-800 underline cursor-pointer">
+                    {{ r.cantidadOTs }}
+                  </a>
+                  <span *ngIf="!r.cantidadOTs || r.cantidadOTs === 0">0</span>
+                </ng-container>
+                <span *ngIf="!resumenEnvioCargoMap.get(rowData.idestacion)">0</span>
+              </td>
+              <td class="text-center">
+                {{ (resumenEnvioCargoMap.get(rowData.idestacion))?.totalPeso | number:'1.0-2' }}
+              </td>
+              <td class="text-center">
+                {{ (resumenEnvioCargoMap.get(rowData.idestacion))?.totalBultos ?? 0 }}
+              </td>
+            </tr>
+          </ng-template>
+
+          <ng-template pTemplate="emptymessage">
+            <tr>
+              <td colspan="19" class="text-center p-3 text-gray-600 text-xs">No hay datos disponibles.</td>
+            </tr>
+          </ng-template>
+        </p-table>
+      </div>
+    </div>
+  </div>
+</div>

@@ -45,9 +45,11 @@ export class GenerarFacturaModalComponent implements OnInit {
   preliquidacion: ListarPreliquidacionResult;
   detalles: DetalleFactura[] = [];
   series: any[] = [];
+  documentos: any[] = []; // registros completos de facturacion.documento
   ordenes: OrdenTrabajoPreliquidacionResult[] = [];
   user: User;
   loading: boolean = false;
+  readonly ID_TIPO_COMPROBANTE = 81; // tipo comprobante a usar para listar series
   
   cols: any[] = [
     { field: 'cantidad', header: 'Cantidad', width: '100px' },
@@ -88,11 +90,8 @@ export class GenerarFacturaModalComponent implements OnInit {
       this.user = JSON.parse(userStorage);
     }
 
-    // Cargar series disponibles (TODO: obtener del backend)
-    this.series = [
-      { label: 'F001', value: 'F001' },
-      { label: 'B001', value: 'B001' }
-    ];
+    // Cargar series desde facturacion.documento
+    this.cargarSeries();
 
     // Cargar conceptos de cobro desde valorTabla con id 6
     this.cargarConceptosCobro();
@@ -115,6 +114,42 @@ export class GenerarFacturaModalComponent implements OnInit {
         total: this.preliquidacion.total || 0
       }];
     }
+  }
+
+  cargarSeries(): void {
+    this.facturacionService.getDocumentos(this.ID_TIPO_COMPROBANTE).subscribe({
+      next: (docs) => {
+        this.documentos = docs;
+        this.series = docs.map(d => ({ label: d.serie, value: d.serie }));
+      },
+      error: (error) => {
+        console.error('Error al cargar series:', error);
+        this.messageService.add({
+          severity: 'warn',
+          summary: 'Advertencia',
+          detail: 'No se pudieron cargar las series disponibles'
+        });
+      }
+    });
+  }
+
+  onSerieChange(serie: string): void {
+    if (!serie) return;
+    const doc = this.documentos.find(d => d.serie === serie);
+    const idtipo = doc?.idTipoComprobante ?? this.ID_TIPO_COMPROBANTE;
+    this.facturacionService.getSiguienteNumeroDocumento(idtipo, serie).subscribe({
+      next: (resp) => {
+        this.facturaForm.patchValue({ numero: resp.siguienteNumero });
+      },
+      error: (error) => {
+        console.error('Error al obtener siguiente número:', error);
+        this.messageService.add({
+          severity: 'warn',
+          summary: 'Advertencia',
+          detail: 'No se pudo obtener el siguiente número para la serie seleccionada'
+        });
+      }
+    });
   }
 
   cargarConceptosCobro(): void {
@@ -173,15 +208,8 @@ export class GenerarFacturaModalComponent implements OnInit {
   }
 
   getIdTipoComprobante(serie: string): number {
-    // Mapear serie a tipo de comprobante
-    // F001 = Factura (1), B001 = Boleta (2)
-    // Ajustar según los valores reales del backend
-    if (serie && serie.startsWith('F')) {
-      return 1; // Factura
-    } else if (serie && serie.startsWith('B')) {
-      return 2; // Boleta
-    }
-    return 1; // Por defecto Factura
+    const doc = this.documentos.find(d => d.serie === serie);
+    return doc?.idTipoComprobante ?? this.ID_TIPO_COMPROBANTE;
   }
 
   agregarItem(): void {
@@ -333,7 +361,7 @@ export class GenerarFacturaModalComponent implements OnInit {
         const comprobante: ComprobanteForCreateDto = {
           numeroComprobante: numeroComprobante,
           idTipoComprobante: this.getIdTipoComprobante(serie),
-          emisionRapida: false,
+          emisionRapida: 0,
           idPreliquidacion: this.preliquidacion.idpreliquidacion,
           idCliente: idCliente,
           fechaEmision: formValue.fechaEmision,

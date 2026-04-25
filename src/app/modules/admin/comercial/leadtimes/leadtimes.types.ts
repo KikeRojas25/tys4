@@ -17,5 +17,14 @@ export interface LeadTimeProvinciaRow {
   departamento: string;
   idProvincia: number;
   provincia: string;
-  dias: number; // 1 a 6
+  dias: number; // 1 a 10
+}
+
+/** Fila retornada por los SPs de lead time (comercial u operativo) */
+export interface LeadTimeRow {
+  iddepartamento: number;
+  departamento: string;
+  idprovincia: number;
+  provincia: string;
+  dias: number | null;
 }

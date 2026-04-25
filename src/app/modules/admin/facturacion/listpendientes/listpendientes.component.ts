@@ -17,6 +17,7 @@ import { CalendarModule } from 'primeng/calendar';
 import { FacturacionService } from '../facturacion.service';
 import { PendientePreliquidacion } from '../facturacion.types';
 import { MantenimientoService } from '../../mantenimiento/mantenimiento.service';
+import { OrdenTransporteService } from '../../recepcion/ordentransporte/ordentransporte.service';
 import { User } from 'app/core/user/user.types';
 
 @Component({
@@ -53,6 +54,7 @@ export class ListpendientesComponent implements OnInit {
   loading: boolean = false;
   displayDialog: boolean = false;
   selectedItems: PendientePreliquidacion[] = [];
+  private clienteDeSeleccion: any = null;
 
   cols: any[] = [];
   clientes: any[] = [];
@@ -62,6 +64,7 @@ export class ListpendientesComponent implements OnInit {
   constructor(
     private facturacionService: FacturacionService,
     private mantenimientoService: MantenimientoService,
+    private ordenTransporteService: OrdenTransporteService,
     private messageService: MessageService,
     private confirmationService: ConfirmationService,
     private router: Router
@@ -105,13 +108,13 @@ export class ListpendientesComponent implements OnInit {
   }
 
   cargarDestinos(): void {
-    this.mantenimientoService.getAllEstaciones('').subscribe({
-      next: (estaciones) => {
+    this.ordenTransporteService.getUbigeo('').subscribe({
+      next: (ubigeos) => {
         this.destinos = [{ label: 'Todos los destinos', value: null }];
-        estaciones.forEach((estacion) => {
+        ubigeos.forEach((u) => {
           this.destinos.push({
-            label: estacion.estacionOrigen,
-            value: estacion.idEstacion
+            label: u.ubigeo,
+            value: u.idDistrito
           });
         });
       },
@@ -135,20 +138,34 @@ export class ListpendientesComponent implements OnInit {
       { field: 'origen', header: 'Origen', width: '150px' },
       { field: 'destino', header: 'Destino', width: '150px' },
       { field: 'modotransporte', header: 'Modo', width: '100px' },
-      // { field: 'tipooperacion', header: 'Tipo Op.', width: '100px' },
       { field: 'peso', header: 'Peso', width: '100px' },
       { field: 'volumen', header: 'Volumen', width: '100px' },
       { field: 'bulto', header: 'Bultos', width: '80px' },
-            { field: 'pesovol', header: 'Peso Vol', width: '120px' },
-     { field: 'tarifa', header: 'Tarifa', width: '100px' },
+      { field: 'pesovol', header: 'Peso Vol', width: '120px' },
+      { field: 'tarifa', header: 'Tarifa', width: '100px' },
+      { field: 'montobase', header: 'Monto Base', width: '100px' },
       { field: 'subtotal', header: 'Subtotal', width: '100px' },
-    
       { field: 'recargo', header: 'Recargo', width: '100px' },
+      { field: 'subtotalfinal', header: 'Subtotal Final', width: '100px' },
 
     ];
   }
 
   buscar(): void {
+    if (
+      this.selectedItems.length > 0 &&
+      this.clienteDeSeleccion !== undefined &&
+      this.model.idcliente !== this.clienteDeSeleccion
+    ) {
+      this.messageService.add({
+        severity: 'warn',
+        summary: 'Cliente cambiado',
+        detail: 'Se cambió el cliente. Se eliminaron las selecciones anteriores.',
+        life: 4000
+      });
+      this.selectedItems = [];
+    }
+
     this.loading = true;
     this.facturacionService.getListarPendientePreliquidacion(
       this.model.idcliente,
@@ -158,6 +175,7 @@ export class ListpendientesComponent implements OnInit {
       next: (pendientes: PendientePreliquidacion[]) => {
         this.pendientes = pendientes;
         this.filteredPendientes = pendientes;
+        this.clienteDeSeleccion = this.model.idcliente;
         this.loading = false;
         console.log('Pendientes cargados:', this.filteredPendientes);
       },
@@ -227,6 +245,8 @@ export class ListpendientesComponent implements OnInit {
 
   limpiarFiltros(): void {
     this.model = {};
+    this.selectedItems = [];
+    this.clienteDeSeleccion = null;
     this.buscar();
   }
 
@@ -245,5 +265,23 @@ export class ListpendientesComponent implements OnInit {
       igv: selected.reduce((sum, item) => sum + (item.igv || 0), 0),
       total: selected.reduce((sum, item) => sum + (item.total || 0), 0)
     };
+  }
+
+  isSelected(rowData: PendientePreliquidacion): boolean {
+    return this.selectedItems.some(item => item.idordentrabajo === rowData.idordentrabajo);
+  }
+
+  toggleSeleccion(rowData: PendientePreliquidacion): void {
+    const idx = this.selectedItems.findIndex(item => item.idordentrabajo === rowData.idordentrabajo);
+    if (idx >= 0) {
+      this.selectedItems = this.selectedItems.filter((_, i) => i !== idx);
+    } else {
+      this.selectedItems = [...this.selectedItems, rowData];
+    }
+  }
+
+  toggleTodos(event: Event): void {
+    const checked = (event.target as HTMLInputElement).checked;
+    this.selectedItems = checked ? [...this.filteredPendientes] : [];
   }
 }

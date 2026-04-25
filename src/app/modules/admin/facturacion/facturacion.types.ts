@@ -68,6 +68,8 @@ export interface PendientePreliquidacion {
     base1: number;
     total: number;
     recargo: number;
+    montobase?: number;
+    subtotalfinal?: number;
     guiatransportista: string;
     conceptocobro: string;
     selected?: boolean; // Para la selección
@@ -87,6 +89,8 @@ export interface ListarPreliquidacionResult {
     subtotal?: number;
     recargo?: number;
     total?: number;
+    estado?: string;
+    idestado?: number;
 }
 
 export interface PreliquidacionDetalle {
@@ -145,6 +149,7 @@ export interface OrdenTrabajoPreliquidacionResult {
     peso: number;
     volumen: number;
     bulto?: number;
+    pesovol?: number;
     tarifa?: number;
     subtotal?: number;
     base1?: number;
@@ -152,6 +157,8 @@ export interface OrdenTrabajoPreliquidacionResult {
     idcliente: number;
     numeropreliquidacion: string;
     recargo?: number;
+    montobase?: number;
+    subtotalfinal?: number;
     igv?: number;
     guiatransportista: string;
     conceptocobro: string;
@@ -160,7 +167,7 @@ export interface OrdenTrabajoPreliquidacionResult {
 export interface ComprobanteForCreateDto {
     numeroComprobante: string;
     idTipoComprobante: number;
-    emisionRapida: boolean;
+    emisionRapida: number;
     idPreliquidacion: number;
     idCliente: number;
     fechaEmision: Date | string;
@@ -193,7 +200,7 @@ export interface ComprobanteResult {
     numeroComprobante: string;
     idTipoComprobante: number;
     tipoComprobante: string;
-    emisionRapida: boolean;
+    emisionRapida: number;
     idPreliquidacion: number;
     numeroPreliquidacion: string;
     idCliente: number;
@@ -232,4 +239,35 @@ export interface ComprobanteConDetallesResult {
     Comprobante?: ComprobanteResult; // Para compatibilidad con backend
     detalles?: DetalleComprobanteResult[];
     Detalles?: DetalleComprobanteResult[]; // Para compatibilidad con backend
+}
+
+export interface DocumentoResult {
+    idNumeroDocumento: number;
+    idTipoComprobante: number;
+    tipoComprobante: string;
+    serie: string;
+    primerNumero: string;
+    ultimoNumero: string;
+    idUsuarioAutorizado?: number;
+    nombreUsuario?: string;
+    idEstacion: number;
+    nombreEstacion: string;
+}
+
+export interface DocumentoForCreateDto {
+    idTipoComprobante: number;
+    serie: string;
+    primerNumero: string;
+    idUsuarioAutorizado?: number;
+    idEstacion: number;
+}
+
+export interface DocumentoForUpdateDto {
+    idNumeroDocumento: number;
+    idTipoComprobante: number;
+    serie: string;
+    primerNumero: string;
+    ultimoNumero: string;
+    idUsuarioAutorizado?: number;
+    idEstacion: number;
 }

@@ -52,6 +52,7 @@ export class LiquidacionCajaChicaListComponent implements OnInit {
     fechaInicio: null as Date | null,
     fechaFin: null as Date | null,
     estado: 'todos' as 'todos' | 'liquidados' | 'no_liquidados',
+    destinatario: '',
   };
   estadoOptions = [
     { label: 'Todos', value: 'todos' },
@@ -187,6 +188,7 @@ export class LiquidacionCajaChicaListComponent implements OnInit {
   limpiarFiltros(): void {
     this.setDefaultFechas();
     this.filtros.estado = 'todos';
+    this.filtros.destinatario = '';
     this.limpiarSeleccion();
     this.load();
   }
@@ -194,15 +196,21 @@ export class LiquidacionCajaChicaListComponent implements OnInit {
   aplicarFiltroEstado(resetSelection: boolean = true): void {
     if (resetSelection) this.limpiarSeleccion();
 
-    const base = this.liquidacionesAll ?? [];
+    let base = this.liquidacionesAll ?? [];
+
     if (this.filtros.estado === 'liquidados') {
-      this.liquidaciones = base.filter((x) => this.isRowLiquidado(x));
-      return;
+      base = base.filter((x) => this.isRowLiquidado(x));
+    } else if (this.filtros.estado === 'no_liquidados') {
+      base = base.filter((x) => !this.isRowLiquidado(x));
     }
-    if (this.filtros.estado === 'no_liquidados') {
-      this.liquidaciones = base.filter((x) => !this.isRowLiquidado(x));
-      return;
+
+    const dest = (this.filtros.destinatario ?? '').trim().toLowerCase();
+    if (dest) {
+      base = base.filter((x) =>
+        (x.destinatariotransferencia ?? '').toLowerCase().includes(dest)
+      );
     }
+
     this.liquidaciones = base;
   }
 
@@ -470,22 +478,19 @@ export class LiquidacionCajaChicaListComponent implements OnInit {
     });
   }
 
-  exportExcelDetallesLiquidados(): void {
+  exportExcelDetallesLiquidados(tipo: string): void {
     this.loading = true;
 
-    this.comprasService.getDetallesLiquidados(this.filtros.fechaInicio, this.filtros.fechaFin).subscribe({
+    this.comprasService.getDetallesLiquidados(this.filtros.fechaInicio, this.filtros.fechaFin, tipo).subscribe({
       next: (detalles: DetalleLiquidadoResult[]) => {
         const rows = (detalles ?? []).map((d: any) => ({
-          ID_DETALLE: d?.idliquidaciondetalle,
-          ID_LIQUIDACION: d?.idliquidacion,
           NUM_LIQUIDACION: String(d?.numeroliquidacion ?? '').trim(),
-          ID_OT: d?.idordentransporte ?? null,
-          NUMCP: String(d?.numcp ?? '').trim(),
-          ID_MANIFIESTO: d?.idmanifiesto ?? null,
+          NUM_OT: String(d?.numcp ?? '').trim(),
           NUM_MANIFIESTO: String(d?.nummanifiesto ?? '').trim(),
+          CLIENTE: String(d?.cliente ?? '').trim(),
+          DESTINO: String(d?.destino ?? '').trim(),
           SUBTOTAL_ORDEN: Number(d?.subtotalorden ?? 0),
           MONTO_PRORRATEADO: Number(d?.montoprorrateado ?? 0),
-          ID_CONCEPTO: d?.idconcepto ?? null,
           CONCEPTO: String(d?.concepto ?? '').trim(),
           FECHA_LIQUIDACION: d?.fechaliquidacion ? this.formatDate(d?.fechaliquidacion, false) : '',
         }));
@@ -504,23 +509,20 @@ export class LiquidacionCajaChicaListComponent implements OnInit {
           const worksheet = XLSX.utils.json_to_sheet(rows);
           this.applyExcelStyles(worksheet);
           worksheet['!cols'] = [
-            { wch: 12 }, // ID_DETALLE
-            { wch: 14 }, // ID_LIQUIDACION
-            { wch: 16 }, // NUM_LIQUIDACION
-            { wch: 10 }, // ID_OT
-            { wch: 14 }, // NUMCP
-            { wch: 12 }, // ID_MANIFIESTO
-            { wch: 16 }, // NUM_MANIFIESTO
+            { wch: 18 }, // NUM_LIQUIDACION
+            { wch: 16 }, // NUM_OT
+            { wch: 18 }, // NUM_MANIFIESTO
+            { wch: 30 }, // CLIENTE
+            { wch: 24 }, // DESTINO
             { wch: 16 }, // SUBTOTAL_ORDEN
             { wch: 18 }, // MONTO_PRORRATEADO
-            { wch: 12 }, // ID_CONCEPTO
             { wch: 26 }, // CONCEPTO
-            { wch: 14 }, // FECHA_LIQUIDACION
+            { wch: 16 }, // FECHA_LIQUIDACION
           ];
 
           const workbook = { Sheets: { DetallesLiquidados: worksheet }, SheetNames: ['DetallesLiquidados'] };
           const excelBuffer: any = XLSX.write(workbook, { bookType: 'xlsx', type: 'array' });
-          this.saveAsExcelFile(excelBuffer, 'DetallesLiquidados');
+          this.saveAsExcelFile(excelBuffer, `DetallesLiquidados_${tipo}`);
         });
       },
       error: (err) => {

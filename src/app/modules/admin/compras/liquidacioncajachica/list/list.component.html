@@ -25,73 +25,115 @@
     </div>
 
     <div class="flex items-center gap-2 mt-4 sm:mt-0">
-      <button pButton type="button" icon="pi pi-refresh" label="Actualizar" (click)="load()"
-              class="px-3 py-2 text-xs font-medium text-gray-700 bg-white border border-gray-300 hover:bg-gray-50 rounded transition-all duration-150">
-      </button>
-      <button pButton type="button" icon="pi pi-file-excel" label="Excel" (click)="exportExcel()"
-              [disabled]="loading || !liquidaciones || liquidaciones.length === 0"
-              class="px-3 py-2 text-xs font-medium text-green-700 bg-white border border-green-300 hover:bg-green-50 rounded transition-all duration-150">
-      </button>
-      <button pButton type="button" icon="pi pi-file-excel" label="Excel (Det. Liquidados)" (click)="exportExcelDetallesLiquidados()"
-              [disabled]="loading"
-              class="px-3 py-2 text-xs font-medium text-green-700 bg-white border border-green-300 hover:bg-green-50 rounded transition-all duration-150">
-      </button>
-      <button pButton type="button" icon="pi pi-file-pdf" label="PDF" (click)="exportPdf()"
-              [disabled]="loading || !liquidaciones || liquidaciones.length === 0"
-              class="px-3 py-2 text-xs font-medium text-red-700 bg-white border border-red-300 hover:bg-red-50 rounded transition-all duration-150">
-      </button>
-      <button pButton type="button" icon="pi pi-plus" label="Nueva" (click)="nueva()"
-              class="px-3 py-2 text-xs font-medium text-white bg-gray-900 hover:bg-gray-800 rounded transition-all duration-150">
-      </button>
+
+    
     </div>
   </div>
 
   <!-- Contenido -->
   <div class="main-content container-fluid p-3">
     <div class="bg-white rounded-md border border-gray-200 overflow-hidden">
-      <div class="px-3 py-2 border-b border-gray-100 bg-gray-50 flex flex-col gap-2">
+      <div class="p-2 border-b border-gray-100">
         <!-- Filtros -->
-        <div class="grid grid-cols-1 md:grid-cols-12 gap-2 items-end">
-          <div class="md:col-span-3">
-            <label class="block text-xs font-medium text-gray-700 mb-1">Fecha inicio</label>
+        <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-5 gap-2">
+
+          <!-- Fecha inicio -->
+          <div class="flex flex-col">
+            <label class="mb-1">Fecha inicio:</label>
             <p-calendar [(ngModel)]="filtros.fechaInicio" [ngModelOptions]="{ standalone: true }"
-                        dateFormat="dd/mm/yy" class="w-full"></p-calendar>
+                        dateFormat="dd/mm/yy" appendTo="body"
+                        placeholder="Seleccione una fecha"
+                        [style]="{'width':'100%'}">
+            </p-calendar>
           </div>
-          <div class="md:col-span-3">
-            <label class="block text-xs font-medium text-gray-700 mb-1">Fecha fin</label>
+
+          <!-- Fecha fin -->
+          <div class="flex flex-col">
+            <label class="mb-1">Fecha fin:</label>
             <p-calendar [(ngModel)]="filtros.fechaFin" [ngModelOptions]="{ standalone: true }"
-                        dateFormat="dd/mm/yy" class="w-full"></p-calendar>
+                        dateFormat="dd/mm/yy" appendTo="body"
+                        placeholder="Seleccione una fecha"
+                        [style]="{'width':'100%'}">
+            </p-calendar>
           </div>
-          <div class="md:col-span-4">
-            <label class="block text-xs font-medium text-gray-700 mb-1">Estado</label>
+
+          <!-- Estado -->
+          <div class="flex flex-col">
+            <label class="mb-1">Estado:</label>
             <p-dropdown
               [options]="estadoOptions"
               [(ngModel)]="filtros.estado"
               [ngModelOptions]="{ standalone: true }"
-              class="w-full"
+              appendTo="body"
               placeholder="Seleccione"
+              [style]="{'width':'100%'}"
               (onChange)="aplicarFiltroEstado()">
             </p-dropdown>
           </div>
-          <div class="md:col-span-2 flex gap-2 justify-end">
+
+          <!-- Destinatario -->
+          <div class="flex flex-col">
+            <label class="mb-1">Destinatario:</label>
+            <input pInputText
+              [(ngModel)]="filtros.destinatario"
+              [ngModelOptions]="{ standalone: true }"
+              placeholder="Buscar destinatario..."
+              (input)="aplicarFiltroEstado(false)"
+              [style]="{'width':'100%'}">
+          </div>
+
+          </div>
+           <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-5 gap-2">
+
+          <!-- Botón Buscar -->
+          <div class="flex flex-col mt-4">
             <button pButton type="button" icon="pi pi-search" label="Buscar" (click)="buscar()"
                     [disabled]="loading"
-                    class="px-3 py-2 text-xs font-medium text-white bg-gray-900 hover:bg-gray-800 rounded transition-all duration-150">
-            </button>
-            <button pButton type="button" icon="pi pi-filter-slash" label="Limpiar" (click)="limpiarFiltros()"
-                    [disabled]="loading"
-                    class="px-3 py-2 text-xs font-medium text-gray-700 bg-white border border-gray-300 hover:bg-gray-50 rounded transition-all duration-150">
+                    class="px-4 py-2.5 text-sm font-medium text-white bg-gray-700 hover:bg-gray-600 rounded-md shadow-sm transition-all duration-150">
             </button>
           </div>
+
+         
+          <!-- Botón Exportar Tráfico
+          <div class="flex flex-col mt-4">
+            <button pButton type="button" icon="pi pi-file-excel" label="Exportar Reporte Tráfico" (click)="exportExcelDetallesLiquidados('trafico')"
+                    [disabled]="loading"
+                    class="px-4 py-2.5 text-sm font-medium text-green-700 bg-white border border-green-300 hover:bg-green-50 rounded-md shadow-sm transition-all duration-150">
+            </button>
+          </div>
+
+          
+          <div class="flex flex-col mt-4">
+            <button pButton type="button" icon="pi pi-file-excel" label="Exportar Reporte Estación" (click)="exportExcelDetallesLiquidados('estacion')"
+                    [disabled]="loading"
+                    class="px-4 py-2.5 text-sm font-medium text-green-700 bg-white border border-green-300 hover:bg-green-50 rounded-md shadow-sm transition-all duration-150">
+            </button>
+          </div> -->
+      <div class="flex flex-col mt-4">
+            <button pButton type="button" icon="pi pi-file-excel" label="Excel" (click)="exportExcel()"
+              [disabled]="loading || !liquidaciones || liquidaciones.length === 0"
+              class="px-3 py-2 text-xs font-medium text-green-700 bg-white border border-green-300 hover:bg-green-50 rounded transition-all duration-150">
+          </button>
+      </div>
+      <div class="flex flex-col mt-4">
+        <button pButton type="button" icon="pi pi-file-pdf" label="PDF" (click)="exportPdf()"
+                [disabled]="loading || !liquidaciones || liquidaciones.length === 0"
+                class="px-3 py-2 text-xs font-medium text-red-700 bg-white border border-red-300 hover:bg-red-50 rounded transition-all duration-150">
+        </button>
+      </div>
+     <div class="flex flex-col mt-4">
+      <button pButton type="button" icon="pi pi-plus" label="Nueva" (click)="nueva()"
+              class="px-3 py-2 text-xs font-medium text-white bg-gray-900 hover:bg-gray-800 rounded transition-all duration-150">
+      </button>
+
         </div>
 
+        </div>
         <!-- Totales -->
-        <div class="text-xs text-gray-700">
+        <div class="text-xs text-gray-700 mt-2">
           <span class="font-medium">Registros:</span>
           <span class="ml-1">{{ totalRegistros }}</span>
-        </div>
-        <div class="text-xs text-gray-700">
-          <span class="font-medium">Total monto:</span>
+          <span class="ml-3 font-medium">Total monto:</span>
           <span class="ml-1 font-semibold text-gray-900">{{ totalMonto | number:'1.2-2' }}</span>
         </div>
       </div>

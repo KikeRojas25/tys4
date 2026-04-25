@@ -25,149 +25,174 @@
 
   <!-- Contenido Principal -->
   <div class="main-content container-fluid p-2">
-    <!-- Filtros de Búsqueda -->
-    <div class="bg-white rounded-lg shadow-sm border border-gray-200 mb-2 overflow-hidden">
-      <div class="p-2">
-        <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-6 gap-2">
-          <!-- Estado -->
-          <div class="flex flex-col">
-            <label class="mb-1">Estado:</label>
-            <p-dropdown
-              name="estados"
-              [options]="estados"
-              [(ngModel)]="model.idestado"
-              scrollHeight="30vh"
-              class="input-form-field"
-              appendTo="body"
-              [virtualScroll]="true"
-              itemSize="30"
-              [style]="{'width':'100%'}"
-              [resetFilterOnHide]="false"
-              [filter]="true"
-              placeholder="Seleccione estado">
-              <ng-template let-item pTemplate="selectedItem">
-                <span>{{item.label}}</span>
-              </ng-template>
-            </p-dropdown>
-          </div>
 
-          <!-- Cliente -->
-          <div class="flex flex-col">
-            <label class="mb-1">Cliente:</label>
+    <!-- Filtros -->
+    <div class="bg-white rounded-xl border border-gray-200 shadow-sm mb-2">
+      <div class="px-4 py-3">
+
+        <!-- Fila 1: dropdowns + texto -->
+        <div class="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-5 gap-2 mb-2">
+
+          <div class="flex flex-col gap-0.5">
+            <label class="text-xs font-medium text-gray-500 uppercase tracking-wide">Cliente</label>
             <p-dropdown
               name="clientes"
               [options]="clientes"
               [(ngModel)]="model.idcliente"
               scrollHeight="30vh"
-              class="input-form-field"
               appendTo="body"
               [virtualScroll]="true"
               itemSize="30"
               [style]="{'width':'100%'}"
-              [resetFilterOnHide]="false"
               [filter]="true"
-              placeholder="Seleccione cliente">
-              <ng-template let-item pTemplate="selectedItem">
-                <span>{{item.label}}</span>
-              </ng-template>
+              [resetFilterOnHide]="false"
+              placeholder="Todos">
+              <ng-template let-item pTemplate="selectedItem"><span class="text-xs">{{item.label}}</span></ng-template>
             </p-dropdown>
           </div>
 
-          <!-- Tipo Comprobante -->
-          <div class="flex flex-col">
-            <label class="mb-1">Tipo Comprobante:</label>
+          <div class="flex flex-col gap-0.5">
+            <label class="text-xs font-medium text-gray-500 uppercase tracking-wide">Estado</label>
+            <p-dropdown
+              name="estados"
+              [options]="estados"
+              [(ngModel)]="model.idestado"
+              scrollHeight="30vh"
+              appendTo="body"
+              [style]="{'width':'100%'}"
+              placeholder="Todos">
+              <ng-template let-item pTemplate="selectedItem"><span class="text-xs">{{item.label}}</span></ng-template>
+            </p-dropdown>
+          </div>
+
+          <div class="flex flex-col gap-0.5">
+            <label class="text-xs font-medium text-gray-500 uppercase tracking-wide">Tipo Comprobante</label>
             <p-dropdown
               name="tiposComprobante"
               [options]="tiposComprobante"
               [(ngModel)]="model.idtipocomprobante"
               scrollHeight="30vh"
-              class="input-form-field"
               appendTo="body"
-              [virtualScroll]="true"
-              itemSize="30"
               [style]="{'width':'100%'}"
-              [resetFilterOnHide]="false"
-              [filter]="true"
-              placeholder="Seleccione tipo">
-              <ng-template let-item pTemplate="selectedItem">
-                <span>{{item.label}}</span>
-              </ng-template>
+              placeholder="Todos">
+              <ng-template let-item pTemplate="selectedItem"><span class="text-xs">{{item.label}}</span></ng-template>
             </p-dropdown>
           </div>
 
-          <!-- Nro Comprobante -->
-          <div class="flex flex-col">
-            <label class="mb-1">Nro Comprobante:</label>
+          <div class="flex flex-col gap-0.5">
+            <label class="text-xs font-medium text-gray-500 uppercase tracking-wide">Nro Comprobante</label>
             <input
               pInputText
               [(ngModel)]="model.numerocomprobante"
-              [style]="{'width':'100%'}"
-              placeholder="Ingrese Nro Comprobante"
-              (keyup.enter)="buscar()" />
+              placeholder="Ej: F001-0001"
+              (keyup.enter)="buscar()"
+              class="p-inputtext-sm w-full" />
           </div>
 
-          <!-- Nro Preliquidación -->
-          <div class="flex flex-col">
-            <label class="mb-1">Nro Preliquidación:</label>
+          <div class="flex flex-col gap-0.5">
+            <label class="text-xs font-medium text-gray-500 uppercase tracking-wide">Nro Preliquidación</label>
             <input
               pInputText
               [(ngModel)]="model.numeroliquidacion"
-              [style]="{'width':'100%'}"
-              placeholder="Ingrese Nro Preliquidación"
-              (keyup.enter)="buscar()" />
+              placeholder="Ej: 030-000001"
+              (keyup.enter)="buscar()"
+              class="p-inputtext-sm w-full" />
           </div>
 
-          <!-- Botones -->
-          <div class="flex flex-col gap-2 mt-4">
+        </div>
+
+        <!-- Fila 2: fechas + acciones -->
+        <div class="flex flex-wrap items-end gap-2">
+
+          <div class="flex flex-col gap-0.5">
+            <label class="text-xs font-medium text-gray-500 uppercase tracking-wide">Fecha desde</label>
+            <p-calendar
+              [(ngModel)]="model.fecharegistroinicio"
+              dateFormat="dd/mm/yy"
+              [showIcon]="true"
+              appendTo="body"
+              [style]="{'width':'150px'}"
+              placeholder="dd/mm/aaaa">
+            </p-calendar>
+          </div>
+
+          <div class="flex flex-col gap-0.5">
+            <label class="text-xs font-medium text-gray-500 uppercase tracking-wide">Fecha hasta</label>
+            <p-calendar
+              [(ngModel)]="model.fecharegistrofin"
+              dateFormat="dd/mm/yy"
+              [showIcon]="true"
+              appendTo="body"
+              [style]="{'width':'150px'}"
+              placeholder="dd/mm/aaaa">
+            </p-calendar>
+          </div>
+
+          <div class="flex items-end gap-2 ml-auto">
             <button
-              class="px-4 py-2.5 text-sm font-medium text-white bg-gray-700 hover:bg-gray-600 rounded-md shadow-sm transition-all duration-150"
               pButton
+              type="button"
               label="Buscar"
               icon="pi pi-search"
-              iconPos="left"
+              class="p-button-sm p-button-primary"
               (click)="buscar()">
             </button>
             <button
-              class="px-4 py-2.5 text-sm font-medium text-gray-700 bg-white border border-gray-300 hover:bg-gray-50 rounded-md shadow-sm transition-all duration-150"
               pButton
-              label="EXCEL"
+              type="button"
+              label="Limpiar"
+              icon="pi pi-refresh"
+              class="p-button-sm p-button-secondary p-button-outlined"
+              (click)="limpiarFiltros()">
+            </button>
+            <button
+              pButton
+              type="button"
+              label="Excel"
               icon="pi pi-file-excel"
-              iconPos="left"
+              class="p-button-sm p-button-success p-button-outlined"
               (click)="exportarExcel()">
             </button>
           </div>
+
         </div>
       </div>
     </div>
 
-    <!-- Botones de Acción (solo cuando hay item seleccionado) -->
-    <div class="bg-white rounded-lg shadow-sm border border-gray-200 mb-2 overflow-hidden p-4" *ngIf="selectedItem">
-      <div class="flex flex-wrap gap-2">
-        <button
-          class="px-4 py-2 text-sm font-medium text-white bg-blue-600 hover:bg-blue-700 rounded-md shadow-sm transition-all duration-150"
-          pButton
-          label="Editar Preliquidación"
-          icon="pi pi-pencil"
-          iconPos="left"
-          (click)="editarPreliquidacion()">
-        </button>
-        <button
-          class="px-4 py-2 text-sm font-medium text-white bg-green-600 hover:bg-green-700 rounded-md shadow-sm transition-all duration-150"
-          pButton
-          label="Ver Reporte"
-          icon="pi pi-file-pdf"
-          iconPos="left"
-          (click)="verReporte()">
-        </button>
-        <button
-          class="px-4 py-2 text-sm font-medium text-white bg-amber-600 hover:bg-amber-700 rounded-md shadow-sm transition-all duration-150"
-          pButton
-          label="Generar Factura"
-          icon="pi pi-file"
-          iconPos="left"
-          (click)="generarFactura()">
-        </button>
-      </div>
+    <!-- Barra de acciones contextual (solo con fila seleccionada) -->
+    <div *ngIf="selectedItem"
+         class="flex flex-wrap items-center gap-2 bg-amber-50 border border-amber-200 rounded-xl px-4 py-2.5 mb-2">
+      <span class="text-xs font-semibold text-amber-700 mr-2">
+        <i class="pi pi-check-circle mr-1"></i>{{ selectedItem.numeropreliquidacion }}
+      </span>
+      <button
+        pButton type="button"
+        label="Editar"
+        icon="pi pi-pencil"
+        class="p-button-sm p-button-outlined"
+        (click)="editarPreliquidacion()">
+      </button>
+      <button
+        pButton type="button"
+        label="Ver Reporte"
+        icon="pi pi-file-pdf"
+        class="p-button-sm p-button-outlined p-button-success"
+        (click)="verReporte()">
+      </button>
+      <button
+        pButton type="button"
+        label="Generar Factura"
+        icon="pi pi-file"
+        class="p-button-sm p-button-warning"
+        (click)="generarFactura()">
+      </button>
+      <button
+        pButton type="button"
+        label="Eliminar"
+        icon="pi pi-trash"
+        class="p-button-sm p-button-danger p-button-outlined"
+        (click)="eliminarPreliquidacion()">
+      </button>
     </div>
 
     <!-- Tabla de Preliquidaciones -->

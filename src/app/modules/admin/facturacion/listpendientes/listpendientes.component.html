@@ -157,7 +157,8 @@
           [tableStyle]="{ 'table-layout': 'fixed', 'width': '100%' }"
           [scrollable]="true"
           [(selection)]="selectedItems"
-          selectionMode="multiple"
+          selectionMode="checkbox"
+          dataKey="idordentrabajo"
           [styleClass]="'custom-table'"
           class="w-full">
 
@@ -173,7 +174,7 @@
           <ng-template pTemplate="header" let-columns>
             <tr class="bg-gray-800 text-white">
               <th class="text-center px-4 py-3">
-                <p-tableHeaderCheckbox></p-tableHeaderCheckbox>
+                <input type="checkbox" [checked]="selectedItems.length === filteredPendientes.length && filteredPendientes.length > 0" (change)="toggleTodos($event)" style="width:16px;height:16px;cursor:pointer;" />
               </th>
               <th
                 style="white-space: normal; word-wrap: break-word;"
@@ -188,10 +189,12 @@
 
           <!-- Table Body -->
           <ng-template pTemplate="body" let-rowData let-columns="columns">
-            <tr [pSelectableRow]="rowData" class="border-b border-gray-100 hover:bg-gray-50 transition-colors duration-150">
+            <tr class="border-b border-gray-100 transition-colors duration-150 cursor-pointer"
+                [ngClass]="isSelected(rowData) ? 'row-selected' : 'row-normal'"
+                (click)="toggleSeleccion(rowData)">
               <!-- Checkbox -->
               <td class="text-center px-2 py-2">
-                <p-tableCheckbox [value]="rowData"></p-tableCheckbox>
+                <input type="checkbox" [checked]="isSelected(rowData)" style="width:16px;height:16px;pointer-events:none;" />
               </td>
 
               <!-- Nro OT -->
@@ -203,7 +206,7 @@
               <td class="text-center px-4 py-3 text-gray-700 text-sm">
                 {{ rowData.fecharegistro | date:'dd/MM/yyyy' }}
               </td>
-
+ 
               <!-- Remitente -->
             
            <td class="text-center px-4 py-3">
@@ -246,6 +249,11 @@
                 <span class="text-gray-700 text-sm">S/. {{ rowData.tarifa | number:'1.2-2' }}</span>
               </td>
 
+
+                  <td class="text-center px-4 py-3">
+                <span class="text-gray-700 text-sm">S/. {{ rowData.montobase | number:'1.2-2' }}</span>
+              </td>
+
               <!-- Subtotal -->
               <td class="text-center px-4 py-3">
                 <span class="text-amber-700 text-sm font-semibold">S/. {{ rowData.subtotal | number:'1.2-2' }}</span>
@@ -254,6 +262,11 @@
     
               <td class="text-center px-4 py-3">
                 <span class="text-amber-700 text-sm font-bold">S/. {{ rowData.recargo | number:'1.2-2' }}</span>
+              </td>
+
+                      
+              <td class="text-center px-4 py-3">
+                <span class="text-gray-700 text-sm">S/. {{ rowData.subtotalfinal | number:'1.2-2' }}</span>
               </td>
 
 

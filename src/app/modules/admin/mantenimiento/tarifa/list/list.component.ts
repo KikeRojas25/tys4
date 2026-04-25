@@ -18,6 +18,7 @@ import { CardModule } from 'primeng/card';
 import { ButtonModule } from 'primeng/button';
 import { TooltipModule } from 'primeng/tooltip';
 import { NewComponent } from '../new/new.component';
+import { ModalActualizacionMasivaComponent } from './modal-actualizacion-masiva.component';
 
 @Component({
   selector: 'app-list',
@@ -330,6 +331,41 @@ export class ListComponent implements OnInit {
           summary: 'Error',
           detail: 'No se pudieron cargar las tarifas'
         });
+      }
+    });
+  }
+
+  abrirActualizacionMasiva(): void {
+    const idCliente = this.filtroForm.value.idCliente;
+    if (!idCliente) {
+      this.messageService.add({
+        severity: 'warn', summary: 'Atención',
+        detail: 'Debe seleccionar un cliente antes de usar la actualización masiva.'
+      });
+      return;
+    }
+
+    const clienteLabel = this.clientes.find(c => c.value === idCliente)?.label ?? '';
+
+    const ref = this.dialogService.open(ModalActualizacionMasivaComponent, {
+      header: `Actualización Masiva — ${clienteLabel}`,
+      width: '520px',
+      closable: true,
+      modal: true,
+      dismissableMask: true,
+      baseZIndex: 10000,
+      data: { idCliente },
+    });
+
+    ref.onClose.subscribe((result) => {
+      if (result?.cantidad != null) {
+        this.messageService.add({
+          severity: 'success',
+          summary: 'Actualización Masiva',
+          detail: result.message,
+          life: 4000,
+        });
+        this.refrescar();
       }
     });
   }

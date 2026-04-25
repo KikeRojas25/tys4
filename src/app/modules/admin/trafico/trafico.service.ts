@@ -72,6 +72,90 @@ export class TraficoService {
         );
     }
 
+    GetResumenOrdenesRecepcion(): Observable<any[]> {
+        return this._httpClient.get<any[]>(
+            `${this.baseUrl}ResumenOrdenesRecepcion`,
+            httpOptions
+        );
+    }
+
+    GetResumenOrdenesRecepcionOT(): Observable<any[]> {
+        return this._httpClient.get<any[]>(
+            `${this.baseUrl}ResumenOrdenesRecepcionOT`,
+            httpOptions
+        );
+    }
+
+    GetDetalleOrdenesxEstacionRecepcion(idProvincia: number): Observable<any[]> {
+        return this._httpClient.get<any[]>(
+            `${this.baseUrl}DetalleOrdenesxEstacionRecepcion?idProvincia=${idProvincia}`,
+            httpOptions
+        );
+    }
+
+    GetDetalleOrdenesxEntregaLocal(idProvincia: number): Observable<any[]> {
+        return this._httpClient.get<any[]>(
+            `${this.baseUrl}DetalleOrdenesxEntregaLocal?idProvincia=${idProvincia}`,
+            httpOptions
+        );
+    }
+
+    GetResumenOrdenesxEntregaLocal(): Observable<any[]> {
+        return this._httpClient.get<any[]>(
+            `${this.baseUrl}ResumenOrdenesxEntregaLocal`,
+            httpOptions
+        );
+    }
+
+    GetResumenPendienteCargo(): Observable<any[]> {
+        return this._httpClient.get<any[]>(
+            `${this.baseUrl}ResumenPendienteCargo`,
+            httpOptions
+        );
+    }
+
+    GetDetallePendienteCargo(idProvincia: number): Observable<any[]> {
+        return this._httpClient.get<any[]>(
+            `${this.baseUrl}DetallePendienteCargo?idProvincia=${idProvincia}`,
+            httpOptions
+        );
+    }
+
+    GetResumenEnvioCargo(): Observable<any[]> {
+        return this._httpClient.get<any[]>(
+            `${this.baseUrl}ResumenEnvioCargo`,
+            httpOptions
+        );
+    }
+
+    GetDetalleEnvioCargo(idProvincia: number): Observable<any[]> {
+        return this._httpClient.get<any[]>(
+            `${this.baseUrl}DetalleEnvioCargo?idProvincia=${idProvincia}`,
+            httpOptions
+        );
+    }
+
+    GetResumenOrdenesxManifiestoEstacion(idProvincia: number): Observable<any[]> {
+        return this._httpClient.get<any[]>(
+            `${this.baseUrl}ResumenOrdenesxManifiestoEstacion?idProvincia=${idProvincia}`,
+            httpOptions
+        );
+    }
+
+    GetDetalleRecojoXEstacion(idProvincia: number): Observable<any[]> {
+        return this._httpClient.get<any[]>(
+            `${this.baseUrl}DetalleRecojoXEstacion?idProvincia=${idProvincia}`,
+            httpOptions
+        );
+    }
+
+    GetResumenRecojoXEstacion(): Observable<any[]> {
+        return this._httpClient.get<any[]>(
+            `${this.baseUrl}ResumenRecojoXEstacion`,
+            httpOptions
+        );
+    }
+
 
     VerDespachosxDepartamentoxProveedor(model: any) {
         const idequipo = model.idequipo ? model.idequipo : ''; // Si model.idequipo es null, usar una cadena vacía

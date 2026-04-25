@@ -53,7 +53,8 @@
             pInputText
             formControlName="direccion"
             [style]="{'width':'100%', 'font-size': '0.75rem', 'padding': '0.375rem 0.5rem'}"
-            placeholder="Ingrese dirección" />
+            placeholder="Ingrese dirección"
+            readonly />
         </div>
       </div>
 
@@ -68,7 +69,8 @@
             placeholder="[Serie]"
             [style]="{'width':'100%'}"
             styleClass="compact-dropdown"
-            appendTo="body">
+            appendTo="body"
+            (onChange)="onSerieChange($event.value)">
           </p-dropdown>
         </div>
 
@@ -79,7 +81,8 @@
             pInputText
             formControlName="numero"
             [style]="{'width':'100%', 'font-size': '0.75rem', 'padding': '0.375rem 0.5rem'}"
-            placeholder="Ingrese número" />
+            placeholder="Ingrese número"
+            readonly />
         </div>
 
         <!-- Observación -->

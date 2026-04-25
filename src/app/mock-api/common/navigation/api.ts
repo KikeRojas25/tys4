@@ -90,16 +90,29 @@ export class NavigationMockApi {
                     {
                        
                         defaultNavItem.submenu.forEach((el) => {
-                            //if(el.visible === true ){
-                            compactNavItem.children.push({
+                            const hasChildren = Array.isArray(el.submenu) && el.submenu.length > 0;
+                            const nivel2: any = {
                                 id: el.pag_str_codmenu,
                                 title: el.pag_str_nombre,
-                                type: 'basic',
+                                type: hasChildren ? 'collapsable' : 'basic',
                                 icon: el.pag_str_icono,
-                                idpadre : el.pag_str_codmenu_padre,
-                                link: el.pag_str_url
-                            });
-                        //  }
+                                idpadre: el.pag_str_codmenu_padre,
+                                link: hasChildren ? undefined : el.pag_str_url,
+                                children: []
+                            };
+                            if (hasChildren) {
+                                el.submenu.forEach((sub: any) => {
+                                    nivel2.children.push({
+                                        id: sub.pag_str_codmenu,
+                                        title: sub.pag_str_nombre,
+                                        type: 'basic',
+                                        icon: sub.pag_str_icono,
+                                        idpadre: sub.pag_str_codmenu_padre,
+                                        link: sub.pag_str_url
+                                    });
+                                });
+                            }
+                            (compactNavItem.children ??= []).push(nivel2);
                         });
                       
 

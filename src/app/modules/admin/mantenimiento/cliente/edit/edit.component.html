@@ -1,3 +1,65 @@
-<p>
-  edit works!
-</p>
+<form [formGroup]="form" (ngSubmit)="onSubmit()" class="flex flex-col gap-4 p-2">
+
+  <p-toast />
+
+  <!-- Razón Social -->
+  <div class="field flex flex-col gap-1">
+    <label class="text-sm font-medium text-gray-700">Razón Social <span class="text-red-500">*</span></label>
+    <input pInputText formControlName="razon_social" placeholder="Ingrese la razón social" class="w-full" />
+    <small *ngIf="form.get('razon_social').invalid && form.get('razon_social').touched" class="text-red-500">
+      Requerido (mínimo 3 caracteres).
+    </small>
+  </div>
+
+  <!-- RUC y Nombre Corto -->
+  <div class="grid grid-cols-2 gap-4">
+    <div class="field flex flex-col gap-1">
+      <label class="text-sm font-medium text-gray-700">RUC <span class="text-red-500">*</span></label>
+      <input pInputText formControlName="ruc" maxlength="11" placeholder="Ej: 20123456789" class="w-full" />
+      <small *ngIf="form.get('ruc').invalid && form.get('ruc').touched" class="text-red-500">
+        Requerido (8-11 dígitos).
+      </small>
+    </div>
+    <div class="field flex flex-col gap-1">
+      <label class="text-sm font-medium text-gray-700">Nombre Corto</label>
+      <input pInputText formControlName="nombrecorto" maxlength="50" placeholder="Alias del cliente" class="w-full" />
+    </div>
+  </div>
+
+  <!-- Línea de Crédito y Moneda -->
+  <div class="grid grid-cols-2 gap-4">
+    <div class="field flex flex-col gap-1">
+      <label class="text-sm font-medium text-gray-700">Línea de Crédito</label>
+      <p-inputNumber formControlName="lineacredito" mode="decimal" [minFractionDigits]="2" [maxFractionDigits]="2"
+                     placeholder="0.00" [useGrouping]="true" styleClass="w-full" />
+    </div>
+    <div class="field flex flex-col gap-1">
+      <label class="text-sm font-medium text-gray-700">Moneda</label>
+      <p-dropdown formControlName="idmonedalinea" [options]="monedas" optionLabel="label" optionValue="value"
+                  appendTo="body" styleClass="w-full" />
+    </div>
+  </div>
+
+  <!-- Checkboxes -->
+  <div class="flex gap-6 mt-1">
+    <div class="flex items-center gap-2">
+      <p-checkbox formControlName="pagocontado" [binary]="true" inputId="pagocontado"></p-checkbox>
+      <label for="pagocontado" class="text-sm text-gray-700 cursor-pointer">Pago Contado</label>
+    </div>
+    <div class="flex items-center gap-2">
+      <p-checkbox formControlName="activo" [binary]="true" inputId="activo"></p-checkbox>
+      <label for="activo" class="text-sm text-gray-700 cursor-pointer">Activo</label>
+    </div>
+    <div class="flex items-center gap-2">
+      <p-checkbox formControlName="tieneventasultimoano" [binary]="true" inputId="tieneventasultimoano"></p-checkbox>
+      <label for="tieneventasultimoano" class="text-sm text-gray-700 cursor-pointer">Cliente Factura</label>
+    </div>
+  </div>
+
+  <!-- Botones -->
+  <div class="flex justify-end gap-3 mt-2 border-t pt-4">
+    <p-button type="button" label="Cancelar" icon="pi pi-times" severity="secondary" (click)="onCancel()"></p-button>
+    <p-button type="submit" label="Guardar" icon="pi pi-check" [disabled]="guardando"></p-button>
+  </div>
+
+</form>

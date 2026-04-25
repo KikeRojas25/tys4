@@ -27,7 +27,7 @@
           pInputText
           [(ngModel)]="numcp"
           (keyup.enter)="buscar()"
-          placeholder="Ingrese número de OT..."
+          placeholder="Ingrese número de documento..."
           class="search-input"
           [disabled]="loading"
         />
@@ -84,6 +84,7 @@
                     <th>Fecha registro</th>
                     <th>Fecha evento</th>
                     <th>Usuario registro</th>
+                    <th>Recurso</th>
                   </tr>
                 </ng-template>
                 <ng-template pTemplate="body" let-event>
@@ -98,6 +99,11 @@
                     <td>{{ event.dateEvent ? (event.dateRegister | date:'dd/MM/yyyy HH:mm') : 'Sin dato' }}</td>
                     <td>{{ event.dateEvent ? (event.dateEvent | date:'dd/MM/yyyy HH:mm') : 'Sin evento' }}</td>
                     <td>{{ event.dateEvent ? (event.user || 'Sin dato') : 'Sin dato' }}</td>
+                    <td>
+                      <ng-container *ngIf="event.idmaestroevento === 4">{{ event.recursotroncal || '-' }}</ng-container>
+                      <ng-container *ngIf="event.idmaestroevento === 38">{{ event.repartidor || '-' }}</ng-container>
+                      <ng-container *ngIf="event.idmaestroevento !== 4 && event.idmaestroevento !== 38">-</ng-container>
+                    </td>
                   </tr>
                 </ng-template>
               </p-table>

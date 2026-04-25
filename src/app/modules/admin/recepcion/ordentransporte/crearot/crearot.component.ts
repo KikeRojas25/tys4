@@ -22,9 +22,12 @@ import { ConfirmDialogModule } from 'primeng/confirmdialog';
 import { InputMaskModule } from 'primeng/inputmask';
 import { forkJoin } from 'rxjs';
 import { DialogService, DynamicDialogRef } from 'primeng/dynamicdialog';
+import { TagModule } from 'primeng/tag';
 import { NewComponent } from 'app/modules/admin/mantenimiento/cliente/new/new.component';
 import { ChangeDetectorRef } from '@angular/core';
 import { DialogOrdenResumenComponent } from '../dialog-orden-resumen/dialog-orden-resumen.component';
+import { DialogBuscarOrComponent } from '../dialog-buscar-or/dialog-buscar-or.component';
+import { RecojoService } from 'app/modules/admin/recojo/recojo.service';
 
 interface GuiaGRR {
   idguia?: number;
@@ -56,8 +59,9 @@ interface GuiaGRR {
     TableModule,
     ConfirmDialogModule ,
     ReactiveFormsModule,
-    InputMaskModule 
-  
+    InputMaskModule,
+    TagModule
+
   ],
   providers: [MessageService,ConfirmationService, DialogService]
 })
@@ -107,6 +111,10 @@ export class CrearotComponent implements OnInit {
   model: any = {};
 
   horacita: any;
+  numBusquedaOr: string = '';
+  orVinculada: { idordentrabajo: number; numcp: string } | null = null;
+  sinRecojo: boolean = false;
+  orTouched: boolean = false;
 
   date: Date = new Date();
   settings = {
@@ -122,7 +130,8 @@ export class CrearotComponent implements OnInit {
             , private messageService: MessageService
             , public dialogService: DialogService
             ,  private cdr: ChangeDetectorRef
-            , private activatedRoute: ActivatedRoute) { }
+            , private activatedRoute: ActivatedRoute
+            , private recojoService: RecojoService) { }
 
 
   ngOnInit() {
@@ -176,7 +185,7 @@ export class CrearotComponent implements OnInit {
 
    // Cargar los combos.
     this.cargarDropDows().then(() => {
-      // this.realizarAsignaciones();
+     //  this.realizarAsignaciones();
     });
 
 
@@ -195,6 +204,41 @@ export class CrearotComponent implements OnInit {
 
 
   }
+  buscarOr() {
+    const criterio = (this.numBusquedaOr || '').trim();
+    const abrirModal = (resultados: any[]) => {
+      this.ref = this.dialogService.open(DialogBuscarOrComponent, {
+        header: 'Buscar Orden de Recojo',
+        width: '60%',
+        dismissableMask: true,
+        data: { resultados }
+      });
+      this.ref.onClose.subscribe((item) => {
+        if (item) {
+          const id = item.idordentrabajo ?? item.IdOrdenTrabajo ?? item.idOrdenTrabajo ?? item.idotvinculada;
+          const numcp = item.numcp ?? item.NumCp ?? item.Numcp;
+          console.log('[OR seleccionada] item recibido:', item, '→ id:', id, 'numcp:', numcp);
+          this.orVinculada = { idordentrabajo: id, numcp };
+        }
+      });
+    };
+
+    if (criterio.length >= 3) {
+      this.recojoService.buscarOrPorNumcp(criterio).subscribe(resultados => abrirModal(resultados));
+    } else {
+      const idCliente = this.form.get('idcliente')?.value;
+      if (!idCliente) {
+        this.messageService.add({
+          severity: 'warn',
+          summary: 'Búsqueda',
+          detail: 'Seleccione un cliente para buscar ORs pendientes.',
+        });
+        return;
+      }
+      this.recojoService.getOtsPendientesRecepcionCreacionOt(idCliente).subscribe(resultados => abrirModal(resultados));
+    }
+  }
+
   realizarAsignaciones(): void {
     this.form.patchValue({ idcliente: 60
       , idorigen : 1
@@ -290,8 +334,11 @@ export class CrearotComponent implements OnInit {
 
   registrar() {
 
-   
-    
+    this.orTouched = true;
+
+    if (!this.sinRecojo && !this.orVinculada) {
+      return;
+    }
 
     if (this.form.valid) {
      
@@ -302,14 +349,15 @@ export class CrearotComponent implements OnInit {
       }));
 
       // Implementa la lógica de registro aquí.
-      this.model = { 
+      this.model = {
         ...this.form.value, // Asignar todos los valores del formulario al modelo
         responsablecomercialid: this.user.id,
         tipoorden: 1,
         idestacionorigen: this.user.idestacionorigen,
         idusuarioregistro: this.user.id,
         etiquetas: [...this.etiquetas], // Agregar las etiquetas actualizadas al modelo
-        guiasremitente: guiasRemitenteDto // Enviar como List<GuiaGrrDto>
+        guiasremitente: guiasRemitenteDto, // Enviar como List<GuiaGrrDto>
+        idotvinculada: this.orVinculada?.idordentrabajo ?? null
     };
 
 
@@ -440,32 +488,38 @@ else {
        this.mismodestinatario = true;
    
        this.cargarFormula(); // Llamar a la función que necesitas
-
+       this.mostrarResumenPorClienteYOrigenSiAplica();
 
     }
-    onOrigenChange(idOrigen: number) {
-      this.cargarFormula(); // sigue ejecutando tu lógica actual
-    
-       const distritosConDialog = [1, 42, 44];
 
-     
-       if (distritosConDialog.includes(idOrigen)) return; // 🔒 bloquea
-      
-      const idCliente = this.form.get('idcliente')?.value; // Obtener el valor del idcliente desde el formulario
-      const idDestino = this.form.get('iddestino')?.value; // Obtener el valor del idcliente desde el formulario
-    
-      if (idCliente && idOrigen) {
-        this.ordenTransporteService.obtenerResumenPorClienteYOrigen(idCliente, idOrigen)
-          .subscribe(ordenes => {
-            if (ordenes.length > 0) {
-              this.dialogService.open(DialogOrdenResumenComponent, {
-                header: 'OTRs con origen similar',
-                width: '70%',
-                data: { ordenes }
-              });
-            }
-          });
+    /**
+     * GET por-cliente-origen: al tener cliente y origen, consulta OTR similares (misma regla de distritos que al cambiar origen).
+     * @param idOrigenOverride valor recién elegido en el dropdown (evita desfase con el formulario)
+     */
+    private mostrarResumenPorClienteYOrigenSiAplica(idOrigenOverride?: number): void {
+      const idCliente = this.form.get('idcliente')?.value;
+      const idOrigen = idOrigenOverride ?? this.form.get('idorigen')?.value;
+      if (!idCliente || !idOrigen) {
+        return;
       }
+      const distritosSinDialog = [1, 42, 44];
+      if (distritosSinDialog.includes(idOrigen)) {
+        return;
+      }
+      this.ordenTransporteService.obtenerResumenPorClienteYOrigen(idCliente, idOrigen).subscribe((ordenes) => {
+        if (ordenes.length > 0) {
+          this.dialogService.open(DialogOrdenResumenComponent, {
+            header: 'OTRs con origen similar',
+            width: '70%',
+            data: { ordenes },
+          });
+        }
+      });
+    }
+
+    onOrigenChange(idOrigen: number) {
+      this.cargarFormula();
+      this.mostrarResumenPorClienteYOrigenSiAplica(idOrigen);
     }
     
 
@@ -580,7 +634,7 @@ else {
     }
 
     this.mostrarTablaGuias = true;
-    this.dialogGrr = false;
+    this.model.guiaInicial = '';
 
     this.messageService.add({
       severity: 'success',

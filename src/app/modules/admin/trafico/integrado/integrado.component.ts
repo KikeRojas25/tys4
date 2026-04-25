@@ -13,6 +13,11 @@ import { DialogService, DynamicDialogRef } from 'primeng/dynamicdialog';
 import { TraficoService } from '../trafico.service';
 import { User } from '../trafico.types';
 import { ModalOtEstacionComponent } from './modal-ot-estacion.component';
+import { ModalRecojoEstacionComponent } from './modal-recojo-estacion.component';
+import { ModalRecepcionEstacionComponent } from './modal-recepcion-estacion.component';
+import { ModalManifiestoEstacionComponent } from './modal-manifiesto-estacion.component';
+import { ModalEntregaLocalEstacionComponent } from './modal-entrega-local-estacion.component';
+import { ModalPendienteCargoEstacionComponent } from './modal-pendiente-cargo-estacion.component';
 import { catchError, forkJoin, of } from 'rxjs';
 declare var $: any;
 
@@ -48,6 +53,11 @@ export class IntegradoComponent implements OnInit {
     model: any = {};
     selectedOrden: any;
     ref: DynamicDialogRef | undefined;
+    resumenRecepcionMap = new Map<number, any>();
+    resumenRecojoMap = new Map<number, any>();
+    resumenEntregaLocalMap = new Map<number, any>();
+    resumenPendienteCargoMap = new Map<number, any>();
+    resumenEnvioCargoMap = new Map<number, any>();
 
     // Mapeo de estados según la columna (según stored procedure)
     estadosMap: { [key: string]: number | number[] } = {
@@ -57,7 +67,8 @@ export class IntegradoComponent implements OnInit {
         'recojo': 11, // Nota: también requiere idtipooperacion = 123
         'enreparto': 13,
         'recabarcargo': 34,
-        'enviocargo': 35
+        'enviocargo': 35,
+        'entrega_local': [6, 7, 8, 9, 10]
     };
 
     constructor(
@@ -82,12 +93,10 @@ export class IntegradoComponent implements OnInit {
             { header: 'F. DESPACHO', field: 'fechaDespacho', width: '80px' },
             { header: 'ORIGEN', field: 'origen', width: '90px' },
             { header: 'DESTINO', field: 'destino', width: '90px' },
-
             { header: '#OTS', field: 'cantidad', width: '50px' },
             { header: 'BULTOS', field: 'bulto', width: '50px' },
             { header: 'PESO', field: 'peso', width: '50px' },
             { header: 'VOL', field: 'volumen', width: '50px' },
-
             { header: 'TOTAL', field: 'total', width: '80px' },
             { header: 'CERRADOS', field: 'cerrados', width: '80px' },
             { header: 'AVANCE', field: 'volumen', width: '80px' },
@@ -100,18 +109,14 @@ export class IntegradoComponent implements OnInit {
             { header: '#OTS', field: 'cantidad', width: '60px' },
             { header: 'PESO', field: 'peso', width: '60px' },
             { header: 'BULTOS', field: 'bulto', width: '60px' },
-
             { header: '#OTS', field: 'cantidad', width: '60px' },
             { header: 'PESO', field: 'peso', width: '60px' },
             { header: 'BULTOS', field: 'bulto', width: '60px' },
-
             { header: '#OTS', field: 'cantidad', width: '60px' },
             { header: 'PESO', field: 'peso', width: '60px' },
             { header: 'BULTOS', field: 'bulto', width: '60px' },
-
             { header: '#OTS', field: 'cantidad', width: '60px' },
             { header: '#OTS', field: 'cantidad', width: '60px' },
-
             { header: 'OTS', field: 'observadas', width: '80px' }, // 👈 Nueva columna
             { header: 'MANIFIESTOS', field: 'observadas', width: '80px' }, // 👈 Nueva columna
         ];
@@ -145,6 +150,8 @@ export class IntegradoComponent implements OnInit {
         this.reload();
     }
     reload() {
+
+        
         this.traficoService.VerHojasRutaTrocal(this.model).subscribe((list) => {
             this.ordenes = list;
             setTimeout(() => {
@@ -152,6 +159,8 @@ export class IntegradoComponent implements OnInit {
             }, 100); 
          
         });
+
+
         this.traficoService
             .VerDespachosxDepartamentoxProveedor(this.model)
             .subscribe((list) => {
@@ -160,33 +169,46 @@ export class IntegradoComponent implements OnInit {
             });
      
 
-        // ordenes3 = base (por estación) + recepcion (lógica separada)
+        // ordenes3 = base (por estación) + recepción + recojo del SP (mergeados por idestacion)
         forkJoin({
             base: this.traficoService.VerDespachosxDepartamentoxEstacion(this.model),
-            recepcion: this.traficoService.GetPendienteRecepcionPorEstacion().pipe(
-                catchError(() => of([] as any[]))
-            ),
-        }).subscribe(({ base, recepcion }) => {
-            const recepcionMap = new Map<number, any>();
+            recepcion: this.traficoService.GetResumenOrdenesRecepcion().pipe(catchError(() => of([] as any[]))),
+            recojo: this.traficoService.GetResumenRecojoXEstacion().pipe(catchError(() => of([] as any[]))),
+            entregaLocal: this.traficoService.GetResumenOrdenesxEntregaLocal().pipe(catchError(() => of([] as any[]))),
+            pendienteCargo: this.traficoService.GetResumenPendienteCargo().pipe(catchError(() => of([] as any[]))),
+            envioCargo: this.traficoService.GetResumenEnvioCargo().pipe(catchError(() => of([] as any[]))),
+        }).subscribe(({ base, recepcion, recojo, entregaLocal, pendienteCargo, envioCargo }) => {
+            this.resumenRecepcionMap = new Map<number, any>();
             (recepcion ?? []).forEach((r: any) => {
-                // El endpoint nuevo viene como idEstacion (camelCase), el resto usa idestacion.
-                const key = Number(r?.idestacion ?? r?.idEstacion);
-                if (Number.isFinite(key)) recepcionMap.set(key, r);
+                const key = Number(r?.idEstacion ?? r?.idestacion);
+                if (Number.isFinite(key)) this.resumenRecepcionMap.set(key, r);
             });
 
-            this.ordenes3 = (base ?? []).map((row: any) => {
-                const key = Number(row?.idestacion);
-                const r = Number.isFinite(key) ? recepcionMap.get(key) : undefined;
-                return {
-                    ...row,
-                    // Reemplazar solo métricas de recepción con el endpoint nuevo (fallback 0)
-                    cantidad_recepcion: r?.cantidad_recepcion ?? 0,
-                    peso_recepcion: r?.peso_recepcion ?? 0,
-                    bulto_recepcion: r?.bulto_recepcion ?? 0,
-                };
+            this.resumenRecojoMap = new Map<number, any>();
+            (recojo ?? []).forEach((r: any) => {
+                const key = Number(r?.idEstacion ?? r?.idestacion);
+                if (Number.isFinite(key)) this.resumenRecojoMap.set(key, r);
             });
 
-            console.log({ recepcion, ordenes3: this.ordenes3 }, 'merge-recepcion');
+            this.resumenEntregaLocalMap = new Map<number, any>();
+            (entregaLocal ?? []).forEach((r: any) => {
+                const key = Number(r?.idEstacion ?? r?.idestacion);
+                if (Number.isFinite(key)) this.resumenEntregaLocalMap.set(key, r);
+            });
+
+            this.resumenPendienteCargoMap = new Map<number, any>();
+            (pendienteCargo ?? []).forEach((r: any) => {
+                const key = Number(r?.idEstacion ?? r?.idestacion);
+                if (Number.isFinite(key)) this.resumenPendienteCargoMap.set(key, r);
+            });
+
+            this.resumenEnvioCargoMap = new Map<number, any>();
+            (envioCargo ?? []).forEach((r: any) => {
+                const key = Number(r?.idEstacion ?? r?.idestacion);
+                if (Number.isFinite(key)) this.resumenEnvioCargoMap.set(key, r);
+            });
+
+            this.ordenes3 = base ?? [];
         });
     }
 
@@ -216,6 +238,96 @@ export class IntegradoComponent implements OnInit {
             this.router.navigate(['/trafico/vistarepartidor', idproveedor, iddepartamento]);
 
 
+    }
+
+    verDetalleRecepcion(rowData: any) {
+        const entrada = this.resumenRecepcionMap.get(rowData.idestacion);
+        const idProvincia = entrada?.idprovincia ?? entrada?.Idprovincia ?? null;
+        const titulo = 'Recepción - ' + rowData.estacion;
+
+        this.ref = this.dialogService.open(ModalRecepcionEstacionComponent, {
+            header: titulo,
+            width: '90%',
+            modal: true,
+            closable: true,
+            dismissableMask: true,
+            data: { idProvincia, titulo }
+        });
+    }
+
+    verDetalleEnvioCargo(rowData: any) {
+        const entrada = this.resumenEnvioCargoMap.get(rowData.idestacion);
+        const idProvincia = entrada?.idprovincia ?? entrada?.Idprovincia ?? null;
+        const titulo = 'Enviar Cargos - ' + rowData.estacion;
+
+        this.ref = this.dialogService.open(ModalPendienteCargoEstacionComponent, {
+            header: titulo,
+            width: '90%',
+            modal: true,
+            closable: true,
+            dismissableMask: true,
+            data: { idProvincia, titulo, tipo: 'enviocargo' }
+        });
+    }
+
+    verDetallePendienteCargo(rowData: any) {
+        const entrada = this.resumenPendienteCargoMap.get(rowData.idestacion);
+        const idProvincia = entrada?.idprovincia ?? entrada?.Idprovincia ?? null;
+        const titulo = 'Recabar Cargos - ' + rowData.estacion;
+
+        this.ref = this.dialogService.open(ModalPendienteCargoEstacionComponent, {
+            header: titulo,
+            width: '90%',
+            modal: true,
+            closable: true,
+            dismissableMask: true,
+            data: { idProvincia, titulo }
+        });
+    }
+
+    verDetalleEntregaLocal(rowData: any) {
+        const entrada = this.resumenEntregaLocalMap.get(rowData.idestacion);
+        const idProvincia = entrada?.idprovincia ?? entrada?.Idprovincia ?? null;
+        const titulo = 'Entrega - ' + rowData.estacion;
+
+        this.ref = this.dialogService.open(ModalEntregaLocalEstacionComponent, {
+            header: titulo,
+            width: '90%',
+            modal: true,
+            closable: true,
+            dismissableMask: true,
+            data: { idProvincia, titulo }
+        });
+    }
+
+    verDetalleManifiestosRecepcion(rowData: any) {
+        const entrada = this.resumenRecepcionMap.get(rowData.idestacion);
+        const idProvincia = entrada?.idprovincia ?? entrada?.Idprovincia ?? null;
+        const titulo = 'Manifiestos en Recepción - ' + rowData.estacion;
+
+        this.ref = this.dialogService.open(ModalManifiestoEstacionComponent, {
+            header: titulo,
+            width: '90%',
+            modal: true,
+            closable: true,
+            dismissableMask: true,
+            data: { idProvincia, titulo }
+        });
+    }
+
+    verDetalleRecojo(rowData: any) {
+        const entrada = this.resumenRecojoMap.get(rowData.idestacion);
+        const idProvincia = entrada?.idprovincia ?? entrada?.Idprovincia ?? null;
+        const titulo = 'Recojo - ' + rowData.estacion;
+
+        this.ref = this.dialogService.open(ModalRecojoEstacionComponent, {
+            header: titulo,
+            width: '90%',
+            modal: true,
+            closable: true,
+            dismissableMask: true,
+            data: { idProvincia, titulo }
+        });
     }
 
     verDetalleOT(idestacion: number, tipoColumna: string, titulo: string) {

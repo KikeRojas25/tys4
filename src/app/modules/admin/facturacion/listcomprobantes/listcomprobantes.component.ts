@@ -74,7 +74,16 @@ export class ListcomprobantesComponent implements OnInit {
     this.cargarUsuario();
     this.cargarClientes();
     this.cargarEstados();
+    this.inicializarFechas();
     this.buscar();
+  }
+
+  inicializarFechas(): void {
+    const hoy = new Date();
+    const hace3Meses = new Date();
+    hace3Meses.setMonth(hoy.getMonth() - 3);
+    this.model.fechafin = hoy;
+    this.model.fechainicio = hace3Meses;
   }
 
   cargarUsuario(): void {
@@ -103,21 +112,12 @@ export class ListcomprobantesComponent implements OnInit {
   }
 
   cargarEstados(): void {
-    // Cargar estados desde valorTabla (ajustar el ID según corresponda)
-    this.mantenimientoService.getValorTabla(1).subscribe({
-      next: (estados) => {
-        this.estados = [{ label: 'Todos los estados', value: null }];
-        estados.forEach((estado) => {
-          this.estados.push({
-            label: estado.valor,
-            value: estado.idValorTabla 
-          });
-        });
-      },
-      error: (error) => {
-        console.error('Error al cargar estados:', error);
-      }
-    });
+    this.estados = [
+      { label: 'Todos los estados', value: null },
+      { label: 'Pend Facturar',     value: 22 },
+      { label: 'Facturado',         value: 23 },
+      { label: 'Anulado',           value: 24 }
+    ];
   }
 
   inicializarColumnas(): void {
@@ -139,8 +139,10 @@ export class ListcomprobantesComponent implements OnInit {
     this.loading = true;
     const idCliente = this.model.idcliente || null;
     const idEstado = this.model.idestado || null;
+    const fechainicio = this.model.fechainicio || null;
+    const fechafin = this.model.fechafin || null;
 
-    this.facturacionService.listarComprobantes(idCliente, idEstado).subscribe({
+    this.facturacionService.listarComprobantes(idCliente, idEstado, fechainicio, fechafin).subscribe({
       next: (comprobantes: ComprobanteResult[]) => {
         this.comprobantes = comprobantes;
         this.filteredComprobantes = [...this.comprobantes];
@@ -160,6 +162,7 @@ export class ListcomprobantesComponent implements OnInit {
 
   limpiarFiltros(): void {
     this.model = {};
+    this.inicializarFechas();
     this.buscar();
   }
 
@@ -180,6 +183,36 @@ export class ListcomprobantesComponent implements OnInit {
       severity: 'info',
       summary: 'Exportar',
       detail: `Exportar comprobante ${comprobante.numeroComprobante}`
+    });
+  }
+
+  anular(comprobante: ComprobanteResult): void {
+    this.confirmationService.confirm({
+      message: `¿Está seguro de anular el comprobante <strong>${comprobante.numeroComprobante}</strong>?<br>Se limpiarán los datos de facturación en todas las órdenes vinculadas.`,
+      header: 'Confirmar Anulación',
+      icon: 'pi pi-exclamation-triangle',
+      acceptLabel: 'Sí, anular',
+      rejectLabel: 'Cancelar',
+      acceptButtonStyleClass: 'p-button-danger',
+      accept: () => {
+        this.facturacionService.deleteComprobante(comprobante.idComprobantePago).subscribe({
+          next: () => {
+            this.messageService.add({
+              severity: 'success',
+              summary: 'Anulado',
+              detail: `Comprobante ${comprobante.numeroComprobante} anulado correctamente`
+            });
+            this.buscar();
+          },
+          error: (error) => {
+            this.messageService.add({
+              severity: 'error',
+              summary: 'Error',
+              detail: error?.error?.message || 'No se pudo anular el comprobante'
+            });
+          }
+        });
+      }
     });
   }
 }

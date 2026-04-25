@@ -281,12 +281,17 @@ export const appRoutes: Route[] = [
                     loadComponent: () => import('./modules/admin/planning/despachos-generados/despachos-generados.component')
                                           .then(m => m.DespachosGeneradosComponent)
                   },
-
-
-                  
-
-                  
-                 
+                  {
+                    path: 'estacion',
+                    loadComponent: () => import('./modules/admin/planning/estacion/estacion.component')
+                                          .then(m => m.PlanningEstacionComponent)
+                  },
+                  {
+                    path: 'leadtime-operativo',
+                    data: { mode: 'operativo' },
+                    loadComponent: () => import('./modules/admin/comercial/leadtimes/list/list.component')
+                                          .then(m => m.ListComponent)
+                  },
                 ]
               },
 
@@ -303,6 +308,13 @@ export const appRoutes: Route[] = [
                       {
                         path: '',
                         pathMatch: 'full',
+                        data: { mode: 'comercial' },
+                        loadComponent: () => import('./modules/admin/comercial/leadtimes/list/list.component')
+                                              .then(m => m.ListComponent)
+                      },
+                      {
+                        path: 'operativo',
+                        data: { mode: 'operativo' },
                         loadComponent: () => import('./modules/admin/comercial/leadtimes/list/list.component')
                                               .then(m => m.ListComponent)
                       }
@@ -436,7 +448,12 @@ export const appRoutes: Route[] = [
                     loadComponent: () => import('./modules/admin/despacho/recepcionar-ordentransporte/recepcionar-ordentransporte.component')
                                           .then(m => m.RecepcionarOrdentransporteComponent)
                   },
-                 
+                  {
+                    path: 'estacion',
+                    loadComponent: () => import('./modules/admin/planning/estacion/estacion.component')
+                                          .then(m => m.PlanningEstacionComponent)
+                  },
+
                 ]
               },
               {
@@ -520,15 +537,19 @@ export const appRoutes: Route[] = [
                     loadComponent: () => import('./modules/admin/mantenimiento/tarifa/tarifa.component')
                                   .then(m => m.TarifaComponent),
                                   children: [
-                                    {  
+                                    {
                                       path: 'list',
                                       loadComponent: () => import('./modules/admin/mantenimiento/tarifa/list/list.component')
                                                             .then(m => m.ListComponent),
                                     },
-                                 
                      ]
                   },
-                 
+                  {
+                    path: 'tarifa-ajustes',
+                    loadComponent: () => import('./modules/admin/mantenimiento/tarifa-ajustes/tarifa-ajustes.component')
+                                        .then(m => m.TarifaAjustesComponent),
+                  },
+
                 ]
               },
                {
@@ -583,6 +604,11 @@ export const appRoutes: Route[] = [
                   path: 'editar/:id',
                   loadComponent: () => import('./modules/admin/facturacion/editarpreliquidacion/editarpreliquidacion.component')
                                         .then(m => m.EditarpreliquidacionComponent)
+                },
+                {
+                  path: 'listadodocumentos',
+                  loadComponent: () => import('./modules/admin/facturacion/listadodocumentos/listadodocumentos.component')
+                                        .then(m => m.ListadodocumentosComponent)
                 }
               ]
             },

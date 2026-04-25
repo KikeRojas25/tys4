@@ -102,7 +102,8 @@ export class ComprasService {
 
   getDetallesLiquidados(
     fechaInicio?: Date | string | null,
-    fechaFin?: Date | string | null
+    fechaFin?: Date | string | null,
+    tipo?: string | null
   ): Observable<DetalleLiquidadoResult[]> {
     let params = new HttpParams();
 
@@ -111,6 +112,9 @@ export class ComprasService {
     }
     if (fechaFin) {
       params = params.set('fechaFin', this.toQueryDate(fechaFin));
+    }
+    if (tipo) {
+      params = params.set('tipo', tipo);
     }
 
     return this._httpClient.get<DetalleLiquidadoResult[]>(
@@ -148,6 +152,20 @@ export class ComprasService {
   deleteLiquidacion(id: number): Observable<void> {
     return this._httpClient.delete<void>(
       `${this.baseUrl}liquidaciones/${id}`,
+      this.getHttpOptions()
+    );
+  }
+
+  getLiquidacionesByMaster(idMasterLiquidacion: number): Observable<LiquidacionCajaDto[]> {
+    return this._httpClient.get<LiquidacionCajaDto[]>(
+      `${this.baseUrl}master-liquidaciones/${idMasterLiquidacion}/liquidaciones`,
+      this.getHttpOptions()
+    );
+  }
+
+  deleteMasterLiquidacion(idMasterLiquidacion: number): Observable<void> {
+    return this._httpClient.delete<void>(
+      `${this.baseUrl}master-liquidaciones/${idMasterLiquidacion}`,
       this.getHttpOptions()
     );
   }

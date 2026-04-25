@@ -90,6 +90,8 @@ export interface DetalleLiquidadoResult {
   idconcepto?: number | null;
   concepto?: string | null;
   fechaliquidacion?: string | Date | null;
+  destino?: string | null;
+  cliente?: string | null;
 }
 
 export interface MasterLiquidacionResult {

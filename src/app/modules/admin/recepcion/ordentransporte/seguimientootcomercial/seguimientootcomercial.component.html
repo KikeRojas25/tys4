@@ -189,7 +189,7 @@
         <ng-template pTemplate="header" let-columns>
           <tr class="bg-gray-800 text-white">
             <th style="white-space: normal; word-wrap: break-word;" *ngFor="let col of columns; let i = index" [pSortableColumn]="col.field" 
-                [ngClass]="{'text-left': i === 1, 'text-left': i !== 1}" 
+                [ngClass]="{'text-left': i === 1, 'text-right': i !== 1}" 
                 class="px-4 py-3 text-sm font-semibold text-gray-100 border-b border-gray-700">
               {{ col.header }}
             </th>

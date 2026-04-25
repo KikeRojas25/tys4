@@ -48,7 +48,13 @@ export const authInterceptor = (
     return next(newReq).pipe(
         catchError((error) => {
             // Catch "401 Unauthorized" responses
-            if (error instanceof HttpErrorResponse && error.status === 401) {
+            // Excluir el endpoint de login: esos 401 deben llegar al componente
+            // para mostrar el mensaje de error en pantalla (credenciales incorrectas, usuario bloqueado, etc.)
+            if (
+                error instanceof HttpErrorResponse &&
+                error.status === 401 &&
+                !req.url.includes('/auth/login')
+            ) {
                 // Sign out
                 authService.signOut();
 

@@ -157,18 +157,21 @@
             </td>
 
           <td class="text-center">{{rowData.cantidad_recepcion}}</td>
+           <td class="text-center">{{rowData.peso_recepcion | number:'1.0-0'}}</td>
           <td class="text-center">{{rowData.bulto_recepcion}}</td>
-          <td class="text-center">{{rowData.peso_recepcion | number:'1.0-0'}}</td>
+
 
 
           <td class="text-center">{{rowData.cantidad_recojo}}</td>
-          <td class="text-center">{{rowData.bulto_recojo}}</td>
           <td class="text-center">{{rowData.peso_recojo | number:'1.0-0'}}</td>
+          <td class="text-center">{{rowData.bulto_recojo}}</td>
+
 
 
           <td class="text-center">{{rowData.cantidad_enreparto}}</td>
+                    <td class="text-center">{{rowData.peso_enreparto | number:'1.0-0'}}</td>
           <td class="text-center">{{rowData.bulto_enreparto}}</td>
-          <td class="text-center">{{rowData.peso_enreparto | number:'1.0-0'}}</td>
+
 
           <td class="text-center">{{rowData.cantidad_recabarcargo}}</td>
           <td class="text-center">{{rowData.cantidad_enviocargo}}</td> 
@@ -210,179 +213,211 @@
           [rows]="20"  [responsive]="true">
 
 
-<ng-template pTemplate="header" let-columns>
-  <tr>
-    <!-- Encabezado superior -->
-    <th colspan="1" style="text-align:center; color:white; background-color:#1E88E5;">GENERAL</th>
+            <ng-template pTemplate="header" let-columns>
+              <tr>
+                <!-- Encabezado superior -->
+                <th colspan="1" style="text-align:center; color:white; background-color:#1E88E5;">GENERAL</th>
+                <th colspan="2" style="text-align:center; color:white; background-color:#FBC02D;">
+                  PENDIENTE DE RECEPCIÓN
+                </th>
+                <th colspan="1" style="text-align:center; color:white; background-color:#0288D1;">
+                  RECOJO
+                </th>
+                <th colspan="3" style="text-align:center; color:white; background-color:#F57C00;">
+                  PENDIENTE DE PROGRAMAR
+                </th>
+                <th colspan="3" style="text-align:center; color:white; background-color:#6A1B9A;">
+                  PENDIENTE DE DESPACHO
+                </th>
+                <th colspan="3" style="text-align:center; color:white; background-color:#03A9F4;">
+                  ENTREGA (LOCAL)
+                </th>
+                <th colspan="3" style="text-align:center; color:white; background-color:#B3E5FC;">
+                  RECABAR CARGOS
+                </th>
+                <th colspan="3" style="text-align:center; color:white; background-color:#00796B;">
+                  ENVIAR CARGOS
+                </th>
 
-    <th colspan="3" style="text-align:center; color:white; background-color:#6A1B9A;">
-      PENDIENTE DE DESPACHO
-    </th>
+              <!-- Encabezado inferior -->
+              <tr>
 
-    <th colspan="3" style="text-align:center; color:white; background-color:#F57C00;">
-      PENDIENTE DE PROGRAMAR
-    </th>
+                <th>Estación</th>
 
+                <th>Manifiestos</th>
+                <th>OTs</th>
 
+                <th>OTs</th>
 
- 
+                <th>#OTs</th>
+                <th>Peso</th>
+                <th>Bultos</th>
 
-    <th colspan="3" style="text-align:center; color:white; background-color:#FBC02D;">
-      RECEPCIÓN
-    </th>
+                <th>#OTs</th>
+                <th>Peso</th>
+                <th>Bultos</th>
 
-    <th colspan="3" style="text-align:center; color:white; background-color:#0288D1;">
-      RECOJO
-    </th>
+                <th>#OTs</th>
+                <th>Peso</th>
+                <th>Bultos</th>
 
-    <th colspan="3" style="text-align:center; color:white; background-color:#03A9F4;">
-      ENTREGA
-    </th>
+                <th>#OTs</th>
+                <th>Peso</th>
+                <th>Bultos</th>
+                <th>#OTs</th>
+                <th>Peso</th>
+                <th>Bultos</th>
+              </tr>
+            </ng-template>
 
-    <th colspan="1" style="text-align:center; color:white; background-color:#B3E5FC;">
-      RECABAR CARGOS
-    </th>
-
-    <th colspan="1" style="text-align:center; color:white; background-color:#00796B;">
-      ENVIAR CARGOS
-    </th>
-
-    <!-- <th colspan="2" style="text-align:center; color:white; background-color:#790E00;">
-      OBSERVADAS
-    </th> -->
-  </tr>
-
-  <!-- Encabezado inferior -->
-  <tr>
-
-    <th>Estación</th>
-    <!-- <th>Proveedor</th> -->
-
-    <th>#OTs</th>
-    <th>Peso</th>
-    <th>Bultos</th>
-
-    <th>#OTs</th>
-    <th>Peso</th>
-    <th>Bultos</th>
-
-    <th>#OTs</th>
-    <th>Peso</th>
-    <th>Bultos</th>
-
-    <th>#OTs</th>
-    <th>Peso</th>
-    <th>Bultos</th>
-
-    <th>#OTs</th>
-    <th>Peso</th>
-    <th>Bultos</th>
-
-
-    <th>Recabar</th>
-    <th>Enviar</th>
-    <!-- <th>Obs1</th>
-    <th>Obs2</th> -->
-  </tr>
-</ng-template>
-
- <ng-template pTemplate="body" let-rowData>
-  <tr>
-    <!-- <td class="text-center">
-      <p-button icon="pi pi-search" severity="info"
-        (click)="verEstacion(rowData.idproveedor, rowData.iddepartamento)"
-        size="small"></p-button>
-    </td> -->
-    <td class="text-left">{{ rowData.estacion }}</td>
-    <!-- <td class="text-left">{{ rowData.repartidor }}</td> -->
+            <ng-template pTemplate="body" let-rowData>
+              <tr>
+                <!-- <td class="text-center">
+                  <p-button icon="pi pi-search" severity="info"
+                    (click)="verEstacion(rowData.idproveedor, rowData.iddepartamento)"
+                    size="small"></p-button>
+                </td> -->
+                <td class="text-left">{{ rowData.estacion }}</td>
+                <!-- <td class="text-left">{{ rowData.repartidor }}</td> -->
 
 
-        <!-- Pendiente de Despacho -->
-        <td class="text-center">
-          <a *ngIf="rowData.cantidad_pendiente_despacho > 0" 
-             (click)="verDetalleOT(rowData.idestacion, 'pendiente_despacho', 'Pendiente de Despacho - ' + rowData.estacion)"
-             class="text-blue-600 hover:text-blue-800 underline cursor-pointer">
-            {{rowData.cantidad_pendiente_despacho}}
-          </a>
-          <span *ngIf="rowData.cantidad_pendiente_despacho === 0 || !rowData.cantidad_pendiente_despacho">{{rowData.cantidad_pendiente_despacho || 0}}</span>
-        </td>
-        <td class="text-center">{{rowData.peso_pendiente_despacho}}</td>
-        <td class="text-center">{{rowData.bulto_pendiente_despacho}}</td>
+                    <!-- Recepción -->
+                    <td class="text-center">
+                      <ng-container *ngIf="resumenRecepcionMap.get(rowData.idestacion) as r">
+                        <a *ngIf="r.cantidadManifiestos > 0"
+                          (click)="verDetalleManifiestosRecepcion(rowData)"
+                          class="text-blue-600 hover:text-blue-800 underline cursor-pointer">
+                          {{ r.cantidadManifiestos }}
+                        </a>
+                        <span *ngIf="!r.cantidadManifiestos || r.cantidadManifiestos === 0">0</span>
+                      </ng-container>
+                      <span *ngIf="!resumenRecepcionMap.get(rowData.idestacion)">0</span>
+                    </td>
+                    <td class="text-center">
+                      <ng-container *ngIf="resumenRecepcionMap.get(rowData.idestacion) as r">
+                        <a *ngIf="r.cantidadOTs > 0"
+                          (click)="verDetalleRecepcion(rowData)"
+                          class="text-blue-600 hover:text-blue-800 underline cursor-pointer">
+                          {{ r.cantidadOTs }}
+                        </a>
+                        <span *ngIf="!r.cantidadOTs || r.cantidadOTs === 0">0</span>
+                      </ng-container>
+                      <span *ngIf="!resumenRecepcionMap.get(rowData.idestacion)">0</span>
+                    </td>
 
 
 
-
-    <!-- Pendiente de Programar -->
-    <td class="text-center">
-      <a *ngIf="rowData.cantidad_pendiente_programar > 0" 
-         (click)="verDetalleOT(rowData.idestacion, 'pendiente_programar', 'Pendiente de Programar - ' + rowData.estacion)"
-         class="text-blue-600 hover:text-blue-800 underline cursor-pointer">
-        {{rowData.cantidad_pendiente_programar}}
-      </a>
-      <span *ngIf="rowData.cantidad_pendiente_programar === 0 || !rowData.cantidad_pendiente_programar">{{rowData.cantidad_pendiente_programar || 0}}</span>
-    </td>
-    <td class="text-center">{{rowData.peso_pendiente_programar}}</td>
-    <td class="text-center">{{rowData.bulto_pendiente_programar}}</td>
+                    
 
 
+                <!-- Recojo -->
+                <td class="text-center">
+                  <ng-container *ngIf="resumenRecojoMap.get(rowData.idestacion) as r">
+                    <a *ngIf="r.cantidadOTs > 0"
+                      (click)="verDetalleRecojo(rowData)"
+                      class="text-blue-600 hover:text-blue-800 underline cursor-pointer">
+                      {{ r.cantidadOTs }}
+                    </a>
+                    <span *ngIf="!r.cantidadOTs || r.cantidadOTs === 0">0</span>
+                  </ng-container>
+                  <span *ngIf="!resumenRecojoMap.get(rowData.idestacion)">0</span>
+                </td>
 
-    <!-- Recepción -->
-    <td class="text-center">
-      <a *ngIf="rowData.cantidad_recepcion > 0"
-         (click)="verDetalleOT(rowData.idestacion, 'recepcion', 'Recepción - ' + rowData.estacion)"
-         class="text-blue-600 hover:text-blue-800 underline cursor-pointer">
-        {{ rowData.cantidad_recepcion }}
-      </a>
-      <span *ngIf="rowData.cantidad_recepcion === 0 || !rowData.cantidad_recepcion">{{ rowData.cantidad_recepcion || 0 }}</span>
-    </td>
-    <td class="text-center">{{rowData.peso_recepcion}}</td>
-    <td class="text-center">{{rowData.bulto_recepcion}}</td>
 
-    <!-- Recojo -->
-    <td class="text-center">
-      <a *ngIf="rowData.cantidad_recojo > 0"
-         (click)="verDetalleOT(rowData.idestacion, 'recojo', 'Recojo - ' + rowData.estacion)"
-         class="text-blue-600 hover:text-blue-800 underline cursor-pointer">
-        {{ rowData.cantidad_recojo }}
-      </a>
-      <span *ngIf="rowData.cantidad_recojo === 0 || !rowData.cantidad_recojo">{{ rowData.cantidad_recojo || 0 }}</span>
-    </td>
-    <td class="text-center">{{rowData.peso_recojo}}</td>
-    <td class="text-center">{{rowData.bulto_recojo}}</td>
 
-    <!-- Entrega -->
-    <td class="text-center">
-      <a *ngIf="rowData.cantidad_enreparto > 0"
-         (click)="verDetalleOT(rowData.idestacion, 'enreparto', 'Entrega - ' + rowData.estacion)"
-         class="text-blue-600 hover:text-blue-800 underline cursor-pointer">
-        {{ rowData.cantidad_enreparto }}
-      </a>
-      <span *ngIf="rowData.cantidad_enreparto === 0 || !rowData.cantidad_enreparto">{{ rowData.cantidad_enreparto || 0 }}</span>
-    </td>
-    <td class="text-center">{{rowData.peso_enreparto}}</td>
-    <td class="text-center">{{rowData.bulto_enreparto}}</td>
 
-    <!-- Recabar / Enviar / Obs -->
-    <td class="text-center">
-      <a *ngIf="rowData.cantidad_recabarcargo > 0"
-         (click)="verDetalleOT(rowData.idestacion, 'recabarcargo', 'Recabar Cargos - ' + rowData.estacion)"
-         class="text-blue-600 hover:text-blue-800 underline cursor-pointer">
-        {{ rowData.cantidad_recabarcargo }}
-      </a>
-      <span *ngIf="rowData.cantidad_recabarcargo === 0 || !rowData.cantidad_recabarcargo">{{ rowData.cantidad_recabarcargo || 0 }}</span>
-    </td>
-    <td class="text-center">
-      <a *ngIf="rowData.cantidad_enviocargo > 0"
-         (click)="verDetalleOT(rowData.idestacion, 'enviocargo', 'Enviar Cargos - ' + rowData.estacion)"
-         class="text-blue-600 hover:text-blue-800 underline cursor-pointer">
-        {{ rowData.cantidad_enviocargo }}
-      </a>
-      <span *ngIf="rowData.cantidad_enviocargo === 0 || !rowData.cantidad_enviocargo">{{ rowData.cantidad_enviocargo || 0 }}</span>
-    </td>
-    <!-- <td class="text-center">{{rowData.cantidad_observadas}}</td>
-    <td class="text-center">{{rowData.cantidad_observadas}}</td> -->
-  </tr>
-</ng-template>
+
+
+                
+                <!-- Pendiente de Programar -->
+                <td class="text-center">
+                  <a *ngIf="rowData.cantidad_pendiente_programar > 0" 
+                    (click)="verDetalleOT(rowData.idestacion, 'pendiente_programar', 'Pendiente de Programar - ' + rowData.estacion)"
+                    class="text-blue-600 hover:text-blue-800 underline cursor-pointer">
+                    {{rowData.cantidad_pendiente_programar}}
+                  </a>
+                  <span *ngIf="rowData.cantidad_pendiente_programar === 0 || !rowData.cantidad_pendiente_programar">{{rowData.cantidad_pendiente_programar || 0}}</span>
+                </td>
+                <td class="text-center">{{rowData.peso_pendiente_programar}}</td>
+                <td class="text-center">{{rowData.bulto_pendiente_programar}}</td>
+
+                    <!-- Pendiente de Despacho -->
+                    <td class="text-center">
+                      <a *ngIf="rowData.cantidad_pendiente_despacho > 0" 
+                        (click)="verDetalleOT(rowData.idestacion, 'pendiente_despacho', 'Pendiente de Despacho - ' + rowData.estacion)"
+                        class="text-blue-600 hover:text-blue-800 underline cursor-pointer">
+                        {{rowData.cantidad_pendiente_despacho}}
+                      </a>
+                      <span *ngIf="rowData.cantidad_pendiente_despacho === 0 || !rowData.cantidad_pendiente_despacho">{{rowData.cantidad_pendiente_despacho || 0}}</span>
+                    </td>
+                    <td class="text-center">{{rowData.peso_pendiente_despacho}}</td>
+                    <td class="text-center">{{rowData.bulto_pendiente_despacho}}</td>
+
+
+
+
+
+
+
+
+                <!-- Entrega (desde SP entrega local) -->
+                <td class="text-center">
+                  <ng-container *ngIf="resumenEntregaLocalMap.get(rowData.idestacion) as r">
+                    <a *ngIf="r.cantidadOTs > 0"
+                      (click)="verDetalleEntregaLocal(rowData)"
+                      class="text-blue-600 hover:text-blue-800 underline cursor-pointer">
+                      {{ r.cantidadOTs }}
+                    </a>
+                    <span *ngIf="!r.cantidadOTs || r.cantidadOTs === 0">0</span>
+                  </ng-container>
+                  <span *ngIf="!resumenEntregaLocalMap.get(rowData.idestacion)">0</span>
+                </td>
+                <td class="text-center">
+                  {{ (resumenEntregaLocalMap.get(rowData.idestacion))?.pesoTotal | number:'1.0-2' }}
+                </td>
+                <td class="text-center">
+                  {{ (resumenEntregaLocalMap.get(rowData.idestacion))?.bultoTotal ?? 0 }}
+                </td>
+
+                <!-- Recabar Cargos -->
+                <td class="text-center">
+                  <ng-container *ngIf="resumenPendienteCargoMap.get(rowData.idestacion) as r">
+                    <a *ngIf="r.cantidadOTs > 0"
+                      (click)="verDetallePendienteCargo(rowData)"
+                      class="text-blue-600 hover:text-blue-800 underline cursor-pointer">
+                      {{ r.cantidadOTs }}
+                    </a>
+                    <span *ngIf="!r.cantidadOTs || r.cantidadOTs === 0">0</span>
+                  </ng-container>
+                  <span *ngIf="!resumenPendienteCargoMap.get(rowData.idestacion)">0</span>
+                </td>
+                <td class="text-center">
+                  {{ (resumenPendienteCargoMap.get(rowData.idestacion))?.totalPeso | number:'1.0-2' }}
+                </td>
+                <td class="text-center">
+                  {{ (resumenPendienteCargoMap.get(rowData.idestacion))?.totalBultos ?? 0 }}
+                </td>
+
+                <!-- Enviar Cargos -->
+                <td class="text-center">
+                  <ng-container *ngIf="resumenEnvioCargoMap.get(rowData.idestacion) as r">
+                    <a *ngIf="r.cantidadOTs > 0"
+                      (click)="verDetalleEnvioCargo(rowData)"
+                      class="text-blue-600 hover:text-blue-800 underline cursor-pointer">
+                      {{ r.cantidadOTs }}
+                    </a>
+                    <span *ngIf="!r.cantidadOTs || r.cantidadOTs === 0">0</span>
+                  </ng-container>
+                  <span *ngIf="!resumenEnvioCargoMap.get(rowData.idestacion)">0</span>
+                </td>
+                <td class="text-center">
+                  {{ (resumenEnvioCargoMap.get(rowData.idestacion))?.totalPeso | number:'1.0-2' }}
+                </td>
+                <td class="text-center">
+                  {{ (resumenEnvioCargoMap.get(rowData.idestacion))?.totalBultos ?? 0 }}
+                </td>
+              </tr>
+            </ng-template>
 
     </p-table>
   </p-panel>

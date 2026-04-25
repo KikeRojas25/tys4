@@ -24,7 +24,7 @@
       </div>
     </div>
 
-    <div class="flex items-center gap-2 mt-4 sm:mt-0">
+    <!-- <div class="flex items-center gap-2 mt-4 sm:mt-0">
       <button
         pButton
         type="button"
@@ -34,44 +34,59 @@
         [disabled]="loading"
         class="px-3 py-2 text-xs font-medium text-gray-700 bg-white border border-gray-300 hover:bg-gray-50 rounded transition-all duration-150">
       </button>
-    </div>
+    </div> -->
   </div>
 
   <!-- Contenido -->
   <div class="main-content container-fluid p-3">
     <div class="bg-white rounded-md border border-gray-200 overflow-hidden">
-      <div class="px-3 py-2 border-b border-gray-100 bg-gray-50 flex flex-col gap-2">
+      <div class="p-2 border-b border-gray-100">
         <!-- Filtros -->
-        <div class="grid grid-cols-1 md:grid-cols-12 gap-2 items-end">
-          <div class="md:col-span-3">
-            <label class="block text-xs font-medium text-gray-700 mb-1">Fecha inicio</label>
+        <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-5 gap-2">
+
+          <!-- Fecha inicio -->
+          <div class="flex flex-col">
+            <label class="mb-1">Fecha inicio:</label>
             <p-calendar [(ngModel)]="filtros.fechaInicio" [ngModelOptions]="{ standalone: true }"
-                        dateFormat="dd/mm/yy" class="w-full"></p-calendar>
+                        dateFormat="dd/mm/yy" appendTo="body"
+                        placeholder="Seleccione una fecha"
+                        [style]="{'width':'100%'}">
+            </p-calendar>
           </div>
-          <div class="md:col-span-3">
-            <label class="block text-xs font-medium text-gray-700 mb-1">Fecha fin</label>
+
+          <!-- Fecha fin -->
+          <div class="flex flex-col">
+            <label class="mb-1">Fecha fin:</label>
             <p-calendar [(ngModel)]="filtros.fechaFin" [ngModelOptions]="{ standalone: true }"
-                        dateFormat="dd/mm/yy" class="w-full"></p-calendar>
+                        dateFormat="dd/mm/yy" appendTo="body"
+                        placeholder="Seleccione una fecha"
+                        [style]="{'width':'100%'}">
+            </p-calendar>
           </div>
-          <div class="md:col-span-6 flex gap-2 justify-end">
+
+          <!-- Botón Buscar -->
+          <div class="flex flex-col mt-4">
             <button pButton type="button" icon="pi pi-search" label="Buscar" (click)="buscar()"
                     [disabled]="loading"
-                    class="px-3 py-2 text-xs font-medium text-white bg-gray-900 hover:bg-gray-800 rounded transition-all duration-150">
-            </button>
-            <button pButton type="button" icon="pi pi-filter-slash" label="Limpiar" (click)="limpiar()"
-                    [disabled]="loading"
-                    class="px-3 py-2 text-xs font-medium text-gray-700 bg-white border border-gray-300 hover:bg-gray-50 rounded transition-all duration-150">
+                    class="px-4 py-2.5 text-sm font-medium text-white bg-gray-700 hover:bg-gray-600 rounded-md shadow-sm transition-all duration-150">
             </button>
           </div>
+
+          <!-- Botón Limpiar -->
+          <div class="flex flex-col mt-4">
+            <button pButton type="button" icon="pi pi-filter-slash" label="Limpiar" (click)="limpiar()"
+                    [disabled]="loading"
+                    class="px-4 py-2.5 text-sm font-medium text-gray-700 bg-white border border-gray-300 hover:bg-gray-50 rounded-md shadow-sm transition-all duration-150">
+            </button>
+          </div>
+
         </div>
 
         <!-- Totales -->
-        <div class="text-xs text-gray-700">
+        <div class="text-xs text-gray-700 mt-2">
           <span class="font-medium">Registros:</span>
           <span class="ml-1">{{ totalRegistros }}</span>
-        </div>
-        <div class="text-xs text-gray-700">
-          <span class="font-medium">Total monto:</span>
+          <span class="ml-3 font-medium">Total monto:</span>
           <span class="ml-1 font-semibold text-gray-900">{{ totalMonto | number:'1.2-2' }}</span>
         </div>
       </div>
@@ -93,7 +108,7 @@
 
           <ng-template pTemplate="header">
             <tr class="bg-gray-800 text-white">
-              <th class="text-center px-2 py-3 text-sm font-semibold text-gray-100 border-b border-gray-700" style="width: 90px">ACC</th>
+              <th class="text-center px-2 py-3 text-sm font-semibold text-gray-100 border-b border-gray-700" style="width: 120px">ACC</th>
               <th class="text-center px-4 py-3 text-sm font-semibold text-gray-100 border-b border-gray-700" style="width: 170px">N° MASTER</th>
               <th class="text-center px-4 py-3 text-sm font-semibold text-gray-100 border-b border-gray-700" style="width: 150px">FECHA</th>
               <th class="text-center px-4 py-3 text-sm font-semibold text-gray-100 border-b border-gray-700" style="width: 180px">LIQUIDADOR</th>
@@ -106,13 +121,22 @@
           <ng-template pTemplate="body" let-row>
             <tr class="border-b border-gray-100 hover:bg-gray-50 transition-colors duration-150">
               <td class="text-center px-2 py-2">
-                <button
-                  pButton
-                  icon="pi pi-print"
-                  class="action-btn action-btn-neutral"
-                  (click)="reimprimir(row)"
-                  title="Reimprimir">
-                </button>
+                <div class="flex gap-1 justify-center items-center">
+                  <button
+                    pButton
+                    icon="pi pi-print"
+                    class="action-btn action-btn-neutral"
+                    (click)="reimprimir(row)"
+                    title="Reimprimir">
+                  </button>
+                  <button
+                    pButton
+                    icon="pi pi-trash"
+                    class="action-btn action-btn-danger"
+                    (click)="eliminar(row)"
+                    title="Eliminar y volver a pendiente">
+                  </button>
+                </div>
               </td>
               <td class="text-center px-4 py-3 text-gray-700 text-sm">{{ row.numeroMasterCaja }}</td>
               <td class="text-center px-4 py-3 text-gray-700 text-sm">{{ row.fechaLiquidacion | date:'dd/MM/yyyy' }}</td>
@@ -135,4 +159,6 @@
     </div>
   </div>
 </div>
+
+<p-confirmDialog header="Confirmación" icon="pi pi-exclamation-triangle"></p-confirmDialog>
 

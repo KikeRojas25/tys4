@@ -24,8 +24,10 @@ export interface User {
     
     usr_str_nombre: string;
     usr_str_apellidos: string;
+    usr_str_email?: string;
     idequipo: number;
-    
+    usr_int_bloqueado?: number;
+
 }
 
 export interface UserForUpdateDto {

@@ -50,6 +50,7 @@ export class PendientepreliquidacionComponent implements OnInit {
   // Dashboard stats
   cantidadSeleccionada: number = 0;
   totalSeleccionado: number = 0;
+  todosMarcados: boolean = false;
 
   constructor(
     private facturacionService: FacturacionService,
@@ -118,6 +119,7 @@ export class PendientepreliquidacionComponent implements OnInit {
         this.pendientes = list.map(item => ({ ...item, selected: false }));
         this.loading = false;
         this.selected = [];
+        this.todosMarcados = false;
         this.calcularDashboard();
       },
       error => {
@@ -139,13 +141,26 @@ export class PendientepreliquidacionComponent implements OnInit {
     this.calcularDashboard();
   }
 
-  seleccionarTodos() {
-    if (this.selected.length === this.pendientes.length) {
-      // Deseleccionar todos
-      this.selected = [];
+  toggleSeleccion(rowData: PendientePreliquidacion & { selected?: boolean }) {
+    rowData.selected = !rowData.selected;
+    if (rowData.selected) {
+      if (!this.selected.includes(rowData)) {
+        this.selected = [...this.selected, rowData];
+      }
     } else {
-      // Seleccionar todos
+      this.selected = this.selected.filter(r => r !== rowData);
+    }
+    this.todosMarcados = this.pendientes.length > 0 && this.selected.length === this.pendientes.length;
+    this.calcularDashboard();
+  }
+
+  seleccionarTodos() {
+    if (this.todosMarcados) {
+      this.pendientes.forEach((r: any) => r.selected = true);
       this.selected = [...this.pendientes];
+    } else {
+      this.pendientes.forEach((r: any) => r.selected = false);
+      this.selected = [];
     }
     this.calcularDashboard();
   }

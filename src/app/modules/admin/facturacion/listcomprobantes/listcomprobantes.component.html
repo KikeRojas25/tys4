@@ -32,9 +32,9 @@
     <!-- Filtros de Búsqueda -->
     <div class="bg-white rounded-lg shadow-sm border border-gray-200 mb-2 overflow-hidden">
       <div class="p-2">
-        <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-2">
+        <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-6 gap-2">
           <!-- Cliente -->
-          <div class="flex flex-col">
+          <div class="flex flex-col lg:col-span-2">
             <label class="mb-1 text-xs font-medium text-gray-700">Cliente:</label>
             <p-dropdown
               name="clientes"
@@ -77,8 +77,34 @@
             </p-dropdown>
           </div>
 
+          <!-- Fecha Inicio -->
+          <div class="flex flex-col">
+            <label class="mb-1 text-xs font-medium text-gray-700">Fecha desde:</label>
+            <p-calendar
+              [(ngModel)]="model.fechainicio"
+              dateFormat="dd/mm/yy"
+              [showIcon]="true"
+              appendTo="body"
+              [style]="{'width':'100%'}"
+              placeholder="dd/mm/aaaa">
+            </p-calendar>
+          </div>
+
+          <!-- Fecha Fin -->
+          <div class="flex flex-col">
+            <label class="mb-1 text-xs font-medium text-gray-700">Fecha hasta:</label>
+            <p-calendar
+              [(ngModel)]="model.fechafin"
+              dateFormat="dd/mm/yy"
+              [showIcon]="true"
+              appendTo="body"
+              [style]="{'width':'100%'}"
+              placeholder="dd/mm/aaaa">
+            </p-calendar>
+          </div>
+
           <!-- Botones -->
-          <div class="flex items-end gap-2 sm:col-span-2 lg:col-span-2">
+          <div class="flex items-end gap-2">
             <button
               pButton
               type="button"
@@ -114,6 +140,8 @@
         [tableStyle]="{'min-width':'100%'}"
         styleClass="p-datatable-sm"
         [globalFilterFields]="['numeroComprobante', 'tipoComprobante', 'numeroPreliquidacion', 'nombreCliente', 'estado']"
+        [sortField]="'numeroComprobante'"
+        [sortOrder]="-1"
         #dt>
         
         <ng-template pTemplate="caption">
@@ -135,8 +163,9 @@
 
         <ng-template pTemplate="header" let-columns>
           <tr>
-            <th *ngFor="let col of columns" class="text-center px-2 py-2 bg-gray-100 text-gray-700 text-xs font-semibold">
+            <th *ngFor="let col of columns" [pSortableColumn]="col.field" class="text-center px-2 py-2 bg-gray-100 text-gray-700 text-xs font-semibold cursor-pointer">
               {{ col.header }}
+              <p-sortIcon [field]="col.field"></p-sortIcon>
             </th>
             <th class="text-center px-2 py-2 bg-gray-100 text-gray-700 text-xs font-semibold">Acciones</th>
           </tr>
@@ -177,6 +206,15 @@
                   pTooltip="Exportar"
                   [style]="{'width': '1.75rem', 'height': '1.75rem'}"
                   (click)="exportar(comprobante)">
+                </button>
+                <button
+                  pButton
+                  type="button"
+                  icon="pi pi-ban"
+                  class="p-button-rounded p-button-text p-button-sm p-button-danger"
+                  pTooltip="Anular comprobante"
+                  [style]="{'width': '1.75rem', 'height': '1.75rem'}"
+                  (click)="anular(comprobante)">
                 </button>
               </div>
             </td>

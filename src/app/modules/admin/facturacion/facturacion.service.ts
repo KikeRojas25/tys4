@@ -2,7 +2,7 @@ import { HttpClient, HttpHeaders } from '@angular/common/http';
 import { inject, Injectable } from '@angular/core';
 import { environment } from 'environments/environment';
 import { Observable, ReplaySubject, tap } from 'rxjs';
-import { Factura, PendientePreliquidacion, ListarPreliquidacionResult, PreliquidacionDetalle, OrdenPreliquidacion, AgregarCargoRequest, OrdenTrabajoRecargoUpdateDto, OrdenTrabajoPreliquidacionResult, ComprobanteForCreateDto, ComprobanteResult, ComprobanteConDetallesResult } from './facturacion.types';
+import { Factura, PendientePreliquidacion, ListarPreliquidacionResult, PreliquidacionDetalle, OrdenPreliquidacion, AgregarCargoRequest, OrdenTrabajoRecargoUpdateDto, OrdenTrabajoPreliquidacionResult, ComprobanteForCreateDto, ComprobanteResult, ComprobanteConDetallesResult, DocumentoResult, DocumentoForCreateDto, DocumentoForUpdateDto } from './facturacion.types';
 
 const httpOptions = {
   headers: new HttpHeaders({
@@ -145,7 +145,9 @@ export class FacturacionService {
     numerocomprobante?: string,
     idtipocomprobante?: number,
     idcliente?: number,
-    numeroliquidacion?: string
+    numeroliquidacion?: string,
+    fecharegistroinicio?: string,
+    fecharegistrofin?: string
   ): Observable<ListarPreliquidacionResult[]> {
     let params = '';
     const paramsList: string[] = [];
@@ -164,6 +166,12 @@ export class FacturacionService {
     }
     if (numeroliquidacion) {
       paramsList.push(`numeroliquidacion=${encodeURIComponent(numeroliquidacion)}`);
+    }
+    if (fecharegistroinicio) {
+      paramsList.push(`fecharegistroinicio=${fecharegistroinicio}`);
+    }
+    if (fecharegistrofin) {
+      paramsList.push(`fecharegistrofin=${fecharegistrofin}`);
     }
 
     if (paramsList.length > 0) {
@@ -219,19 +227,73 @@ export class FacturacionService {
   }
 
   // Listar comprobantes
-  listarComprobantes(idcliente?: number, idestado?: number): Observable<ComprobanteResult[]> {
-    let params = '';
+  listarComprobantes(idcliente?: number, idestado?: number, fechainicio?: Date, fechafin?: Date): Observable<ComprobanteResult[]> {
+    const paramsList: string[] = [];
     if (idcliente !== null && idcliente !== undefined) {
-      params += `?idcliente=${idcliente}`;
+      paramsList.push(`idcliente=${idcliente}`);
     }
     if (idestado !== null && idestado !== undefined) {
-      params += params ? `&idestado=${idestado}` : `?idestado=${idestado}`;
+      paramsList.push(`idestado=${idestado}`);
     }
+    if (fechainicio) {
+      paramsList.push(`fechainicio=${fechainicio.toISOString().split('T')[0]}`);
+    }
+    if (fechafin) {
+      paramsList.push(`fechafin=${fechafin.toISOString().split('T')[0]}`);
+    }
+    const params = paramsList.length > 0 ? '?' + paramsList.join('&') : '';
     return this._httpClient.get<ComprobanteResult[]>(`${this.baseUrl}ListarComprobantes${params}`, httpOptions);
+  }
+
+  // Eliminar comprobante
+  deleteComprobante(id: number): Observable<any> {
+    return this._httpClient.delete(`${this.baseUrl}DeleteComprobante/${id}`, httpOptions);
   }
 
   // Obtener comprobante con detalles
   getComprobante(id: number): Observable<ComprobanteConDetallesResult> {
     return this._httpClient.get<ComprobanteConDetallesResult>(`${this.baseUrl}GetComprobante/${id}`, httpOptions);
+  }
+
+  getDocumentos(idtipocomprobante: number): Observable<any[]> {
+    return this._httpClient.get<any[]>(
+      `${this.baseUrl}GetDocumentos?idtipocomprobante=${idtipocomprobante}`,
+      httpOptions
+    );
+  }
+
+  getSiguienteNumeroDocumento(idtipocomprobante: number, serie: string): Observable<{ siguienteNumero: string }> {
+    return this._httpClient.get<{ siguienteNumero: string }>(
+      `${this.baseUrl}GetSiguienteNumeroDocumento?idtipocomprobante=${idtipocomprobante}&serie=${encodeURIComponent(serie)}`,
+      httpOptions
+    );
+  }
+
+  eliminarPreliquidacion(id: number, idusuario: number): Observable<any> {
+    return this._httpClient.delete(
+      `${this.baseUrl}DeletePreliquidacion/${id}?idusuario=${idusuario}`,
+      httpOptions
+    );
+  }
+
+  // CRUD Documentos
+  listarDocumentos(idtipocomprobante?: number, idestacion?: number): Observable<DocumentoResult[]> {
+    const params: string[] = [];
+    if (idtipocomprobante != null) params.push(`idtipocomprobante=${idtipocomprobante}`);
+    if (idestacion != null) params.push(`idestacion=${idestacion}`);
+    const qs = params.length ? '?' + params.join('&') : '';
+    return this._httpClient.get<DocumentoResult[]>(`${this.baseUrl}ListarDocumentos${qs}`, httpOptions);
+  }
+
+  createDocumento(dto: DocumentoForCreateDto): Observable<any> {
+    return this._httpClient.post(`${this.baseUrl}CreateDocumento`, dto, httpOptions);
+  }
+
+  updateDocumento(dto: DocumentoForUpdateDto): Observable<any> {
+    return this._httpClient.put(`${this.baseUrl}UpdateDocumento`, dto, httpOptions);
+  }
+
+  deleteDocumento(id: number): Observable<any> {
+    return this._httpClient.delete(`${this.baseUrl}DeleteDocumento/${id}`, httpOptions);
   }
 }

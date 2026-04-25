@@ -18,6 +18,8 @@ import { PickListModule } from 'primeng/picklist';
 import { DialogModule } from 'primeng/dialog';
 import { DropdownModule } from 'primeng/dropdown';
 import { MultiSelectModule } from 'primeng/multiselect';
+import { CheckboxModule } from 'primeng/checkbox';
+import { TooltipModule } from 'primeng/tooltip';
 
 import { MantenimientoService } from '../../mantenimiento/mantenimiento.service';
 import { UserForUpdateDto } from 'app/core/user/user.types';
@@ -41,7 +43,9 @@ import { UserForUpdateDto } from 'app/core/user/user.types';
     PickListModule,
     DialogModule,
     DropdownModule,
-    MultiSelectModule
+    MultiSelectModule,
+    CheckboxModule,
+    TooltipModule
   ],
   providers: [
     DialogService,
@@ -52,9 +56,15 @@ import { UserForUpdateDto } from 'app/core/user/user.types';
 export class ListuserComponent implements OnInit {
 
   model: any = {};
-  users: User[]  = null; // Variable para almacenar el usuario
-  displayDialog: boolean = false; // Para controlar el popup
+  users: User[]  = null;
+  displayDialog: boolean = false;
   filteredUsers: any[];
+  mostrarBloqueados: boolean = false;
+
+  dialogCambiarPasswordVisible = false;
+  usuarioParaPassword: User | null = null;
+  nuevaPassword: string = '';
+  confirmarPassword: string = '';
 
 
   roles: any[] = []; // Lista de roles
@@ -95,26 +105,28 @@ export class ListuserComponent implements OnInit {
   }
 
   buscar() {
-    // Llama al método get() del servicio y suscríbete al observable
-    this.userService.get( this.model.param ).subscribe((users: User[]) => {
-      // Asigna los usuarios al array
+    this.userService.get(this.model.param).subscribe((users: User[]) => {
       this.users = users;
-
-      console.log('Usuarios cargados:', this.users);
-  
-      // Si no hay ningún valor en 'this.model.param', mostramos todos los usuarios
-      if (!this.model.param || this.model.param.trim() === '') {
-        this.filteredUsers = this.users; // Muestra todos los usuarios sin filtrar
-      } else {
-        // Aplica el filtro basado en el parámetro 'param' del modelo
-        this.filteredUsers = this.users.filter(user =>
-          user.usr_str_nombre.toLowerCase().includes(this.model.param.toLowerCase())
-        );
-      }
-  
-      // Muestra los usuarios (filtrados o no) en la consola
-      console.log(this.filteredUsers);
+      this.aplicarFiltros();
     });
+  }
+
+  aplicarFiltros() {
+    let result = this.users || [];
+
+    if (this.model.param && this.model.param.trim() !== '') {
+      const q = this.model.param.toLowerCase();
+      result = result.filter(user =>
+        user.usr_str_nombre?.toLowerCase().includes(q) ||
+        user.usr_str_red?.toLowerCase().includes(q)
+      );
+    }
+
+    if (!this.mostrarBloqueados) {
+      result = result.filter(user => !user.usr_int_bloqueado || user.usr_int_bloqueado === 0);
+    }
+
+    this.filteredUsers = result;
   }
 
 
@@ -132,6 +144,73 @@ getNombreEquipo(id: number): string {
   };
   return mapaEquipos[id] || 'Sin asignar';
 }
+
+  abrirCambiarPassword(usuario: User) {
+    this.usuarioParaPassword = usuario;
+    this.nuevaPassword = '';
+    this.confirmarPassword = '';
+    this.dialogCambiarPasswordVisible = true;
+  }
+
+  guardarCambioPassword() {
+    if (!this.usuarioParaPassword) return;
+
+    if (!this.nuevaPassword || this.nuevaPassword.trim().length < 6) {
+      this.messageService.add({ severity: 'warn', summary: 'Validación', detail: 'La contraseña debe tener al menos 6 caracteres.', life: 3000 });
+      return;
+    }
+    if (this.nuevaPassword !== this.confirmarPassword) {
+      this.messageService.add({ severity: 'warn', summary: 'Validación', detail: 'Las contraseñas no coinciden.', life: 3000 });
+      return;
+    }
+
+    this.userService.cambiarPassword(this.usuarioParaPassword.usr_int_id, this.nuevaPassword).subscribe({
+      next: () => {
+        const nombre = this.usuarioParaPassword?.usr_str_nombre ?? '';
+        this.messageService.add({ severity: 'success', summary: 'Contraseña actualizada', detail: `La contraseña de ${nombre} fue actualizada correctamente.`, life: 3000 });
+        this.dialogCambiarPasswordVisible = false;
+        this.usuarioParaPassword = null;
+      },
+      error: (err) => {
+        const msg = err?.error?.message || 'No se pudo actualizar la contraseña. Intenta nuevamente.';
+        this.messageService.add({ severity: 'error', summary: 'Error', detail: msg, life: 4000 });
+      }
+    });
+  }
+
+  bloquearUsuario(usuario: User) {
+    const bloqueado = usuario.usr_int_bloqueado === 1 ? 0 : 1;
+    const accion = bloqueado === 1 ? 'bloquear' : 'desbloquear';
+
+    this.confirmationService.confirm({
+      message: `¿Está seguro que desea ${accion} al usuario ${usuario.usr_str_nombre} ${usuario.usr_str_apellidos}?`,
+      header: bloqueado === 1 ? 'Confirmar Bloqueo' : 'Confirmar Desbloqueo',
+      icon: bloqueado === 1 ? 'pi pi-ban' : 'pi pi-check-circle',
+      acceptLabel: bloqueado === 1 ? 'Bloquear' : 'Desbloquear',
+      rejectLabel: 'Cancelar',
+      accept: () => {
+        this.userService.bloquearUsuario(usuario.usr_int_id, bloqueado).subscribe({
+          next: () => {
+            this.messageService.add({
+              severity: bloqueado === 1 ? 'warn' : 'success',
+              summary: bloqueado === 1 ? 'Usuario bloqueado' : 'Usuario desbloqueado',
+              detail: `El usuario ${usuario.usr_str_nombre} ${usuario.usr_str_apellidos} fue ${bloqueado === 1 ? 'bloqueado' : 'desbloqueado'} correctamente.`,
+              life: 3000
+            });
+            this.buscar();
+          },
+          error: () => {
+            this.messageService.add({
+              severity: 'error',
+              summary: 'Error',
+              detail: 'No se pudo realizar la operación. Intenta nuevamente.',
+              life: 3000
+            });
+          }
+        });
+      }
+    });
+  }
 
   nuevo() {
     this.router.navigate(['/seguridad/newusuario']  );

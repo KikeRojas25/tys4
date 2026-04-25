@@ -11,8 +11,8 @@ import { CommonModule } from '@angular/common';
   <p-table [value]="ordenes" [paginator]="true" [rows]="10" responsiveLayout="scroll">
     <ng-template pTemplate="header">
       <tr>
-        <th>ID</th>
-        <th>NumCP</th>
+        
+        <th># OT</th>
         <th>Origen</th>
         <th>Destino</th>
         <th>Guías</th>
@@ -20,7 +20,7 @@ import { CommonModule } from '@angular/common';
     </ng-template>
     <ng-template pTemplate="body" let-orden>
       <tr>
-        <td>{{ orden.idOrdenTrabajo }}</td>
+        
         <td>{{ orden.numcp }}</td>
         <td>{{ orden.origen }}</td>
         <td>{{ orden.destino }}</td>

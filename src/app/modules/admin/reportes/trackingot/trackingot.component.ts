@@ -16,6 +16,9 @@ interface EventItem {
   dateRegister?: string;
   dateEvent?: string;
   user?: string;
+  idmaestroevento?: number;
+  recursotroncal?: string;
+  repartidor?: string;
 }
 
 interface OrdenConEventos {
@@ -103,7 +106,10 @@ export class TrackingotComponent {
                 status: e.evento ?? e.status,
                 dateRegister: e.fechaRegistro ?? e.dateRegister,
                 dateEvent: e.fechaEvento ?? e.dateEvent,
-                user: (e.usuario === 'ADMIN ADMIN' ? 'CHATBOT' : e.usuario) ?? e.user
+                user: (e.usuario === 'ADMIN ADMIN' ? 'CHATBOT' : e.usuario) ?? e.user,
+                idmaestroevento: e.idMaestroEvento ?? e.idmaestroevento ?? null,
+                recursotroncal: e.recursotroncal ?? e.Recursotroncal ?? null,
+                repartidor: e.repartidor ?? e.Repartidor ?? null,
               }));
               const ot = res?.detalle?.ordenTransporte ?? res?.detalle ?? null;
               const guias = res?.detalle?.guias ?? [];

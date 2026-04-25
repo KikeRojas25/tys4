@@ -1,64 +1,282 @@
-/* Estilos para tabla y botones de acción - alineados con tarifa */
-::ng-deep .custom-table .p-datatable-thead > tr > th {
-  background-color: #374151 !important;
-  color: #ffffff !important;
+/* ── Barra de control ─────────────────────────────────── */
+.lt-sep {
+  width: 1px;
+  height: 24px;
+  background-color: #e5e7eb;
+  flex-shrink: 0;
 }
 
-::ng-deep .custom-table .p-datatable-tbody > tr {
-  border-bottom: 1px solid #e5e7eb;
+/* Buscador */
+.lt-search {
+  position: relative;
+  display: flex;
+  align-items: center;
 }
 
-::ng-deep .custom-table .p-datatable-thead > tr > th,
-::ng-deep .custom-table .p-datatable-tbody > tr > td {
-  text-align: center;
-  vertical-align: middle;
+.lt-search-icon {
+  position: absolute;
+  left: 10px;
+  color: #9ca3af;
+  font-size: 0.8rem;
+  pointer-events: none;
 }
 
-.action-btn {
-  width: 28px !important;
-  height: 28px !important;
-  padding: 0 !important;
-  border-radius: 0.25rem !important;
-  display: flex !important;
-  align-items: center !important;
-  justify-content: center !important;
-  font-size: 0.75rem !important;
-  transition: all 0.15s ease-in-out !important;
-  border: none !important;
-}
-
-.action-btn-primary {
-  background-color: #1e40af !important;
-  color: white !important;
-}
-
-.action-btn-primary:hover {
-  background-color: #1e3a8a !important;
-  transform: scale(1.05);
-}
-
-.action-btn-danger {
-  background-color: #ef4444 !important;
-  color: white !important;
-}
-
-.action-btn-danger:hover {
-  background-color: #dc2626 !important;
-  transform: scale(1.05);
-}
-
-/* Celdas de día: clickeables con cambio de color */
-.celda-dia {
-  background-color: #f9fafb;
+.lt-search-input {
+  width: 100%;
+  padding: 6px 32px 6px 30px;
+  font-size: 0.82rem;
+  color: #1f2937;
   border: 1px solid #e5e7eb;
+  border-radius: 6px;
+  background: #f9fafb;
+  outline: none;
+  transition: border-color 0.15s, background 0.15s;
 }
 
-.celda-dia:hover {
-  background-color: #fef3c7;
+.lt-search-input:focus {
+  border-color: #f59e0b;
+  background: #fff;
+  box-shadow: 0 0 0 3px rgba(245, 158, 11, 0.1);
 }
 
-.celda-dia-seleccionada {
-  background-color: #f59e0b !important;
-  color: white !important;
+.lt-search-input::placeholder {
+  color: #c0c5cc;
+}
+
+.lt-search-clear {
+  position: absolute;
+  right: 8px;
+  background: none;
+  border: none;
+  cursor: pointer;
+  color: #9ca3af;
+  font-size: 0.72rem;
+  padding: 2px;
+  display: flex;
+  align-items: center;
+  transition: color 0.1s;
+}
+
+.lt-search-clear:hover {
+  color: #6b7280;
+}
+
+/* Checkbox solo vacíos */
+.lt-check-label {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 0.8rem;
+  color: #4b5563;
+  cursor: pointer;
+  user-select: none;
+  white-space: nowrap;
+  flex-shrink: 0;
+}
+
+.lt-check {
+  width: 15px;
+  height: 15px;
+  accent-color: #f59e0b;
+  cursor: pointer;
+}
+
+/* Contador */
+.lt-counter {
+  font-size: 0.78rem;
+  white-space: nowrap;
+  flex-shrink: 0;
+}
+
+/* Botón guardar */
+.lt-btn-save {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 6px 16px;
+  font-size: 0.82rem;
   font-weight: 600;
+  color: #fff;
+  background-color: #d97706;
+  border: none;
+  border-radius: 6px;
+  cursor: pointer;
+  transition: background-color 0.15s;
+  white-space: nowrap;
+  flex-shrink: 0;
+}
+
+.lt-btn-save:hover:not(:disabled) {
+  background-color: #b45309;
+}
+
+.lt-btn-save:disabled {
+  opacity: 0.6;
+  cursor: default;
+}
+
+/* ── Tabla ────────────────────────────────────────────── */
+.lt-table {
+  border-collapse: collapse;
+  table-layout: fixed;
+  width: 100%;
+}
+
+/* Encabezados */
+.lt-th {
+  background-color: #1e293b;
+  color: #94a3b8;
+  font-size: 0.7rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  padding: 8px 10px;
+  white-space: nowrap;
+  border-bottom: 2px solid #0f172a;
+  position: sticky;
+  top: 0;
+  z-index: 1;
+}
+
+.lt-th-dept {
+  text-align: left;
+  padding-left: 10px;
+  width: 100px;
+  min-width: 100px;
+  max-width: 100px;
+  border-right: 1px solid #334155;
+}
+
+.lt-th-prov {
+  text-align: left;
+  padding-left: 8px;
+  width: 120px;
+  min-width: 120px;
+  max-width: 120px;
+}
+
+.lt-th-dia {
+  text-align: center;
+  width: 80px;
+  min-width: 80px;
+  border-left: 1px solid #334155;
+}
+
+/* Filas */
+.lt-tr {
+  border-bottom: 1px solid #f1f5f9;
+  transition: background-color 0.08s;
+}
+
+.lt-tr:hover {
+  background-color: #fafafa;
+}
+
+/* Celdas */
+.lt-td {
+  vertical-align: middle;
+  border: none;
+}
+
+/* Departamento */
+.lt-td-dept {
+  padding: 0 6px 0 10px;
+  width: 100px;
+  min-width: 100px;
+  max-width: 100px;
+  border-right: 1px solid #e5e7eb;
+  vertical-align: middle;
+  background-color: #f8fafc;
+  overflow: hidden;
+}
+
+.lt-dept-label {
+  display: block;
+  font-size: 0.68rem;
+  font-weight: 700;
+  color: #475569;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+/* Provincia */
+.lt-td-prov {
+  padding: 3px 8px 3px 8px;
+  width: 120px;
+  min-width: 120px;
+  max-width: 120px;
+  border-right: 1px solid #f1f5f9;
+  overflow: hidden;
+}
+
+.lt-prov-text {
+  display: block;
+  font-size: 0.76rem;
+  color: #374151;
+  font-weight: 400;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.lt-prov-text mark {
+  background-color: #fef3c7;
+  color: #92400e;
+  border-radius: 2px;
+  padding: 0 1px;
+  font-weight: 600;
+}
+
+/* Celdas de días */
+.lt-td-dia {
+  text-align: center;
+  padding: 4px 0;
+  cursor: pointer;
+  user-select: none;
+  width: 80px;
+  min-width: 80px;
+  border-left: 1px solid #f1f5f9;
+  transition: background-color 0.1s;
+}
+
+/* Badge circular del número */
+.lt-dia-badge {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 32px;
+  height: 32px;
+  border-radius: 50%;
+  font-size: 0.82rem;
+  font-weight: 600;
+  transition: all 0.12s;
+}
+
+/* Vacío */
+.lt-dia-vacio .lt-dia-badge {
+  color: #cbd5e1;
+  background: transparent;
+  border: 1.5px solid #e2e8f0;
+}
+
+.lt-dia-vacio:hover .lt-dia-badge {
+  color: #d97706;
+  background: #fef3c7;
+  border-color: #fcd34d;
+}
+
+/* Activo */
+.lt-dia-activo .lt-dia-badge {
+  background: #f59e0b;
+  color: #fff;
+  border: 1.5px solid #f59e0b;
+  box-shadow: 0 1px 4px rgba(245, 158, 11, 0.4);
+}
+
+.lt-dia-activo:hover .lt-dia-badge {
+  background: #d97706;
+  border-color: #d97706;
 }

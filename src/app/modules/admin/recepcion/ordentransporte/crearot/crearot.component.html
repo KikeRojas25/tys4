@@ -287,10 +287,36 @@
                     </div>
                 </div>
             </div>
-    
+
+            <div class="field flex flex-col">
+                <div class="flex align-items-center justify-content-between mb-1">
+                    <label>Orden de Recojo (OR) <span *ngIf="!sinRecojo" class="text-red-500">*</span></label>
+                    <div class="flex align-items-center gap-2">
+                        <p-checkbox [(ngModel)]="sinRecojo" [ngModelOptions]="{standalone: true}"
+                            [binary]="true" inputId="sinRecojo"
+                            (onChange)="orVinculada = null; numBusquedaOr = ''; orTouched = false">
+                        </p-checkbox>
+                        <label for="sinRecojo" class="cursor-pointer text-sm">Sin recojo</label>
+                    </div>
+                </div>
+                <div class="p-inputgroup">
+                    <input pInputText [(ngModel)]="numBusquedaOr" [ngModelOptions]="{standalone: true}"
+                        placeholder="Buscar OR..." (blur)="buscarOr()" [disabled]="sinRecojo" />
+                    <button pButton type="button" icon="pi pi-search" class="p-button-primary" (click)="buscarOr()" [disabled]="sinRecojo"></button>
+                </div>
+                <div *ngIf="orVinculada" class="mt-1 flex align-items-center gap-2">
+                    <p-tag severity="success" [value]="orVinculada.numcp"></p-tag>
+                    <button pButton type="button" icon="pi pi-times" class="p-button-text p-button-danger p-button-sm"
+                        (click)="orVinculada = null; numBusquedaOr = ''"></button>
+                </div>
+                <div *ngIf="!sinRecojo && !orVinculada && orTouched" class="alert-danger mt-1">
+                    Debe vincular una Orden de Recojo o marcar "Sin recojo".
+                </div>
+            </div>
+
         </div>
     </p-panel>
-    
+
       <p-panel header="Datos complementarios" class="w-full mb-3 custom-header-panel">
         <div class="grid grid-cols-1 md:grid-cols-4 gap-4">
     
@@ -669,7 +695,7 @@
   </div>
   <div class="flex align-items-center gap-3 mb-5">
       <label for="grrinicial" class="font-semibold w-6rem">GRR Inicial</label>
-      <input pInputText name="grrinicial" [(ngModel)]="model.guiaInicial" class="flex-auto" autocomplete="off" />
+      <input pInputText name="grrinicial" [(ngModel)]="model.guiaInicial" class="flex-auto" autocomplete="off" (keydown.enter)="generarGrr()" />
   </div>
   <div class="flex justify-content-end gap-2">
        <p-button label="Cerrar" severity="secondary" (onClick)="dialogGrr= false" />

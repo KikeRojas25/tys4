@@ -1,104 +1,87 @@
 <div class="flex flex-col flex-auto min-w-0 p-8 bg-card sm:py-10 sm:px-12">
-  <!-- Encabezado con íconos de navegación y título -->
+  <!-- Encabezado -->
   <div class="flex flex-col sm:flex-row flex-0 sm:items-center sm:justify-between border-b bg-card dark:bg-transparent">
     <div class="flex-1 min-w-0">
       <div class="flex flex-wrap items-center font-medium">
-        <div>
-          <a [routerLink]="['/comercio']">
-            <i class="fa fa-home" style="font-size: 34px; color: #6c6a6b;"></i>
-          </a>
+        <a class="whitespace-nowrap text-primary-500">TMS</a>
+        <div class="flex items-center ml-2 whitespace-nowrap">
+          <mat-icon class="fuse-horizontal-navigation-item-icon" [svgIcon]="'heroicons_solid:chevron-right'"></mat-icon>
+          <a class="ml-2 subtitulo" [routerLink]="['/seguridad/listausuarios']">Gestión de Usuarios</a>
         </div>
         <div class="flex items-center ml-2 whitespace-nowrap">
           <mat-icon class="fuse-horizontal-navigation-item-icon" [svgIcon]="'heroicons_solid:chevron-right'"></mat-icon>
-          <a class="ml-2 subtitulo">Seguridad</a>
+          <span class="ml-2 subtitulo">Editar Usuario</span>
         </div>
       </div>
       <div class="mt-4">
         <h2 class="text-3xl md:text-4xl font-extrabold tracking-tight leading-7 sm:leading-10 truncate">
-          Gestión de Usuarios
+          Editar Usuario
         </h2>
       </div>
     </div>
   </div>
 
   <!-- Formulario -->
-  <div class="p-grid p-justify-between p-align-center bg-card p-mb-6 p-ml-6 p-mr-6">
+  <div class="bg-card p-6 mt-6 ml-6 mr-6">
     <form [formGroup]="userForm" (ngSubmit)="onSubmit()" novalidate>
-      <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+      <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
 
-         <!-- User Name -->
-         <div class="field flex flex-col">
-          <label for="username">Usuario</label>
-          <input id="username" maxlength="12" pInputText formControlName="username" class="w-full md:w-3/4" />
-          <p-message *ngIf="userForm.get('username').invalid && userForm.get('username').touched"
-                     severity="error" text="Usuario es requerido"></p-message>
+        <!-- Usuario de red (solo lectura) -->
+        <div class="field flex flex-col gap-1 md:col-span-2">
+          <label class="text-sm font-medium text-gray-700">Usuario de red</label>
+          <input pInputText [value]="usernameDisplay" disabled class="w-full md:w-1/2 bg-gray-100" />
         </div>
 
-        <!-- Nombre Completo -->
-        <div class="field flex flex-col">
-          <label for="nombrecompleto">Nombre Completo</label>
-          <input id="nombrecompleto" maxlength="30" pInputText formControlName="nombrecompleto" class="w-full md:w-3/4" />
-          <p-message *ngIf="userForm.get('nombrecompleto').invalid && userForm.get('nombrecompleto').touched"
-                     severity="error" text="Nombre es requerido"></p-message>
+        <!-- Nombres -->
+        <div class="field flex flex-col gap-1">
+          <label for="nombres" class="text-sm font-medium text-gray-700">Nombres <span class="text-red-500">*</span></label>
+          <input id="nombres" pInputText formControlName="nombres" maxlength="50" class="w-full" />
+          <p-message *ngIf="userForm.get('nombres').invalid && userForm.get('nombres').touched"
+                     severity="error" text="Los nombres son requeridos"></p-message>
         </div>
 
-        <!-- Documento de Identidad -->
-        <div class="field flex flex-col">
-          <label for="dni">Documento de Identidad</label>
-          <input maxlength="12" id="dni" pInputText formControlName="dni" class="w-full md:w-3/4" />
-          <p-message *ngIf="userForm.get('dni').invalid && userForm.get('dni').touched"
-                     severity="error" text="Documento es requerido"></p-message>
+        <!-- Apellidos -->
+        <div class="field flex flex-col gap-1">
+          <label for="apellidos" class="text-sm font-medium text-gray-700">Apellidos <span class="text-red-500">*</span></label>
+          <input id="apellidos" pInputText formControlName="apellidos" maxlength="50" class="w-full" />
+          <p-message *ngIf="userForm.get('apellidos').invalid && userForm.get('apellidos').touched"
+                     severity="error" text="Los apellidos son requeridos"></p-message>
         </div>
 
         <!-- Email -->
-        <div class="field flex flex-col">
-          <label for="email">Email</label>
-          <input id="email" pInputText formControlName="email" type="email" class="w-full md:w-3/4" />
+        <div class="field flex flex-col gap-1">
+          <label for="email" class="text-sm font-medium text-gray-700">Email <span class="text-red-500">*</span></label>
+          <input id="email" pInputText formControlName="email" type="email" class="w-full" />
           <p-message *ngIf="userForm.get('email').invalid && userForm.get('email').touched"
-                     severity="error" text="Email no es válido"></p-message>
+                     severity="error" text="Ingrese un email válido"></p-message>
         </div>
 
-        <!-- Teléfono -->
-        <div class="field flex flex-col">
-          <label for="telefono">Teléfono</label>
-          <p-inputMask id="telefono"   mask="+51999999999"   placeholder="+51-999999999" formControlName="telefono" class="w-full md:w-3/4" />
-
-           
-          <p-message *ngIf="userForm.get('telefono').invalid && userForm.get('telefono').touched"
-                     severity="error" text="Teléfono no es válido"></p-message>
+        <!-- Clientes -->
+        <div class="field flex flex-col gap-1">
+          <label for="clientesIds" class="text-sm font-medium text-gray-700">Clientes vinculados</label>
+          <p-multiSelect
+            id="clientesIds"
+            [options]="listClientes"
+            formControlName="clientesIds"
+            optionLabel="label"
+            optionValue="value"
+            appendTo="body"
+            [filter]="true"
+            placeholder="Seleccione clientes (opcional)"
+            styleClass="w-full">
+          </p-multiSelect>
         </div>
 
-        <!-- Permisos a Clientes -->
-        <div class="field flex flex-col">
-          <label for="clientesIds">Permisos a clientes:</label>
-          <p-multiSelect 
-          [options]="listClientes" 
-          formControlName="clientesIds" 
-          optionLabel="label" 
-          optionValue="value"
-          id="listClientes"
-          appendTo="body" 
-          style="width: 230px;"
-          [filter]="true" 
-          placeholder="Selección de clientes" />
-          <p-message *ngIf="userForm.get('clientesIds').invalid && userForm.get('clientesIds').touched"
-                     severity="error" text="Seleccione uno o más clientes"></p-message>
-        </div>
+      </div>
 
-    
-
-       
-        </div>
-
-
-      <!-- Botones de acción -->
-      <div class="p-d-flex p-jc-end mt-5 p-mt-3">
-        <p-button  type="submit"   [disabled]="isSaveDisabled" label="Guardar" [disabled]="userForm.invalid"></p-button>
-        <p-button  type="button" label="Regresar" class="p-ml-2" (click)="onCancel()"></p-button>
+      <!-- Botones -->
+      <div class="flex gap-3 mt-8">
+        <p-button type="submit" label="Guardar" icon="pi pi-check" [disabled]="guardando"></p-button>
+        <p-button type="button" label="Cancelar" icon="pi pi-times" severity="secondary" (click)="onCancel()"></p-button>
       </div>
     </form>
   </div>
 </div>
-<p-confirmDialog />
 
+<p-confirmDialog />
 <p-toast />

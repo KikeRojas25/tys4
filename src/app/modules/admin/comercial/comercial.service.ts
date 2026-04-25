@@ -2,7 +2,7 @@ import { HttpClient, HttpHeaders } from '@angular/common/http';
 import { inject, Injectable } from '@angular/core';
 import { environment } from 'environments/environment';
 import { BehaviorSubject, Observable, of } from 'rxjs';
-import { IntegradoComercialPorClienteResult, IntegradoSemaforoPorClienteResult } from '../recojo/recojo.types';
+import { IntegradoComercialPorClienteResult, IntegradoSemaforoPorClienteResult, SemaforoIntegradoDetalleResult } from '../recojo/recojo.types';
 import { LeadTime } from './leadtimes/leadtimes.types';
 
 const httpOptions = {
@@ -49,16 +49,37 @@ export class ComercialService {
     );
   }
 
-  /** Integrado semáforo por cliente - Mock con datos ficticios */
-  getIntegradoSemaforoPorCliente(idusuario: number, idequipo?: number | null): Observable<IntegradoSemaforoPorClienteResult[]> {
-    const mock: IntegradoSemaforoPorClienteResult[] = [
-      { idcliente: 1, cliente: 'EDICIONES COREFO S.A.C.', cantidad_atiempo: 12, cantidad_porvencer: 3, cantidad_fueratiempo: 1, cantidad_observadas: 2 },
-      { idcliente: 2, cliente: 'DISTRIBUIDORA SANTA ROSA S.A.', cantidad_atiempo: 8, cantidad_porvencer: 5, cantidad_fueratiempo: 0, cantidad_observadas: 1 },
-      { idcliente: 3, cliente: 'LIBRERÍA CULTURAL PERUANA', cantidad_atiempo: 15, cantidad_porvencer: 2, cantidad_fueratiempo: 2, cantidad_observadas: 4 },
-      { idcliente: 4, cliente: 'EDITORIAL NORMA S.A.C.', cantidad_atiempo: 22, cantidad_porvencer: 1, cantidad_fueratiempo: 0, cantidad_observadas: 0 },
-      { idcliente: 5, cliente: 'GRUPO EDITORIAL MACRO E.I.R.L.', cantidad_atiempo: 5, cantidad_porvencer: 7, cantidad_fueratiempo: 3, cantidad_observadas: 2 },
-    ];
-    return of(mock);
+  getIntegradoSemaforoPorCliente(
+    idusuario?: number | null,
+    idequipo?:  number | null,
+    fechaDesde?: string | null,
+    fechaHasta?: string | null,
+    idcliente?:  number | null
+  ): Observable<IntegradoSemaforoPorClienteResult[]> {
+    const params: string[] = [];
+    if (fechaDesde) params.push(`fechaDesde=${fechaDesde}`);
+    if (fechaHasta) params.push(`fechaHasta=${fechaHasta}`);
+    if (idcliente != null) params.push(`idcliente=${idcliente}`);
+    const qs = params.length ? `?${params.join('&')}` : '';
+    return this._httpClient.get<IntegradoSemaforoPorClienteResult[]>(
+      `${this.baseUrl}integrado-semaforo${qs}`,
+      httpOptions
+    );
+  }
+
+  getSemaforoIntegradoDetalle(
+    idcliente: number,
+    tipo: 'atiempo' | 'porvencer' | 'fueratiempo',
+    fechaDesde?: string | null,
+    fechaHasta?: string | null
+  ): Observable<SemaforoIntegradoDetalleResult[]> {
+    const params: string[] = [`idcliente=${idcliente}`, `tipo=${tipo}`];
+    if (fechaDesde) params.push(`fechaDesde=${fechaDesde}`);
+    if (fechaHasta) params.push(`fechaHasta=${fechaHasta}`);
+    return this._httpClient.get<SemaforoIntegradoDetalleResult[]>(
+      `${this.baseUrl}integrado-semaforo/detalle?${params.join('&')}`,
+      httpOptions
+    );
   }
 
   getOrdenesDetallePorClienteEstado(idcliente: number, estados: number | number[]): Observable<OrdenTrabajoDetallePorClienteEstadoResult[]> {
@@ -107,15 +128,27 @@ export class ComercialService {
     return this._leadTimesMock.value;
   }
 
-  /** OTs pendientes por cliente - Mock para registro de citas */
-  getOTsPendientesPorCliente(idcliente: number): Observable<{ numcp: string; destino: string; peso: number; bulto: number; estado: string }[]> {
-    const mock = [
-      { numcp: '100-891825', destino: 'AREQUIPA', peso: 3, bulto: 1, estado: 'En Ruta' },
-      { numcp: '100-891824', destino: 'MARISCAL NIETO', peso: 251, bulto: 6, estado: 'En Ruta' },
-      { numcp: '100-891823', destino: 'SAN ROMAN', peso: 220, bulto: 3, estado: 'Pendiente' },
-      { numcp: '100-891822', destino: 'CALLAO', peso: 1, bulto: 2, estado: 'En Ruta' },
-      { numcp: '100-891821', destino: 'LIMA', peso: 9, bulto: 1, estado: 'Pendiente' },
-    ];
-    return of(mock);
+  getOTsCitasPendientesPorCliente(idcliente: number): Observable<any[]> {
+    return this._httpClient.get<any[]>(
+      `${this.baseUrl}ots-citas-pendientes?idcliente=${idcliente}`,
+      httpOptions
+    );
+  }
+
+  buscarOTPorNumcp(numcp: string): Observable<any> {
+    const baseUrlOrden = environment.baseUrl + '/api/Orden/';
+    return this._httpClient.get<any>(`${baseUrlOrden}GetOrdenTransporteByNumero?numcp=${numcp}`, httpOptions);
+  }
+
+  guardarCita(payload: {
+    idOrdenTrabajo: number;
+    idCliente: number;
+    fechaCita: string;
+    horaCita: string;
+    idUsuarioRegistro: number;
+    observaciones?: string;
+  }): Observable<any> {
+    const baseUrlRecojo = environment.baseUrl + '/api/recojo/';
+    return this._httpClient.post<any>(`${baseUrlRecojo}guardar-cita`, payload, httpOptions);
   }
 }

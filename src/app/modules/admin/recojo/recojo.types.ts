@@ -298,6 +298,25 @@ export interface IntegradoSemaforoPorClienteResult {
   cantidad_observadas: number;
 }
 
+export interface SemaforoIntegradoDetalleResult {
+  idordentrabajo: number;
+  numcp: string | null;
+  cliente: string | null;
+  destino_provincia: string | null;
+  peso: number | null;
+  bulto: number | null;
+  fecharecojo: string | null;
+  fecharegistro: string | null;
+  estacion: string | null;
+  idmanifiesto: number | null;
+  idestado: number;
+  estado: string | null;
+  dias_comprometidos: number;
+  dias_operativos: number;
+  dias_transcurridos: number;
+  dias_restantes: number;
+}
+
 export interface IntegradoComercialPorClienteResult {
   idcliente: number;
   cliente: string | null;

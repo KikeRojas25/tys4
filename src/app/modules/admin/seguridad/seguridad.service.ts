@@ -74,6 +74,24 @@ getUser(id: any): Observable<User> {
     return this._httpClient.post(`${this.baseUrlUser}updatePassword`, user);
   }
 
+  // Método para bloquear/desbloquear usuario (usr_int_bloqueado)
+  bloquearUsuario(userId: number, bloqueado: number): Observable<any> {
+    return this._httpClient.post(`${this.baseUrlUser}bloquear`, { userId, bloqueado });
+  }
+
+  // Método para cambiar la contraseña de un usuario via SP
+  cambiarPassword(userId: number, nuevaPassword: string): Observable<any> {
+    return this._httpClient.post(`${this.baseUrlUser}cambiar-password`, { userId, nuevaPassword });
+  }
+
+  registrarUsuario(dto: { username: string; nombres: string; apellidos: string; email: string; password: string; clientesIds: string[] }): Observable<any> {
+    return this._httpClient.post(`${this.baseUrlUser}registrar`, dto);
+  }
+
+  actualizarUsuario(dto: { userId: number; nombres: string; apellidos: string; email: string; clientesIds: string[] }): Observable<any> {
+    return this._httpClient.post(`${this.baseUrlUser}actualizar`, dto);
+  }
+
   // getRolesByUser(user: any): Observable<any> {
   //   return this._httpClient.get<Rol>(`${this.baseUrlRol}getallroles?UserId=${user}` , user);
   // }

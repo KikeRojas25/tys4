@@ -69,6 +69,7 @@ export interface OrdenTransporte {
     numhojaruta?: string;
     numHojaRuta?: string;
     ruta?: string;
+    otauxiliar?: string;
 
     fecvisita1?: Date;
     fecvisita2?: Date;

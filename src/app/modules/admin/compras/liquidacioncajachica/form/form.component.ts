@@ -63,6 +63,8 @@ export class LiquidacionCajaChicaFormComponent implements OnInit {
     { label: 'Recibo por Honorarios', value: 'Recibo por Honorarios' },
     { label: 'Factura', value: 'Factura' },
     { label: 'Caja de egreso', value: 'Caja de egreso' },
+    { label: 'Planilla movilidad', value: 'Planilla movilidad' },
+
   ];
 
   // --- Buscador de OTs/Manifiesto (Detalles) ---
@@ -766,11 +768,22 @@ export class LiquidacionCajaChicaFormComponent implements OnInit {
           error: (err) => {
             console.error('Error guardando liquidación:', err);
             this.loading = false;
-            this.messageService.add({
-              severity: 'error',
-              summary: 'Compras',
-              detail: 'No se pudo guardar la liquidación. Verifique los datos e intente nuevamente.',
-            });
+            // 409 = pago doble detectado
+            if (err?.status === 409) {
+              const msg = err?.error?.message || 'Posible pago doble detectado.';
+              this.messageService.add({
+                severity: 'warn',
+                summary: 'Advertencia — Pago Doble',
+                detail: msg,
+                life: 8000,
+              });
+            } else {
+              this.messageService.add({
+                severity: 'error',
+                summary: 'Compras',
+                detail: 'No se pudo guardar la liquidación. Verifique los datos e intente nuevamente.',
+              });
+            }
           },
           complete: () => (this.loading = false),
         });

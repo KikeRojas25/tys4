@@ -1,11 +1,16 @@
 import { CommonModule } from '@angular/common';
 import { Component, OnInit } from '@angular/core';
-import { FormsModule, ReactiveFormsModule, FormGroup, FormBuilder, Validators } from '@angular/forms';
-import { ConfirmationService, MessageService } from 'primeng/api';
+import { FormBuilder, FormGroup, FormsModule, ReactiveFormsModule, Validators } from '@angular/forms';
 import { ButtonModule } from 'primeng/button';
-import { DialogService, DynamicDialogRef } from 'primeng/dynamicdialog';
+import { CheckboxModule } from 'primeng/checkbox';
+import { DropdownModule } from 'primeng/dropdown';
 import { InputNumberModule } from 'primeng/inputnumber';
 import { InputTextModule } from 'primeng/inputtext';
+import { MessageModule } from 'primeng/message';
+import { DialogService, DynamicDialogRef } from 'primeng/dynamicdialog';
+import { MessageService } from 'primeng/api';
+import { ToastModule } from 'primeng/toast';
+
 import { MantenimientoService } from '../../mantenimiento.service';
 
 @Component({
@@ -19,96 +24,60 @@ import { MantenimientoService } from '../../mantenimiento.service';
     ReactiveFormsModule,
     InputTextModule,
     ButtonModule,
-    InputNumberModule 
+    InputNumberModule,
+    CheckboxModule,
+    DropdownModule,
+    MessageModule,
+    ToastModule,
   ],
-  providers: [ DialogService ]
+  providers: [DialogService, MessageService],
 })
 export class NewComponent implements OnInit {
   form: FormGroup;
+  guardando = false;
+
+  monedas = [
+    { label: 'Soles (PEN)', value: 1 },
+    { label: 'Dólares (USD)', value: 2 },
+  ];
 
   constructor(
+    private fb: FormBuilder,
     private mantenimientoService: MantenimientoService,
     public ref: DynamicDialogRef,
-    private fb: FormBuilder,
-    private confirmationService: ConfirmationService ,
     private messageService: MessageService
   ) {}
 
   ngOnInit(): void {
     this.form = this.fb.group({
-      razon_social: [
-        '',
-        [Validators.required, Validators.minLength(3), Validators.maxLength(50)]
-      ],
-      ruc: [
-        null,
-        [Validators.required, Validators.minLength(8), Validators.maxLength(11)]
-      ],
-    
+      razon_social:  ['', [Validators.required, Validators.minLength(3), Validators.maxLength(150)]],
+      ruc:           ['', [Validators.required, Validators.minLength(8), Validators.maxLength(11)]],
+      nombrecorto:   ['', Validators.maxLength(50)],
+      lineacredito:  [null],
+      idmonedalinea: [1],
+      pagocontado:          [false],
+      activo:               [true],
+      tieneventasultimoano: [true],
     });
   }
 
   onSubmit(): void {
-
-    if (this.form.valid) {
-      this.confirmationService.confirm({
-        message: '¿Está seguro de registrar este cliente?',
-        header: 'Confirmación de Registro',
-        icon: 'pi pi-exclamation-triangle',
-        accept: () => {
-          this.registrarCliente(); // Llama a la función de registro al aceptar
-           
-         
-
-        },
-        reject: () => {
-          console.log('Registro cancelado');
-        },
-      });
-    } else {
-      console.log('Formulario no válido');
+    if (this.form.invalid) {
+      this.form.markAllAsTouched();
+      return;
     }
-
-
-
+    this.guardando = true;
+    this.mantenimientoService.registrarCliente(this.form.value).subscribe({
+      next: () => this.ref.close(true),
+      error: (err) => {
+        this.guardando = false;
+        const msg = typeof err.error === 'string' ? err.error : (err.error?.message || 'Error al registrar el cliente.');
+        this.messageService.add({ severity: 'error', summary: 'Error', detail: msg, life: 4000 });
+      },
+    });
   }
 
   onCancel(): void {
-    this.ref.close(); // Cierra el diálogo
+    this.ref.close();
   }
-
-
-  registrarCliente(): void {
-
-    console.log('variable', this.form.value);
-
-    const formData = {
-      ...this.form.value,
-      ruc: this.form.value.ruc?.toString(), // Convierte el RUC a cadena
-    };
-
-
-
-    this.mantenimientoService.registrarCliente(formData).subscribe(
-      (resp) => {
-        console.log('Cliente registrado con éxito:', resp);
-
-       // this.messageService.add({ severity: 'success', summary: 'Nuevo Cliente', detail: 'Se ha registrado el nuevo cliente con éxito.' });
-
-
-        this.ref.close(true); // Cierra el diálogo al completar
-      },
-      (error) => {
-        console.error('Error al registrar cliente:', error);
-
-        this.messageService.add({ severity: 'error', summary: 'Nuevo Cliente', detail: error.error });
-
-
-      }
-    );
-  }
-
-
-
-
 }

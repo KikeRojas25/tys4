@@ -27,12 +27,18 @@ export class MantenimientoService {
   private baseUrlCliente = environment.baseUrl + '/api/Cliente/';
     private baseUrlTarifa = environment.baseUrl + '/api/tarifa/';
   private baseUrlProveedor = environment.baseUrl + '/api/Proveedor/';
+  private baseUrlTarifaAjuste = environment.baseUrl + '/api/TarifaAjuste/';
   private baseUrlVehiculo = environment.baseUrl + '/api/Vehiculo/';
+  private baseUrlUsers = environment.baseUrl + '/api/Users/';
 
 constructor() { }
 
 getValorTabla(TablaId: number): Observable<ValorTabla[]> {
   return this._httpClient.get<ValorTabla[]>(this.baseUrl + 'GetAllValorTabla?TablaId=' + TablaId, httpOptions);
+}
+
+getUsuarios(): Observable<any[]> {
+  return this._httpClient.get<any[]>(this.baseUrlUsers, httpOptions);
 }
 
 
@@ -63,6 +69,18 @@ getAllClientes(criterio: string, usuarioid : number, esComercial : boolean = fal
 
     }));
 }
+
+  getClientesAdmin(): Observable<any[]> {
+    return this._httpClient.get<any[]>(this.baseUrlCliente, httpOptions);
+  }
+
+  getClienteById(id: number): Observable<any> {
+    return this._httpClient.get<any>(`${this.baseUrlCliente}Get?id=${id}`, httpOptions);
+  }
+
+  updateCliente(model: any): Observable<any> {
+    return this._httpClient.post(`${this.baseUrlCliente}ClientUpdate`, model, httpOptions);
+  }
 
 
 
@@ -303,6 +321,45 @@ editar_chofer(model: any) {
 
   eliminarTarifa(idTarifa: number): Observable<void> {
     return this._httpClient.delete<void>(`${this.baseUrlTarifa}${idTarifa}`, httpOptions);
+  }
+
+  // ── TarifaAjuste ─────────────────────────────────────────────────────────
+  getTarifaAjustesByCliente(idCliente: number): Observable<any[]> {
+    return this._httpClient.get<any[]>(`${this.baseUrlTarifaAjuste}?idCliente=${idCliente}`, httpOptions);
+  }
+
+  createTarifaAjuste(dto: {
+    idCliente: number;
+    factor: number;
+    motivo?: string;
+    fechaDesde: string;
+    fechaHasta?: string | null;
+    idUsuarioRegistro?: number | null;
+  }): Observable<any> {
+    return this._httpClient.post<any>(this.baseUrlTarifaAjuste, dto, httpOptions);
+  }
+
+  inactivarTarifaAjuste(id: number): Observable<any> {
+    return this._httpClient.put<any>(`${this.baseUrlTarifaAjuste}${id}/inactivar`, {}, httpOptions);
+  }
+
+  eliminarTarifaAjuste(id: number): Observable<any> {
+    return this._httpClient.delete<any>(`${this.baseUrlTarifaAjuste}${id}`, httpOptions);
+  }
+  // ─────────────────────────────────────────────────────────────────────────
+
+  actualizacionMasivaTarifas(dto: {
+    idCliente: number;
+    pctBase?: number | null;
+    pctMinimo?: number | null;
+    pctDesde?: number | null;
+    pctHasta?: number | null;
+    pctPrecio?: number | null;
+    pctAdicional?: number | null;
+  }): Observable<{ message: string; cantidad: number }> {
+    return this._httpClient.post<{ message: string; cantidad: number }>(
+      `${this.baseUrlTarifa}actualizacion-masiva`, dto, httpOptions
+    );
   }
 
   getAllCentroCosto(idCliente?: number | null): Observable<any[]> {

@@ -10,17 +10,54 @@ export const defaultNavigation: FuseNavigationItem[] = [
         link : '/example'
     },
     {
+        id   : 'planning',
+        title: 'Despacho',
+        type : 'aside',
+        icon : 'heroicons_outline:truck',
+        children: [
+            {
+                id   : 'estacion',
+                title: 'Ver Estaciones',
+                type : 'basic',
+                icon : 'heroicons_outline:map-pin',
+                link : '/planning/estacion'
+            },
+            {
+                id   : 'leadtime-operativo',
+                title: 'Lead Time Operativo',
+                type : 'basic',
+                icon : 'heroicons_outline:clock',
+                link : '/planning/leadtime-operativo'
+            }
+        ]
+    },
+    {
         id   : 'comercial',
         title: 'Comercial',
         type : 'aside',
         icon : 'heroicons_outline:briefcase',
         children: [
             {
-                id   : 'leadtimes',
-                title: 'Lead Times',
-                type : 'basic',
-                icon : 'heroicons_outline:clock',
-                link : '/comercial/leadtimes'
+                id       : 'leadtimes',
+                title    : 'Lead Times',
+                type     : 'collapsable',
+                icon     : 'heroicons_outline:clock',
+                children : [
+                    {
+                        id   : 'leadtimes.comercial',
+                        title: 'Comercial',
+                        type : 'basic',
+                        icon : 'heroicons_outline:user-group',
+                        link : '/comercial/leadtimes'
+                    },
+                    {
+                        id   : 'leadtimes.operativo',
+                        title: 'Operativo',
+                        type : 'basic',
+                        icon : 'heroicons_outline:truck',
+                        link : '/comercial/leadtimes/operativo'
+                    }
+                ]
             }
         ]
     },
@@ -56,17 +93,54 @@ export const compactNavigation: FuseNavigationItem[] = [
         link : '/example'
     },
     {
+        id   : 'planning',
+        title: 'Despacho',
+        type : 'aside',
+        icon : 'heroicons_outline:truck',
+        children: [
+            {
+                id   : 'estacion',
+                title: 'Ver Estaciones',
+                type : 'basic',
+                icon : 'heroicons_outline:map-pin',
+                link : '/planning/estacion'
+            },
+            {
+                id   : 'leadtime-operativo',
+                title: 'Lead Time Operativo',
+                type : 'basic',
+                icon : 'heroicons_outline:clock',
+                link : '/planning/leadtime-operativo'
+            }
+        ]
+    },
+    {
         id   : 'comercial',
         title: 'Comercial',
         type : 'aside',
         icon : 'heroicons_outline:briefcase',
         children: [
             {
-                id   : 'leadtimes',
-                title: 'Lead Times',
-                type : 'basic',
-                icon : 'heroicons_outline:clock',
-                link : '/comercial/leadtimes'
+                id       : 'leadtimes',
+                title    : 'Lead Times',
+                type     : 'collapsable',
+                icon     : 'heroicons_outline:clock',
+                children : [
+                    {
+                        id   : 'leadtimes.comercial',
+                        title: 'Comercial',
+                        type : 'basic',
+                        icon : 'heroicons_outline:user-group',
+                        link : '/comercial/leadtimes'
+                    },
+                    {
+                        id   : 'leadtimes.operativo',
+                        title: 'Operativo',
+                        type : 'basic',
+                        icon : 'heroicons_outline:truck',
+                        link : '/comercial/leadtimes/operativo'
+                    }
+                ]
             }
         ]
     },
@@ -102,17 +176,54 @@ export const futuristicNavigation: FuseNavigationItem[] = [
         link : '/example'
     },
     {
+        id   : 'planning',
+        title: 'Despacho',
+        type : 'aside',
+        icon : 'heroicons_outline:truck',
+        children: [
+            {
+                id   : 'estacion',
+                title: 'Ver Estaciones',
+                type : 'basic',
+                icon : 'heroicons_outline:map-pin',
+                link : '/planning/estacion'
+            },
+            {
+                id   : 'leadtime-operativo',
+                title: 'Lead Time Operativo',
+                type : 'basic',
+                icon : 'heroicons_outline:clock',
+                link : '/planning/leadtime-operativo'
+            }
+        ]
+    },
+    {
         id   : 'comercial',
         title: 'Comercial',
         type : 'aside',
         icon : 'heroicons_outline:briefcase',
         children: [
             {
-                id   : 'leadtimes',
-                title: 'Lead Times',
-                type : 'basic',
-                icon : 'heroicons_outline:clock',
-                link : '/comercial/leadtimes'
+                id       : 'leadtimes',
+                title    : 'Lead Times',
+                type     : 'collapsable',
+                icon     : 'heroicons_outline:clock',
+                children : [
+                    {
+                        id   : 'leadtimes.comercial',
+                        title: 'Comercial',
+                        type : 'basic',
+                        icon : 'heroicons_outline:user-group',
+                        link : '/comercial/leadtimes'
+                    },
+                    {
+                        id   : 'leadtimes.operativo',
+                        title: 'Operativo',
+                        type : 'basic',
+                        icon : 'heroicons_outline:truck',
+                        link : '/comercial/leadtimes/operativo'
+                    }
+                ]
             }
         ]
     },
@@ -148,17 +259,54 @@ export const horizontalNavigation: FuseNavigationItem[] = [
         link : '/example'
     },
     {
+        id   : 'planning',
+        title: 'Despacho',
+        type : 'aside',
+        icon : 'heroicons_outline:truck',
+        children: [
+            {
+                id   : 'estacion',
+                title: 'Ver Estaciones',
+                type : 'basic',
+                icon : 'heroicons_outline:map-pin',
+                link : '/planning/estacion'
+            },
+            {
+                id   : 'leadtime-operativo',
+                title: 'Lead Time Operativo',
+                type : 'basic',
+                icon : 'heroicons_outline:clock',
+                link : '/planning/leadtime-operativo'
+            }
+        ]
+    },
+    {
         id   : 'comercial',
         title: 'Comercial',
         type : 'aside',
         icon : 'heroicons_outline:briefcase',
         children: [
             {
-                id   : 'leadtimes',
-                title: 'Lead Times',
-                type : 'basic',
-                icon : 'heroicons_outline:clock',
-                link : '/comercial/leadtimes'
+                id       : 'leadtimes',
+                title    : 'Lead Times',
+                type     : 'collapsable',
+                icon     : 'heroicons_outline:clock',
+                children : [
+                    {
+                        id   : 'leadtimes.comercial',
+                        title: 'Comercial',
+                        type : 'basic',
+                        icon : 'heroicons_outline:user-group',
+                        link : '/comercial/leadtimes'
+                    },
+                    {
+                        id   : 'leadtimes.operativo',
+                        title: 'Operativo',
+                        type : 'basic',
+                        icon : 'heroicons_outline:truck',
+                        link : '/comercial/leadtimes/operativo'
+                    }
+                ]
             }
         ]
     },

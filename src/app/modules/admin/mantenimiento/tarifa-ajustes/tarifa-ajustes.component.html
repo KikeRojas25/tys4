@@ -1,0 +1,236 @@
+<div class="flex flex-col flex-auto min-w-0 bg-gray-50">
+
+  <!-- Header -->
+  <div class="flex flex-col sm:flex-row flex-0 sm:items-center sm:justify-between p-2 sm:py-8 sm:px-10 border-b border-gray-200 bg-white shadow-sm">
+    <div class="flex-1 min-w-0">
+      <div class="flex flex-wrap items-center font-medium text-sm text-gray-600">
+        <a class="whitespace-nowrap text-gray-700 hover:text-gray-900">TMS</a>
+        <mat-icon class="fuse-horizontal-navigation-item-icon text-gray-400 mx-1" [svgIcon]="'heroicons_solid:chevron-right'"></mat-icon>
+        <a class="text-gray-700 hover:text-gray-900">Mantenimiento</a>
+        <mat-icon class="fuse-horizontal-navigation-item-icon text-gray-400 mx-1" [svgIcon]="'heroicons_solid:chevron-right'"></mat-icon>
+        <span class="text-gray-500">Ajustes de Tarifa</span>
+      </div>
+      <div class="mt-2">
+        <h2 class="text-3xl md:text-4xl font-semibold tracking-tight leading-7 sm:leading-10 truncate text-gray-900">
+          Ajustes de Tarifa por Cliente
+        </h2>
+        <p class="text-sm text-amber-700 mt-1.5">Historial de incrementos y reducciones por variación de costos</p>
+      </div>
+    </div>
+  </div>
+
+  <p-toast />
+
+  <div class="main-content container-fluid p-4 flex flex-col gap-4">
+
+    <!-- Filtro de cliente -->
+    <div class="bg-white rounded-lg shadow-sm border border-gray-200 p-4">
+      <div class="flex flex-wrap items-end gap-4">
+        <div class="flex flex-col gap-1 flex-1 min-w-[280px]">
+          <label class="text-sm font-medium text-gray-700">Cliente</label>
+          <p-dropdown
+            [options]="clientes"
+            [(ngModel)]="idClienteSeleccionado"
+            placeholder="Seleccione un cliente"
+            [filter]="true"
+            [showClear]="true"
+            appendTo="body"
+            scrollHeight="30vh"
+            [style]="{'width':'100%'}"
+            (onChange)="onClienteChange()">
+          </p-dropdown>
+        </div>
+
+        <button pButton label="Nuevo Ajuste" icon="pi pi-plus"
+                [disabled]="!idClienteSeleccionado"
+                class="px-4 py-2 text-sm font-medium text-white bg-amber-600 hover:bg-amber-500 rounded-md shadow-sm"
+                (click)="abrirNuevo()">
+        </button>
+      </div>
+    </div>
+
+    <!-- Tabla historial -->
+    <div class="bg-white rounded-lg shadow-sm border border-gray-200 overflow-hidden">
+      <div class="px-4 py-3 border-b border-gray-100 flex items-center justify-between">
+        <span class="text-sm font-semibold text-gray-700">Historial de ajustes</span>
+        <span class="text-xs text-gray-400">{{ ajustes.length }} registro(s)</span>
+      </div>
+
+      <p-table [value]="ajustes" [loading]="loading"
+               [scrollable]="true" scrollHeight="60vh"
+               styleClass="custom-table"
+               [tableStyle]="{'min-width':'780px'}">
+
+        <ng-template pTemplate="header">
+          <tr class="bg-gray-800 text-white">
+            <th style="width:90px"  class="text-center px-3 py-3 text-xs font-semibold uppercase">ACC</th>
+            <th style="width:90px"  class="text-center px-3 py-3 text-xs font-semibold uppercase">Estado</th>
+            <th style="width:90px"  class="text-right  px-3 py-3 text-xs font-semibold uppercase">Factor</th>
+            <th style="width:110px" class="text-right  px-3 py-3 text-xs font-semibold uppercase">% Ajuste</th>
+            <th style="width:120px" class="text-center px-3 py-3 text-xs font-semibold uppercase">Desde</th>
+            <th style="width:120px" class="text-center px-3 py-3 text-xs font-semibold uppercase">Hasta</th>
+            <th                     class="text-left   px-3 py-3 text-xs font-semibold uppercase">Motivo</th>
+            <th style="width:160px" class="text-center px-3 py-3 text-xs font-semibold uppercase">F. Registro</th>
+          </tr>
+        </ng-template>
+
+        <ng-template pTemplate="body" let-a>
+          <tr class="border-b border-gray-100 hover:bg-gray-50 transition-colors"
+              [ngClass]="{'bg-green-50': a.vigente}">
+
+            <!-- Acciones -->
+            <td class="text-center px-2 py-2">
+              <div class="flex gap-1 justify-center">
+                <button pButton icon="pi pi-ban" class="action-btn"
+                        style="color:#d97706"
+                        pTooltip="Inactivar" tooltipPosition="top"
+                        [disabled]="!a.vigente"
+                        (click)="inactivar(a)">
+                </button>
+                <button pButton icon="pi pi-trash" class="action-btn action-btn-danger"
+                        pTooltip="Eliminar" tooltipPosition="top"
+                        (click)="eliminar(a)">
+                </button>
+              </div>
+            </td>
+
+            <!-- Estado -->
+            <td class="text-center px-3 py-2">
+              <p-tag [value]="a.vigente ? 'Vigente' : 'Inactivo'"
+                     [severity]="a.vigente ? 'success' : 'secondary'">
+              </p-tag>
+            </td>
+
+            <!-- Factor -->
+            <td class="text-right px-3 py-2 font-mono text-sm text-gray-700">
+              {{ a.factor | number:'1.4-6' }}
+            </td>
+
+            <!-- % Ajuste -->
+            <td class="text-right px-3 py-2">
+              <span class="font-semibold text-sm"
+                    [ngClass]="a.porcentajeAjuste >= 0 ? 'text-green-700' : 'text-red-600'">
+                {{ a.porcentajeAjuste >= 0 ? '+' : '' }}{{ a.porcentajeAjuste | number:'1.2-4' }}%
+              </span>
+            </td>
+
+            <!-- Fechas -->
+            <td class="text-center px-3 py-2 text-sm text-gray-600">{{ formatDate(a.fechaDesde) }}</td>
+            <td class="text-center px-3 py-2 text-sm text-gray-600">
+              {{ a.fechaHasta ? formatDate(a.fechaHasta) : '—' }}
+            </td>
+
+            <!-- Motivo -->
+            <td class="text-left px-3 py-2 text-sm text-gray-700">{{ a.motivo || '—' }}</td>
+
+            <!-- F. Registro -->
+            <td class="text-center px-3 py-2 text-xs text-gray-500">
+              {{ a.fechaRegistro | date:'dd/MM/yyyy HH:mm' }}
+            </td>
+          </tr>
+        </ng-template>
+
+        <ng-template pTemplate="emptymessage">
+          <tr>
+            <td colspan="8" class="text-center py-10 text-gray-400">
+              {{ idClienteSeleccionado ? 'No hay ajustes registrados para este cliente.' : 'Seleccione un cliente para ver el historial.' }}
+            </td>
+          </tr>
+        </ng-template>
+
+      </p-table>
+    </div>
+
+  </div>
+</div>
+
+<!-- Dialog Nuevo Ajuste -->
+<p-dialog header="Nuevo Ajuste de Tarifa" [(visible)]="dialogVisible"
+          [modal]="true" [closable]="true" [dismissableMask]="true"
+          [style]="{width:'480px'}" [baseZIndex]="10000">
+
+  <form [formGroup]="form" class="flex flex-col gap-4 pt-2">
+
+    <!-- Porcentaje de ajuste -->
+    <div class="flex flex-col gap-1">
+      <label class="text-sm font-medium text-gray-700">
+        Porcentaje de ajuste <span class="text-red-500">*</span>
+        <span class="ml-2 text-xs text-gray-400">(positivo = incremento, negativo = reducción)</span>
+      </label>
+      <div class="flex items-center gap-2">
+        <p-inputNumber formControlName="porcentaje"
+                       mode="decimal" [minFractionDigits]="2" [maxFractionDigits]="4"
+                       [min]="-99.99" [max]="10000"
+                       [showButtons]="true" [step]="0.5"
+                       placeholder="Ej: 10.00 o -5.00"
+                       styleClass="flex-1"
+                       inputStyleClass="text-right w-full text-lg font-semibold">
+        </p-inputNumber>
+        <span class="text-gray-600 text-xl font-bold">%</span>
+      </div>
+
+      <!-- Preview del factor calculado -->
+      <div *ngIf="form.get('porcentaje')?.value !== null && form.get('porcentaje')?.value !== 0"
+           class="flex items-center justify-between px-3 py-2 rounded-md text-sm font-medium mt-1"
+           [ngClass]="form.get('porcentaje')?.value > 0
+             ? 'bg-green-50 text-green-700 border border-green-200'
+             : 'bg-red-50 text-red-700 border border-red-200'">
+        <span>
+          {{ form.get('porcentaje')?.value > 0 ? '↑ Incremento' : '↓ Reducción' }} del
+          {{ (form.get('porcentaje')?.value < 0 ? form.get('porcentaje')?.value * -1 : form.get('porcentaje')?.value) | number:'1.2-4' }}%
+        </span>
+        <span class="text-xs font-mono opacity-75">
+          Factor: {{ factorCalculado | number:'1.6-6' }}
+        </span>
+      </div>
+
+      <small *ngIf="form.get('porcentaje')?.invalid && form.get('porcentaje')?.touched" class="text-red-500">
+        Porcentaje requerido (entre -99.99% y 10000%).
+      </small>
+    </div>
+
+    <!-- Motivo -->
+    <div class="flex flex-col gap-1">
+      <label class="text-sm font-medium text-gray-700">Motivo</label>
+      <input pInputText formControlName="motivo" maxlength="200"
+             placeholder="Ej: Ajuste por alza de combustible" class="w-full" />
+    </div>
+
+    <!-- Fechas -->
+    <div class="grid grid-cols-2 gap-4">
+      <div class="flex flex-col gap-1">
+        <label class="text-sm font-medium text-gray-700">Fecha Desde <span class="text-red-500">*</span></label>
+        <p-calendar formControlName="fechaDesde" dateFormat="dd/mm/yy"
+                    appendTo="body" [showIcon]="true" styleClass="w-full">
+        </p-calendar>
+      </div>
+      <div class="flex flex-col gap-1">
+        <label class="text-sm font-medium text-gray-700">Fecha Hasta
+          <span class="text-xs text-gray-400 ml-1">(vacío = vigente)</span>
+        </label>
+        <p-calendar formControlName="fechaHasta" dateFormat="dd/mm/yy"
+                    appendTo="body" [showIcon]="true" [showClear]="true" styleClass="w-full">
+        </p-calendar>
+      </div>
+    </div>
+
+    <!-- Aviso vigente -->
+    <div class="bg-amber-50 border border-amber-200 rounded-md px-3 py-2 text-xs text-amber-700">
+      Si existe un ajuste <strong>vigente</strong> para este cliente, quedará inactivado automáticamente al guardar.
+    </div>
+
+  </form>
+
+  <ng-template pTemplate="footer">
+    <button pButton type="button" label="Cancelar" icon="pi pi-times" severity="secondary"
+            (click)="dialogVisible = false">
+    </button>
+    <button pButton type="button" label="Guardar" icon="pi pi-check"
+            [loading]="guardando"
+            class="px-4 py-2 text-sm font-medium text-white bg-amber-600 hover:bg-amber-500 rounded-md"
+            (click)="guardar()">
+    </button>
+  </ng-template>
+</p-dialog>
+
+<p-confirmDialog header="Confirmación" icon="pi pi-exclamation-triangle" />

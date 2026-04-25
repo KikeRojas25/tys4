@@ -73,10 +73,21 @@ export class ListpreliquidacionesComponent implements OnInit {
 
   ngOnInit(): void {
     this.inicializarColumnas();
+    this.inicializarFechas();
     this.cargarUsuario();
     this.cargarClientes();
     this.cargarEstados();
     this.cargarTiposComprobante();
+    this.buscar();
+  }
+
+  inicializarFechas(): void {
+    const hoy = new Date();
+    const hace3Meses = new Date();
+    hace3Meses.setMonth(hoy.getMonth() - 3);
+    this.model.fecharegistroinicio = hace3Meses;
+    this.model.fecharegistrofin = hoy;
+    this.model.idestado = 22;
   }
 
   cargarUsuario(): void {
@@ -112,10 +123,12 @@ export class ListpreliquidacionesComponent implements OnInit {
   cargarEstados(): void {
     this.estados = [
       { label: 'Todos los estados', value: null },
-      { label: 'Pendiente', value: 1 },
-      { label: 'Aprobado', value: 2 },
-      { label: 'Anulado', value: 3 }
+      { label: 'Pendiente Facturar', value: 22 },
+      { label: 'Facturado', value: 23 },
+      
     ];
+
+
   }
 
   cargarTiposComprobante(): void {
@@ -145,6 +158,14 @@ export class ListpreliquidacionesComponent implements OnInit {
     ];
   }
 
+  private formatFecha(fecha: Date): string {
+    if (!fecha) return undefined;
+    const y = fecha.getFullYear();
+    const m = String(fecha.getMonth() + 1).padStart(2, '0');
+    const d = String(fecha.getDate()).padStart(2, '0');
+    return `${y}-${m}-${d}`;
+  }
+
   buscar(): void {
     this.loading = true;
     this.facturacionService.listarPreliquidacion(
@@ -152,7 +173,9 @@ export class ListpreliquidacionesComponent implements OnInit {
       this.model.numerocomprobante,
       this.model.idtipocomprobante,
       this.model.idcliente,
-      this.model.numeroliquidacion
+      this.model.numeroliquidacion,
+      this.formatFecha(this.model.fecharegistroinicio),
+      this.formatFecha(this.model.fecharegistrofin)
     ).subscribe({
       next: (preliquidaciones: ListarPreliquidacionResult[]) => {
         this.preliquidaciones = preliquidaciones;
@@ -174,6 +197,7 @@ export class ListpreliquidacionesComponent implements OnInit {
 
   limpiarFiltros(): void {
     this.model = {};
+    this.inicializarFechas();
     this.buscar();
   }
 
@@ -211,12 +235,66 @@ export class ListpreliquidacionesComponent implements OnInit {
     window.open(url, '_blank');
   }
 
+  eliminarPreliquidacion(): void {
+    if (!this.selectedItem || !this.selectedItem.idpreliquidacion) {
+      this.messageService.add({
+        severity: 'warn',
+        summary: 'Advertencia',
+        detail: 'Debe seleccionar una preliquidación para eliminar'
+      });
+      return;
+    }
+
+    this.confirmationService.confirm({
+      message: `¿Está seguro que desea eliminar la preliquidación <b>${this.selectedItem.numeropreliquidacion}</b>?<br>Esta acción no se puede deshacer.`,
+      header: 'Confirmar eliminación',
+      icon: 'pi pi-exclamation-triangle',
+      acceptLabel: 'Eliminar',
+      rejectLabel: 'Cancelar',
+      acceptButtonStyleClass: 'p-button-danger',
+      accept: () => {
+        const idusuario = this.user?.id || 0;
+        this.facturacionService.eliminarPreliquidacion(
+          this.selectedItem!.idpreliquidacion,
+          idusuario
+        ).subscribe({
+          next: () => {
+            this.messageService.add({
+              severity: 'success',
+              summary: 'Eliminada',
+              detail: 'Preliquidación eliminada correctamente'
+            });
+            this.selectedItem = null;
+            this.buscar();
+          },
+          error: (err) => {
+            const msg = err?.error?.message || 'Error al eliminar la preliquidación';
+            this.messageService.add({
+              severity: 'error',
+              summary: 'Error',
+              detail: msg
+            });
+          }
+        });
+      }
+    });
+  }
+
   generarFactura(): void {
     if (!this.selectedItem || !this.selectedItem.idpreliquidacion) {
       this.messageService.add({
         severity: 'warn',
         summary: 'Advertencia',
         detail: 'Debe seleccionar una preliquidación para generar la factura'
+      });
+      return;
+    }
+
+    if (this.selectedItem.idestado !== 22) {
+      this.messageService.add({
+        severity: 'warn',
+        summary: 'Advertencia',
+        detail: 'Solo se puede generar factura para preliquidaciones en estado Pendiente'
       });
       return;
     }

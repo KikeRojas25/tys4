@@ -46,6 +46,7 @@ getAllOrderRecojo(model: any) {
   params.idcliente = params.idcliente && params.idcliente !== 0 ? params.idcliente : '';
   params.idestado = params.idestado && params.idestado !== 0 ? params.idestado : '';
   params.idresponsable = params.idresponsable && params.idresponsable !== 0 ? params.idresponsable : '';
+  params.numcp = params.numcp ? params.numcp.trim() : '';
 
   console.log('params enviados:', params);
 
@@ -56,7 +57,8 @@ getAllOrderRecojo(model: any) {
     `&fec_ini=${params.fec_ini.toLocaleDateString()}` +
     `&fec_fin=${params.fec_fin.toLocaleDateString()}` +
     `&idestado=${params.idestado}` +
-    `&idresponsable=${params.idresponsable}`;
+    `&idresponsable=${params.idresponsable}` +
+    `&numcp=${params.numcp}`;
 
   return this.http.get<OrdenTransporte[]>(url, httpOptions);
 }
@@ -99,6 +101,18 @@ registrar(model: any): Observable<OrdenTransporte> {
 
   getUsuariosPorRol(rolId: number): Observable<Usuario[]> {
     return this.http.get<Usuario[]>(`${this.baseUrlAuth}usuarios/${rolId}`, httpOptions);
+  }
+
+  buscarOrPorNumcp(numcp: string): Observable<any[]> {
+    return this.http.get<any[]>(`${this.baseUrl}BuscarOrPorNumcp?numcp=${numcp}`, httpOptions);
+  }
+
+  getOtsPendientesRecepcionCreacionOt(idCliente: number): Observable<any[]> {
+    return this.http.get<any[]>(`${this.baseUrl}OtsPendientesRecepcionCreacionOt?idCliente=${idCliente}`, httpOptions);
+  }
+
+  reasignarProveedor(idordentrabajo: number, idproveedor: number): Observable<any> {
+    return this.http.put<any>(`${this.baseUrl}ReasignarProveedor/${idordentrabajo}`, idproveedor, httpOptions);
   }
 
 }

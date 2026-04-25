@@ -112,6 +112,11 @@
   white-space: normal;
 }
 
+::ng-deep .p-checkbox .mdc-checkbox__native-control {
+  opacity: 1 !important;
+  pointer-events: auto !important;
+}
+
 ::ng-deep .p-toast {
   z-index: 9999 !important;
 }
