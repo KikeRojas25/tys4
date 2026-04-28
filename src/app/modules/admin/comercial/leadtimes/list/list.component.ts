@@ -41,7 +41,7 @@ export class ListComponent implements OnInit {
   loading = false;
   saving = false;
 
-  readonly dias = [1, 2, 3, 4, 5, 6, 7, 8, 9, 10];
+  readonly dias = Array.from({ length: 30 }, (_, i) => i + 1);
   filtro: string = '';
   soloVacios: boolean = false;
 

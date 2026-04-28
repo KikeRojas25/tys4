@@ -157,4 +157,46 @@ export class TrackingotComponent {
     const s = estado.toLowerCase().replace(/\s/g, '-');
     return 'estado-' + s;
   }
+
+  /** Normaliza el texto del evento a un código de tipo para rutear acciones. */
+  private tipoEvento(status?: string): string {
+    const txt = (status || '').toLowerCase();
+    if (txt.includes('ot creada') || (txt.includes('registr') && txt.includes('orden de transporte'))) return 'ot-creada';
+    if (txt.includes('planificada')) return 'ot-planificada';
+    if (txt.includes('manifiesto') || txt.includes('hoja ruta') || txt.includes('hr generado')) return 'manifiesto-hr';
+    if (txt.includes('despachada')) return 'ot-despachada';
+    if (txt.includes('en zona')) return 'en-zona';
+    if (txt.includes('en reparto')) return 'en-reparto';
+    if (txt.includes('entrega') && (txt.includes('conforme') || txt.includes('(ok)'))) return 'entrega-ok';
+    return 'none';
+  }
+
+  /**
+   * Abre el visor de adjuntos / link contextual del evento.
+   * El comportamiento por tipo se irá conectando gradualmente.
+   */
+  verAdjuntosEvento(event: EventItem, item: OrdenConEventos): void {
+    const type = this.tipoEvento(event.status);
+
+    switch (type) {
+      // "Se registró la orden de transporte" → reporte de OT en webreports
+      case 'ot-creada': {
+        const idOrden = item?.orden?.idordentrabajo ?? (item?.ordenTransporte?.idordentrabajo);
+        if (!idOrden) {
+          this.messageService.add({ severity: 'warn', summary: 'Adjuntos', detail: 'No se encontró el ID de la orden.' });
+          return;
+        }
+        window.open(`http://104.36.166.65/webreports/ot.aspx?idorden=${idOrden}`, '_blank');
+        return;
+      }
+
+      // TODO: agregar el resto de tipos a medida que se vayan definiendo
+      default:
+        this.messageService.add({
+          severity: 'info', summary: 'Adjuntos',
+          detail: 'Este evento aún no tiene visor configurado.'
+        });
+        console.log('[adjuntos] tipo evento sin handler:', type, '| event:', event, '| item:', item);
+    }
+  }
 }

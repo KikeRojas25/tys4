@@ -183,11 +183,7 @@ export const appRoutes: Route[] = [
                     loadComponent: () => import('./modules/admin/recojo/integrado/integrado.component')
                                           .then(m => m.IntegradoComponent)
                   },
-                  {
-                    path: 'integrado-semaforo',
-                    loadComponent: () => import('./modules/admin/recojo/integrado-semaforo/integrado-semaforo.component')
-                                          .then(m => m.IntegradoSemaforoComponent)
-                  },
+                  
                   {
                     path: 'confirmarentregas',
                     loadComponent: () => import('./modules/admin/trafico/confirmarentrega/confirmarentrega.component')
@@ -321,9 +317,19 @@ export const appRoutes: Route[] = [
                     ]
                   },
                   {
+                    path: 'integrado-semaforo',
+                    loadComponent: () => import('./modules/admin/recojo/integrado-semaforo/integrado-semaforo.component')
+                                          .then(m => m.IntegradoSemaforoComponent)
+                  },  
+                  {
                     path: 'registro-citas',
                     loadComponent: () => import('./modules/admin/comercial/registro-citas/registro-citas.component')
                                           .then(m => m.RegistroCitasComponent)
+                  },
+                  {
+                    path: 'seguimiento-reclamos',
+                    loadComponent: () => import('./modules/admin/comercial/reclamos/seguimiento/seguimiento-reclamos.component')
+                                          .then(m => m.SeguimientoReclamosComponent)
                   }
                 ]
               },

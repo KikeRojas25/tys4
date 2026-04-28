@@ -1,0 +1,210 @@
+<div class="flex flex-col flex-auto min-w-0" [class.bg-gray-50]="!embedded">
+  <!-- Header (solo en modo página) -->
+  <div *ngIf="!embedded" class="flex flex-col sm:flex-row flex-0 sm:items-center sm:justify-between px-4 py-3 sm:px-6 sm:py-4 border-b border-gray-200 bg-white shadow-sm">
+    <div class="flex-1 min-w-0">
+      <div class="flex flex-wrap items-center font-medium text-xs text-gray-600">
+        <a [routerLink]="['/comercial/leadtimes']" class="text-gray-700 hover:text-gray-900">TMS</a>
+        <mat-icon class="text-gray-400 ml-1" [svgIcon]="'heroicons_solid:chevron-right'" [style.width.px]="16" [style.height.px]="16"></mat-icon>
+        <a [routerLink]="['/comercial/leadtimes']" class="ml-1 text-gray-700 hover:text-gray-900">Comercial</a>
+        <mat-icon class="text-gray-400 ml-1" [svgIcon]="'heroicons_solid:chevron-right'" [style.width.px]="16" [style.height.px]="16"></mat-icon>
+        <span class="ml-1 text-gray-500">Seguimiento de reclamos</span>
+      </div>
+      <div class="mt-1">
+        <h2 class="text-xl md:text-2xl font-semibold tracking-tight text-gray-900">Seguimiento de reclamos</h2>
+        <p class="text-xs text-amber-700 mt-0.5">Filtre, consulte detalle y actualice el estado de los reclamos registrados</p>
+      </div>
+    </div>
+  </div>
+
+  <p-toast />
+  <p-confirmDialog />
+
+  <div class="main-content container-fluid" [class.p-4]="!embedded">
+    <!-- Filtros -->
+    <div class="bg-white rounded-lg shadow-sm border border-gray-200 p-3 mb-3">
+      <div class="grid grid-cols-1 gap-2 items-end" [class.md:grid-cols-5]="!embedded" [class.md:grid-cols-4]="embedded">
+        <div *ngIf="!embedded">
+          <label class="block text-xs font-semibold text-gray-700 mb-1">Cliente</label>
+          <p-dropdown [options]="clientes" [(ngModel)]="filtros.idcliente"
+            optionLabel="label" optionValue="value" [filter]="true" appendTo="body"
+            placeholder="Todos" [style]="{'width':'100%'}"></p-dropdown>
+        </div>
+        <div>
+          <label class="block text-xs font-semibold text-gray-700 mb-1">Área</label>
+          <p-dropdown [options]="areasOpts" [(ngModel)]="filtros.idarea"
+            optionLabel="label" optionValue="value" appendTo="body"
+            placeholder="Todas" [style]="{'width':'100%'}"></p-dropdown>
+        </div>
+        <div>
+          <label class="block text-xs font-semibold text-gray-700 mb-1">Estado</label>
+          <p-dropdown [options]="estadosOpts" [(ngModel)]="filtros.idestado"
+            optionLabel="label" optionValue="value" appendTo="body"
+            placeholder="Todos" [style]="{'width':'100%'}"></p-dropdown>
+        </div>
+        <div>
+          <label class="block text-xs font-semibold text-gray-700 mb-1">Desde</label>
+          <p-calendar [(ngModel)]="filtros.fechaDesde" dateFormat="dd/mm/yy"
+            appendTo="body" [style]="{'width':'100%'}"></p-calendar>
+        </div>
+        <div>
+          <label class="block text-xs font-semibold text-gray-700 mb-1">Hasta</label>
+          <p-calendar [(ngModel)]="filtros.fechaHasta" dateFormat="dd/mm/yy"
+            appendTo="body" [style]="{'width':'100%'}"></p-calendar>
+        </div>
+      </div>
+      <div class="flex justify-end gap-2 mt-3">
+        <button pButton type="button" label="Limpiar" icon="pi pi-eraser"
+          class="p-button-sm p-button-outlined" (click)="limpiarFiltros()"></button>
+        <button pButton type="button" label="Buscar" icon="pi pi-search"
+          class="p-button-sm bg-amber-600 hover:bg-amber-500 text-white border-0"
+          (click)="buscar()" [loading]="loading"></button>
+      </div>
+    </div>
+
+    <!-- Tabla -->
+    <div class="bg-white rounded-lg shadow-sm border border-gray-200">
+      <p-table [value]="reclamos" [loading]="loading"
+        [paginator]="true" [rows]="15" [rowsPerPageOptions]="[15,30,50]"
+        styleClass="p-datatable-sm p-datatable-striped" responsiveLayout="scroll">
+        <ng-template pTemplate="header">
+          <tr class="bg-blue-700 text-white">
+            <th class="text-center" style="width:60px">N°</th>
+            <th>F. Registro</th>
+            <th>Cliente</th>
+            <th>Área</th>
+            <th>Subtipo</th>
+            <th>OT</th>
+            <th>Responsable</th>
+            <th class="text-center">Estado</th>
+            <th class="text-center" style="width:90px">Acciones</th>
+          </tr>
+        </ng-template>
+        <ng-template pTemplate="body" let-r>
+          <tr>
+            <td class="text-center text-xs font-medium">#{{ r.idreclamo }}</td>
+            <td class="text-xs">{{ r.fecharegistro | date:'dd/MM/yy HH:mm' }}</td>
+            <td class="text-xs">{{ r.cliente }}</td>
+            <td class="text-xs">{{ r.area_nombre }}</td>
+            <td class="text-xs">{{ r.subtipo_nombre }}<span *ngIf="r.texto_libre"> — <em class="text-gray-500">{{ r.texto_libre }}</em></span></td>
+            <td class="text-xs">{{ r.ot_numcp || '—' }}</td>
+            <td class="text-xs">{{ r.usuario_registro }}</td>
+            <td class="text-center">
+              <p-tag [value]="r.estado_nombre" [severity]="severidadEstado(r.estado_codigo)"></p-tag>
+            </td>
+            <td class="text-center">
+              <button pButton type="button" icon="pi pi-eye"
+                class="p-button-rounded p-button-text p-button-sm"
+                pTooltip="Ver detalle / cambiar estado" tooltipPosition="left"
+                (click)="verDetalle(r)"></button>
+            </td>
+          </tr>
+        </ng-template>
+        <ng-template pTemplate="emptymessage">
+          <tr><td colspan="9" class="text-center py-6 text-gray-500">No hay reclamos para los filtros aplicados</td></tr>
+        </ng-template>
+      </p-table>
+    </div>
+  </div>
+
+  <!-- Detalle -->
+  <p-dialog [(visible)]="detalleVisible" [modal]="true" [style]="{width:'880px'}"
+    [draggable]="false" [resizable]="false" header="Detalle del reclamo">
+    <div *ngIf="reclamoSel" class="space-y-4">
+      <!-- Cabecera -->
+      <div class="bg-gray-50 border border-gray-200 rounded-md p-3">
+        <div class="flex items-center justify-between mb-2">
+          <div class="flex items-center gap-2">
+            <span class="font-semibold text-gray-800">Reclamo #{{ reclamoSel.idreclamo }}</span>
+            <p-tag [value]="reclamoSel.estado_nombre" [severity]="severidadEstado(reclamoSel.estado_codigo)"></p-tag>
+          </div>
+          <button pButton type="button" label="Cambiar estado" icon="pi pi-refresh"
+            class="p-button-sm bg-amber-600 hover:bg-amber-500 text-white border-0"
+            (click)="abrirCambioEstado()"></button>
+        </div>
+        <div class="grid grid-cols-2 md:grid-cols-3 gap-2 text-xs">
+          <div><span class="font-semibold text-gray-600">Cliente:</span> {{ reclamoSel.cliente }}</div>
+          <div><span class="font-semibold text-gray-600">Área:</span> {{ reclamoSel.area_nombre }}</div>
+          <div><span class="font-semibold text-gray-600">Subtipo:</span> {{ reclamoSel.subtipo_nombre }}</div>
+          <div *ngIf="reclamoSel.texto_libre"><span class="font-semibold text-gray-600">Detalle:</span> {{ reclamoSel.texto_libre }}</div>
+          <div><span class="font-semibold text-gray-600">OT:</span> {{ reclamoSel.ot_numcp || '—' }}</div>
+          <div><span class="font-semibold text-gray-600">Registrado por:</span> {{ reclamoSel.usuario_registro }}</div>
+          <div><span class="font-semibold text-gray-600">F. Registro:</span> {{ reclamoSel.fecharegistro | date:'dd/MM/yyyy HH:mm' }}</div>
+          <div *ngIf="reclamoSel.fechaactualiza">
+            <span class="font-semibold text-gray-600">Última actualización:</span>
+            {{ reclamoSel.fechaactualiza | date:'dd/MM/yyyy HH:mm' }}
+            <ng-container *ngIf="reclamoSel.usuario_actualiza"> — por {{ reclamoSel.usuario_actualiza }}</ng-container>
+          </div>
+        </div>
+        <div *ngIf="reclamoSel.observaciones" class="mt-2 text-xs">
+          <span class="font-semibold text-gray-600">Observaciones / Instrucción:</span>
+          <p class="text-gray-800 mt-0.5 whitespace-pre-wrap">{{ reclamoSel.observaciones }}</p>
+        </div>
+      </div>
+
+      <!-- Historial -->
+      <div>
+        <h4 class="text-sm font-semibold text-gray-800 mb-2 flex items-center gap-1">
+          <i class="pi pi-history"></i> Historial de cambios
+        </h4>
+        <p-table [value]="historial" [loading]="loadingDetalle"
+          styleClass="p-datatable-sm p-datatable-striped" responsiveLayout="scroll">
+          <ng-template pTemplate="header">
+            <tr class="bg-blue-700 text-white">
+              <th>Fecha</th>
+              <th>Acción</th>
+              <th>Comentario</th>
+              <th>Responsable</th>
+            </tr>
+          </ng-template>
+          <ng-template pTemplate="body" let-h>
+            <tr>
+              <td class="text-xs">{{ h.fecha | date:'dd/MM/yy HH:mm' }}</td>
+              <td class="text-xs">
+                <ng-container *ngIf="h.estado_anterior; else creado">
+                  {{ h.estado_anterior }} <i class="pi pi-arrow-right text-[10px]"></i> <strong>{{ h.estado_nuevo }}</strong>
+                </ng-container>
+                <ng-template #creado>
+                  <strong class="text-green-700">Creación → {{ h.estado_nuevo }}</strong>
+                </ng-template>
+              </td>
+              <td class="text-xs">{{ h.comentario || '—' }}</td>
+              <td class="text-xs">{{ h.usuario || '—' }}</td>
+            </tr>
+          </ng-template>
+          <ng-template pTemplate="emptymessage">
+            <tr><td colspan="4" class="text-center py-4 text-gray-500">Sin movimientos</td></tr>
+          </ng-template>
+        </p-table>
+      </div>
+    </div>
+  </p-dialog>
+
+  <!-- Cambio de estado -->
+  <p-dialog [(visible)]="cambioEstadoVisible" [modal]="true" [style]="{width:'460px'}"
+    [draggable]="false" [resizable]="false" header="Cambiar estado del reclamo">
+    <div class="space-y-3" *ngIf="reclamoSel">
+      <div class="text-xs text-gray-600">
+        Reclamo #{{ reclamoSel.idreclamo }} — Estado actual:
+        <p-tag [value]="reclamoSel.estado_nombre" [severity]="severidadEstado(reclamoSel.estado_codigo)"></p-tag>
+      </div>
+      <div>
+        <label class="block text-xs font-semibold text-gray-700 mb-1">Nuevo estado <span class="text-red-500">*</span></label>
+        <p-dropdown [options]="estadosDisponibles" [(ngModel)]="cambioEstadoModel.estado_codigo"
+          optionLabel="label" optionValue="value" appendTo="body"
+          placeholder="Seleccione" [style]="{'width':'100%'}"></p-dropdown>
+      </div>
+      <div>
+        <label class="block text-xs font-semibold text-gray-700 mb-1">Comentario</label>
+        <textarea pInputTextarea [(ngModel)]="cambioEstadoModel.comentario" rows="3" class="w-full"
+          placeholder="Comentario opcional sobre el cambio..."></textarea>
+      </div>
+    </div>
+    <ng-template pTemplate="footer">
+      <button pButton type="button" label="Cancelar" icon="pi pi-times"
+        class="p-button-sm p-button-text" (click)="cambioEstadoVisible = false"></button>
+      <button pButton type="button" label="Confirmar" icon="pi pi-check"
+        class="p-button-sm bg-amber-600 hover:bg-amber-500 text-white border-0"
+        [loading]="cambiando" (click)="confirmarCambioEstado()"></button>
+    </ng-template>
+  </p-dialog>
+</div>

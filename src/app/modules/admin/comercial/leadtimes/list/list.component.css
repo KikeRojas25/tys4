@@ -140,25 +140,28 @@
 
 .lt-th-dept {
   text-align: left;
-  padding-left: 10px;
-  width: 100px;
-  min-width: 100px;
-  max-width: 100px;
+  padding-left: 8px;
+  width: 90px;
+  min-width: 90px;
+  max-width: 90px;
   border-right: 1px solid #334155;
 }
 
 .lt-th-prov {
   text-align: left;
-  padding-left: 8px;
-  width: 120px;
-  min-width: 120px;
-  max-width: 120px;
+  padding-left: 6px;
+  width: 110px;
+  min-width: 110px;
+  max-width: 110px;
 }
 
 .lt-th-dia {
   text-align: center;
-  width: 80px;
-  min-width: 80px;
+  width: 28px;
+  min-width: 28px;
+  padding: 8px 2px;
+  font-size: 0.65rem;
+  letter-spacing: 0;
   border-left: 1px solid #334155;
 }
 
@@ -180,10 +183,10 @@
 
 /* Departamento */
 .lt-td-dept {
-  padding: 0 6px 0 10px;
-  width: 100px;
-  min-width: 100px;
-  max-width: 100px;
+  padding: 0 4px 0 8px;
+  width: 90px;
+  min-width: 90px;
+  max-width: 90px;
   border-right: 1px solid #e5e7eb;
   vertical-align: middle;
   background-color: #f8fafc;
@@ -204,10 +207,10 @@
 
 /* Provincia */
 .lt-td-prov {
-  padding: 3px 8px 3px 8px;
-  width: 120px;
-  min-width: 120px;
-  max-width: 120px;
+  padding: 3px 6px;
+  width: 110px;
+  min-width: 110px;
+  max-width: 110px;
   border-right: 1px solid #f1f5f9;
   overflow: hidden;
 }
@@ -233,11 +236,11 @@
 /* Celdas de días */
 .lt-td-dia {
   text-align: center;
-  padding: 4px 0;
+  padding: 3px 0;
   cursor: pointer;
   user-select: none;
-  width: 80px;
-  min-width: 80px;
+  width: 28px;
+  min-width: 28px;
   border-left: 1px solid #f1f5f9;
   transition: background-color 0.1s;
 }
@@ -247,10 +250,10 @@
   display: inline-flex;
   align-items: center;
   justify-content: center;
-  width: 32px;
-  height: 32px;
+  width: 22px;
+  height: 22px;
   border-radius: 50%;
-  font-size: 0.82rem;
+  font-size: 0.7rem;
   font-weight: 600;
   transition: all 0.12s;
 }

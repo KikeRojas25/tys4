@@ -135,6 +135,13 @@ export class ComercialService {
     );
   }
 
+  getOTsObservadasPorCliente(idcliente: number): Observable<any[]> {
+    return this._httpClient.get<any[]>(
+      `${this.baseUrl}ots-observadas?idcliente=${idcliente}`,
+      httpOptions
+    );
+  }
+
   buscarOTPorNumcp(numcp: string): Observable<any> {
     const baseUrlOrden = environment.baseUrl + '/api/Orden/';
     return this._httpClient.get<any>(`${baseUrlOrden}GetOrdenTransporteByNumero?numcp=${numcp}`, httpOptions);

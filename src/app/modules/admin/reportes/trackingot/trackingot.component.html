@@ -85,6 +85,7 @@
                     <th>Fecha evento</th>
                     <th>Usuario registro</th>
                     <th>Recurso</th>
+                    <th style="width: 110px;">Adjuntos</th>
                   </tr>
                 </ng-template>
                 <ng-template pTemplate="body" let-event>
@@ -103,6 +104,15 @@
                       <ng-container *ngIf="event.idmaestroevento === 4">{{ event.recursotroncal || '-' }}</ng-container>
                       <ng-container *ngIf="event.idmaestroevento === 38">{{ event.repartidor || '-' }}</ng-container>
                       <ng-container *ngIf="event.idmaestroevento !== 4 && event.idmaestroevento !== 38">-</ng-container>
+                    </td>
+                    <td class="text-center">
+                      <button *ngIf="event.dateEvent" pButton type="button"
+                              icon="pi pi-paperclip"
+                              label="Ver"
+                              class="p-button-sm p-button-outlined p-button-secondary"
+                              (click)="verAdjuntosEvento(event, item)">
+                      </button>
+                      <span *ngIf="!event.dateEvent" class="text-gray-400 text-xs">—</span>
                     </td>
                   </tr>
                 </ng-template>

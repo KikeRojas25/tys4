@@ -1,5 +1,7 @@
 import { CommonModule } from '@angular/common';
-import { Component, OnInit } from '@angular/core';
+import { Component, OnDestroy, OnInit } from '@angular/core';
+import { Observable, Subject, forkJoin, of } from 'rxjs';
+import { catchError, takeUntil } from 'rxjs/operators';
 import { FormsModule } from '@angular/forms';
 import { MatIcon } from '@angular/material/icon';
 import { ActivatedRoute, Router, RouterModule } from '@angular/router';
@@ -46,7 +48,19 @@ import { ModalReasignarRepartidorComponent } from './modal-reasignar-repartidor.
     ConfirmationService
   ]
 })
-export class VistarepartidorComponent implements OnInit {
+export class VistarepartidorComponent implements OnInit, OnDestroy {
+  /** Códigos de estado usados en getAllOrdersxRepartidor / manifiestos. */
+  private static readonly EST_RECEPCION_MANIFIESTO = 11;
+  private static readonly EST_REPARTO              = 13;
+  private static readonly EST_RECABAR_CARGO        = 34;
+  private static readonly EST_ENVIAR_CARGO         = 35;
+  private static readonly EST_NO_ENTREGADO         = 38;
+
+  /** Flag global de recarga: el template puede mostrar spinner / disabled. */
+  loading = false;
+
+  private readonly destroy$ = new Subject<void>();
+
   modalDetalleManifiesto = false;
   repartidor: any = {};
   idproveedor: any;
@@ -216,131 +230,112 @@ this.cols6 = [
   
 
   }
-  reloadDetalles() {
+  ngOnDestroy(): void {
+    this.destroy$.next();
+    this.destroy$.complete();
+  }
 
-    // Limpiar ordenes5 antes de cargar nuevos datos para evitar duplicados
-    this.ordenes5 = [];
+  /**
+   * Recarga todos los paneles del repartidor en una sola pasada.
+   * - Coordina las 8 llamadas con `forkJoin` → un único `loading` y resultado atómico.
+   * - `catchError` por stream: una falla no bloquea las demás (devuelve fallback).
+   * - `takeUntil(destroy$)` evita actualizar estado si el componente fue destruido.
+   * - Resuelve la race-condition previa en `ordenes5` calculando la unión a partir
+   *   de las 3 llamadas (estados 34, 35 y 38) ya resueltas.
+   */
+  reloadDetalles(): void {
+    this.loading = true;
+    const E = VistarepartidorComponent;
 
-    this.traficoService.getAllManifiestosForProvider(this.idproveedor, 11,  this.iddepartamento ).subscribe(x=> {
-      this.despachos1 = x; 
-      this.totalRecepcion = x.length;
-    });
+    // Helper: cualquier error en una stream → fallback (no rompe forkJoin)
+    const safe = <T>(src: Observable<T>, fallback: T): Observable<T> =>
+      src.pipe(catchError(() => of(fallback)));
 
-    this.traficoService.getAllOTsForProviderRecojo(this.idproveedor, this.iddepartamento).subscribe((list: OrdenTransporteProviderRecojoResult[]) => {
-      const mapped = (list ?? []).map((x) => ({
-        idordentrabajo: x.idordentrabajo,
-        numcp: x.numCp,
-        idestado: x.idEstado,
-        estado: x.estado,
-        razonsocial: x.razonSocial,
-        fecharegistro: x.fechaRegistro,
-        puntorecojo: x.puntoRecojo,
-        origen: x.origen,
-        numhojaruta: x.numHojaRuta,
-        peso: x.peso,
-        bulto: x.bulto,
-        pesovol: x.pesoVol,
-        volumen: x.volumen,
-        cliente: x.cliente,
-        fechahoracita: x.fechaHoraCita,
-        fechahoracitafin: x.fechaHoraCitaFin,
-        fechahoracitareal: x.fechaHoraCitaReal,
-        fechahoracitafinreal: x.fechaHoraCitaFinReal,
-      }));
-      this.ordenesRecojo = mapped;
-      this.totalRecojo = mapped.length;
+    forkJoin({
+      manifiestosRecepcion: safe(this.traficoService.getAllManifiestosForProvider(this.idproveedor, E.EST_RECEPCION_MANIFIESTO, this.iddepartamento), [] as Manifiesto[]),
+      otsRecojo:            safe(this.traficoService.getAllOTsForProviderRecojo(this.idproveedor, this.iddepartamento), [] as OrdenTransporteProviderRecojoResult[]),
+      reparto:              safe(this.traficoService.getAllOrdersxRepartidor(this.idproveedor, E.EST_REPARTO,         this.iddepartamento), [] as OrdenTransporte[]),
+      recabarCargo:         safe(this.traficoService.getAllOrdersxRepartidor(this.idproveedor, E.EST_RECABAR_CARGO,   this.iddepartamento), [] as OrdenTransporte[]),
+      enviarCargo:          safe(this.traficoService.getAllOrdersxRepartidor(this.idproveedor, E.EST_ENVIAR_CARGO,    this.iddepartamento), [] as OrdenTransporte[]),
+      noEntregado:          safe(this.traficoService.getAllOrdersxRepartidor(this.idproveedor, E.EST_NO_ENTREGADO,    this.iddepartamento), [] as OrdenTransporte[]),
+      logisticaInversa:     safe(this.traficoService.getOTRsLogisticaInversaxProveedor(this.idproveedor, this.iddepartamento), { success: false, data: [] as OrdenTransporte[], count: 0 } as any),
+      proveedor:            safe(this.traficoService.getProveedor(this.idproveedor), null as any),
+    })
+    .pipe(takeUntil(this.destroy$))
+    .subscribe({
+      next: (r) => {
+        // Manifiestos en recepción
+        this.despachos1     = r.manifiestosRecepcion ?? [];
+        this.totalRecepcion = this.despachos1.length;
 
-      console.log('ordenesRecojo', this.ordenesRecojo);
-    });
+        // OTs de recojo (mapeo PascalCase → camelCase usado en el template)
+        this.ordenesRecojo = (r.otsRecojo ?? []).map((x) => ({
+          idordentrabajo:        x.idordentrabajo,
+          numcp:                 x.numCp,
+          idestado:              x.idEstado,
+          estado:                x.estado,
+          razonsocial:           x.razonSocial,
+          fecharegistro:         x.fechaRegistro,
+          puntorecojo:           x.puntoRecojo,
+          origen:                x.origen,
+          numhojaruta:           x.numHojaRuta,
+          peso:                  x.peso,
+          bulto:                 x.bulto,
+          pesovol:               x.pesoVol,
+          volumen:               x.volumen,
+          cliente:               x.cliente,
+          fechahoracita:         x.fechaHoraCita,
+          fechahoracitafin:      x.fechaHoraCitaFin,
+          fechahoracitareal:     x.fechaHoraCitaReal,
+          fechahoracitafinreal:  x.fechaHoraCitaFinReal,
+        }));
+        this.totalRecojo = this.ordenesRecojo.length;
 
-    this.traficoService.getAllOrdersxRepartidor(this.idproveedor, 13, this.iddepartamento).subscribe(x => {
-      this.ordenes2 = x; 
-      this.totalReparto = x.length;
-    });
+        // Reparto
+        this.ordenes2     = r.reparto ?? [];
+        this.totalReparto = this.ordenes2.length;
 
-      this.traficoService.getAllOrdersxRepartidor(this.idproveedor, 34, this.iddepartamento).subscribe(x => {
-      
-        this.ordenes3 = x;
-        this.totalRecabarCargo = x.length;
+        // Recabar / enviar cargo
+        this.ordenes3          = r.recabarCargo ?? [];
+        this.totalRecabarCargo = this.ordenes3.length;
+        this.ordenes4          = r.enviarCargo ?? [];
+        this.totalEnviarCargo  = this.ordenes4.length;
 
-      const conTipoEntrega = x.filter(o => o.tipoentrega !== null);
-      this.ordenes5 = [...this.ordenes5, ...conTipoEntrega];
+        // Observadas: unión de los 3 estados (34 + 35 + 38) que tengan
+        // tipoentrega definido y NO tengan una OTR (idotvinculada) ya generada.
+        // Si la OT ya generó su OTR de logística inversa, deja de listarse aquí.
+        const observada = (l: OrdenTransporte[]) => (l ?? []).filter(
+          o => o.tipoentrega !== null && (o as any).idotvinculada == null,
+        );
+        this.ordenes5        = [...observada(r.recabarCargo), ...observada(r.enviarCargo), ...observada(r.noEntregado)];
+        this.totalObservadas = this.ordenes5.length;
 
-       this.totalObservadas = this.ordenes5.length;
-
-    });
-
-    this.traficoService.getAllOrdersxRepartidor(this.idproveedor, 35, this.iddepartamento).subscribe(x => {
-      this.ordenes4 = x;
-      this.totalEnviarCargo = x.length;
-      const conTipoEntrega = x.filter(o => o.tipoentrega !== null);
-      this.ordenes5 = [...this.ordenes5, ...conTipoEntrega];
-
-      this.totalObservadas = this.ordenes5.length;
-
-     
-    });
-
-
-      this.traficoService.getAllOrdersxRepartidor(this.idproveedor, 38, this.iddepartamento).subscribe(x => {
-      const conTipoEntrega = x.filter(o => o.tipoentrega !== null && (o as any).idotvinculada === null);
-      this.ordenes5 = conTipoEntrega; // Reemplaza, no acumula
-      this.totalObservadas = this.ordenes5.length;
-
-
-     
-    });
-
-
-
-    
-
-
-    this.traficoService.getOTRsLogisticaInversaxProveedor(this.idproveedor, this.iddepartamento).subscribe({
-      next: (response) => {
-        if (response.success && response.data) {
-          this.ordenes6 = response.data;
-          this.totalPendientesDespacho = response.count || response.data.length;
-
-
-
-           console.log('ordenes6', this.ordenes6);
-
-
-
+        // Logística inversa (OTRs pendientes de despacho)
+        const inv = r.logisticaInversa as any;
+        if (inv?.success && inv?.data) {
+          this.ordenes6                = inv.data;
+          this.totalPendientesDespacho = inv.count ?? inv.data.length;
         } else {
-          this.ordenes6 = [];
+          this.ordenes6                = [];
           this.totalPendientesDespacho = 0;
-
-         
-
-         
-
-
         }
+
+        // Datos del proveedor (cabecera)
+        if (r.proveedor) {
+          this.repartidor.nombre    = r.proveedor.razonSocial;
+          this.repartidor.direccion = r.proveedor.direccion;
+          this.repartidor.telefono  = r.proveedor.telefono;
+          this.repartidor.ruc       = r.proveedor.ruc;
+          this.repartidor.provincia = r.proveedor.distrito;
+        }
+
+        this.loading = false;
       },
-      error: (error) => {
-        console.error('Error al cargar OTRs de logística inversa:', error);
-        this.ordenes6 = [];
-        this.totalPendientesDespacho = 0;
-      }
+      error: () => {
+        this.loading = false;
+        this.messageService.add({ severity: 'error', summary: 'Error', detail: 'No se pudo recargar los datos del repartidor' });
+      },
     });
-
-    this.traficoService.getProveedor(this.idproveedor).subscribe( resp => {
-
-      this.repartidor.nombre = resp.razonSocial;
-      this.repartidor.direccion = resp.direccion;
-      this.repartidor.telefono = resp.telefono;
-      this.repartidor.ruc = resp.ruc;
-      this.repartidor.provincia = resp.distrito;
-
-
-
-    });
-
-
-
-
   }
 
   verEventos(id) {

@@ -619,7 +619,7 @@ unConfirm(){
   private normalizeStatus(s?: string): EventActionType {
     const txt = (s || '').toLowerCase();
 
-    if (txt.includes('ot creada')) return 'ot-creada';
+    if (txt.includes('ot creada') || (txt.includes('registr') && txt.includes('orden de transporte'))) return 'ot-creada';
     if (txt.includes('planificada')) return 'ot-planificada';
     if (txt.includes('manifiesto') || txt.includes('hoja ruta') || txt.includes('hr generado')) return 'manifiesto-hr';
     if (txt.includes('despachada')) return 'ot-despachada';
@@ -629,6 +629,32 @@ unConfirm(){
 
     return 'none';
   }
+  /**
+   * Abre el visor de adjuntos del evento (imágenes / documentos).
+   * El comportamiento concreto se define por tipo de evento — se irá conectando
+   * gradualmente. Por ahora solo loggea el tipo y la fila para identificar el caso.
+   */
+  verAdjuntosEvento(row: EventRow): void {
+    const type = this.normalizeStatus(row.status);
+
+    switch (type) {
+      // Evento "Se registró la orden de transporte" → reporte de OT en webreports
+      case 'ot-creada': {
+        const idOrden = this.ordenTransporte?.idordentrabajo;
+        if (!idOrden) {
+          console.warn('[adjuntos] no hay idordentrabajo para abrir el reporte de OT');
+          return;
+        }
+        window.open(`http://104.36.166.65/webreports/ot.aspx?idorden=${idOrden}`, '_blank');
+        return;
+      }
+
+      // TODO: agregar el resto de tipos a medida que se vayan definiendo
+      default:
+        console.log('[adjuntos] tipo evento sin handler aún:', type, '| row:', row);
+    }
+  }
+
    /** Abre el diálogo con la acción acorde al evento */
   openEventAction(row: EventRow) {
     const type = this.normalizeStatus(row.status);

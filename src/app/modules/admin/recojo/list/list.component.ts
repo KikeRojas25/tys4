@@ -1,7 +1,7 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, Input, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule, ReactiveFormsModule } from '@angular/forms';
-import { Router } from '@angular/router';
+import { ActivatedRoute, Router } from '@angular/router';
 import { ConfirmationService, MessageService, MenuItem, SelectItem } from 'primeng/api';
 import { DialogService, DynamicDialogRef, DynamicDialogModule } from 'primeng/dynamicdialog';
 import { InputTextModule } from 'primeng/inputtext';
@@ -47,6 +47,11 @@ import { forkJoin, of } from 'rxjs';
   providers: [ConfirmationService, DialogService, MessageService],
 })
 export class listarOrdenRecojoComponent implements OnInit {
+  /** Modo embebido en otra pantalla: oculta header. */
+  @Input() embedded = false;
+  /** Cliente preseleccionado cuando se usa embebido. */
+  @Input() idClienteEmbed: number | null = null;
+
   // ===========================
   // 🔹 Variables principales
   // ===========================
@@ -83,7 +88,8 @@ export class listarOrdenRecojoComponent implements OnInit {
   constructor(
     private orderRecojoService: RecojoService,
     private mantenimientoService: MantenimientoService,
-    
+
+    private route: ActivatedRoute,
     private router: Router,
     private dialogService: DialogService,
     private messageService: MessageService,
@@ -194,7 +200,11 @@ export class listarOrdenRecojoComponent implements OnInit {
         // Procesar clientes
         this.clientes = [{ value: 0, label: 'TODOS LOS CLIENTES' }];
         resultados.clientes.forEach((c) => this.clientes.push({ value: c.idCliente, label: c.razonSocial }));
-        this.model.idcliente = 0;
+        const idClientePreseleccionado = (this.embedded && this.idClienteEmbed && this.idClienteEmbed > 0)
+          ? this.idClienteEmbed
+          : Number(this.route.snapshot.queryParamMap.get('idcliente'));
+        const existeCliente = idClientePreseleccionado > 0 && this.clientes.some(c => c.value === idClientePreseleccionado);
+        this.model.idcliente = existeCliente ? idClientePreseleccionado : 0;
         this.model.numcp = '';
 
         // Procesar ubigeo

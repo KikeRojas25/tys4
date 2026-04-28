@@ -10,13 +10,19 @@ import { DropdownModule } from 'primeng/dropdown';
 import { CalendarModule } from 'primeng/calendar';
 import { InputTextModule } from 'primeng/inputtext';
 import { InputTextareaModule } from 'primeng/inputtextarea';
+import { InputMaskModule } from 'primeng/inputmask';
 import { TableModule } from 'primeng/table';
 import { ToastModule } from 'primeng/toast';
+import { TooltipModule } from 'primeng/tooltip';
 import { ConfirmDialogModule } from 'primeng/confirmdialog';
 import { ComercialService } from '../comercial.service';
 import { MantenimientoService } from '../../mantenimiento/mantenimiento.service';
 import { RecojoService } from '../../recojo/recojo.service';
-import { TipoRegistro, OTPendiente } from './registro-citas.types';
+import { listarOrdenRecojoComponent } from '../../recojo/list/list.component';
+import { ReclamoService } from '../reclamos/reclamo.service';
+import { SeguimientoReclamosComponent } from '../reclamos/seguimiento/seguimiento-reclamos.component';
+import { ReclamoAreaCodigo, ReclamoCreatePayload } from '../reclamos/reclamo.types';
+import { TipoRegistro, OTPendiente, OTObservada } from './registro-citas.types';
 import moment from 'moment';
 
 @Component({
@@ -34,15 +40,23 @@ import moment from 'moment';
     CalendarModule,
     InputTextModule,
     InputTextareaModule,
+    InputMaskModule,
     ButtonModule,
     CardModule,
     TableModule,
     ToastModule,
+    TooltipModule,
     ConfirmDialogModule,
+    listarOrdenRecojoComponent,
+    SeguimientoReclamosComponent,
   ],
   providers: [MessageService, ConfirmationService],
 })
 export class RegistroCitasComponent implements OnInit {
+  /** Toggle del listado de OR embebido. */
+  mostrarListadoOR = false;
+  /** Toggle del seguimiento de reclamos embebido. */
+  mostrarReclamos = false;
   form: FormGroup;
   clientes: SelectItem[] = [];
   ubigeo: SelectItem[] = [];
@@ -54,6 +68,12 @@ export class RegistroCitasComponent implements OnInit {
   nuevoDestino: any = { idDestinoFinal: null, cantidad: null, peso: null, volumen: null };
   destinosFinales: any[] = [];
   busquedaOT = '';
+
+  // OT observadas (entrada del flujo Instrucción de Incidencias)
+  otsObservadas: OTObservada[] = [];
+  loadingOTsObservadas = false;
+  selectedOTObservada: OTObservada | null = null;
+  busquedaOTObs = '';
 
   // ── Incidencias ──────────────────────────────────────────────
   subtipoIncidencia: string | null = null;
@@ -72,6 +92,24 @@ export class RegistroCitasComponent implements OnInit {
     { id: 'falta-actualizacion',     label: 'Falta de actualización del sistema' },
     { id: 'falta-carga',             label: 'Falta de carga' },
   ];
+
+  subtiposProgramacionLocal = [
+    { id: 'no-recojo',                 label: 'No se ejecutó el recojo programado' },
+    { id: 'no-li',                     label: 'No se ejecutó la LI programada' },
+    { id: 'arribo-tarde',              label: 'Arribo tarde al cliente' },
+    { id: 'falta-actualizacion-drive', label: 'Falta de actualización de datos drive' },
+    { id: 'no-procedimiento',          label: 'No se cumplió procedimiento del cliente' },
+  ];
+
+  subtipoProgramacionLocal: string | null = null;
+
+  subtiposProgramacionProvincia = [
+    { id: 'no-despacho-ot', label: 'No se cumplió el despacho de la OT' },
+    { id: 'otros',          label: 'Otros:' },
+  ];
+
+  subtipoProgramacionProvincia: string | null = null;
+  otrosProgramacionProvincia: string = '';
 
   subtiposAlmacen = [
     { id: 'error-despacho',     label: 'Error en despacho',          otSearch: false },
@@ -105,12 +143,27 @@ export class RegistroCitasComponent implements OnInit {
     );
   }
 
+  get otsObservadasFiltradas(): OTObservada[] {
+    const q = this.busquedaOTObs.trim().toLowerCase();
+    if (!q) return this.otsObservadas;
+    return this.otsObservadas.filter(o =>
+      (o.numcp        ?? '').toLowerCase().includes(q) ||
+      (o.remitente    ?? '').toLowerCase().includes(q) ||
+      (o.destinatario ?? '').toLowerCase().includes(q) ||
+      (o.destino      ?? '').toLowerCase().includes(q) ||
+      (o.tipoentrega  ?? '').toLowerCase().includes(q) ||
+      (o.observacion  ?? '').toLowerCase().includes(q)
+    );
+  }
+
   user: any;
+  minFechaRecojo: Date = moment().startOf('day').toDate();
 
   tipos: { id: TipoRegistro; label: string; icon: string; desc: string }[] = [
-    { id: 'recojo',     label: 'Registro de Recojos',          icon: 'heroicons_solid:truck',                    desc: 'Registrar orden de recojo' },
-    { id: 'cita',       label: 'Cita de Orden de Transporte',   icon: 'heroicons_solid:calendar',                 desc: 'Agendar cita para OT' },
-    { id: 'incidencia', label: 'Instrucción de Incidencias',    icon: 'heroicons_solid:exclamation-triangle',     desc: 'Registrar instrucción' },
+    { id: 'recojo',     label: 'Registro de OR',         icon: 'heroicons_solid:truck',                desc: 'Registrar orden de recojo' },
+    { id: 'cita',       label: 'Cita de OT', icon: 'heroicons_solid:calendar',             desc: 'Agendar cita para OT' },
+    { id: 'reclamo',    label: 'Registro de Reclamos',        icon: 'heroicons_solid:chat-bubble-left-right', desc: 'Registrar reclamos del cliente' },
+    { id: 'incidencia', label: 'Instrucción de Incidencias',  icon: 'heroicons_solid:exclamation-triangle', desc: 'Sobre OT con observaciones' },
   ];
 
   constructor(
@@ -118,6 +171,7 @@ export class RegistroCitasComponent implements OnInit {
     private comercialService: ComercialService,
     private mantenimientoService: MantenimientoService,
     private recojoService: RecojoService,
+    private reclamoService: ReclamoService,
     private messageService: MessageService,
     private confirmationService: ConfirmationService
   ) {
@@ -150,12 +204,38 @@ export class RegistroCitasComponent implements OnInit {
     this.form.get('idCliente')?.valueChanges.subscribe((id) => {
       this.form.patchValue({ tipo: null });
       this.resetCamposDetalle();
+      this.otsObservadas = [];
       if (id) this.cargarOTsPendientes(id);
     });
 
-    this.form.get('tipo')?.valueChanges.subscribe(() => {
+    this.form.get('tipo')?.valueChanges.subscribe((tipo) => {
       this.resetCamposDetalle();
+      const idCliente = this.form.value.idCliente;
+      if (tipo === 'incidencia' && idCliente) {
+        this.cargarOTsObservadas(idCliente);
+      }
+      if (tipo === 'recojo') {
+        this.form.patchValue({ fechaCita: moment().add(1, 'day').startOf('day').toDate() });
+      }
     });
+  }
+
+  get puedeRetrocederFechaRecojo(): boolean {
+    const actual = this.form.get('fechaCita')?.value;
+    if (!actual) return true;
+    return moment(actual).startOf('day').isAfter(moment().startOf('day'));
+  }
+
+  ajustarFechaRecojo(dias: number): void {
+    const actual = this.form.get('fechaCita')?.value;
+    const base = actual ? moment(actual) : moment().add(1, 'day');
+    const nueva = base.add(dias, 'day');
+    const hoy = moment().startOf('day');
+    if (nueva.isBefore(hoy)) {
+      this.messageService.add({ severity: 'warn', summary: 'Aviso', detail: 'No se permiten fechas anteriores a hoy' });
+      return;
+    }
+    this.form.patchValue({ fechaCita: nueva.toDate() });
   }
 
   private resetCamposDetalle(): void {
@@ -169,8 +249,13 @@ export class RegistroCitasComponent implements OnInit {
     this.destinosFinales = [];
     this.nuevoDestino = { idDestinoFinal: null, cantidad: null, peso: null, volumen: null };
     this.busquedaOT         = '';
+    this.selectedOTObservada = null;
+    this.busquedaOTObs      = '';
     this.subtipoIncidencia  = null;
     this.subtipoTrafico     = null;
+    this.subtipoProgramacionLocal = null;
+    this.subtipoProgramacionProvincia = null;
+    this.otrosProgramacionProvincia = '';
     this.subtipoAlmacen     = null;
     this.orSeleccionada     = null;
     this.otProvSeleccionada = null;
@@ -209,10 +294,27 @@ export class RegistroCitasComponent implements OnInit {
     });
   }
 
+  cargarOTsObservadas(idcliente: number): void {
+    this.loadingOTsObservadas = true;
+    this.selectedOTObservada = null;
+    this.comercialService.getOTsObservadasPorCliente(idcliente).subscribe({
+      next: (list) => { this.otsObservadas = list ?? []; this.loadingOTsObservadas = false; },
+      error: () => { this.otsObservadas = []; this.loadingOTsObservadas = false; },
+    });
+  }
+
   get tipoSeleccionado(): TipoRegistro | null { return this.form.get('tipo')?.value; }
-  get esCita(): boolean      { return this.tipoSeleccionado === 'cita'; }
+  get esCita(): boolean       { return this.tipoSeleccionado === 'cita'; }
   get esRecojo(): boolean     { return this.tipoSeleccionado === 'recojo'; }
+  get esReclamo(): boolean    { return this.tipoSeleccionado === 'reclamo'; }
   get esIncidencia(): boolean { return this.tipoSeleccionado === 'incidencia'; }
+
+  onOTObservadaSelect(event: { data: OTObservada }): void {
+    this.selectedOTObservada = event.data;
+  }
+  onOTObservadaUnselect(): void {
+    this.selectedOTObservada = null;
+  }
 
   agregarDestinoFinal(): void {
     if (!this.nuevoDestino.idDestinoFinal || !this.nuevoDestino.cantidad) {
@@ -251,6 +353,11 @@ export class RegistroCitasComponent implements OnInit {
         this.messageService.add({ severity: 'warn', summary: 'Advertencia', detail: 'Complete los campos obligatorios del recojo (*)' });
         return;
       }
+      const horaRecojo = moment(v.horaCita, 'HH:mm');
+      if (!horaRecojo.isValid() || horaRecojo.hours() > 23 || horaRecojo.minutes() > 59) {
+        this.messageService.add({ severity: 'warn', summary: 'Advertencia', detail: 'Hora inválida (HH:mm)' });
+        return;
+      }
       this.confirmationService.confirm({
         message: '¿Está seguro que desea registrar esta Orden de Recojo?',
         header: 'Confirmación',
@@ -262,7 +369,7 @@ export class RegistroCitasComponent implements OnInit {
           const payload = {
             idcliente:            v.idCliente,
             fechaCita:            moment(v.fechaCita).format('YYYY-MM-DD'),
-            horaCita:             moment(v.horaCita).format('HH:mm:ss'),
+            horaCita:             horaRecojo.format('HH:mm:ss'),
             idorigen:             v.idorigen,
             puntoOrigen:          v.puntoOrigen,
             contacto:             v.contacto,
@@ -306,7 +413,12 @@ export class RegistroCitasComponent implements OnInit {
         return;
       }
       const fecha = moment(v.fechaCita).format('YYYY-MM-DD');
-      const hora  = moment(v.horaCita).format('HH:mm:ss');
+      const horaParsed = moment(v.horaCita, 'HH:mm');
+      if (!horaParsed.isValid() || horaParsed.hours() > 23 || horaParsed.minutes() > 59) {
+        this.messageService.add({ severity: 'warn', summary: 'Advertencia', detail: 'Hora inválida (HH:mm)' });
+        return;
+      }
+      const hora  = horaParsed.format('HH:mm:ss');
       this.confirmationService.confirm({
         message: `¿Confirma agendar la cita para la OT <strong>${this.selectedOT.numcp}</strong> el <strong>${moment(v.fechaCita).format('DD/MM/YYYY')}</strong> a las <strong>${hora}</strong>?`,
         header: 'Confirmar cita',
@@ -338,6 +450,128 @@ export class RegistroCitasComponent implements OnInit {
       });
       return;
     }
+
+    if (this.esReclamo || this.esIncidencia) {
+      this.guardarReclamo();
+      return;
+    }
+  }
+
+  // ── Persistencia de reclamo / instrucción de incidencia ──────
+  private subtipoSeleccionadoActual(): string | null {
+    switch (this.subtipoIncidencia) {
+      case 'programacion-local':     return this.subtipoProgramacionLocal;
+      case 'programacion-provincia': return this.subtipoProgramacionProvincia;
+      case 'trafico':                return this.subtipoTrafico;
+      case 'almacen':                return this.subtipoAlmacen;
+      default:                        return null;
+    }
+  }
+
+  private guardarReclamo(): void {
+    const v = this.form.value;
+
+    if (!v.idCliente) {
+      this.messageService.add({ severity: 'warn', summary: 'Advertencia', detail: 'Seleccione el cliente' });
+      return;
+    }
+
+    let areaCodigo:    ReclamoAreaCodigo;
+    let subtipoCodigo: string;
+    let idOT:          number | null;
+    let textoLibre:    string | null = null;
+
+    if (this.esIncidencia) {
+      // Flujo Incidencia: solo OT observada + instrucción.
+      if (!this.selectedOTObservada) {
+        this.messageService.add({ severity: 'warn', summary: 'Advertencia', detail: 'Seleccione una OT con observaciones' });
+        return;
+      }
+      const instruccion = (v.observaciones ?? '').trim();
+      if (!instruccion) {
+        this.messageService.add({ severity: 'warn', summary: 'Advertencia', detail: 'Escriba la instrucción de la observación' });
+        return;
+      }
+      areaCodigo    = 'incidencia' as ReclamoAreaCodigo;
+      subtipoCodigo = 'ot-observada';
+      idOT          = this.selectedOTObservada.idordentrabajo;
+    } else {
+      // Flujo Reclamo: requiere área + subtipo + OT/OR relacionada.
+      if (!this.subtipoIncidencia) {
+        this.messageService.add({ severity: 'warn', summary: 'Advertencia', detail: 'Seleccione el área' });
+        return;
+      }
+      const sub = this.subtipoSeleccionadoActual();
+      if (!sub) {
+        this.messageService.add({ severity: 'warn', summary: 'Advertencia', detail: 'Seleccione una alternativa' });
+        return;
+      }
+      if (this.subtipoIncidencia === 'programacion-provincia'
+          && this.subtipoProgramacionProvincia === 'otros'
+          && !this.otrosProgramacionProvincia.trim()) {
+        this.messageService.add({ severity: 'warn', summary: 'Advertencia', detail: 'Especifique el detalle en "Otros"' });
+        return;
+      }
+      const esLocal = this.subtipoIncidencia === 'programacion-local';
+      if (esLocal && !this.orSeleccionada) {
+        this.messageService.add({ severity: 'warn', summary: 'Advertencia', detail: 'Busque y seleccione la Orden de Recojo (OR) relacionada' });
+        return;
+      }
+      if (!esLocal && !this.otProvSeleccionada) {
+        this.messageService.add({ severity: 'warn', summary: 'Advertencia', detail: 'Busque y seleccione la Orden de Transporte (OT) relacionada' });
+        return;
+      }
+      areaCodigo    = this.subtipoIncidencia as ReclamoAreaCodigo;
+      subtipoCodigo = sub;
+      idOT          = esLocal
+        ? (this.orSeleccionada?.idordentrabajo ?? null)
+        : (this.otProvSeleccionada?.idordentrabajo ?? null);
+      textoLibre    = (this.subtipoIncidencia === 'programacion-provincia' && this.subtipoProgramacionProvincia === 'otros')
+        ? this.otrosProgramacionProvincia.trim()
+        : null;
+    }
+
+    const payload: ReclamoCreatePayload = {
+      idcliente:         v.idCliente,
+      area_codigo:       areaCodigo,
+      subtipo_codigo:    subtipoCodigo,
+      texto_libre:       textoLibre,
+      idordentrabajo:    idOT,
+      observaciones:     v.observaciones ?? null,
+      idusuarioregistro: this.user?.id ?? 0,
+    };
+
+    const confirmMsg = this.esIncidencia
+      ? '¿Confirma el registro de la instrucción para esta OT observada?'
+      : '¿Confirma el registro del reclamo?';
+
+    this.confirmationService.confirm({
+      message: confirmMsg,
+      header: 'Confirmación',
+      icon: 'pi pi-exclamation-triangle',
+      acceptLabel: 'Sí, guardar',
+      rejectLabel: 'Cancelar',
+      accept: () => {
+        this.loading = true;
+        this.reclamoService.guardar(payload).subscribe({
+          next: (resp) => {
+            this.loading = false;
+            this.messageService.add({
+              severity: 'success', summary: 'Éxito',
+              detail: this.esIncidencia
+                ? `Instrucción registrada (#${resp.idreclamo})`
+                : `Reclamo registrado (#${resp.idreclamo})`,
+            });
+            this.form.patchValue({ tipo: null });
+            this.resetCamposDetalle();
+          },
+          error: () => {
+            this.loading = false;
+            this.messageService.add({ severity: 'error', summary: 'Error', detail: 'No se pudo registrar' });
+          },
+        });
+      }
+    });
   }
 
   onOTSelect(event: { data: OTPendiente }): void { this.form.patchValue({ idOT: event.data.numcp }); }
@@ -345,15 +579,18 @@ export class RegistroCitasComponent implements OnInit {
 
   // ── Incidencias ──────────────────────────────────────────────
   seleccionarSubtipoIncidencia(id: string): void {
-    this.subtipoIncidencia  = id;
-    this.subtipoTrafico     = null;
-    this.subtipoAlmacen     = null;
-    this.orSeleccionada     = null;
-    this.otProvSeleccionada = null;
-    this.resultadosOR       = [];
-    this.resultadosOTProv   = [];
-    this.busquedaOR         = '';
-    this.busquedaOTProv     = '';
+    this.subtipoIncidencia            = id;
+    this.subtipoTrafico               = null;
+    this.subtipoProgramacionLocal     = null;
+    this.subtipoProgramacionProvincia = null;
+    this.otrosProgramacionProvincia   = '';
+    this.subtipoAlmacen               = null;
+    this.orSeleccionada               = null;
+    this.otProvSeleccionada           = null;
+    this.resultadosOR                 = [];
+    this.resultadosOTProv             = [];
+    this.busquedaOR                   = '';
+    this.busquedaOTProv               = '';
   }
 
   buscarOR(): void {

@@ -2,3 +2,37 @@
 :host ::ng-deep .cursor-pointer {
   cursor: pointer;
 }
+
+/* Calendario embebido en input-group con botones de día anterior/siguiente */
+:host ::ng-deep .calendar-flush .p-inputtext {
+  border-radius: 0;
+  border-left: 0;
+  border-right: 0;
+}
+:host ::ng-deep .calendar-flush .p-datepicker-trigger {
+  border-radius: 0;
+}
+
+/* Compactación general de inputs y dropdowns dentro del formulario */
+:host ::ng-deep .p-inputtext,
+:host ::ng-deep .p-dropdown,
+:host ::ng-deep .p-calendar .p-inputtext,
+:host ::ng-deep .p-inputmask {
+  font-size: 0.8125rem;
+  padding-top: 0.375rem;
+  padding-bottom: 0.375rem;
+}
+:host ::ng-deep .p-dropdown .p-dropdown-label {
+  padding-top: 0.375rem;
+  padding-bottom: 0.375rem;
+  font-size: 0.8125rem;
+}
+:host ::ng-deep textarea.p-inputtextarea {
+  font-size: 0.8125rem;
+}
+
+/* Tablas más compactas */
+:host ::ng-deep .p-datatable .p-datatable-thead > tr > th,
+:host ::ng-deep .p-datatable .p-datatable-tbody > tr > td {
+  padding: 0.4rem 0.5rem;
+}

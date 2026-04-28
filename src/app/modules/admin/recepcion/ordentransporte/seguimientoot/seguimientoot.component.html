@@ -328,8 +328,8 @@
           <th>Fecha registro</th>
           <th>Fecha evento</th>
           <th>Usuario registro</th>
-         
-          <th style="width: 120px;">Acción</th>  <!-- ✅ nueva columna -->
+          <th style="width: 110px;">Adjuntos</th> <!-- ✅ nueva columna -->
+          <th style="width: 120px;">Acción</th>
         </tr>
       </ng-template>
 
@@ -355,7 +355,18 @@
           <td>
             {{ event.dateEvent ? (event.user || 'Sin dato') : 'Sin dato' }}
           </td>
-       
+
+          <!-- ✅ Adjuntos del evento (tipo de visor a definir por evento) -->
+          <td class="text-center">
+            <button *ngIf="event.dateEvent" pButton type="button"
+                    icon="pi pi-paperclip"
+                    label="Ver"
+                    class="p-button-sm p-button-outlined p-button-secondary"
+                    (click)="verAdjuntosEvento(event)">
+            </button>
+            <span *ngIf="!event.dateEvent" class="text-gray-400 text-xs">—</span>
+          </td>
+
           <!-- ✅ botón que abre el diálogo contextual -->
           <td class="text-center">
             <button pButton type="button"
