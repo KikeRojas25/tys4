@@ -1,0 +1,270 @@
+# Instructions
+
+- Following Playwright test failed.
+- Explain why, be concise, respect Playwright best practices.
+- Provide a snippet of code with the fix, if possible.
+
+# Test info
+
+- Name: crearot.e2e.spec.ts >> Crear OT - E2E >> bloquea el submit si no se vinculó OR ni se marcó "sin recojo"
+- Location: e2e\crearot.e2e.spec.ts:313:7
+
+# Error details
+
+```
+Test timeout of 30000ms exceeded.
+```
+
+# Page snapshot
+
+```yaml
+- generic [ref=e4]:
+  - generic [ref=e8]:
+    - img "Logo image" [ref=e11]
+    - generic [ref=e14] [cursor=pointer]:
+      - img [ref=e15]:
+        - img [ref=e16]
+      - generic [ref=e19]: Comercial
+    - generic [ref=e22] [cursor=pointer]:
+      - img [ref=e23]:
+        - img [ref=e24]
+      - generic [ref=e27]: Estación
+    - generic [ref=e30] [cursor=pointer]:
+      - img [ref=e31]:
+        - img [ref=e32]
+      - generic [ref=e35]: Planning
+    - generic [ref=e38] [cursor=pointer]:
+      - img [ref=e39]:
+        - img [ref=e40]
+      - generic [ref=e43]: Tráfico
+    - generic [ref=e46] [cursor=pointer]:
+      - img [ref=e47]:
+        - img [ref=e48]
+      - generic [ref=e52]: Mantenimientos
+    - generic [ref=e55] [cursor=pointer]:
+      - img [ref=e56]:
+        - img [ref=e57]
+      - generic [ref=e60]: Seguridad
+    - generic [ref=e63] [cursor=pointer]:
+      - img [ref=e64]:
+        - img [ref=e65]
+      - generic [ref=e68]: Facturación
+    - generic [ref=e71] [cursor=pointer]:
+      - img [ref=e72]:
+        - img [ref=e73]
+      - generic [ref=e77]: Reportes
+    - generic [ref=e80] [cursor=pointer]:
+      - img [ref=e81]:
+        - img [ref=e82]
+      - generic [ref=e85]: Compras
+  - generic [ref=e88]:
+    - generic [ref=e89]:
+      - button [ref=e90] [cursor=pointer]:
+        - img [ref=e91]:
+          - img [ref=e92]
+      - generic [ref=e96]:
+        - button [ref=e98] [cursor=pointer]:
+          - img [ref=e99]:
+            - img [ref=e100]
+        - search [ref=e104]:
+          - button [ref=e105] [cursor=pointer]:
+            - img [ref=e106]:
+              - img [ref=e107]
+        - button [ref=e112] [cursor=pointer]:
+          - img [ref=e113]:
+            - img [ref=e114]
+        - button [ref=e119] [cursor=pointer]:
+          - img [ref=e120]:
+            - img [ref=e121]
+        - button [ref=e126] [cursor=pointer]:
+          - img [ref=e129]:
+            - img [ref=e130]
+    - generic [ref=e138]:
+      - generic [ref=e140]:
+        - generic [ref=e141]:
+          - generic [ref=e142]: TMS
+          - generic [ref=e143]:
+            - img [ref=e144]:
+              - img [ref=e145]
+            - generic [ref=e147]: Tráfico
+          - generic [ref=e148]:
+            - img [ref=e149]:
+              - img [ref=e150]
+            - link "Ordén de Transporte" [ref=e152] [cursor=pointer]:
+              - /url: "#/trafico/integrado"
+        - heading "Crear OT" [level=2] [ref=e154]
+      - generic [ref=e156]:
+        - generic [ref=e158]:
+          - generic [ref=e160]: Datos generales
+          - region "Datos generales" [ref=e161]:
+            - generic [ref=e163]:
+              - generic [ref=e164]:
+                - generic [ref=e165]: Cliente (*)
+                - generic [ref=e167] [cursor=pointer]:
+                  - combobox "Seleccione un cliente" [expanded] [ref=e168]
+                  - button "dropdown trigger" [expanded] [ref=e169]:
+                    - img [ref=e171]
+                  - generic [ref=e178]:
+                    - searchbox [active] [ref=e179]:
+                      - listbox "Option List" [ref=e180]:
+                        - option "No results found" [ref=e181]
+                    - img [ref=e182]
+                - generic [ref=e190]: Requiere seleccionar un cliente.
+              - generic [ref=e191]:
+                - generic [ref=e192]:
+                  - text: Remitente (*)
+                  - link "Elegir otro" [ref=e193] [cursor=pointer]:
+                    - /url: "#"
+                - generic [ref=e195] [cursor=pointer]:
+                  - combobox "Seleccione un remitente" [ref=e196]
+                  - button "dropdown trigger" [ref=e197]:
+                    - img [ref=e199]
+              - generic [ref=e201]:
+                - generic [ref=e202]:
+                  - generic [ref=e203]: "Destinatario (*) :"
+                  - link "Elegir otro" [ref=e204] [cursor=pointer]:
+                    - /url: "#"
+                  - button "Nuevo Destinatario" [ref=e206] [cursor=pointer]:
+                    - generic [ref=e207]: Nuevo Destinatario
+                - generic [ref=e209] [cursor=pointer]:
+                  - combobox "Seleccione un destinatario" [ref=e210]
+                  - button "dropdown trigger" [ref=e211]:
+                    - img [ref=e213]
+              - generic [ref=e215]:
+                - generic [ref=e216]: "Origen (*) :"
+                - generic [ref=e218] [cursor=pointer]:
+                  - combobox [ref=e219]
+                  - button "dropdown trigger" [ref=e220]:
+                    - img [ref=e222]
+              - generic [ref=e224]:
+                - generic [ref=e225]: Dirección (*)
+                - textbox [ref=e226]
+              - generic [ref=e227]:
+                - generic [ref=e228]: "Destino :"
+                - generic [ref=e230] [cursor=pointer]:
+                  - combobox [ref=e231]
+                  - button "dropdown trigger" [ref=e232]:
+                    - img [ref=e234]
+              - generic [ref=e236]:
+                - generic [ref=e237]: Dirección
+                - textbox [ref=e238]
+        - generic [ref=e240]:
+          - generic [ref=e242]: Datos del portador
+          - region "Datos del portador" [ref=e243]:
+            - generic [ref=e245]:
+              - generic [ref=e246]:
+                - generic [ref=e247]: "Placa de recojo :"
+                - generic [ref=e249] [cursor=pointer]:
+                  - combobox [ref=e250]
+                  - button "dropdown trigger" [ref=e251]:
+                    - img [ref=e253]
+              - generic [ref=e255]:
+                - generic [ref=e256]: "Conductor de recojo :"
+                - generic [ref=e258] [cursor=pointer]:
+                  - combobox [ref=e259]
+                  - button "dropdown trigger" [ref=e260]:
+                    - img [ref=e262]
+              - generic [ref=e264]:
+                - generic [ref=e265]: "Fecha de recojo :"
+                - generic [ref=e267]:
+                  - combobox [ref=e268]
+                  - generic:
+                    - img
+              - generic [ref=e269]:
+                - generic [ref=e270]: "Hora de recojo (*) :"
+                - textbox [ref=e272]
+              - generic [ref=e273]:
+                - generic [ref=e274]: "Guía de recojo (*) :"
+                - listbox [ref=e278]:
+                  - option [ref=e279]:
+                    - textbox [ref=e280]
+              - generic [ref=e281]:
+                - generic [ref=e282]:
+                  - generic [ref=e283]: Orden de Recojo (OR) *
+                  - generic [ref=e284]:
+                    - generic [ref=e287] [cursor=pointer]:
+                      - checkbox "Sin recojo"
+                    - generic [ref=e289] [cursor=pointer]: Sin recojo
+                - generic [ref=e290]:
+                  - textbox "Buscar OR..." [ref=e291]
+                  - button [ref=e292] [cursor=pointer]:
+                    - generic [ref=e293]: 
+        - generic [ref=e295]:
+          - generic [ref=e297]: Datos complementarios
+          - region "Datos complementarios" [ref=e298]:
+            - generic [ref=e300]:
+              - generic [ref=e301]:
+                - generic [ref=e302]: Cant. Bultos
+                - spinbutton [ref=e305]
+              - generic [ref=e306]:
+                - generic [ref=e307]: Peso Kg.
+                - spinbutton [ref=e310]
+              - generic [ref=e311]:
+                - generic [ref=e312]: Volumen m3
+                - spinbutton [ref=e315]
+              - generic [ref=e316]:
+                - generic [ref=e317]: Peso Vol
+                - spinbutton [ref=e320]
+              - generic [ref=e321]:
+                - generic [ref=e322]: "Fórmula :"
+                - generic [ref=e324] [cursor=pointer]:
+                  - combobox [ref=e325]
+                  - button "dropdown trigger" [ref=e326]:
+                    - img [ref=e328]
+              - generic [ref=e330]:
+                - generic [ref=e331]: "Medio de transporte :"
+                - generic [ref=e333] [cursor=pointer]:
+                  - combobox [ref=e334]
+                  - button "dropdown trigger" [ref=e335]:
+                    - img [ref=e337]
+              - generic [ref=e339]:
+                - generic [ref=e340]: "Concepto de cobro :"
+                - generic [ref=e342] [cursor=pointer]:
+                  - combobox [ref=e343]
+                  - button "dropdown trigger" [ref=e344]:
+                    - img [ref=e346]
+              - generic [ref=e348]:
+                - generic [ref=e349]: "Mercadería especial :"
+                - generic [ref=e351] [cursor=pointer]:
+                  - combobox [ref=e352]
+                  - button "dropdown trigger" [ref=e353]:
+                    - img [ref=e355]
+              - generic [ref=e357]:
+                - generic [ref=e358]: "Referencia :"
+                - textbox [ref=e359]
+              - generic [ref=e360]:
+                - generic [ref=e361]: "Descripción de Mercadería :"
+                - textbox [ref=e362]
+              - generic [ref=e363]:
+                - generic [ref=e364]: "GRR (Guías de remitente) :"
+                - button "Generar GRRs Masivas..." [ref=e368] [cursor=pointer]:
+                  - generic [ref=e369]: Generar GRRs Masivas...
+        - generic [ref=e371]:
+          - generic [ref=e373]: ¿Como lo almaceno?
+          - region "¿Como lo almaceno?" [ref=e374]:
+            - generic [ref=e376]:
+              - button "Agregar etiqueta" [ref=e379] [cursor=pointer]:
+                - generic [ref=e380]: Agregar etiqueta
+              - table [ref=e385]:
+                - rowgroup [ref=e386]:
+                  - row "Acc Tipo Cantidad" [ref=e387]:
+                    - columnheader "Acc" [ref=e388]
+                    - columnheader "Tipo" [ref=e389]
+                    - columnheader "Cantidad" [ref=e390]
+                - rowgroup
+        - generic [ref=e392]:
+          - generic [ref=e394]: Valorizado
+          - region "Valorizado" [ref=e395]:
+            - generic [ref=e396]:
+              - generic [ref=e397]:
+                - button "Refrescar" [ref=e399] [cursor=pointer]:
+                  - generic [ref=e400]: Refrescar
+                - generic [ref=e403]:
+                  - generic [ref=e404]: Subtotal
+                  - generic [ref=e405]: S/.
+              - paragraph [ref=e408]:
+                - generic:
+                  - button "Guardar" [disabled]
+                - button "Cancel" [ref=e410] [cursor=pointer]
+    - generic [ref=e412]: TYS © 2026
+```

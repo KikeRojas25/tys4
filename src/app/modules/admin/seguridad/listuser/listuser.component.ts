@@ -23,6 +23,8 @@ import { TooltipModule } from 'primeng/tooltip';
 
 import { MantenimientoService } from '../../mantenimiento/mantenimiento.service';
 import { UserForUpdateDto } from 'app/core/user/user.types';
+import { Rol } from '../seguridad.types';
+import { forkJoin } from 'rxjs';
 
 @Component({
   selector: 'app-listuser',
@@ -66,9 +68,17 @@ export class ListuserComponent implements OnInit {
   nuevaPassword: string = '';
   confirmarPassword: string = '';
 
+  // Roles
+  private readonly USUARIOS_INTOCABLES = ['admin', 'erojas'];
+  dialogRolesVisible = false;
+  usuarioParaRoles: User | null = null;
+  rolesDisponibles: Rol[] = [];
+  rolesAsignados: Rol[] = [];
+  cargandoRoles = false;
 
-  roles: any[] = []; // Lista de roles
-  selectedRoles: any[] = []; // Roles seleccionados
+  // (legacy) restos de la implementación previa, no se usan
+  roles: any[] = [];
+  selectedRoles: any[] = [];
 
   dialogAsignarVisible = false;
   usuarioSeleccionado: any = null;
@@ -146,6 +156,16 @@ getNombreEquipo(id: number): string {
 }
 
   abrirCambiarPassword(usuario: User) {
+    if (this.esIntocable(usuario)) {
+      this.messageService.add({
+        severity: 'warn',
+        summary: 'Acción no permitida',
+        detail: `El usuario "${usuario.usr_str_red}" es intocable y no permite cambio de contraseña.`,
+        life: 3000
+      });
+      return;
+    }
+
     this.usuarioParaPassword = usuario;
     this.nuevaPassword = '';
     this.confirmarPassword = '';
@@ -179,6 +199,16 @@ getNombreEquipo(id: number): string {
   }
 
   bloquearUsuario(usuario: User) {
+    if (this.esIntocable(usuario)) {
+      this.messageService.add({
+        severity: 'warn',
+        summary: 'Acción no permitida',
+        detail: `El usuario "${usuario.usr_str_red}" es intocable y no permite bloqueo o desbloqueo.`,
+        life: 3000
+      });
+      return;
+    }
+
     const bloqueado = usuario.usr_int_bloqueado === 1 ? 0 : 1;
     const accion = bloqueado === 1 ? 'bloquear' : 'desbloquear';
 
@@ -215,8 +245,17 @@ getNombreEquipo(id: number): string {
   nuevo() {
     this.router.navigate(['/seguridad/newusuario']  );
   }
-  editarUsuario(id:any) {
-    this.router.navigate(['/seguridad/editusuario' , id ]  );
+  editarUsuario(usuario: User) {
+    if (this.esIntocable(usuario)) {
+      this.messageService.add({
+        severity: 'warn',
+        summary: 'Acción no permitida',
+        detail: `El usuario "${usuario.usr_str_red}" es intocable y no permite edición.`,
+        life: 3000
+      });
+      return;
+    }
+    this.router.navigate(['/seguridad/editusuario', usuario.usr_int_id]);
   }
   eliminarUsuario(id: any) {
 
@@ -299,8 +338,83 @@ guardarCambioEquipo() {
     }
   }
 
+  esIntocable(usuario: User): boolean {
+    const red = (usuario?.usr_str_red ?? '').trim().toLowerCase();
+    return this.USUARIOS_INTOCABLES.includes(red);
+  }
+
+  abrirAsignarRoles(usuario: User) {
+    if (this.esIntocable(usuario)) {
+      this.messageService.add({
+        severity: 'warn',
+        summary: 'Acción no permitida',
+        detail: `El usuario "${usuario.usr_str_red}" es intocable y no permite cambios de roles.`,
+        life: 3000
+      });
+      return;
+    }
+
+    this.usuarioParaRoles = usuario;
+    this.rolesDisponibles = [];
+    this.rolesAsignados = [];
+    this.cargandoRoles = true;
+    this.dialogRolesVisible = true;
+
+    forkJoin({
+      todos: this.userService.getAllRoles(),
+      asignadosIds: this.userService.getRolesByUser(usuario.usr_int_id)
+    }).subscribe({
+      next: ({ todos, asignadosIds }) => {
+        const idsSet = new Set(asignadosIds || []);
+        this.rolesAsignados = (todos || []).filter(r => idsSet.has(r.id));
+        this.rolesDisponibles = (todos || []).filter(r => !idsSet.has(r.id));
+        this.cargandoRoles = false;
+      },
+      error: () => {
+        this.cargandoRoles = false;
+        this.dialogRolesVisible = false;
+        this.messageService.add({
+          severity: 'error',
+          summary: 'Error',
+          detail: 'No se pudieron cargar los roles. Intenta nuevamente.',
+          life: 3000
+        });
+      }
+    });
+  }
+
+  guardarRolesUsuario() {
+    if (!this.usuarioParaRoles) return;
+
+    const roleIds = this.rolesAsignados.map(r => r.id);
+    const userId = this.usuarioParaRoles.usr_int_id;
+
+    this.userService.updateRolesUser(userId, roleIds).subscribe({
+      next: () => {
+        const nombre = `${this.usuarioParaRoles?.usr_str_nombre ?? ''} ${this.usuarioParaRoles?.usr_str_apellidos ?? ''}`.trim();
+        this.messageService.add({
+          severity: 'success',
+          summary: 'Roles actualizados',
+          detail: `Los roles de ${nombre} se actualizaron correctamente.`,
+          life: 3000
+        });
+        this.dialogRolesVisible = false;
+        this.usuarioParaRoles = null;
+      },
+      error: (err) => {
+        const msg = err?.error?.message || 'No se pudieron actualizar los roles.';
+        this.messageService.add({
+          severity: 'error',
+          summary: 'Error',
+          detail: msg,
+          life: 4000
+        });
+      }
+    });
+  }
+
   saveRoles() {
-    
+
   }
 
   abrirModalClientes(usuario: User) {
@@ -334,6 +448,54 @@ guardarCambioEquipo() {
       .split(',')
       .map(s => Number(s.trim()))
       .filter(n => !isNaN(n) && n > 0);
+  }
+
+  exportarExcel(): void {
+    const datos = this.filteredUsers || [];
+    if (datos.length === 0) {
+      this.messageService.add({
+        severity: 'warn',
+        summary: 'Sin datos',
+        detail: 'No hay usuarios para exportar.',
+        life: 3000
+      });
+      return;
+    }
+
+    import('xlsx').then((xlsx: any) => {
+      const XLSX: any = xlsx?.default ?? xlsx;
+      const exportData = datos.map(u => ({
+        'ID': u.usr_int_id,
+        'Usuario': u.usr_str_red || '',
+        'Nombres': u.usr_str_nombre || '',
+        'Apellidos': u.usr_str_apellidos || '',
+        'Equipo': this.getNombreEquipo(u.idequipo),
+        'Email': u.email || '',
+        'Cliente': u.esCliente ? 'SI' : 'NO',
+        'Estado': u.usr_int_bloqueado ? 'Inactivo' : 'Activo'
+      }));
+
+      const worksheet = XLSX.utils.json_to_sheet(exportData);
+      const workbook = { Sheets: { 'Usuarios': worksheet }, SheetNames: ['Usuarios'] };
+      const excelBuffer: any = XLSX.write(workbook, { bookType: 'xlsx', type: 'array' });
+      this.saveAsExcelFile(excelBuffer, 'Usuarios');
+    });
+  }
+
+  private saveAsExcelFile(buffer: any, fileName: string): void {
+    import('file-saver').then((FileSaver: any) => {
+      const EXCEL_TYPE = 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet;charset=UTF-8';
+      const EXCEL_EXTENSION = '.xlsx';
+      const data: Blob = new Blob([buffer], { type: EXCEL_TYPE });
+      const saver = FileSaver?.default ?? FileSaver;
+      saver.saveAs(data, fileName + '_' + new Date().getTime() + EXCEL_EXTENSION);
+      this.messageService.add({
+        severity: 'success',
+        summary: 'Exportación exitosa',
+        detail: 'Archivo Excel generado correctamente.',
+        life: 3000
+      });
+    });
   }
 
   guardarClientesUsuario() {

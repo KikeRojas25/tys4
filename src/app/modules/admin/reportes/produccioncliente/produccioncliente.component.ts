@@ -8,8 +8,38 @@ import { CalendarModule } from 'primeng/calendar';
 import { DropdownModule } from 'primeng/dropdown';
 import { DialogService } from 'primeng/dynamicdialog';
 import { ToastModule } from 'primeng/toast';
+import { ProgressSpinnerModule } from 'primeng/progressspinner';
 import { ReporteService } from '../reporte.service';
+import { MantenimientoService } from '../../mantenimiento/mantenimiento.service';
 import { User } from 'app/core/user/user.types';
+
+interface PivotProvincia {
+  provincia: string;
+  valoresPorMes: { [mes: string]: number };
+  total: number;
+}
+
+interface PivotDepartamento {
+  departamento: string;
+  provincias: PivotProvincia[];
+  totalesPorMes: { [mes: string]: number };
+  total: number;
+}
+
+interface PivotCliente {
+  cliente: string;
+  departamentos: PivotDepartamento[];
+  totalesPorMes: { [mes: string]: number };
+  total: number;
+}
+
+interface PivotResult {
+  tipo: string;
+  meses: string[];
+  totalesPorMes: { [mes: string]: number };
+  totalGeneral: number;
+  clientes: PivotCliente[];
+}
 
 @Component({
   selector: 'app-produccioncliente',
@@ -24,6 +54,7 @@ import { User } from 'app/core/user/user.types';
     DropdownModule,
     CalendarModule,
     ToastModule,
+    ProgressSpinnerModule,
   ],
   providers: [DialogService, MessageService],
 })
@@ -38,8 +69,15 @@ export class ProduccionclienteComponent implements OnInit {
   dateInicio: Date = new Date(Date.now());
   dateFin: Date = new Date(Date.now());
 
+  loading = false;
+  loadingExcel = false;
+  loadingPdf = false;
+
+  pivot: PivotResult | null = null;
+
   constructor(
     private reporteService: ReporteService,
+    private mantenimientoService: MantenimientoService,
     private messageService: MessageService
   ) {}
 
@@ -51,10 +89,9 @@ export class ProduccionclienteComponent implements OnInit {
       { value: 2, label: 'Peso' },
       { value: 3, label: 'Valor' },
     ];
-    // No seleccionar por defecto: obligar al usuario a elegir una unidad
     this.model.idunidadmedida = null;
 
-    this.reporteService.getClientes(this.user?.idscliente).subscribe((resp) => {
+    this.mantenimientoService.getAllClientes('', this.user?.id, true).subscribe((resp) => {
       this.clientes = [{ value: '0', label: 'TODOS LOS CLIENTES' }];
       (resp ?? []).forEach((c) => {
         this.clientes.push({ value: c.idCliente, label: c.razonSocial });
@@ -64,89 +101,139 @@ export class ProduccionclienteComponent implements OnInit {
 
     this.es = {
       firstDayOfWeek: 1,
-      dayNames: [
-        'domingo',
-        'lunes',
-        'martes',
-        'miércoles',
-        'jueves',
-        'viernes',
-        'sábado',
-      ],
-      dayNamesShort: ['dom', 'lun', 'mar', 'mié', 'jue', 'vie', 'sáb'],
-      dayNamesMin: ['D', 'L', 'M', 'X', 'J', 'V', 'S'],
-      monthNames: [
-        'enero',
-        'febrero',
-        'marzo',
-        'abril',
-        'mayo',
-        'junio',
-        'julio',
-        'agosto',
-        'septiembre',
-        'octubre',
-        'noviembre',
-        'diciembre',
-      ],
-      monthNamesShort: [
-        'ene',
-        'feb',
-        'mar',
-        'abr',
-        'may',
-        'jun',
-        'jul',
-        'ago',
-        'sep',
-        'oct',
-        'nov',
-        'dic',
-      ],
+      dayNames: ['domingo','lunes','martes','miércoles','jueves','viernes','sábado'],
+      dayNamesShort: ['dom','lun','mar','mié','jue','vie','sáb'],
+      dayNamesMin: ['D','L','M','X','J','V','S'],
+      monthNames: ['enero','febrero','marzo','abril','mayo','junio','julio','agosto','septiembre','octubre','noviembre','diciembre'],
+      monthNamesShort: ['ene','feb','mar','abr','may','jun','jul','ago','sep','oct','nov','dic'],
       today: 'Hoy',
       clear: 'Borrar',
     };
   }
 
-  buscar(): void {
+  private validarFiltros(): boolean {
     if (!this.dateInicio || !this.dateFin) {
-      this.messageService.add({
-        severity: 'warn',
-        summary: 'Filtro de búsqueda',
-        detail: 'Seleccione un rango de fechas (Inicio y Fin).',
-      });
-      return;
+      this.messageService.add({ severity: 'warn', summary: 'Filtro de búsqueda', detail: 'Seleccione un rango de fechas (Inicio y Fin).' });
+      return false;
     }
-
     const unidad = Number(this.model?.idunidadmedida);
     if (!Number.isFinite(unidad) || unidad <= 0) {
-      this.messageService.add({
-        severity: 'warn',
-        summary: 'Filtro de búsqueda',
-        detail: 'Seleccione una unidad de medida.',
-      });
-      return;
+      this.messageService.add({ severity: 'warn', summary: 'Filtro de búsqueda', detail: 'Seleccione una unidad de medida.' });
+      return false;
     }
+    return true;
+  }
 
-    let idcliente: any = this.model?.idcliente;
-    if (idcliente === undefined || idcliente === '0' || idcliente === 0) {
-      idcliente = '';
+  private getParametros(): { idcliente: number | null; fecini: string; fecfin: string; unidad: number } {
+    const idclienteRaw = this.model?.idcliente;
+    const idcliente =
+      idclienteRaw === undefined || idclienteRaw === '0' || idclienteRaw === 0
+        ? null
+        : Number(idclienteRaw);
+    return {
+      idcliente,
+      fecini: this.formatFecha(this.dateInicio),
+      fecfin: this.formatFecha(this.dateFin),
+      unidad: Number(this.model.idunidadmedida),
+    };
+  }
+
+  private formatFecha(d: Date): string {
+    const dd = ('0' + d.getDate()).slice(-2);
+    const mm = ('0' + (d.getMonth() + 1)).slice(-2);
+    const yyyy = d.getFullYear();
+    return `${dd}/${mm}/${yyyy}`;
+  }
+
+  buscar(): void {
+    if (!this.validarFiltros()) return;
+    const { idcliente, fecini, fecfin, unidad } = this.getParametros();
+
+    this.loading = true;
+    this.pivot = null;
+
+    this.reporteService.getProduccionPorCliente(idcliente, fecini, fecfin, unidad).subscribe({
+      next: (data) => {
+        this.pivot = data as unknown as PivotResult;
+        this.loading = false;
+        this.messageService.add({
+          severity: 'success',
+          summary: 'Éxito',
+          detail: `Se encontraron ${this.pivot?.clientes?.length ?? 0} clientes.`,
+        });
+      },
+      error: (err) => {
+        this.loading = false;
+        this.messageService.add({
+          severity: 'error',
+          summary: 'Error',
+          detail: err?.error?.message || 'No se pudo obtener el reporte.',
+        });
+      },
+    });
+  }
+
+  descargarExcel(): void {
+    if (!this.validarFiltros()) return;
+    const { idcliente, fecini, fecfin, unidad } = this.getParametros();
+    this.loadingExcel = true;
+    this.reporteService.descargarProduccionPorClienteExcel(idcliente, fecini, fecfin, unidad).subscribe({
+      next: (blob) => {
+        this.guardarArchivo(blob, `ProduccionPorCliente_${Date.now()}.xlsx`);
+        this.loadingExcel = false;
+        this.messageService.add({ severity: 'success', summary: 'Excel descargado', detail: 'El archivo se descargó correctamente.' });
+      },
+      error: () => {
+        this.loadingExcel = false;
+        this.messageService.add({ severity: 'error', summary: 'Error', detail: 'No se pudo generar el Excel.' });
+      },
+    });
+  }
+
+  descargarPdf(): void {
+    if (!this.validarFiltros()) return;
+    const { idcliente, fecini, fecfin, unidad } = this.getParametros();
+    this.loadingPdf = true;
+    this.reporteService.descargarProduccionPorClientePdf(idcliente, fecini, fecfin, unidad).subscribe({
+      next: (blob) => {
+        this.guardarArchivo(blob, `ProduccionPorCliente_${Date.now()}.pdf`);
+        this.loadingPdf = false;
+        this.messageService.add({ severity: 'success', summary: 'PDF descargado', detail: 'El archivo se descargó correctamente.' });
+      },
+      error: () => {
+        this.loadingPdf = false;
+        this.messageService.add({ severity: 'error', summary: 'Error', detail: 'No se pudo generar el PDF.' });
+      },
+    });
+  }
+
+  private guardarArchivo(blob: Blob, fileName: string): void {
+    const url = window.URL.createObjectURL(blob);
+    const link = document.createElement('a');
+    link.href = url;
+    link.download = fileName;
+    link.click();
+    window.URL.revokeObjectURL(url);
+  }
+
+  // Helpers usados desde el template
+  valorMes(map: { [k: string]: number } | undefined, mes: string): number {
+    if (!map) return 0;
+    const v = map[mes];
+    return v == null ? 0 : v;
+  }
+
+  rowSpanCliente(c: PivotCliente): number {
+    // 1 fila de cabecera con totales del cliente +
+    // para cada dpto: N provincias + 1 fila "Total" del dpto
+    let n = 1;
+    for (const d of c.departamentos) {
+      n += d.provincias.length + 1;
     }
+    return Math.max(n, 1);
+  }
 
-    const fechainicio = this.dateInicio.toLocaleDateString();
-    const fechafin = this.dateFin.toLocaleDateString();
-
-    const url =
-      'http://104.36.166.65/webreports/produccioncliente.aspx?idcliente=' +
-      idcliente +
-      '&fecinicio=' +
-      fechainicio +
-      '&fecfin=' +
-      fechafin +
-      '&idunidadmedida=' +
-      unidad;
-
-    window.open(url);
+  rowSpanDpto(d: PivotDepartamento): number {
+    return d.provincias.length + 1;
   }
 }
-

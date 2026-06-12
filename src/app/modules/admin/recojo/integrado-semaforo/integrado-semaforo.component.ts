@@ -44,19 +44,35 @@ export class IntegradoSemaforoComponent implements OnInit {
   }
 
   reload(): void {
-    const idusuario = this.user?.usr_int_id ?? this.user?.id;
+    const idusuario = this.user?.id ?? this.user?.usr_int_id;
     const idequipo = this.user?.idequipo ?? (this.user as any)?.['idEquipo'];
+    console.log('[integrado-semaforo] user en localStorage:', this.user);
+    console.log('[integrado-semaforo] idusuario que se envía:', idusuario, 'idequipo:', idequipo);
     this.loading = true;
     this.comercialService.getIntegradoSemaforoPorCliente(idusuario, idequipo).subscribe({
       next: (list) => {
         this.ordenes = list ?? [];
+        this.cargarObservadas(idusuario);
       },
       error: () => {
         this.ordenes = [];
-      },
-      complete: () => {
         this.loading = false;
       },
+    });
+  }
+
+  private cargarObservadas(idusuario: number | null | undefined): void {
+    this.comercialService.getIntegradoSemaforoObservadas(idusuario).subscribe({
+      next: (obs) => {
+        const map = new Map<number, number>();
+        (obs ?? []).forEach(o => map.set(o.idcliente, o.cantidad_observadas ?? 0));
+        this.ordenes = this.ordenes.map(r => ({
+          ...r,
+          cantidad_observadas: map.get(r.idcliente) ?? 0
+        }));
+      },
+      complete: () => { this.loading = false; },
+      error:    () => { this.loading = false; }
     });
   }
 

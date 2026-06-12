@@ -23,6 +23,7 @@ import { ConfirmDialogModule } from 'primeng/confirmdialog';
 import { InputMaskModule } from 'primeng/inputmask';
 import { FileModalComponent } from '../seguimientoot/modalfiles';
 import { Clipboard } from '@angular/cdk/clipboard'; // opcional para copiar
+import { MantenimientoService } from 'app/modules/admin/mantenimiento/mantenimiento.service';
 
 
 interface EventItem {
@@ -106,7 +107,7 @@ export class SeguimientootcomercialComponent implements OnInit {
   ordenesFiltradas: OrdenTransporte[] = [];
   ordenesParaGrilla: any[] = [];
   selected: OrdenTransporte[];
-  groupByField: 'provinciaDisplay' | 'destino' | null = 'provinciaDisplay';
+  groupByField: 'provinciaDisplay' | 'destino' | null = null;
   /** Grupos expandidos (colapsables). Solo filas de estos grupos se muestran. */
   expandedGroups: Set<string> = new Set();
   opcionesAgrupacion: SelectItem[] = [
@@ -157,6 +158,7 @@ export class SeguimientootcomercialComponent implements OnInit {
               private route: ActivatedRoute,
               private confirmationService: ConfirmationService,
               public messageService: MessageService,
+              public _mantenimientoService: MantenimientoService,
               private clipboard: Clipboard
               ) { }
 
@@ -242,7 +244,7 @@ export class SeguimientootcomercialComponent implements OnInit {
     };
 
 
-    this.ordenTransporteService.getClientes(this.user.idscliente).subscribe(resp => {
+    this._mantenimientoService.getAllClientes('', this.user.id, true) .subscribe(resp => {
         this.clientes.push({ value: 0,  label : 'TODOS LOS CLIENTES'});
         resp.forEach(element => {
             this.clientes.push({ value: element.idCliente ,  label : element.razonSocial});
@@ -254,6 +256,9 @@ export class SeguimientootcomercialComponent implements OnInit {
           this.model.idcliente = 0;
         }
       });
+
+
+      
 
 
     this.ordenTransporteService.getUbigeo('').subscribe(resp => {

@@ -1,6 +1,7 @@
 import { HttpClient, HttpHeaders } from '@angular/common/http';
 import { inject, Injectable } from '@angular/core';
 import { User } from 'app/core/user/user.types';
+import { Rol, Pagina, RolMantenimientoPayload } from './seguridad.types';
 
 import { environment } from 'environments/environment';
 import { Observable, ReplaySubject, tap } from 'rxjs';
@@ -92,12 +93,49 @@ getUser(id: any): Observable<User> {
     return this._httpClient.post(`${this.baseUrlUser}actualizar`, dto);
   }
 
-  // getRolesByUser(user: any): Observable<any> {
-  //   return this._httpClient.get<Rol>(`${this.baseUrlRol}getallroles?UserId=${user}` , user);
-  // }
-  // getRoles(user: any): Observable<any> {
-  //   return this._httpClient.get<Rol>(`${this.baseUrlRol}` , user);
-  // }
+  getAllRoles(): Observable<Rol[]> {
+    return this._httpClient.get<Rol[]>(`${this.baseUrlRol}`);
+  }
 
+  getRolesByUser(userId: number): Observable<number[]> {
+    return this._httpClient.get<number[]>(`${this.baseUrlRol}by-user/${userId}`);
+  }
+
+  updateRolesUser(userId: number, roleIds: number[]): Observable<any> {
+    return this._httpClient.post(`${this.baseUrlRol}update-user`, { userId, roleIds });
+  }
+
+  // ==================== Mantenimiento de Roles ====================
+
+  listarRolesMantenimiento(param?: string): Observable<Rol[]> {
+    const url = param
+      ? `${this.baseUrlRol}mantenimiento?param=${encodeURIComponent(param)}`
+      : `${this.baseUrlRol}mantenimiento`;
+    return this._httpClient.get<Rol[]>(url);
+  }
+
+  registrarRol(payload: RolMantenimientoPayload): Observable<any> {
+    return this._httpClient.post(`${this.baseUrlRol}registrar`, payload);
+  }
+
+  actualizarRol(payload: RolMantenimientoPayload): Observable<any> {
+    return this._httpClient.post(`${this.baseUrlRol}actualizar`, payload);
+  }
+
+  toggleActivoRol(rolId: number, activo: boolean): Observable<any> {
+    return this._httpClient.post(`${this.baseUrlRol}toggle-activo`, { rolId, activo });
+  }
+
+  getPaginasArbol(): Observable<Pagina[]> {
+    return this._httpClient.get<Pagina[]>(`${this.baseUrlRol}paginas-arbol`);
+  }
+
+  getPaginasPorRol(rolId: number): Observable<number[]> {
+    return this._httpClient.get<number[]>(`${this.baseUrlRol}paginas-por-rol/${rolId}`);
+  }
+
+  asignarPaginasRol(rolId: number, paginaIds: number[]): Observable<any> {
+    return this._httpClient.post(`${this.baseUrlRol}asignar-paginas`, { rolId, paginaIds });
+  }
 
 }

@@ -19,6 +19,7 @@ import { ToastModule } from 'primeng/toast';
 import {  User } from '../../trafico.types';
 import { ConfirmDialogModule } from 'primeng/confirmdialog';
 import { OrdenTransporte } from 'app/modules/admin/recepcion/ordentransporte/ordentransporte.types';
+import { MantenimientoService } from 'app/modules/admin/mantenimiento/mantenimiento.service';
 
 
 interface EventItem {
@@ -94,6 +95,7 @@ export class ListComponent implements OnInit {
               public dialogService: DialogService,
               private router: Router,
               private confirmationService: ConfirmationService,
+              public _mantenimientoService: MantenimientoService,
               public messageService: MessageService
               ) { }
 
@@ -162,8 +164,9 @@ export class ListComponent implements OnInit {
         clear: 'Borrar'
     };
 
+    console.log(this.user);
 
-    this.ordenTransporteService.getClientes(this.user.idscliente).subscribe(resp => {
+    this._mantenimientoService.getAllClientes('', this.user.id, true).subscribe(resp => {
         this.clientes.push({ value: 0,  label : 'TODOS LOS CLIENTES'});
         resp.forEach(element => {
             this.clientes.push({ value: element.idCliente ,  label : element.razonSocial});

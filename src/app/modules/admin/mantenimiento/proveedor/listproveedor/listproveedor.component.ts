@@ -50,7 +50,7 @@ export class ListproveedorComponent implements OnInit {
   ngOnInit() {
 
     this.cols = [
-      { field: 'idProveedor', header: 'ACC', width: '160px' },
+      { field: 'idProveedor', header: 'ACC', width: '140px' },
       { field: 'tipo', header: 'TIPO', width: '120px' },
       { field: 'razonSocial', header: 'RAZÓN SOCIAL', width: '260px' },
       { field: 'ruc', header: 'RUC', width: '140px' },
@@ -101,6 +101,12 @@ export class ListproveedorComponent implements OnInit {
     const id = Number(idProveedor);
     if (!Number.isFinite(id) || id <= 0) return;
     this.router.navigate(['/mantenimiento/editarproveedor', id]);
+  }
+
+  verTarifas(idProveedor: any): void {
+    const id = Number(idProveedor);
+    if (!Number.isFinite(id) || id <= 0) return;
+    this.router.navigate(['/mantenimiento/proveedor', id, 'tarifas']);
   }
 
   eliminar(idProveedor: any): void {

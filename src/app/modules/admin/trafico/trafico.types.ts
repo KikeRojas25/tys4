@@ -29,6 +29,7 @@ export interface Manifiesto {
   numHojaRuta: string;
   placa: string;
   idordencarga: number;
+  idorden?: number;
   estado: string;
 
 

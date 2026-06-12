@@ -82,7 +82,7 @@ export class IntegradoComponent implements OnInit {
 
         console.log(this.user);
 
-        this.model.idusuario = this.user.usr_int_id;
+        this.model.idusuario = this.user.id;
         this.model.idequipo = this.user.idEquipo;
 
         this.cols = [

@@ -1,6 +1,6 @@
 <p-toast></p-toast>
 
-<div class="flex flex-col flex-auto min-w-0 bg-gray-50">
+<div class="flex flex-col flex-auto min-w-0 bg-card">
   <div
     class="flex flex-col sm:flex-row flex-0 sm:items-center sm:justify-between p-2 sm:py-8 sm:px-10 border-b border-gray-200 bg-white shadow-sm"
   >
@@ -22,11 +22,11 @@
     </div>
   </div>
 
-  <div class="main-content container-fluid p-2">
-    <div class="bg-white rounded-lg shadow-sm border border-gray-200 overflow-hidden">
-      <div class="p-4 grid grid-cols-1 md:grid-cols-12 gap-3 items-end">
-        <div class="md:col-span-4">
-          <label class="block text-xs font-medium text-gray-700 mb-1">Fecha inicio</label>
+  <div class="main-content container mx-auto p-6">
+    <div class="card p-6 shadow-md rounded-lg bg-white dark:bg-gray-800">
+      <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
+        <div class="flex flex-col">
+          <label class="font-semibold mb-1">Fecha inicio</label>
           <p-calendar
             [(ngModel)]="filtros.fechaInicio"
             [ngModelOptions]="{ standalone: true }"
@@ -37,8 +37,8 @@
           ></p-calendar>
         </div>
 
-        <div class="md:col-span-4">
-          <label class="block text-xs font-medium text-gray-700 mb-1">Fecha fin</label>
+        <div class="flex flex-col">
+          <label class="font-semibold mb-1">Fecha fin</label>
           <p-calendar
             [(ngModel)]="filtros.fechaFin"
             [ngModelOptions]="{ standalone: true }"
@@ -48,30 +48,30 @@
             class="w-full"
           ></p-calendar>
         </div>
-
-        <div class="md:col-span-4 flex items-center justify-end gap-2">
-          <button
-            pButton
-            type="button"
-            icon="pi pi-search"
-            label="Buscar"
-            (click)="buscar()"
-            [disabled]="loading"
-            class="px-4 py-2.5 text-sm font-medium text-white bg-gray-700 hover:bg-gray-600 rounded-md shadow-sm transition-all duration-150"
-          ></button>
-          <button
-            pButton
-            type="button"
-            icon="pi pi-filter-slash"
-            label="Limpiar"
-            (click)="limpiar()"
-            [disabled]="loading"
-            class="px-4 py-2.5 text-sm font-medium text-gray-700 bg-white border border-gray-300 hover:bg-gray-50 rounded-md shadow-sm transition-all duration-150"
-          ></button>
-        </div>
       </div>
 
-      <div class="px-4 pb-4 text-xs text-gray-600">
+      <div class="flex flex-wrap gap-2 mt-6">
+        <button
+          pButton
+          type="button"
+          icon="pi pi-search"
+          label="Buscar"
+          (click)="buscar()"
+          [disabled]="loading"
+          class="px-4 py-2 text-sm font-medium text-white bg-blue-600 hover:bg-blue-500 rounded-md shadow-sm"
+        ></button>
+        <button
+          pButton
+          type="button"
+          icon="pi pi-filter-slash"
+          label="Limpiar"
+          (click)="limpiar()"
+          [disabled]="loading"
+          class="px-4 py-2 text-sm font-medium text-gray-700 bg-white border border-gray-300 hover:bg-gray-50 rounded-md shadow-sm"
+        ></button>
+      </div>
+
+      <div class="mt-4 text-xs text-gray-600">
         El botón <span class="font-semibold">Buscar</span> abrirá el reporte en una nueva pestaña con el rango seleccionado.
       </div>
     </div>

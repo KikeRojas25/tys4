@@ -8,7 +8,7 @@
         </div>
         <div class="flex items-center ml-1 whitespace-nowrap">
           <mat-icon class="fuse-horizontal-navigation-item-icon text-gray-400" [svgIcon]="'heroicons_solid:chevron-right'"></mat-icon>
-          <a class="ml-1 text-gray-700 hover:text-gray-900">Mantenimiento</a>
+          <a class="ml-1 text-gray-500">Mantenimiento</a>
         </div>
       </div>
       <div class="mt-2">
@@ -111,6 +111,7 @@
               <td class="text-center px-2 py-2">
                 <div class="flex gap-1 justify-center items-center">
                   <button pButton class="action-btn action-btn-primary" icon="pi pi-pencil" title="Editar" (click)="editar(rowData.idProveedor || rowData.idproveedor)"></button>
+                  <button pButton class="action-btn action-btn-success" icon="pi pi-dollar" title="Tarifas" (click)="verTarifas(rowData.idProveedor || rowData.idproveedor)"></button>
                   <button pButton class="action-btn action-btn-danger" icon="pi pi-trash" title="Eliminar" (click)="eliminar(rowData.idProveedor || rowData.idproveedor)"></button>
                 </div>
               </td>

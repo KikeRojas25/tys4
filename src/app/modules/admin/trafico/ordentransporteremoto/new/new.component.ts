@@ -19,6 +19,9 @@ import { InputTextModule } from 'primeng/inputtext';
 import { PanelModule } from 'primeng/panel';
 import { TableModule } from 'primeng/table';
 import { ToastModule } from 'primeng/toast';
+import { SkeletonModule } from 'primeng/skeleton';
+import { MantenimientoService } from 'app/modules/admin/mantenimiento/mantenimiento.service';
+import { forkJoin } from 'rxjs';
 
 interface GuiaGRR {
   idguia?: number;
@@ -50,7 +53,8 @@ interface GuiaGRR {
     TableModule,
     ConfirmDialogModule ,
     ReactiveFormsModule,
-    InputMaskModule 
+    InputMaskModule,
+    SkeletonModule
   ],
   providers: [MessageService,ConfirmationService]
   
@@ -60,6 +64,7 @@ export class NewComponent implements OnInit {
   dialogEtiqueta = false;
   es: any;
   public loading = false;
+  cargando = true;
   model: any = {};
   // Cuando se crea una OTR vinculada, el backend requiere el proveedor
   idproveedor: number | null = null;
@@ -74,6 +79,7 @@ export class NewComponent implements OnInit {
   
 
   clientes: SelectItem[] = [];
+  clientesTodos: SelectItem[] = [];
   tipounidad: SelectItem[] = [];
   mercaderiasEspeciales: SelectItem[] = [];
   ubigeos: SelectItem[] = [];
@@ -105,10 +111,38 @@ export class NewComponent implements OnInit {
     format: 'dd-MM-yyyy',
     defaultOpen: true
   };
+
+  private readonly etiquetasCampos: { [key: string]: string } = {
+    idcliente: 'Cliente',
+    idremitente: 'Remitente',
+    iddestinatario: 'Destinatario',
+    idorigen: 'Origen',
+    puntopartida: 'Dirección de partida',
+    iddestino: 'Destino',
+    puntollegada: 'Dirección de llegada',
+    idvehiculo: 'Placa de recojo',
+    idchofer: 'Conductor de recojo',
+    fecharecojo: 'Fecha de recojo',
+    horarecojo: 'Hora de recojo',
+    guiarecojo: 'Guía de recojo',
+    bulto: 'Cant. Bultos',
+    peso: 'Peso (Kg)',
+    volumen: 'Volumen (m3)',
+    pesovol: 'Peso Vol',
+    idformula: 'Fórmula',
+    idtipotransporte: 'Medio de transporte',
+    idconceptocobro: 'Concepto de cobro',
+    idtipomercaderia: 'Mercadería especial',
+    docgeneral: 'Referencia',
+    descripciongeneral: 'Descripción de mercadería',
+    guiasremitente: 'Guías de remitente (GRR)',
+  };
+
   constructor(private ordenTransporteService: OrdenTransporteService
             , private confirmationService: ConfirmationService
             , private router: Router
             ,private fb: FormBuilder
+            ,public _mantenimientoService: MantenimientoService
             ,private messageService: MessageService
             , private activatedRoute: ActivatedRoute) { }
 
@@ -292,86 +326,36 @@ export class NewComponent implements OnInit {
   }
 
   cargarDropDows() {
-
-
-    this.user.idscliente === null ? '': this.user.idscliente;
-    console.log(this.user.idscliente);
-    
-    this.ordenTransporteService.getValorTabla(4).subscribe(resp => {
-      resp.forEach(element => {
-          this.tipounidad.push({ value: element.idValorTabla ,  label : element.valor});
-        });
-    });
-
-    this.ordenTransporteService.getValorTabla(16).subscribe(resp => {
-      resp.forEach(element => {
-          this.mercaderiasEspeciales.push({ value: element.idValorTabla ,  label : element.valor});
-        });
-    });
-
-    
-    this.ordenTransporteService.getClientes(this.user.idscliente).subscribe({
-      next: resp => {
-        resp.forEach(element => {
-          this.clientes.push({ value: element.idCliente ,  label : element.razonSocial});
-        });
-
-        // Si ya se obtuvo la OR vinculada (y ya tenemos ubigeos), aplicar precarga ahora.
+    forkJoin({
+      tabla4: this.ordenTransporteService.getValorTabla(4),
+      tabla16: this.ordenTransporteService.getValorTabla(16),
+      clientes: this._mantenimientoService.getAllClientes('', this.user.id, true),
+      clientesTodos: this._mantenimientoService.getAllClientes('', this.user.id, null),
+      vehiculos: this.ordenTransporteService.getVehiculos(''),
+      choferes: this.ordenTransporteService.getChoferes(''),
+      ubigeo: this.ordenTransporteService.getUbigeo(''),
+    }).subscribe({
+      next: ({ tabla4, tabla16, clientes, clientesTodos, vehiculos, choferes, ubigeo }) => {
+        this.tipounidad = tabla4.map(e => ({ value: e.idValorTabla, label: e.valor }));
+        this.mercaderiasEspeciales = tabla16.map(e => ({ value: e.idValorTabla, label: e.valor }));
+        this.clientes = clientes.map(e => ({ value: e.idCliente, label: e.razonSocial }));
+        this.clientesTodos = clientesTodos.map(e => ({ value: e.idCliente, label: e.razonSocial }));
+        this.vehiculos = vehiculos.map(e => ({ value: e.idVehiculo, label: e.placa }));
+        this.choferes = choferes.map(e => ({
+          value: e.idChofer,
+          label: `DNI: ${e.dni} NOMBRE: ${e.nombreChofer} ${e.apellidoChofer}`
+        }));
+        this.ubigeos = ubigeo.map(e => ({ value: e.idDistrito, label: e.ubigeo }));
+      },
+      error: (err) => {
+        console.error('Error al cargar los dropdowns', err);
+        this.cargando = false;
+      },
+      complete: () => {
         this.aplicarPrecargaDesdeOrdenVinculada();
-
-        // this.model.idcliente = this.modeltemp.idcliente;
-        // this.model.idremitente =  this.modeltemp.idcliente ;
-        // this.model.iddestinatario =   this.modeltemp.idcliente ;
-        // // this.mismoremitente = true;
-        // // this.mismodestinatario = true;
-      }
-
-    }); 
-
-    this.ordenTransporteService.getVehiculos('').subscribe({
-      next: resp => {
-        resp.forEach(element => {
-          this.vehiculos.push({ value: element.idVehiculo ,  label : element.placa});
-        });
-
-
+        this.cargando = false;
       }
     });
-    this.ordenTransporteService.getChoferes('').subscribe({
-      next: resp => {
-        resp.forEach(element => {
-          this.choferes.push({ value: element.idChofer ,  label : `DNI: ${element.dni} NOMBRE: ${element.nombreChofer} ${element.apellidoChofer}` });
-        });
-
-
-      }
-    })
-
-
-
-    
-
-  this.ordenTransporteService.getUbigeo('').subscribe(resp => {
-
-    resp.forEach(element => {
-        this.ubigeos.push({ value: element.idDistrito ,  label : element.ubigeo});
-      });
-
-
-  }, error => {
-
-  }, () => {
-    this.model.idorigen =   this.modeltemp.idorigen;
-    this.model.iddestino =   this.modeltemp.iddestino;
-
-    // Si ya se obtuvo la OR vinculada, aplicar precarga ahora que ya tenemos ubigeos.
-    this.aplicarPrecargaDesdeOrdenVinculada();
-
-  });
-
-
-
-
   }
 
 
@@ -382,6 +366,62 @@ export class NewComponent implements OnInit {
     }
     return true;
    }
+
+  private obtenerCamposFaltantes(): string[] {
+    const faltantes: string[] = [];
+    Object.keys(this.form.controls).forEach(key => {
+      const control = this.form.get(key);
+      if (control && control.invalid) {
+        faltantes.push(this.etiquetasCampos[key] || key);
+      }
+    });
+    return faltantes;
+  }
+
+  private alertarCamposFaltantes(): void {
+    const faltantes = this.obtenerCamposFaltantes();
+    if (faltantes.length === 0) {
+      return;
+    }
+    this.messageService.add({
+      severity: 'warn',
+      summary: 'Faltan campos obligatorios',
+      detail: `Por favor complete: ${faltantes.join(', ')}.`,
+      life: 8000,
+    });
+    this.scrollAlPrimerCampoInvalido();
+  }
+
+  private scrollAlPrimerCampoInvalido(): void {
+    const primero = Object.keys(this.form.controls).find(key => this.form.get(key)?.invalid);
+    if (!primero) {
+      return;
+    }
+    setTimeout(() => {
+      const elemento = document.querySelector(`[formcontrolname="${primero}"]`) as HTMLElement | null;
+      if (!elemento) {
+        return;
+      }
+      const offsetSuperior = 140;
+      const destino = window.scrollY + elemento.getBoundingClientRect().top - offsetSuperior;
+      this.scrollSuave(destino, 1000);
+    });
+  }
+
+  private scrollSuave(destino: number, duracion: number): void {
+    const inicio = window.scrollY;
+    const distancia = destino - inicio;
+    const tiempoInicio = performance.now();
+    const easeInOutCubic = (t: number) => (t < 0.5 ? 4 * t * t * t : 1 - Math.pow(-2 * t + 2, 3) / 2);
+    const animar = (ahora: number) => {
+      const progreso = Math.min((ahora - tiempoInicio) / duracion, 1);
+      window.scrollTo(0, inicio + distancia * easeInOutCubic(progreso));
+      if (progreso < 1) {
+        requestAnimationFrame(animar);
+      }
+    };
+    requestAnimationFrame(animar);
+  }
 
   registrar() {
 
@@ -450,6 +490,7 @@ export class NewComponent implements OnInit {
 }
 else {
   this.form.markAllAsTouched(); // Para mostrar los errores en todos los campos
+  this.alertarCamposFaltantes();
   return ;
 }
 

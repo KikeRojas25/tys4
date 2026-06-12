@@ -1,0 +1,104 @@
+<div class="flex flex-col flex-auto min-w-0 bg-gray-50">
+  <!-- Header -->
+  <div class="flex flex-col sm:flex-row flex-0 sm:items-center sm:justify-between p-2 sm:py-8 sm:px-10 border-b border-gray-200 bg-white shadow-sm">
+    <div class="flex-1 min-w-0">
+      <div class="flex flex-wrap items-center font-medium text-sm text-gray-600">
+        <div><a class="whitespace-nowrap text-gray-700 hover:text-gray-900">TMS</a></div>
+        <div class="flex items-center ml-1 whitespace-nowrap">
+          <mat-icon class="fuse-horizontal-navigation-item-icon text-gray-400" [svgIcon]="'heroicons_solid:chevron-right'"></mat-icon>
+          <a class="ml-1 text-gray-500">Seguimiento</a>
+        </div>
+        <div class="flex items-center ml-1 whitespace-nowrap">
+          <mat-icon class="fuse-horizontal-navigation-item-icon text-gray-400" [svgIcon]="'heroicons_solid:chevron-right'"></mat-icon>
+          <a class="ml-1 text-gray-500 cursor-pointer" (click)="volver()">Liquidación</a>
+        </div>
+      </div>
+      <div class="mt-2">
+        <h2 class="text-3xl md:text-4xl font-semibold tracking-tight leading-7 sm:leading-10 truncate text-gray-900">
+          Documentos por liquidar (GRT)
+        </h2>
+        <p class="text-sm text-amber-700 mt-1.5">OT: {{ idordentrabajo }} · HR: {{ numhojaruta }} · Manifiesto: {{ idmanifiesto }}</p>
+      </div>
+    </div>
+  </div>
+
+  <p-toast />
+  <p-confirmDialog />
+
+  <div class="main-content container-fluid p-2">
+
+    <div class="bg-white rounded-lg shadow-sm border border-gray-200 mb-2 overflow-hidden">
+      <div class="p-2 flex justify-end">
+        <button
+          pButton
+          class="px-4 py-2.5 text-sm font-medium text-gray-700 bg-white border border-gray-300 hover:bg-gray-50 rounded-md shadow-sm"
+          label="Regresar"
+          icon="pi pi-arrow-left"
+          (click)="volver()">
+        </button>
+      </div>
+    </div>
+
+    <div class="bg-white rounded-lg shadow-sm border border-gray-200 overflow-hidden">
+      <div class="p-6">
+        <p-table
+          [value]="guias"
+          [columns]="cols"
+          [paginator]="true"
+          [rows]="20"
+          [rowsPerPageOptions]="[20,40,60,120]"
+          scrollHeight="70vh"
+          [resizableColumns]="true"
+          [tableStyle]="{ 'table-layout': 'fixed', 'width': '100%' }"
+          [scrollable]="true"
+          [loading]="loading"
+          [styleClass]="'custom-table'"
+          class="w-full">
+
+          <ng-template pTemplate="colgroup" let-columns>
+            <colgroup>
+              <col *ngFor="let col of columns" [style.width]="col.width">
+            </colgroup>
+          </ng-template>
+
+          <ng-template pTemplate="header" let-columns>
+            <tr class="bg-gray-800 text-white">
+              <th *ngFor="let col of columns"
+                  class="text-center px-4 py-3 text-sm font-semibold text-gray-100 border-b border-gray-700">
+                {{ col.header }}
+              </th>
+            </tr>
+          </ng-template>
+
+          <ng-template pTemplate="body" let-rowData>
+            <tr class="border-b border-gray-100 hover:bg-gray-50">
+              <td class="text-center px-2 py-2">
+                <div class="flex gap-1 justify-center items-center">
+                  <button pButton class="action-btn action-btn-success" icon="pi pi-check" title="Vincular" (click)="vincular(rowData.id)"></button>
+                  <button pButton class="action-btn action-btn-danger" icon="pi pi-times" title="Desvincular" (click)="desvincular(rowData.id)"></button>
+                  <button pButton class="action-btn action-btn-warning" icon="pi pi-exclamation-circle" title="Extraviado" (click)="extraviado(rowData.id)"></button>
+                  <button pButton class="action-btn action-btn-info" icon="pi pi-inbox" title="Usada en otro servicio" (click)="otroservicio(rowData.id)"></button>
+                </div>
+              </td>
+              <td class="text-center px-4 py-3 text-gray-700 text-sm">{{ rowData.numeroguia }}</td>
+              <td class="text-center px-4 py-3 text-gray-700 text-sm">{{ rowData.fecharegistro | date:'dd-MM-yyyy' }}</td>
+              <td class="text-center px-4 py-3 text-sm">
+                <span class="px-2 py-1 rounded text-xs font-medium" [ngClass]="estadoClass(rowData.estado)">
+                  {{ rowData.estado }}
+                </span>
+              </td>
+            </tr>
+          </ng-template>
+
+          <ng-template pTemplate="emptymessage">
+            <tr>
+              <td colspan="4" class="text-center p-4">
+                <span class="text-gray-600">No hay guías para esta OT</span>
+              </td>
+            </tr>
+          </ng-template>
+        </p-table>
+      </div>
+    </div>
+  </div>
+</div>

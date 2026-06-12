@@ -3,6 +3,7 @@ import { Router } from '@angular/router';
 import { SelectItem, MenuItem, ConfirmationService, MessageService } from 'primeng/api';
 import { DynamicDialogRef, DialogService } from 'primeng/dynamicdialog';
 import { OrdenTransporteService } from '../../recepcion/ordentransporte/ordentransporte.service';
+import { MantenimientoService } from '../../mantenimiento/mantenimiento.service';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { MatIcon } from '@angular/material/icon';
@@ -98,6 +99,7 @@ export class ConfirmarentregaComponent implements OnInit {
 
 
   constructor(private ordenTransporteService: OrdenTransporteService,
+              private mantenimientoService: MantenimientoService,
               public dialogService: DialogService,
               private router: Router,
               private confirmationService: ConfirmationService,
@@ -127,7 +129,7 @@ export class ConfirmarentregaComponent implements OnInit {
           {label: 'Setup', icon: 'pi pi-cog', routerLink: ['/setup']}
       ];
 
-    this.model.idusuario = this.user.usr_int_id;
+    this.model.idusuario = this.user.id;
     this.dateInicio.setDate((new Date()).getDate() - 1);
     this.dateFin.setDate((new Date()).getDate() );
     this.model.numcp = '';
@@ -179,7 +181,7 @@ export class ConfirmarentregaComponent implements OnInit {
     };
 
 
-    this.ordenTransporteService.getClientes(this.user.idscliente).subscribe(resp => {
+    this.mantenimientoService.getAllClientes('', this.user.usr_int_id, false).subscribe(resp => {
         this.clientes.push({ value: 0,  label : 'TODOS LOS CLIENTES'});
         resp.forEach(element => {
             this.clientes.push({ value: element.idCliente ,  label : element.razonSocial});

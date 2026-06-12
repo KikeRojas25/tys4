@@ -103,7 +103,6 @@ export class PlanninglocalComponent implements OnInit {
 
     model: any = {};
     dateInicio: Date = new Date(Date.now());
-    dateFin: Date = new Date(Date.now());
 
     ngOnInit() {
 
@@ -159,30 +158,23 @@ export class PlanninglocalComponent implements OnInit {
 
         this.cols = [
             { header: 'OT', field: 'numcp', width: '120px' },
-            { header: 'F. CITA', field: 'fechahoracita', width: '60px' },
-            { header: 'H. CITA', field: 'horacita', width: '60px' },
-            { header: 'CLIENTE', field: 'remitente', width: '260px' },
-            { header: 'ORIGEN', field: 'distritoOrigen', width: '70px' },
-            { header: 'PUNTO DE PARTIDA', field: 'origen', width: '120px' },
-            { header: 'DESTINO', field: 'distritoDestino', width: '70px' },
-            {
-                header: 'CENTRO DE ACOPIO',
-                field: 'centroacopio',
-                width: '20px',
-            },
-
-            { header: 'CONTACTO', field: 'personarecojo', width: '20px' },
-
-            { header: 'OBSERVACIONES', field: 'observaciones', width: '20px' },
-            { header: 'BULTOS', field: 'bulto', width: '30px' },
-            { header: 'PESO', field: 'peso', width: '30px' },
-            { header: 'ACCIONES', field: 'acciones', width: '40px' },
+            { header: 'F. CITA', field: 'fechahoracita', width: '90px' },
+            { header: 'H. CITA', field: 'horacita', width: '70px' },
+            { header: 'CLIENTE', field: 'remitente', width: '180px' },
+            { header: 'ORIGEN', field: 'distritoOrigen', width: '120px' },
+            { header: 'PUNTO DE PARTIDA', field: 'origen', width: '210px' },
+            { header: 'DESTINO', field: 'distritoDestino', width: '120px' },
+            { header: 'CENTRO DE ACOPIO', field: 'centroacopio', width: '160px' },
+            { header: 'OBSERVACIONES', field: 'observaciones', width: '230px' },
+            { header: 'BULTOS', field: 'bulto', width: '65px' },
+            { header: 'PESO', field: 'peso', width: '65px' },
+            { header: 'ACCIONES', field: 'acciones', width: '60px' },
         ];
 
         this.cols2 = [
             { field: 'numcarga', header: 'N° MOVIL', width: '120px' },
             { header: 'Tipo de Unidad', field: 'tipounidad', width: '60px' },
-            { header: 'Planificador', field: 'planificador', width: '90px' },
+            { header: 'Planificador', field: 'planificador', width: '160px' },
             { header: 'Placa', field: 'placa', width: '90px' },
             { header: 'Estado', field: 'estado', width: '90px' },
             {
@@ -193,14 +185,13 @@ export class PlanninglocalComponent implements OnInit {
             { header: 'Peso', field: 'peso', width: '30px' },
             { header: 'Volumen', field: 'volumen', width: '60px' },
             // {header: 'SubTotal', field: 'subtotal'  ,  width: '60px'  },
-            { header: 'ACCIONES', field: 'acciones', width: '220px' },
+            { header: 'ACCIONES', field: 'acciones', width: '140px' },
         ];
 
-        this.dateInicio.setDate(new Date().getDate() - 7);
-        this.dateFin.setDate(new Date().getDate());
+        // Fecha única de filtro: hoy (la pantalla programa rutas del día)
+        this.dateInicio = new Date();
 
         this.model.fec_ini = this.dateInicio;
-        this.model.fec_fin = this.dateFin;
         this.model.idestado = 6; // pendiente de programación
 
         
@@ -230,9 +221,10 @@ export class PlanninglocalComponent implements OnInit {
 
         const ref = this.dialogService.open(VerDetalleOrdenRecojoComponent, {
             header: 'Ver Detalle',
-            width: '40%',
-            height: '450px',
-            contentStyle: { height: '450px', overflow: 'auto' },
+            width: '70vw',
+            style: { 'max-width': '900px' },
+            contentStyle: { 'max-height': '80vh', 'overflow-y': 'auto' },
+            baseZIndex: 10000,
             data: { rowData },
                 });
                 ref.onClose.subscribe(() => {
@@ -327,8 +319,9 @@ export class PlanninglocalComponent implements OnInit {
         this.pesoTotal = 0;
         this.subtotalTotal = 0;
 
-        this.model.fechainicio = this.dateInicio.toLocaleDateString();
-        this.model.fechafin = this.dateFin.toLocaleDateString();
+        // SP v2 espera @fecha en formato dd/MM/yyyy (CONVERT 103). Usamos locale es-PE
+        // que devuelve ese mismo formato.
+        this.model.fecha = this.dateInicio.toLocaleDateString('es-PE');
         this.model.id = this.id;
 
         this.ordenService

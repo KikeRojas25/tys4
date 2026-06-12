@@ -1,2 +1,72 @@
-/* Intencionalmente mínimo: el proyecto ya trae estilos globales para inputs/tablas. */
+/* Producción por Cliente — tabla pivotada */
+::ng-deep .p-dropdown,
+::ng-deep .p-calendar {
+  width: 100%;
+}
 
+::ng-deep .p-dropdown-item {
+  font-size: 12px !important;
+  white-space: nowrap !important;
+}
+
+.pivot-table {
+  border-collapse: collapse;
+}
+
+.pivot-table th,
+.pivot-table td {
+  border: 1px solid #e5e7eb;
+}
+
+.pivot-table thead th {
+  position: sticky;
+  top: 0;
+  z-index: 5;
+  font-weight: 600;
+  font-size: 0.78rem;
+  letter-spacing: 0.02em;
+}
+
+.pivot-table .cliente-cell {
+  border-right: 2px solid #d1d5db;
+  min-width: 220px;
+  max-width: 280px;
+  word-wrap: break-word;
+}
+
+.pivot-table .dpto-cell {
+  border-right: 1px solid #d1d5db;
+  min-width: 130px;
+  vertical-align: middle;
+}
+
+.pivot-table tbody td {
+  font-size: 0.82rem;
+}
+
+/* Cabecera del cliente con sus totales por mes */
+.pivot-table tr.row-cliente-header {
+  background-color: #e5e7eb; /* gray-200 */
+}
+
+.pivot-table tr.row-cliente-header td {
+  color: #1f2937; /* gray-800 */
+}
+
+/* Subtotal por departamento — gris claro */
+.pivot-table tr.row-subtotal {
+  background-color: #f3f4f6; /* gray-100 */
+}
+
+.pivot-table tr.row-subtotal td {
+  color: #374151; /* gray-700 */
+}
+
+/* Total general al final */
+.pivot-table tr.row-total-general {
+  background-color: #1f2937; /* gray-800 */
+}
+
+.pivot-table tr.row-total-general td {
+  color: #ffffff;
+}

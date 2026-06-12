@@ -1,122 +1,168 @@
-<div class="flex flex-col flex-auto min-w-0 p-8 bg-card sm:py-10 sm:px-12">
-  <!-- Encabezado con íconos de navegación y título -->
-  <div class="flex flex-col sm:flex-row flex-0 sm:items-center sm:justify-between border-b bg-card dark:bg-transparent">
+<!-- Pantalla Principal -->
+<div class="flex flex-col flex-auto min-w-0 bg-gray-50">
+  <!-- Header -->
+  <div class="flex flex-col sm:flex-row flex-0 sm:items-center sm:justify-between p-2 sm:py-8 sm:px-10 border-b border-gray-200 bg-white shadow-sm">
     <div class="flex-1 min-w-0">
-      <div class="flex flex-wrap items-center font-medium">
-          <a class="whitespace-nowrap text-primary-500">TMS</a>
-        <div class="flex items-center ml-2 whitespace-nowrap">
-          <mat-icon class="fuse-horizontal-navigation-item-icon" [svgIcon]="'heroicons_solid:chevron-right'"></mat-icon>
-          <a class="ml-2 subtitulo">Seguridad</a>
+      <div class="flex flex-wrap items-center font-medium text-sm text-gray-600">
+        <div>
+          <a class="whitespace-nowrap text-gray-700 hover:text-gray-900">TMS</a>
+        </div>
+        <div class="flex items-center ml-1 whitespace-nowrap">
+          <mat-icon class="fuse-horizontal-navigation-item-icon text-gray-400" [svgIcon]="'heroicons_solid:chevron-right'"></mat-icon>
+          <span class="ml-1 text-gray-500">Seguridad</span>
+        </div>
+        <div class="flex items-center ml-1 whitespace-nowrap">
+          <mat-icon class="fuse-horizontal-navigation-item-icon text-gray-400" [svgIcon]="'heroicons_solid:chevron-right'"></mat-icon>
+          <span class="ml-1 text-gray-500">Gestión de Usuarios</span>
         </div>
       </div>
-      <div class="mt-4">
-        <h2 class="text-3xl md:text-4xl font-extrabold tracking-tight leading-7 sm:leading-10 truncate">
-          Gestión de Usuarios
-        </h2>
+      <div class="mt-2">
+        <h2 class="text-3xl md:text-4xl font-semibold tracking-tight leading-7 sm:leading-10 truncate text-gray-900">Gestión de Usuarios</h2>
       </div>
     </div>
   </div>
 
-  <!-- Barra de búsqueda con más margen y padding -->
-  <div class="p-grid p-justify-start p-align-center bg-card p-mb-6 p-mt-6 p-ml-6">
-    <div class="p-col-12 flex items-center gap-6 p-4">
-      <!-- Campo de búsqueda con más margen -->
-      <span class="p-input-icon-left">
-        <input type="text" pInputText placeholder="Buscar por nombre o usuario" [(ngModel)]="model.param" class="p-2"/>
-      </span>
+  <!-- Contenido Principal -->
+  <div class="main-content container-fluid p-2">
+    <!-- Filtros de Búsqueda -->
+    <div class="bg-white rounded-lg shadow-sm border border-gray-200 mb-2 overflow-hidden">
+      <div class="p-2">
+        <div class="grid grid-cols-1 md:grid-cols-4 gap-4">
 
-      <!-- Botón de Buscar -->
-      <p-button label="Buscar" severity="primary" (onClick)="buscar()" class="p-button-sm p-2"></p-button>
+          <!-- Búsqueda -->
+          <div class="md:col-span-2">
+            <label class="block text-sm font-semibold text-gray-700 mb-1">Buscar:</label>
+            <input pInputText type="text" [(ngModel)]="model.param" placeholder="Buscar por nombre o usuario"
+                   class="w-full filter-control-compact"
+                   (keyup.enter)="buscar()" />
+          </div>
 
-      <!-- Nuevo Usuario -->
-      <p-button label="Nuevo Usuario" icon="pi pi-plus" severity="secondary" (onClick)="nuevo()" class="p-button-sm p-2"></p-button>
+          <!-- Incluir bloqueados -->
+          <div class="flex items-end">
+            <div class="flex items-center gap-2 h-8">
+              <p-checkbox
+                [(ngModel)]="mostrarBloqueados"
+                [binary]="true"
+                inputId="chkBloqueados"
+                (ngModelChange)="aplicarFiltros()">
+              </p-checkbox>
+              <label for="chkBloqueados" class="cursor-pointer text-sm text-gray-700 select-none">
+                Incluir bloqueados
+              </label>
+            </div>
+          </div>
 
-      <!-- Check incluir bloqueados -->
-      <div class="flex items-center gap-2">
-        <p-checkbox
-          [(ngModel)]="mostrarBloqueados"
-          [binary]="true"
-          inputId="chkBloqueados"
-          (ngModelChange)="aplicarFiltros()">
-        </p-checkbox>
-        <label for="chkBloqueados" class="cursor-pointer text-sm text-gray-600 select-none">
-          Incluir bloqueados
-        </label>
+          <!-- Botones -->
+          <div class="flex items-end justify-end gap-2">
+            <button pButton type="button" icon="pi pi-search" label="Buscar" iconPos="left" (click)="buscar()"
+                    class="px-4 py-2.5 text-sm font-medium text-white bg-gray-700 hover:bg-gray-600 rounded-md shadow-sm transition-all duration-150">
+            </button>
+            <button pButton type="button" icon="pi pi-plus" label="Nuevo" iconPos="left" (click)="nuevo()"
+                    class="px-4 py-2.5 text-sm font-medium text-gray-700 bg-white border border-gray-300 hover:bg-gray-50 rounded-md shadow-sm transition-all duration-150">
+            </button>
+            <button pButton type="button" icon="pi pi-file-excel" label="Excel" iconPos="left" (click)="exportarExcel()"
+                    [disabled]="!filteredUsers || filteredUsers.length === 0"
+                    class="px-4 py-2.5 text-sm font-medium text-white bg-green-600 hover:bg-green-500 rounded-md shadow-sm transition-all duration-150">
+            </button>
+          </div>
+
+        </div>
       </div>
     </div>
-  </div>
 
-  <!-- Tabla de usuarios -->
-  <div class="p-grid p-justify-between p-align-center bg-card p-mb-6 p-ml-6 p-mr-6">
-    <p-table [value]="filteredUsers" [scrollable]="true" scrollHeight="650px"
-     selectionMode="single" dataKey="usr_int_id" 
-     [paginator]="true"
-     [rows]="20"
-     [rowsPerPageOptions]="[20, 40, 60, 80, 100]"
-      [tableStyle]="{ 'min-width': '50rem' }" >
-      <!-- Cabecera de la tabla -->
-      <ng-template pTemplate="header">
-        <tr>
-          <th style="text-align: center; width: 80px;">ID</th>
-          
-          <th style="text-align: center; width: 280px;">Usuario</th>
-          <th style="text-align: center; width: 280px;">Nombre completo</th>
-          <th style="text-align: center; width: 180px;">Equipo</th>
-          <th>Email</th>
-          <th>Estado</th>
-          <th style="text-align: center; width: 280px;">Acciones</th>
-        </tr>
-      </ng-template>
-      
-      <!-- Cuerpo de la tabla -->
-      <ng-template pTemplate="body" let-usuario>
-        <tr [pSelectableRow]="usuario">
-          <td style="text-align: center">{{ usuario.usr_int_id }}</td>
-          
-          <td>{{ usuario.usr_str_red }}</td>
-          <td>{{ usuario.usr_str_nombre + ' ' + usuario.usr_str_apellidos }}</td>
-          <td>{{ getNombreEquipo(usuario.idequipo) }}</td>
-          <td>{{ usuario.email }}</td>
-          <td>
-            <p-chip *ngIf="!usuario.usr_int_bloqueado" label="Activo" class="p-chip-success"></p-chip>
-            <p-chip *ngIf="usuario.usr_int_bloqueado" label="Inactivo" class="p-chip-danger"></p-chip>
-            
-          </td>
-          <td>
-            <!-- <p-button size="small" severity="secondary" icon="fa fa-pencil" (click)="editarUsuario(usuario.usr_int_id)"></p-button>
-            <p-button size="small" icon="fa fa-trash" (click)="eliminarUsuario(usuario.usr_int_id)"></p-button> -->
-            <p-button size="small" icon="pi pi-pencil" severity="secondary" pTooltip="Editar usuario" tooltipPosition="top" (click)="editarUsuario(usuario.usr_int_id)"></p-button>
-            <p-button size="small" icon="fa fa-user-o" (click)="verRolesUsuario(usuario.usr_int_id)" class="p-ml-1"></p-button>
-            <p-button size="small" icon="fa fa-building-o" (click)="abrirModalClientes(usuario)" class="p-ml-1"></p-button>
-            <p-button
-              size="small"
-              icon="pi pi-key"
-              severity="secondary"
-              pTooltip="Cambiar contraseña"
-              tooltipPosition="top"
-              (click)="abrirCambiarPassword(usuario)"
-              class="p-ml-1">
-            </p-button>
-            <p-button
-              size="small"
-              [icon]="usuario.usr_int_bloqueado === 1 ? 'pi pi-lock-open' : 'pi pi-ban'"
-              [severity]="usuario.usr_int_bloqueado === 1 ? 'success' : 'danger'"
-              [pTooltip]="usuario.usr_int_bloqueado === 1 ? 'Desbloquear usuario' : 'Bloquear usuario'"
-              tooltipPosition="top"
-              (click)="bloquearUsuario(usuario)"
-              class="p-ml-1">
-            </p-button>
-          </td>
-        </tr>
-      </ng-template>
-    </p-table>
+    <!-- Tabla de Usuarios -->
+    <div class="bg-white rounded-lg shadow-sm border border-gray-200 overflow-hidden">
+      <div class="p-6">
+        <p-table
+            [value]="filteredUsers"
+            [paginator]="true"
+            [rows]="20"
+            [rowsPerPageOptions]="[20, 40, 60, 80, 100]"
+            scrollHeight="650px"
+            [scrollable]="true"
+            selectionMode="single"
+            dataKey="usr_int_id"
+            [styleClass]="'custom-table'"
+            [tableStyle]="{ 'min-width': '50rem' }"
+            class="w-full">
+
+            <ng-template pTemplate="header">
+              <tr class="bg-gray-800 text-white">
+                <th class="text-center px-4 py-3 text-sm font-semibold text-gray-100 border-b border-gray-700" style="width: 80px;">ID</th>
+                <th class="text-center px-4 py-3 text-sm font-semibold text-gray-100 border-b border-gray-700" style="width: 220px;">Usuario</th>
+                <th class="text-center px-4 py-3 text-sm font-semibold text-gray-100 border-b border-gray-700" style="width: 280px;">Nombre completo</th>
+                <th class="text-center px-4 py-3 text-sm font-semibold text-gray-100 border-b border-gray-700" style="width: 180px;">Equipo</th>
+                <th class="text-center px-4 py-3 text-sm font-semibold text-gray-100 border-b border-gray-700">Email</th>
+                <th class="text-center px-4 py-3 text-sm font-semibold text-gray-100 border-b border-gray-700" style="width: 90px;">Cliente</th>
+                <th class="text-center px-4 py-3 text-sm font-semibold text-gray-100 border-b border-gray-700" style="width: 110px;">Estado</th>
+                <th class="text-center px-4 py-3 text-sm font-semibold text-gray-100 border-b border-gray-700" style="width: 220px;">Acciones</th>
+              </tr>
+            </ng-template>
+
+            <ng-template pTemplate="body" let-usuario>
+              <tr [pSelectableRow]="usuario" class="border-b border-gray-100 hover:bg-gray-50 transition-colors duration-150">
+                <td class="text-center px-4 py-3 text-gray-700 text-sm">{{ usuario.usr_int_id }}</td>
+                <td class="text-left px-4 py-3 text-gray-700 text-sm">{{ usuario.usr_str_red }}</td>
+                <td class="text-left px-4 py-3 text-gray-700 text-sm">{{ usuario.usr_str_nombre + ' ' + usuario.usr_str_apellidos }}</td>
+                <td class="text-center px-4 py-3 text-gray-700 text-sm">{{ getNombreEquipo(usuario.idequipo) }}</td>
+                <td class="text-left px-4 py-3 text-gray-700 text-sm">{{ usuario.email }}</td>
+                <td class="text-center px-4 py-3">
+                  <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium"
+                        [ngClass]="{
+                          'bg-blue-100 text-blue-800': usuario.esCliente,
+                          'bg-gray-100 text-gray-700': !usuario.esCliente
+                        }">
+                    {{ usuario.esCliente ? 'SI' : 'NO' }}
+                  </span>
+                </td>
+                <td class="text-center px-4 py-3">
+                  <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium"
+                        [ngClass]="{
+                          'bg-green-100 text-green-800': !usuario.usr_int_bloqueado,
+                          'bg-red-100 text-red-800': usuario.usr_int_bloqueado
+                        }">
+                    {{ usuario.usr_int_bloqueado ? 'Inactivo' : 'Activo' }}
+                  </span>
+                </td>
+                <td class="text-center px-2 py-2">
+                  <div class="flex gap-1 justify-center items-center">
+                    <button pButton icon="pi pi-pencil" class="action-btn action-btn-primary"
+                            [pTooltip]="esIntocable(usuario) ? 'Usuario intocable' : 'Editar usuario'" tooltipPosition="top"
+                            [disabled]="esIntocable(usuario)"
+                            (click)="editarUsuario(usuario)"></button>
+                    <button pButton icon="pi pi-users" class="action-btn action-btn-info"
+                            pTooltip="Asignar equipo" tooltipPosition="top"
+                            (click)="verRolesUsuario(usuario.usr_int_id)"></button>
+                    <button pButton icon="pi pi-shield" class="action-btn action-btn-purple"
+                            [pTooltip]="esIntocable(usuario) ? 'Usuario intocable' : 'Asignar roles'" tooltipPosition="top"
+                            [disabled]="esIntocable(usuario)"
+                            (click)="abrirAsignarRoles(usuario)"></button>
+                    <button pButton icon="pi pi-building" class="action-btn action-btn-info"
+                            pTooltip="Clientes vinculados" tooltipPosition="top"
+                            (click)="abrirModalClientes(usuario)"></button>
+                    <button pButton icon="pi pi-key" class="action-btn action-btn-warning"
+                            [pTooltip]="esIntocable(usuario) ? 'Usuario intocable' : 'Cambiar contraseña'" tooltipPosition="top"
+                            [disabled]="esIntocable(usuario)"
+                            (click)="abrirCambiarPassword(usuario)"></button>
+                    <button pButton
+                            [icon]="usuario.usr_int_bloqueado === 1 ? 'pi pi-lock-open' : 'pi pi-ban'"
+                            [class]="usuario.usr_int_bloqueado === 1 ? 'action-btn action-btn-success' : 'action-btn action-btn-danger'"
+                            [pTooltip]="esIntocable(usuario) ? 'Usuario intocable' : (usuario.usr_int_bloqueado === 1 ? 'Desbloquear usuario' : 'Bloquear usuario')"
+                            tooltipPosition="top"
+                            [disabled]="esIntocable(usuario)"
+                            (click)="bloquearUsuario(usuario)"></button>
+                  </div>
+                </td>
+              </tr>
+            </ng-template>
+        </p-table>
+      </div>
+    </div>
   </div>
 </div>
-<p-confirmDialog />
 
+<p-confirmDialog header="Confirmación" icon="pi pi-exclamation-triangle"></p-confirmDialog>
 <p-toast />
-
-
 
 <!-- Modal Asignar Equipo -->
 <p-dialog
@@ -125,8 +171,7 @@
   [modal]="true"
   [style]="{ width: '400px' }"
   [draggable]="false"
-  [resizable]="false"
->
+  [resizable]="false">
   <div *ngIf="usuarioSeleccionado" class="flex flex-col gap-4">
     <div class="text-sm text-gray-700">
       <strong>Usuario ID:</strong> {{ usuarioSeleccionado.usr_int_id }}
@@ -134,7 +179,7 @@
 
     <div>
       <label for="equipo" class="block text-sm font-medium text-gray-700 mb-1">Seleccionar Equipo</label>
-     <p-dropdown
+      <p-dropdown
         id="equipo"
         [options]="listaEquipos"
         [(ngModel)]="usuarioSeleccionado.idequipo"
@@ -142,29 +187,17 @@
         optionValue="id"
         appendTo="body"
         placeholder="Seleccione un equipo"
-        class="w-full"
-      >
+        class="w-full">
         <ng-template let-item pTemplate="selectedItem">
           <span *ngIf="!item">Sin equipo asignado</span>
           <span *ngIf="item">{{ item.nombre }}</span>
         </ng-template>
       </p-dropdown>
-
     </div>
 
     <div class="flex justify-end gap-3 mt-4">
-      <p-button
-        label="Cancelar"
-        icon="pi pi-times"
-        class="p-button-text"
-        (click)="dialogAsignarVisible = false"
-      ></p-button>
-      <p-button
-        label="Guardar"
-        icon="pi pi-check"
-        class="p-button-success"
-        (click)="guardarCambioEquipo()"
-      ></p-button>
+      <p-button label="Cancelar" icon="pi pi-times" class="p-button-text" (click)="dialogAsignarVisible = false"></p-button>
+      <p-button label="Guardar" icon="pi pi-check" class="p-button-success" (click)="guardarCambioEquipo()"></p-button>
     </div>
   </div>
 </p-dialog>
@@ -176,8 +209,7 @@
   [modal]="true"
   [style]="{ width: '450px' }"
   [draggable]="false"
-  [resizable]="false"
->
+  [resizable]="false">
   <div *ngIf="usuarioParaClientes" class="flex flex-col gap-4">
     <div class="text-sm text-gray-700">
       <strong>Usuario:</strong> {{ usuarioParaClientes.usr_str_nombre }} {{ usuarioParaClientes.usr_str_apellidos }}
@@ -194,25 +226,14 @@
         appendTo="body"
         [filter]="true"
         placeholder="Seleccione uno o más clientes (ninguno para desvincular todos)"
-        [style]="{ width: '100%' }"
-      >
+        [style]="{ width: '100%' }">
       </p-multiSelect>
       <p class="text-xs text-gray-500 mt-1">Puede seleccionar ninguno, uno o varios clientes.</p>
     </div>
 
     <div class="flex justify-end gap-3 mt-4">
-      <p-button
-        label="Cancelar"
-        icon="pi pi-times"
-        class="p-button-text"
-        (click)="dialogClientesVisible = false"
-      ></p-button>
-      <p-button
-        label="Guardar"
-        icon="pi pi-check"
-        class="p-button-success"
-        (click)="guardarClientesUsuario()"
-      ></p-button>
+      <p-button label="Cancelar" icon="pi pi-times" class="p-button-text" (click)="dialogClientesVisible = false"></p-button>
+      <p-button label="Guardar" icon="pi pi-check" class="p-button-success" (click)="guardarClientesUsuario()"></p-button>
     </div>
   </div>
 </p-dialog>
@@ -224,8 +245,7 @@
   [modal]="true"
   [style]="{ width: '380px' }"
   [draggable]="false"
-  [resizable]="false"
->
+  [resizable]="false">
   <div *ngIf="usuarioParaPassword" class="flex flex-col gap-4">
     <div class="text-sm text-gray-700">
       <strong>Usuario:</strong> {{ usuarioParaPassword.usr_str_nombre }} {{ usuarioParaPassword.usr_str_apellidos }}
@@ -233,24 +253,12 @@
 
     <div class="flex flex-col gap-1">
       <label class="text-sm font-medium text-gray-700">Nueva contraseña</label>
-      <input
-        pInputText
-        type="password"
-        [(ngModel)]="nuevaPassword"
-        placeholder="Mínimo 6 caracteres"
-        class="w-full"
-      />
+      <input pInputText type="password" [(ngModel)]="nuevaPassword" placeholder="Mínimo 6 caracteres" class="w-full" />
     </div>
 
     <div class="flex flex-col gap-1">
       <label class="text-sm font-medium text-gray-700">Confirmar contraseña</label>
-      <input
-        pInputText
-        type="password"
-        [(ngModel)]="confirmarPassword"
-        placeholder="Repita la contraseña"
-        class="w-full"
-      />
+      <input pInputText type="password" [(ngModel)]="confirmarPassword" placeholder="Repita la contraseña" class="w-full" />
     </div>
 
     <div class="flex justify-end gap-3 mt-2">
@@ -260,28 +268,51 @@
   </div>
 </p-dialog>
 
-<p-dialog [(visible)]="displayDialog" header="Asignar Roles" [modal]="true" [closable]="false">
-  <div class="p-fluid">
-      <p-pickList 
-          [source]="selectedRoles" 
-          [target]="roles" 
-          [responsive]="true" 
-          filter="true" 
-          dragDrop="true"
-          style="width: 100%; max-width: 400px;">
-          <ng-template let-role pTemplate="header">
-              <div>{{ role.descripcion }}</div>
-          </ng-template>
-          <ng-template let-role pTemplate="item">
-              <div>{{ role.descripcion }}</div>
-          </ng-template>
-      </p-pickList>
-      
-      <!-- Fila para los botones alineados uno al lado del otro -->
-          <div class="button-container">
-            <button (click)="saveRoles()" pButton label="Guardar" icon="pi pi-check"></button>
-            <button (click)="displayDialog = false" pButton label="Cancelar" icon="pi pi-times" class="p-button-secondary"></button>
+<!-- Modal Asignar Roles -->
+<p-dialog
+  header="Asignar Roles"
+  [(visible)]="dialogRolesVisible"
+  [modal]="true"
+  [style]="{ width: '720px' }"
+  [draggable]="false"
+  [resizable]="false"
+  [closable]="true">
+  <div *ngIf="usuarioParaRoles" class="flex flex-col gap-4">
+    <div class="text-sm text-gray-700">
+      <strong>Usuario:</strong> {{ usuarioParaRoles.usr_str_nombre }} {{ usuarioParaRoles.usr_str_apellidos }}
+      <span class="text-gray-500"> ({{ usuarioParaRoles.usr_str_red }})</span>
+    </div>
+
+    <div *ngIf="cargandoRoles" class="flex items-center gap-2 text-sm text-gray-500">
+      <i class="pi pi-spin pi-spinner"></i>
+      <span>Cargando roles...</span>
+    </div>
+
+    <p-pickList
+      *ngIf="!cargandoRoles"
+      [source]="rolesDisponibles"
+      [target]="rolesAsignados"
+      sourceHeader="Disponibles"
+      targetHeader="Asignados"
+      [responsive]="true"
+      [showSourceControls]="false"
+      [showTargetControls]="false"
+      filterBy="descripcion,alias"
+      sourceFilterPlaceholder="Buscar disponible"
+      targetFilterPlaceholder="Buscar asignado"
+      [sourceStyle]="{ height: '320px' }"
+      [targetStyle]="{ height: '320px' }">
+      <ng-template let-rol pTemplate="item">
+        <div class="flex items-center justify-between w-full">
+          <span class="text-sm text-gray-800">{{ rol.descripcion }}</span>
+          <span class="text-xs text-gray-500 ml-2">{{ rol.alias }}</span>
         </div>
+      </ng-template>
+    </p-pickList>
+
+    <div class="flex justify-end gap-3 mt-2">
+      <p-button label="Cancelar" icon="pi pi-times" class="p-button-text" (click)="dialogRolesVisible = false"></p-button>
+      <p-button label="Guardar" icon="pi pi-check" class="p-button-success" (click)="guardarRolesUsuario()" [disabled]="cargandoRoles"></p-button>
+    </div>
   </div>
 </p-dialog>
-

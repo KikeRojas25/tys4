@@ -104,3 +104,39 @@ export interface MasterLiquidacionResult {
   TotalMovimientos: number;
   TotalMonto: number;
 }
+
+/**
+ * Fila del SP [Facturacion].[pa_listarliquidaciones_exportar].
+ * Granularidad: una por idliquidaciondetalle (OT) — pensado para exports.
+ */
+export interface LiquidacionCajaExportarRow {
+  idliquidacion: number;
+  numeroliquidacion?: string | null;
+  fechaliquidacion?: string | Date | null;
+  idusuarioregistro?: number | null;
+  usuarioregistro?: string | null;
+  fecharegistro?: string | Date | null;
+  idconcepto?: number | null;
+  concepto?: string | null;
+  monto?: number | null;
+  numerocomprobante?: string | null;
+  idtipotransferencia?: number | null;
+  tipotransferencia?: string | null;
+  destinatariotransferencia?: string | null;
+  cuentatransferencia?: string | null;
+  numerooperacion?: string | null;
+  observaciones?: string | null;
+  liquidado?: boolean | null;
+  idliquidaciondetalle?: number | null;
+  idordentransporte?: number | null;
+  distritodestino?: string | null;
+  provinciadestino?: string | null;
+  tipocomprobante?: string | null;
+  razonsocialdocumento?: string | null;
+  numcp?: string | null;
+  cliente?: string | null;
+  peso?: number | null;
+  valorizado?: number | null;
+  distritoorigen?: string | null;
+  provinciaorigen?: string | null;
+}

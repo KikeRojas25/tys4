@@ -14,6 +14,7 @@ import { CardModule } from 'primeng/card';
 import { FacturacionService } from '../facturacion.service';
 import { PendientePreliquidacion } from '../facturacion.types';
 import { OrdenTransporteService } from '../../recepcion/ordentransporte/ordentransporte.service';
+import { MantenimientoService } from '../../mantenimiento/mantenimiento.service';
 import { User } from 'app/core/user/user.types';
 
 @Component({
@@ -55,6 +56,7 @@ export class PendientepreliquidacionComponent implements OnInit {
   constructor(
     private facturacionService: FacturacionService,
     private ordenTransporteService: OrdenTransporteService,
+    private mantenimientoService: MantenimientoService,
     public messageService: MessageService
   ) { }
 
@@ -89,7 +91,7 @@ export class PendientepreliquidacionComponent implements OnInit {
     ];
 
     // Cargar clientes
-    this.ordenTransporteService.getClientes(this.user.idscliente).subscribe(resp => {
+    this.mantenimientoService.getAllClientes('', this.user.usr_int_id, false).subscribe(resp => {
       this.clientes.push({ value: null, label: 'TODOS LOS CLIENTES' });
       resp.forEach(element => {
         this.clientes.push({ value: element.idCliente, label: element.razonSocial });

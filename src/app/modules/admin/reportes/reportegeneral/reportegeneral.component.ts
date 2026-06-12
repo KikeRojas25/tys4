@@ -14,6 +14,7 @@ import { MessagesModule } from 'primeng/messages';
 import { TableModule } from 'primeng/table';
 import { ToastModule } from 'primeng/toast';
 import { ReporteService } from '../reporte.service';
+import { MantenimientoService } from '../../mantenimiento/mantenimiento.service';
 import { CalendarModule } from 'primeng/calendar';
 
 @Component({
@@ -49,12 +50,17 @@ export class ReportegeneralComponent implements OnInit {
   dateInicio: Date = new Date(Date.now());
   dateFin: Date = new Date(Date.now());
 
-  constructor(private reporteService: ReporteService) { }
+  constructor(
+    private reporteService: ReporteService,
+    private mantenimientoService: MantenimientoService
+  ) { }
 
   ngOnInit(): void {
     this.user = JSON.parse(localStorage.getItem('user'));
 
-    this.reporteService.getClientes(this.user.idscliente).subscribe(resp => {
+    console.log(this.user);
+
+    this.mantenimientoService.getAllClientes('', this.user.id, true).subscribe(resp => {
       this.clientes.push({ value: '0', label: 'TODOS LOS CLIENTES' });
       resp.forEach(element => {
         this.clientes.push({ value: element.idCliente, label: element.razonSocial });

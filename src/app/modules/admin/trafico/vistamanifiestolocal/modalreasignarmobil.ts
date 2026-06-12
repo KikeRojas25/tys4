@@ -8,6 +8,14 @@ import { DynamicDialogConfig, DynamicDialogRef } from 'primeng/dynamicdialog';
 import { ToastModule } from 'primeng/toast';
 import { TraficoService } from '../trafico.service';
 
+interface MovilDestinoOption {
+  idManifiestoDestino: number;
+  idHojaRutaDestino: number;
+  numHojaRutaDestino: string;
+  idVehiculoDestino: number;
+  placa: string;
+}
+
 @Component({
   template: `
     <div class="p-fluid p-3" [formGroup]="movilForm">
@@ -16,7 +24,7 @@ import { TraficoService } from '../trafico.service';
           <label for="movil">Seleccione Móvil/Placa:</label>
           <p-dropdown
             id="movil"
-            formControlName="placa"
+            formControlName="destino"
             [options]="listaMoviles"
             optionLabel="label"
             optionValue="value"
@@ -74,7 +82,7 @@ import { TraficoService } from '../trafico.service';
 export class DialogReasignarMobileLocalComponent implements OnInit {
   movilForm!: FormGroup;
   idOrdenTrabajo!: number;
-  listaMoviles: { label: string; value: string }[] = [];
+  listaMoviles: { label: string; value: MovilDestinoOption }[] = [];
 
   constructor(
     private fb: FormBuilder,
@@ -84,33 +92,34 @@ export class DialogReasignarMobileLocalComponent implements OnInit {
     private confirmationService: ConfirmationService
   ) {
     this.movilForm = this.fb.group({
-      placa: [null],
+      destino: [null],
       observacion: ['']
     });
   }
 
 
 ngOnInit(): void {
-  this.idOrdenTrabajo = this.config.data.id;
+  // El padre nos pasa el idordentrabajo seleccionado en la grilla.
+  // El backend resuelve a qué manifiesto pertenece y reasigna ese manifiesto entero.
+  this.idOrdenTrabajo = this.config.data.idordentrabajo;
 
     this.traficoService.VerHojasRutaTrocalLocal().subscribe({
       next: (list: any[]) => {
-        console.log('ordenes', list);
-
-        // Usamos Map para quedarnos solo con la primera ocurrencia de cada placa
+        // Dedup por placa: una placa puede aparecer en varios manifiestos de su HR.
         const unique = Array.from(
           new Map(list.map(item => [item.placa, item])).values()
         );
 
         this.listaMoviles = unique.map((item) => ({
-          label: `${item.placa} `,
-          value: item.idManifiesto   // 👈 mejor usar id único para guardar
+          label: `${item.placa} — ${item.numHojaRuta ?? ''}`,
+          value: {
+            idManifiestoDestino: item.idManifiesto,
+            idHojaRutaDestino:   item.idHojaRuta,
+            numHojaRutaDestino:  item.numHojaRuta,
+            idVehiculoDestino:   item.idVehiculo,
+            placa:               item.placa,
+          }
         }));
-
-        // Preselecciona si ya hay un valor asignado
-        if (this.config.data?.idVehiculoActual) {
-          this.movilForm.patchValue({ placa: this.config.data.idVehiculoActual });
-        }
       },
       error: (err) => {
         console.error('Error al cargar móviles:', err);
@@ -122,20 +131,31 @@ ngOnInit(): void {
 
   ejecutarGuardar(): void {
     const raw = this.movilForm.value;
+    const destino: MovilDestinoOption | null = raw.destino;
+
+    if (!destino) {
+      console.warn('Debe seleccionar una placa destino');
+      return;
+    }
 
     const dto = {
-      idOrdenTrabajo: this.idOrdenTrabajo,
-      placa: raw.placa,
-      observacion: raw.observacion
+      idOrdenTrabajo:      this.idOrdenTrabajo,
+      idManifiestoDestino: destino.idManifiestoDestino,
+      idVehiculoDestino:   destino.idVehiculoDestino,
+      numHojaRutaDestino:  destino.numHojaRutaDestino,
+      placaDestino:        destino.placa,
+      observacion:         raw.observacion ?? null
     };
 
-    this.traficoService.asignarMovil(dto).subscribe({
+    this.traficoService.reasignarMovilManifiesto(dto).subscribe({
       next: () => {
-        this.ref.close(true);
+        this.ref.close({ ok: true });
       },
       error: (err) => {
-        console.error('Error al asignar móvil:', err);
-        this.ref.close(false);
+        console.error('Error al reasignar móvil:', err);
+        // El backend responde con { success, message }. Si no, fallback al statusText.
+        const backendMsg = err?.error?.message ?? err?.message ?? 'Error desconocido';
+        this.ref.close({ ok: false, message: backendMsg });
       }
     });
   }

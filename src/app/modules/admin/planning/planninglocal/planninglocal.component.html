@@ -1,170 +1,208 @@
-<div class="flex flex-col flex-auto min-w-0 bg-card">
-  <!-- Cabecera -->
-  <div class="flex flex-col sm:flex-row items-start sm:items-center justify-between p-6 sm:py-8 sm:px-10 border-b border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-800">
-    <div class="flex-1 min-w-0">
-      <nav class="flex items-center text-sm text-gray-500 dark:text-gray-400" aria-label="Breadcrumb">
-        <a href="#" class="text-primary-500 hover:underline">TMS</a>
-        <span class="mx-2">/</span>
-        <a href="#" class="text-primary-500 hover:underline">Seguimiento</a>
+<div class="flex flex-col flex-auto min-w-0 bg-gray-50 dark:bg-gray-900">
+
+  <!-- Cabecera compacta -->
+  <header class="flex flex-col sm:flex-row sm:items-end sm:justify-between px-6 py-4 bg-white dark:bg-gray-800 border-b border-gray-200 dark:border-gray-700">
+    <div>
+      <nav class="flex items-center text-xs text-gray-500 dark:text-gray-400">
+        <span>TMS</span>
+        <mat-icon class="text-gray-400 mx-1" style="font-size:14px;width:14px;height:14px" [svgIcon]="'heroicons_solid:chevron-right'"></mat-icon>
+        <span>Seguimiento</span>
       </nav>
-      <h2 class="text-3xl md:text-4xl font-extrabold tracking-tight leading-7 sm:leading-10 truncate"> Planificación Local </h2>
+      <h1 class="mt-1 text-xl sm:text-2xl font-semibold text-gray-900 dark:text-gray-100 tracking-tight">
+        Planificación Local
+      </h1>
     </div>
-  </div>
+  </header>
 
-  <!-- Contenido Principal -->
-  <div class="main-content container mx-auto px-4 py-6 grid grid-cols-12 gap-6">
-    <!-- Sección de Acciones -->
-    <div class="col-span-12">
-      <div class="flex justify-end space-x-3">
-        <p-button
-          severity="primary"
-          icon="pi pi-file"
-          label="Crear Bolsa"
-          (click)="crearcarga()"
-          
-        ></p-button>
-        <p-button
-          
-          icon="pi pi-plus"
-          severity="secondary"
-          label="Agregar ORDEN a Bolsa"
-          (click)="agregaracarga()"
-          
-        ></p-button>
-      </div>
-    </div>
+  <!-- Contenido principal -->
+  <div class="max-w-screen-2xl w-full mx-auto px-4 sm:px-6 py-6 space-y-6">
 
-  </div>
-
-    <!-- Tabla de Móviles Generadas -->
-     <section class="col-span-12">
-      <div class="card shadow-sm rounded-lg overflow-hidden">
-        <div class="bg-primary-600 text-white px-6 py-3 font-semibold">Móviles Generadas</div>
-        <div class="card-body p-4">
-          <p-table
-            [columns]="cols2"
-            selectionMode="single"
-            dataKey="idcarga"
-            [rowsPerPageOptions]="[20, 40, 60, 120]"
-            [value]="despachos"
-            paginator="true"
-            [rows]="20"
-            [responsive]="true"
-
-            [scrollable]="true"
-            scrollHeight="400px"
-            class="w-full"
-          >
-            <!-- Colgroup -->
-            <ng-template pTemplate="colgroup" let-columns>
-              <colgroup>
-                <col *ngFor="let col of columns" [ngStyle]="{ width: col.width }" />
-              </colgroup>
-            </ng-template>
-
-            <!-- Encabezado -->
-            <ng-template pTemplate="header" let-columns>
-              <tr class="bg-gray-100 dark:bg-gray-700 text-gray-700 dark:text-gray-200">
-                <th
-                  *ngFor="let col of columns"
-                  [ngStyle]="{ width: col.width }"
-                  pResizableColumn
-                  [pSortableColumn]="col.field"
-                  class="   px-4 py-2"
-                >
-                  {{ col.header }}
-                </th>
-              </tr>
-            </ng-template>
-
-            <!-- Cuerpo -->
-            <ng-template pTemplate="body" let-rowData>
-              <tr [pSelectableRow]="rowData" class="hover:bg-gray-50 dark:hover:bg-gray-700">
-                <td class="   bg-green-600 text-white px-4 py-2">{{ rowData.numcarga2 }}</td>
-                <td class="   px-4 py-2">{{ rowData.tipounidad }}</td>
-                <td class="   px-4 py-2">{{ rowData.planificador }}</td>
-                <td class="   px-4 py-2">{{ rowData.placa }}</td>
-                <td class="   bg-yellow-500 text-black px-4 py-2">{{ rowData.estado }}</td>
-                <td class="   px-4 py-2">{{ rowData.fecharegistro | date: 'dd/MM/yyyy' }}</td>
-                <td class="   px-4 py-2">{{ rowData.peso | number: '1.0-2' }}</td>
-                <td class="   px-4 py-2">{{ rowData.vol | number: '1.0-2' }}</td>
-                <!-- <td class="   px-4 py-2">S/. {{ rowData.subtotal | number: '1.0-2' }}</td> -->
-                <td class="   px-4 py-2 space-x-2">
-                 
-                  <button
-                    type="button"
-                    class="px-2 py-1 bg-red-500 text-white rounded hover:bg-red-600 transition"
-                    pButton
-                    icon="pi pi-trash"
-                    title="Eliminar"
-                              *ngIf="rowData.estado !== 'Planificada'"
-                    (click)="eliminarDespacho(rowData.idcarga)"
-                  ></button>
-                  <button
-                    type="button"
-                    class="px-2 py-1 bg-green-500 text-white rounded hover:bg-green-600 transition"
-                    pButton
-                    [icon]="rowData.estado === 'Planificada' ? 'pi pi-refresh' : 'pi pi-check'"
-                    [title]="rowData.estado === 'Planificada' ? 'Reprogramar' : 'Confirmar'"
-                    [label]="rowData.estado === 'Planificada' ? 'Reprogramar' : ''"
-                    (click)="generar(rowData.idcarga)"
-                  ></button>
-                  <button
-                    type="button"
-                    class="px-2 py-1 bg-blue-500 text-white rounded hover:bg-blue-600 transition"
-                    pButton
-                    icon="pi pi-search"
-                    title="Ver"
-                    (click)="ver(rowData.idcarga)"
-                  ></button>
-                  <button *ngIf="rowData.estado === 'Planificada'"
-                  type="button"
-                  class="px-2 py-1 bg-blue-500 text-white rounded hover:bg-blue-600 transition"
-                  pButton
-                  icon="pi pi-file"
-                  title="Ver"
-                  (click)="verDocument(rowData)"
-                ></button>
-                </td>
-              </tr>
-            </ng-template>
-
-            <!-- Pie de Tabla -->
-            <ng-template pTemplate="footer">
-              <tr class="bg-gray-100 dark:bg-gray-700">
-                <td colspan="5" class="text-right font-semibold px-4 py-2">Totales</td>
-                <td class="text-center   font-semibold px-4 py-2">{{ pesoTotal | number: '1.0-2' }}</td>
-                <td class="text-center   font-semibold px-4 py-2">{{ bultosTotal | number: '1.0-2' }}</td>
-                  <td class="text-right font-semibold px-4 py-2"></td>
-              </tr>
-            </ng-template>
-          </p-table>
+    <!-- Móviles Generadas -->
+    <section class="bg-white dark:bg-gray-800 rounded-lg shadow-sm border border-gray-200 dark:border-gray-700">
+      <div class="flex flex-wrap items-center justify-between gap-2 px-5 py-3 border-b border-gray-200 dark:border-gray-700">
+        <h2 class="text-sm font-semibold text-gray-700 dark:text-gray-200 uppercase tracking-wide">
+          Móviles generadas
+        </h2>
+        <div class="flex items-center gap-2">
+          <p-button
+            severity="primary"
+            icon="pi pi-file"
+            label="Crear Bolsa"
+            (click)="crearcarga()"
+          ></p-button>
+          <p-button
+            severity="secondary"
+            icon="pi pi-plus"
+            label="Agregar Orden a Bolsa"
+            (click)="agregaracarga()"
+          ></p-button>
         </div>
       </div>
-     </section>
 
-    <!-- Filtros de Fecha -->
-    <section class="col-span-12">
-      <div class="card shadow-sm rounded-lg p-4 bg-gray-50 dark:bg-gray-700">
-        <div class="flex flex-wrap sm:flex-nowrap items-end space-y-4 sm:space-y-0 sm:space-x-4">
-          <div class="w-full sm:w-auto flex-1">
-            <label class="block text-sm font-medium text-gray-700 dark:text-gray-300">Inicio:</label>
-            <p-calendar [(ngModel)]="dateInicio" baseZIndex="100" [locale]="es" dateFormat="dd/mm/yy" class="w-full mt-1"></p-calendar>
+      <div class="p-4">
+        <p-table
+          [columns]="cols2"
+          selectionMode="single"
+          dataKey="idcarga"
+          [rowsPerPageOptions]="[10, 20, 50, 100, 200]"
+          [value]="despachos"
+          paginator="true"
+          [rows]="10"
+          styleClass="p-datatable-sm"
+          [tableStyle]="{ 'table-layout': 'fixed', 'width': '100%' }"
+          class="w-full"
+        >
+          <ng-template pTemplate="colgroup" let-columns>
+            <colgroup>
+              <col *ngFor="let col of columns" [ngStyle]="{ width: col.width }" />
+            </colgroup>
+          </ng-template>
+
+          <ng-template pTemplate="header" let-columns>
+            <tr class="text-xs uppercase tracking-wide text-gray-500 dark:text-gray-400 bg-gray-50 dark:bg-gray-700">
+              <th
+                *ngFor="let col of columns"
+                [ngStyle]="{ width: col.width }"
+                pResizableColumn
+                [pSortableColumn]="col.field"
+                class="px-3 py-1 text-left font-medium"
+              >
+                {{ col.header }}
+              </th>
+            </tr>
+          </ng-template>
+
+          <ng-template pTemplate="body" let-rowData>
+            <tr [pSelectableRow]="rowData" class="hover:bg-gray-50 dark:hover:bg-gray-700/40 transition-colors text-sm">
+              <td class="px-3 py-1">
+                <span class="inline-block font-mono text-xs px-2 py-0.5 rounded bg-emerald-50 text-emerald-700 dark:bg-emerald-900/30 dark:text-emerald-300 border border-emerald-200 dark:border-emerald-800">
+                  {{ rowData.numcarga2 }}
+                </span>
+              </td>
+              <td class="px-3 py-1 text-gray-700 dark:text-gray-200">{{ rowData.tipounidad }}</td>
+              <td class="px-3 py-1 text-gray-700 dark:text-gray-200">{{ rowData.planificador | titlecase }}</td>
+              <td class="px-3 py-1 text-gray-700 dark:text-gray-200">{{ rowData.placa }}</td>
+              <td class="px-3 py-1">
+                <span
+                  class="inline-block text-xs px-2 py-0.5 rounded-full border"
+                  [ngClass]="rowData.estado === 'Planificada'
+                    ? 'bg-emerald-50 text-emerald-700 border-emerald-200 dark:bg-emerald-900/30 dark:text-emerald-300 dark:border-emerald-800'
+                    : 'bg-amber-50 text-amber-700 border-amber-200 dark:bg-amber-900/30 dark:text-amber-300 dark:border-amber-800'">
+                  {{ rowData.estado }}
+                </span>
+              </td>
+              <td class="px-3 py-1 text-gray-600 dark:text-gray-300">{{ rowData.fecharegistro | date: 'dd/MM/yyyy' }}</td>
+              <td class="px-3 py-1 text-gray-700 dark:text-gray-200 tabular-nums">{{ rowData.peso | number: '1.0-2' }}</td>
+              <td class="px-3 py-1 text-gray-700 dark:text-gray-200 tabular-nums">{{ rowData.vol | number: '1.0-2' }}</td>
+              <td class="px-3 py-1">
+                <div class="flex items-center gap-0.5">
+                  <p-button
+                    severity="danger"
+                    [text]="true"
+                    size="small"
+                    icon="pi pi-trash"
+                    styleClass="!p-1 !w-7 !h-7"
+                    pTooltip="Eliminar"
+                    *ngIf="rowData.estado !== 'Planificada'"
+                    (click)="eliminarDespacho(rowData.idcarga)"
+                  ></p-button>
+                  <p-button
+                    [severity]="rowData.estado === 'Planificada' ? 'warning' : 'success'"
+                    [text]="true"
+                    size="small"
+                    styleClass="!p-1 !w-7 !h-7"
+                    [icon]="rowData.estado === 'Planificada' ? 'pi pi-refresh' : 'pi pi-check'"
+                    [pTooltip]="rowData.estado === 'Planificada' ? 'Reprogramar' : 'Confirmar'"
+                    (click)="generar(rowData.idcarga)"
+                  ></p-button>
+                  <p-button
+                    severity="info"
+                    [text]="true"
+                    size="small"
+                    icon="pi pi-search"
+                    styleClass="!p-1 !w-7 !h-7"
+                    pTooltip="Ver"
+                    (click)="ver(rowData.idcarga)"
+                  ></p-button>
+                  <p-button
+                    *ngIf="rowData.estado === 'Planificada'"
+                    severity="info"
+                    [text]="true"
+                    size="small"
+                    icon="pi pi-file"
+                    styleClass="!p-1 !w-7 !h-7"
+                    pTooltip="Documento"
+                    (click)="verDocument(rowData)"
+                  ></p-button>
+                </div>
+              </td>
+            </tr>
+          </ng-template>
+
+          <ng-template pTemplate="footer">
+            <tr class="bg-gray-50 dark:bg-gray-700/40 text-sm">
+              <td colspan="5" class="text-right font-medium px-3 py-1 text-gray-600 dark:text-gray-300">Totales</td>
+              <td class="text-right font-semibold px-3 py-1 tabular-nums text-gray-800 dark:text-gray-100">{{ pesoTotal | number: '1.0-2' }}</td>
+              <td class="text-right font-semibold px-3 py-1 tabular-nums text-gray-800 dark:text-gray-100">{{ bultosTotal | number: '1.0-2' }}</td>
+              <td class="px-3 py-1"></td>
+            </tr>
+          </ng-template>
+        </p-table>
+      </div>
+    </section>
+
+    <!-- Filtros -->
+    <section class="bg-white dark:bg-gray-800 rounded-lg shadow-sm border border-gray-200 dark:border-gray-700">
+      <div class="p-4">
+        <div class="flex flex-wrap items-end gap-3">
+          <div class="w-44">
+            <label class="block text-xs font-medium text-gray-500 dark:text-gray-400 mb-1 uppercase tracking-wide">
+              Fecha
+            </label>
+            <p-calendar
+              [(ngModel)]="dateInicio"
+              baseZIndex="100"
+              [locale]="es"
+              dateFormat="dd/mm/yy"
+              styleClass="w-full"
+            ></p-calendar>
           </div>
-          <div class="w-full sm:w-auto flex-1">
-            <label class="block text-sm font-medium text-gray-700 dark:text-gray-300">Fin:</label>
-            <p-calendar [(ngModel)]="dateFin" baseZIndex="100" [locale]="es" dateFormat="dd/mm/yy" class="w-full mt-1"></p-calendar>
+          <div>
+            <p-button
+              severity="success"
+              icon="pi pi-search"
+              label="Buscar"
+              (click)="buscar()"
+            ></p-button>
           </div>
-          <div class="w-full sm:w-auto flex items-end">
-            <p-button severity="success" icon="pi pi-search" label="Buscar" (click)="buscar()" ></p-button>
+          <div class="flex-1 min-w-[220px]">
+            <label class="block text-xs font-medium text-gray-500 dark:text-gray-400 mb-1 uppercase tracking-wide">
+              Buscar orden
+            </label>
+            <span class="p-input-icon-left w-full">
+              <i class="pi pi-search text-gray-400"></i>
+              <input
+                pInputText
+                type="text"
+                (input)="dt2.filterGlobal($event.target.value, 'contains')"
+                placeholder="N° OT, cliente, destino..."
+                class="w-full"
+              />
+            </span>
           </div>
         </div>
       </div>
     </section>
-    
-  
-     <section class="col-span-12">
-      <div class="card rounded-xl shadow-md p-5 bg-white dark:bg-gray-800">
+
+    <!-- Órdenes para planificar -->
+    <section class="bg-white dark:bg-gray-800 rounded-lg shadow-sm border border-gray-200 dark:border-gray-700">
+      <div class="flex items-center justify-between px-5 py-3 border-b border-gray-200 dark:border-gray-700">
+        <h2 class="text-sm font-semibold text-gray-700 dark:text-gray-200 uppercase tracking-wide">
+          Órdenes disponibles
+        </h2>
+      </div>
+
+      <div class="p-4">
         <p-table
           #dt2
           [columns]="cols"
@@ -173,80 +211,64 @@
           dataKey="idordentrabajo"
           selectionMode="multiple"
           paginator="true"
-          [rows]="20"
-          class="w-full"
-          [scrollable]="true"
-          scrollHeight="400px"
-          responsive="true"
-          [rowsPerPageOptions]="[20,40,60,120]"
+          [rows]="10"
           responsiveLayout="scroll"
+          [rowsPerPageOptions]="[10, 20, 50, 100, 200]"
+          styleClass="p-datatable-sm"
+          [tableStyle]="{ 'table-layout': 'fixed', 'width': '100%' }"
+          class="w-full"
         >
-            <!-- Barra de búsqueda -->
-            <ng-template pTemplate="caption">
-              <div class="flex">
-                <span class="p-input-icon-left ml-auto">
-                  <i class="pi pi-search"></i>
-                  <input
-                    pInputText
-                    type="text"
-                    (input)="dt2.filterGlobal($event.target.value, 'contains')"
-                    placeholder="Buscar..."
-                  />
+          <ng-template pTemplate="colgroup" let-columns>
+            <colgroup>
+              <col *ngFor="let col of columns" [ngStyle]="{ width: col.width }" />
+            </colgroup>
+          </ng-template>
+
+          <ng-template pTemplate="header" let-columns>
+            <tr class="text-xs uppercase tracking-wide text-gray-500 dark:text-gray-400 bg-gray-50 dark:bg-gray-700">
+              <th *ngFor="let col of columns" [pSortableColumn]="col.field" class="px-3 py-1 text-left font-medium">
+                {{ col.header }}
+              </th>
+            </tr>
+          </ng-template>
+
+          <ng-template pTemplate="body" let-rowData>
+            <tr [pSelectableRow]="rowData" class="hover:bg-gray-50 dark:hover:bg-gray-700/40 transition-colors text-sm">
+              <td class="px-3 py-1">
+                <span class="inline-block font-mono text-xs px-2 py-0.5 rounded bg-sky-50 text-sky-700 dark:bg-sky-900/30 dark:text-sky-300 border border-sky-200 dark:border-sky-800">
+                  {{ rowData.numcp }}
                 </span>
-              </div>
-            </ng-template>
-
-            <!-- Columnas -->
-            <!-- <ng-template pTemplate="colgroup" let-columns>
-              <colgroup>
-                <col *ngFor="let col of columns" [style.width]="col.width">
-              </colgroup>
-            </ng-template> -->
-
-            <!-- Encabezado -->
-            <ng-template pTemplate="header" let-cols>
-              <tr>
-                <th *ngFor="let col of cols" [style]="col.width" [pSortableColumn]="col.field" >
-                  {{ col.header }}
-                </th>
-              </tr>
-            </ng-template>
-
-            <!-- Cuerpo -->
-            <ng-template pTemplate="body" let-rowData>
-              <tr [pSelectableRow]="rowData">
-                <td class="bg-blue-100">{{ rowData.numcp }}</td>
-                <td>{{ rowData.fechahoracita | date: 'dd/MM/yyyy' }}</td>
-                <td>{{ rowData.horacita }}</td>
-                <td class="text-left">{{ rowData.remitente }}</td>
-                <td>{{ rowData.distritoOrigen }}</td>
-                <td >{{ rowData.origen }}</td>
-                <td>{{ rowData.distritoDestino }}</td>
-                <td >{{ rowData.centroacopio }}</td>
-                <td >{{ rowData.personarecojo }}</td>
-                <td >{{ rowData.observaciones }}</td>
-                <td>{{ rowData.bulto }}</td>
-                <td>{{ rowData.peso | number: '1.0-2' }}</td>
-                <td class="px-4 py-2 text-center">
-                  <button
-                    type="button"
-                    class="px-2 py-1 bg-blue-500 text-white rounded hover:bg-blue-600 transition"
-                    pButton
-                    icon="pi pi-search"
-                    title="Ver"
-                    (click)="verDetalle(rowData)"
-                  ></button>
-                </td>
-              </tr>
-            </ng-template>
-          </p-table>
-   
+              </td>
+              <td class="px-3 py-1 text-gray-700 dark:text-gray-200 truncate">{{ rowData.fechahoracita | date: 'dd/MM/yyyy' }}</td>
+              <td class="px-3 py-1 text-gray-700 dark:text-gray-200 truncate">{{ rowData.horacita }}</td>
+              <td class="px-3 py-1 text-left text-gray-700 dark:text-gray-200 truncate" [pTooltip]="rowData.remitente">{{ rowData.remitente | titlecase }}</td>
+              <td class="px-3 py-1 text-gray-600 dark:text-gray-300 truncate" [pTooltip]="rowData.distritoOrigen">{{ rowData.distritoOrigen | titlecase }}</td>
+              <td class="px-3 py-1 text-gray-600 dark:text-gray-300 truncate" [pTooltip]="rowData.origen">{{ rowData.origen }}</td>
+              <td class="px-3 py-1 text-gray-600 dark:text-gray-300 truncate" [pTooltip]="rowData.distritoDestino">{{ rowData.distritoDestino | titlecase }}</td>
+              <td class="px-3 py-1 text-gray-600 dark:text-gray-300 truncate" [pTooltip]="rowData.centroacopio">{{ rowData.centroacopio | titlecase }}</td>
+              <td class="px-3 py-1 text-gray-600 dark:text-gray-300 truncate" [pTooltip]="rowData.observaciones">{{ rowData.observaciones }}</td>
+              <td class="px-3 py-1 tabular-nums text-gray-700 dark:text-gray-200">{{ rowData.bulto }}</td>
+              <td class="px-3 py-1 tabular-nums text-gray-700 dark:text-gray-200">{{ rowData.peso | number: '1.0-2' }}</td>
+              <td class="px-3 py-1 text-center">
+                <p-button
+                  severity="info"
+                  [text]="true"
+                  size="small"
+                  icon="pi pi-search"
+                  styleClass="!p-1 !w-7 !h-7"
+                  pTooltip="Ver detalle"
+                  (click)="verDetalle(rowData)"
+                ></p-button>
+              </td>
+            </tr>
+          </ng-template>
+        </p-table>
       </div>
-     </section>
+    </section>
 
-
-   
+  </div>
 
   <!-- Diálogos y Toasts -->
   <p-confirmDialog header="Confirmación" icon="pi pi-exclamation-triangle"></p-confirmDialog>
   <p-toast [baseZIndex]="10000" position="top-right"></p-toast>
+</div>

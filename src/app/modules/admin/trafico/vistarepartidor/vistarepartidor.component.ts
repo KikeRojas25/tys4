@@ -304,10 +304,19 @@ this.cols6 = [
         // Observadas: unión de los 3 estados (34 + 35 + 38) que tengan
         // tipoentrega definido y NO tengan una OTR (idotvinculada) ya generada.
         // Si la OT ya generó su OTR de logística inversa, deja de listarse aquí.
+        // El SP de un estado puede devolver rows de otro estado relacionado
+        // (lógica @sincargo) -> dedupamos por idordentrabajo para no repetir.
         const observada = (l: OrdenTransporte[]) => (l ?? []).filter(
           o => o.tipoentrega !== null && (o as any).idotvinculada == null,
         );
-        this.ordenes5        = [...observada(r.recabarCargo), ...observada(r.enviarCargo), ...observada(r.noEntregado)];
+        const mergedObservadas = [
+          ...observada(r.recabarCargo),
+          ...observada(r.enviarCargo),
+          ...observada(r.noEntregado),
+        ];
+        this.ordenes5 = Array.from(
+          new Map(mergedObservadas.map(o => [o.idordentrabajo, o])).values(),
+        );
         this.totalObservadas = this.ordenes5.length;
 
         // Logística inversa (OTRs pendientes de despacho)

@@ -8,6 +8,7 @@ import { PanelModule } from 'primeng/panel';
 import { ProgressBarModule } from 'primeng/progressbar';
 import { TableModule } from 'primeng/table';
 import { TabViewModule } from 'primeng/tabview';
+import { TooltipModule } from 'primeng/tooltip';
 import { TraficoService } from '../trafico.service';
 import { User } from '../trafico.types';
 
@@ -26,6 +27,7 @@ import { User } from '../trafico.types';
         PanelModule,
         TabViewModule,
         ProgressBarModule,
+        TooltipModule,
     ],
 })
 export class IntegradolocalComponent implements OnInit {

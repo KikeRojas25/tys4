@@ -13,6 +13,7 @@ import { TableModule } from 'primeng/table';
 import { OrdenTransporte } from '../ordentransporte.types';
 import { User } from 'app/core/user/user.types';
 import { OrdenTransporteService } from '../ordentransporte.service';
+import { MantenimientoService } from '../../../mantenimiento/mantenimiento.service';
 import { Router } from '@angular/router';
 import { DropdownModule } from 'primeng/dropdown';
 import { CalendarModule } from 'primeng/calendar';
@@ -21,6 +22,7 @@ import { TimelineModule } from 'primeng/timeline';
 import { ToastModule } from 'primeng/toast';
 import { ConfirmDialogModule } from 'primeng/confirmdialog';
 import { InputMaskModule } from 'primeng/inputmask';
+import { TooltipModule } from 'primeng/tooltip';
 import { FileModalComponent } from './modalfiles';
 import { Clipboard } from '@angular/cdk/clipboard'; // opcional para copiar
 
@@ -33,6 +35,7 @@ interface EventItem {
   color?: string;
   image?: string;
   user?: string;
+  station?: string;
 }
 
 
@@ -82,8 +85,9 @@ interface ActionConfig {
     TimelineModule,
     ToastModule,
     ConfirmDialogModule,
-    InputMaskModule
-    
+    InputMaskModule,
+    TooltipModule
+
   ],
   providers: [
     ConfirmationService,
@@ -143,6 +147,7 @@ export class SeguimientootComponent implements OnInit {
 
 
   constructor(private ordenTransporteService: OrdenTransporteService,
+              private mantenimientoService: MantenimientoService,
               public dialogService: DialogService,
               private router: Router,
               private confirmationService: ConfirmationService,
@@ -196,6 +201,7 @@ export class SeguimientootComponent implements OnInit {
         {header: 'F. RECOJO', field: 'fecharegistro' , width: '120px'  },
         {header: 'F. DESPACHO', field: 'fecharegistro' , width: '120px'  },
         {header: 'F. ENTREGA', field: 'fecharegistro' , width: '120px'  },
+        {header: 'DISC.', field: 'tieneDiscrepanciaEntrega' , width: '70px'  },
         {header: 'CLIENTE', field: 'razonsocial'  ,  width: '180px'  },
         {header: 'DESTINATARIO', field: 'razonsocial'  ,  width: '180px'  },
         // {header: 'MANIFIESTO TRONCAL', field: 'razonsocial'  ,  width: '280px'  },
@@ -230,7 +236,7 @@ export class SeguimientootComponent implements OnInit {
     };
 
 
-    this.ordenTransporteService.getClientes(this.user.idscliente).subscribe(resp => {
+    this.mantenimientoService.getAllClientes('', this.user.id, true).subscribe(resp => {
         this.clientes.push({ value: 0,  label : 'TODOS LOS CLIENTES'});
         resp.forEach(element => {
             this.clientes.push({ value: element.idCliente ,  label : element.razonSocial});
@@ -519,11 +525,12 @@ vertracking(idordentransporte: number) {
     this.dialoglifecycle = true;
 
    eventos.forEach(x => {
-  this.events.push({ 
+  this.events.push({
     status: x.evento,
     dateRegister: x.fechaRegistro,
     dateEvent: x.fechaEvento,
     user: x.usuario === 'ADMIN ADMIN' ? 'CHATBOT' : x.usuario,
+    station: x.estacionUsuario,
     icon: 'pi pi-shopping-cart',
     color: '#9C27B0'
   });

@@ -1,24 +1,19 @@
 <div class="flex flex-col flex-auto min-w-0 bg-card">
   <div
-    class="flex flex-col sm:flex-row sm:items-center sm:justify-between p-6 sm:py-8 sm:px-10 border-b bg-card dark:bg-transparent"
+    class="flex flex-col sm:flex-row sm:items-center sm:justify-between p-2 sm:py-8 sm:px-10 border-b border-gray-200 bg-white shadow-sm"
   >
     <div class="flex-1 min-w-0">
-      <div class="flex flex-wrap items-center font-medium">
+      <div class="flex flex-wrap items-center font-medium text-sm text-gray-600">
         <div>
-          <a class="whitespace-nowrap text-primary-500">TMS</a>
+          <a class="whitespace-nowrap text-gray-700 hover:text-gray-900">TMS</a>
         </div>
         <div class="flex items-center ml-1 whitespace-nowrap">
-          <mat-icon
-            class="fuse-horizontal-navigation-item-icon"
-            [svgIcon]="'heroicons_solid:chevron-right'"
-          ></mat-icon>
-          <a class="ml-1 text-primary-500">Reporte</a>
+          <mat-icon class="fuse-horizontal-navigation-item-icon text-gray-400" [svgIcon]="'heroicons_solid:chevron-right'"></mat-icon>
+          <a class="ml-1 text-gray-500">Reporte</a>
         </div>
       </div>
       <div class="mt-2">
-        <h2
-          class="text-3xl md:text-4xl font-extrabold tracking-tight leading-7 sm:leading-10 truncate"
-        >
+        <h2 class="text-3xl md:text-4xl font-semibold tracking-tight leading-7 sm:leading-10 truncate text-gray-900">
           Producción por Cliente
         </h2>
       </div>
@@ -26,6 +21,8 @@
   </div>
 
   <div class="main-content container mx-auto p-6">
+
+    <!-- Filtros -->
     <div class="card p-6 shadow-md rounded-lg bg-white dark:bg-gray-800">
       <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
         <div class="flex flex-col">
@@ -40,8 +37,7 @@
             itemSize="30"
             [resetFilterOnHide]="false"
             [filter]="true"
-            placeholder="Seleccione cliente"
-          >
+            placeholder="Seleccione cliente">
             <ng-template let-item pTemplate="selectedItem">
               <span>{{ item.label }}</span>
             </ng-template>
@@ -57,8 +53,7 @@
             class="w-full input-form-field"
             [resetFilterOnHide]="false"
             [filter]="true"
-            placeholder="Seleccionar tipo de unidad"
-          >
+            placeholder="Seleccionar tipo de unidad">
             <ng-template let-item pTemplate="selectedItem">
               <span>{{ item.label }}</span>
             </ng-template>
@@ -72,8 +67,7 @@
             baseZIndex="100"
             [locale]="es"
             dateFormat="dd/mm/yy"
-            class="w-full"
-          ></p-calendar>
+            class="w-full"></p-calendar>
         </div>
 
         <div class="flex flex-col">
@@ -83,24 +77,134 @@
             baseZIndex="100"
             [locale]="es"
             dateFormat="dd/mm/yy"
-            class="w-full"
-          ></p-calendar>
+            class="w-full"></p-calendar>
         </div>
       </div>
 
-      <div class="flex mt-6">
+      <div class="flex flex-wrap gap-2 mt-6">
         <button
-          class="btn btn-primary flex items-center px-4 py-2 text-white bg-blue-600 rounded-lg shadow-md hover:bg-blue-700"
-          pButton
-          iconPos="left"
-          label="Buscar"
-          icon="fa fa-search"
-          (click)="buscar()"
-        ></button>
+          class="px-4 py-2 text-sm font-medium text-white bg-blue-600 hover:bg-blue-500 rounded-md shadow-sm"
+          pButton iconPos="left" label="Buscar" icon="pi pi-search"
+          [disabled]="loading"
+          (click)="buscar()">
+        </button>
+        <button
+          class="px-4 py-2 text-sm font-medium text-white bg-green-600 hover:bg-green-500 rounded-md shadow-sm"
+          pButton iconPos="left" label="Excel" icon="pi pi-file-excel"
+          [disabled]="loadingExcel"
+          (click)="descargarExcel()">
+        </button>
+        <button
+          class="px-4 py-2 text-sm font-medium text-white bg-red-600 hover:bg-red-500 rounded-md shadow-sm"
+          pButton iconPos="left" label="PDF" icon="pi pi-file-pdf"
+          [disabled]="loadingPdf"
+          (click)="descargarPdf()">
+        </button>
       </div>
+    </div>
+
+    <!-- Loading -->
+    <div *ngIf="loading" class="flex justify-center items-center my-8">
+      <p-progressSpinner styleClass="w-12 h-12"></p-progressSpinner>
+    </div>
+
+    <!-- Resultados pivotados -->
+    <div *ngIf="!loading && pivot && pivot.clientes.length > 0"
+         class="mt-6 bg-white rounded-lg shadow-sm border border-gray-200 overflow-auto">
+      <table class="pivot-table w-full text-sm">
+        <thead>
+          <tr class="bg-blue-700 text-white">
+            <th class="px-3 py-2 text-left whitespace-nowrap">PRODUCCIÓN POR CLIENTE</th>
+            <th class="px-3 py-2 text-left whitespace-nowrap">Departamento</th>
+            <th class="px-3 py-2 text-left whitespace-nowrap">Provincia</th>
+            <th *ngFor="let m of pivot.meses"
+                class="px-3 py-2 text-right whitespace-nowrap">{{ m }}</th>
+            <th class="px-3 py-2 text-right whitespace-nowrap">Total</th>
+          </tr>
+        </thead>
+
+        <tbody>
+          <!-- Por cliente -->
+          <ng-container *ngFor="let cli of pivot.clientes">
+            <!-- Cabecera del cliente: totales por mes a la altura del cliente -->
+            <tr class="row-cliente-header border-b border-gray-200 font-semibold">
+              <td [attr.rowspan]="rowSpanCliente(cli)"
+                  class="cliente-cell px-3 py-2 align-top font-bold bg-gray-100">
+                {{ cli.cliente }}
+              </td>
+              <td colspan="2" class="px-3 py-2"></td>
+              <td *ngFor="let m of pivot.meses" class="px-3 py-2 text-right">
+                <span *ngIf="valorMes(cli.totalesPorMes, m) !== 0">
+                  {{ valorMes(cli.totalesPorMes, m) | number:'1.2-2' }}
+                </span>
+              </td>
+              <td class="px-3 py-2 text-right">{{ cli.total | number:'1.2-2' }}</td>
+            </tr>
+
+            <ng-container *ngFor="let dpto of cli.departamentos">
+              <!-- Provincias del departamento -->
+              <ng-container *ngFor="let prov of dpto.provincias; let pIndex = index">
+                <tr class="hover:bg-gray-50 border-b border-gray-100">
+                  <!-- Departamento: rowspan en la primera provincia -->
+                  <td *ngIf="pIndex === 0"
+                      [attr.rowspan]="rowSpanDpto(dpto)"
+                      class="dpto-cell px-3 py-2 align-top font-semibold bg-gray-50">
+                    {{ dpto.departamento }}
+                  </td>
+
+                  <td class="px-3 py-2">{{ prov.provincia }}</td>
+
+                  <td *ngFor="let m of pivot.meses"
+                      class="px-3 py-2 text-right">
+                    <span *ngIf="valorMes(prov.valoresPorMes, m) !== 0">
+                      {{ valorMes(prov.valoresPorMes, m) | number:'1.2-2' }}
+                    </span>
+                  </td>
+
+                  <td class="px-3 py-2 text-right font-medium bg-gray-50">
+                    {{ prov.total | number:'1.2-2' }}
+                  </td>
+                </tr>
+              </ng-container>
+
+              <!-- Subtotal por departamento (cliente y dpto siguen cubiertos por rowspan) -->
+              <tr class="row-subtotal border-b border-gray-200 font-semibold">
+                <td class="px-3 py-2 text-right">Total</td>
+                <td *ngFor="let m of pivot.meses" class="px-3 py-2 text-right">
+                  <span *ngIf="valorMes(dpto.totalesPorMes, m) !== 0">
+                    {{ valorMes(dpto.totalesPorMes, m) | number:'1.2-2' }}
+                  </span>
+                </td>
+                <td class="px-3 py-2 text-right">{{ dpto.total | number:'1.2-2' }}</td>
+              </tr>
+            </ng-container>
+          </ng-container>
+
+          <!-- Total General al final -->
+          <tr class="row-total-general border-t-2 border-gray-700 font-bold">
+            <td colspan="3" class="px-3 py-2 text-right">TOTAL GENERAL</td>
+            <td *ngFor="let m of pivot.meses" class="px-3 py-2 text-right">
+              {{ valorMes(pivot.totalesPorMes, m) | number:'1.2-2' }}
+            </td>
+            <td class="px-3 py-2 text-right">{{ pivot.totalGeneral | number:'1.2-2' }}</td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+
+    <!-- Vacío -->
+    <div *ngIf="!loading && pivot && pivot.clientes.length === 0"
+         class="mt-6 bg-white rounded-lg shadow-sm border border-gray-200 p-8 text-center">
+      <mat-icon class="text-gray-400 mb-2" style="font-size: 48px; width: 48px; height: 48px;">search_off</mat-icon>
+      <div class="text-gray-600">No se encontraron datos para los filtros seleccionados</div>
+    </div>
+
+    <div *ngIf="!loading && !pivot"
+         class="mt-6 bg-white rounded-lg shadow-sm border border-gray-200 p-8 text-center">
+      <mat-icon class="text-gray-400 mb-2" style="font-size: 48px; width: 48px; height: 48px;">analytics</mat-icon>
+      <div class="text-gray-600">Configure los filtros y presione Buscar</div>
     </div>
   </div>
 </div>
 
 <p-toast></p-toast>
-

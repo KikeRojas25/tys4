@@ -1,0 +1,330 @@
+<div class="flex flex-col flex-auto min-w-0 bg-gray-50">
+  <!-- Header -->
+  <div class="flex flex-col sm:flex-row flex-0 sm:items-center sm:justify-between p-2 sm:py-8 sm:px-10 border-b border-gray-200 bg-white shadow-sm">
+    <div class="flex-1 min-w-0">
+      <div class="flex flex-wrap items-center font-medium text-sm text-gray-600">
+        <div><a class="whitespace-nowrap text-gray-700 hover:text-gray-900">TMS</a></div>
+        <div class="flex items-center ml-1 whitespace-nowrap">
+          <mat-icon class="fuse-horizontal-navigation-item-icon text-gray-400" [svgIcon]="'heroicons_solid:chevron-right'"></mat-icon>
+          <span class="ml-1 text-gray-500">Retorno</span>
+        </div>
+        <div class="flex items-center ml-1 whitespace-nowrap">
+          <mat-icon class="fuse-horizontal-navigation-item-icon text-gray-400" [svgIcon]="'heroicons_solid:chevron-right'"></mat-icon>
+          <span class="ml-1 text-gray-500">OTs Pendientes de Cargo</span>
+        </div>
+      </div>
+      <div class="mt-2">
+        <h2 class="text-3xl md:text-4xl font-semibold tracking-tight leading-7 sm:leading-10 truncate text-gray-900">OTs Pendientes de Cargo</h2>
+      </div>
+    </div>
+  </div>
+
+  <!-- Contenido -->
+  <div class="main-content container-fluid p-2">
+    <!-- Filtros de Búsqueda -->
+    <div class="bg-white rounded-lg shadow-sm border border-gray-200 mb-2 overflow-hidden">
+      <div class="p-2">
+        <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-5 gap-2">
+
+          <!-- Cliente -->
+          <div class="flex flex-col">
+            <label class="mb-1">Cliente:</label>
+            <p-dropdown name="clientes"
+                        [options]="clientes" [(ngModel)]="model.idcliente"
+                        scrollHeight="30vh" class="input-form-field"
+                        appendTo="body"
+                        [virtualScroll]="true" itemSize="30"
+                        [style]="{'width':'100%'}" [resetFilterOnHide]="false"
+                        [filter]="true">
+              <ng-template let-item pTemplate="selectedItem">
+                <span>{{item.label}}</span>
+              </ng-template>
+            </p-dropdown>
+          </div>
+
+          <!-- Repartidor -->
+          <div class="flex flex-col">
+            <label class="mb-1">Repartidor:</label>
+            <p-dropdown name="repartidores"
+                        [options]="repartidores" [(ngModel)]="model.idrepartidor"
+                        scrollHeight="30vh" class="input-form-field"
+                        appendTo="body"
+                        [virtualScroll]="true" itemSize="30"
+                        [style]="{'width':'100%'}" [resetFilterOnHide]="false"
+                        [filter]="true">
+              <ng-template let-item pTemplate="selectedItem">
+                <span>{{item.label}}</span>
+              </ng-template>
+            </p-dropdown>
+          </div>
+
+          <!-- Inicio -->
+          <div class="flex flex-col">
+            <label class="mb-1">Fecha de Inicio:</label>
+            <p-calendar [(ngModel)]="dateInicio" baseZIndex="100" appendTo="body"
+                        dateFormat="dd/mm/yy" placeholder="Seleccione una fecha"
+                        [style]="{'width':'100%'}">
+            </p-calendar>
+          </div>
+
+          <!-- Fin -->
+          <div class="flex flex-col">
+            <label class="mb-1">Fecha de Final:</label>
+            <p-calendar [(ngModel)]="dateFin" baseZIndex="100" appendTo="body"
+                        dateFormat="dd/mm/yy" placeholder="Seleccione una fecha"
+                        [style]="{'width':'100%'}">
+            </p-calendar>
+          </div>
+
+          <!-- Nro OT -->
+          <div class="flex flex-col">
+            <label class="mb-1">Nro OT:</label>
+            <input pInputText [(ngModel)]="model.numcp"
+                   [style]="{'width':'100%'}" placeholder="Ingrese Nro OT"
+                   (keyup.enter)="buscar()" />
+          </div>
+
+          <!-- GRR -->
+          <div class="flex flex-col">
+            <label class="mb-1">GRR:</label>
+            <input pInputText [(ngModel)]="model.grr"
+                   [style]="{'width':'100%'}" placeholder="Ingrese GRR"
+                   (keyup.enter)="buscar()" />
+          </div>
+
+          <!-- Botones -->
+          <div class="flex flex-col mt-4">
+            <button
+              class="px-4 py-2.5 text-sm font-medium text-white bg-gray-700 hover:bg-gray-600 rounded-md shadow-sm transition-all duration-150"
+              pButton
+              label="Buscar"
+              icon="pi pi-search"
+              iconPos="left"
+              (click)="buscar()">
+            </button>
+          </div>
+          <div class="flex flex-col mt-4">
+            <button
+              class="px-4 py-2.5 text-sm font-medium text-gray-700 bg-white border border-gray-300 hover:bg-gray-50 rounded-md shadow-sm transition-all duration-150"
+              pButton
+              label="EXCEL"
+              icon="pi pi-file-excel"
+              iconPos="left"
+              [disabled]="!ordenes || ordenes.length === 0"
+              (click)="exportarExcel()">
+            </button>
+          </div>
+
+        </div>
+      </div>
+    </div>
+
+    <!-- Grilla -->
+    <div class="bg-white rounded-lg shadow-sm border border-gray-200 overflow-hidden">
+      <div class="p-3">
+        <h3 class="text-base font-semibold text-gray-700 mb-3">Órdenes de Transporte</h3>
+        <p-table [value]="ordenes" [paginator]="true" [rows]="20"
+                 [rowsPerPageOptions]="[20, 40, 60, 100]"
+                 dataKey="idordentrabajo"
+                 editMode="row"
+                 [styleClass]="'custom-table'" [scrollable]="true" scrollHeight="65vh"
+                 [tableStyle]="{ 'min-width': '140rem' }" class="w-full">
+
+          <ng-template pTemplate="header">
+            <tr>
+              <th class="text-center px-2 py-3 text-sm" style="width: 170px;">ACC</th>
+              <th class="text-center px-2 py-3 text-sm" style="width: 110px;">OT</th>
+              <th class="text-center px-2 py-3 text-sm" style="width: 170px;">CÁMARA</th>
+              <th class="text-center px-2 py-3 text-sm" style="width: 130px;">SIN F. EN DOC</th>
+              <th class="text-center px-2 py-3 text-sm" style="width: 150px;">F. ENTREGA REAL DOC</th>
+              <th class="text-center px-2 py-3 text-sm" style="width: 100px;">HR. REAL DOC</th>
+              <th class="text-center px-2 py-3 text-sm" style="width: 180px;">TIPO ENTREGA DOC</th>
+              <th class="text-center px-2 py-3 text-sm" style="width: 180px;">REMITENTE</th>
+              <th class="text-center px-2 py-3 text-sm" style="width: 180px;">DESTINATARIO</th>
+              <th class="text-center px-2 py-3 text-sm" style="width: 150px;">DESTINO</th>
+              <th class="text-center px-2 py-3 text-sm" style="width: 140px;">ESTADO</th>
+              <th class="text-center px-2 py-3 text-sm" style="width: 110px;">F. RECOJO</th>
+              <th class="text-center px-2 py-3 text-sm" style="width: 150px;">F. ENTREGA</th>
+              <th class="text-center px-2 py-3 text-sm" style="width: 130px;">F. ENTREGA DOC</th>
+              <th class="text-center px-2 py-3 text-sm" style="width: 130px;">F. CONCILIACIÓN</th>
+              <th class="text-center px-2 py-3 text-sm" style="width: 80px;">LEAD DOC</th>
+              <th class="text-center px-2 py-3 text-sm" style="width: 100px;">DÍAS TRANSC.</th>
+              <th class="text-center px-2 py-3 text-sm" style="width: 160px;">REPARTIDOR</th>
+              <th class="text-center px-2 py-3 text-sm" style="width: 160px;">COORDINADOR</th>
+            </tr>
+          </ng-template>
+
+          <ng-template pTemplate="body" let-row let-editing="editing" let-ri="rowIndex">
+            <tr [pEditableRow]="row" class="border-b border-gray-100 hover:bg-gray-50">
+              <!-- Acciones -->
+              <td class="text-center px-1 py-2">
+                <div class="flex gap-1 justify-center items-center">
+                  <button pButton type="button" icon="pi pi-download"
+                          class="action-btn action-btn-primary"
+                          pTooltip="Ver fotos" tooltipPosition="top"
+                          (click)="verarchivos(row.idordentrabajo)"></button>
+
+                  <button pButton type="button" icon="pi pi-upload"
+                          class="action-btn action-btn-success"
+                          pTooltip="Subir fotos" tooltipPosition="top"
+                          (click)="cargarfiles(row.idordentrabajo)"></button>
+
+                  <button *ngIf="!editing" pButton pRipple type="button" pInitEditableRow
+                          icon="pi pi-pencil"
+                          class="action-btn action-btn-warning"
+                          pTooltip="Editar" tooltipPosition="top"
+                          (click)="onRowEditInit(row)"></button>
+
+                  <button *ngIf="editing" pButton pRipple type="button" pSaveEditableRow
+                          icon="pi pi-check"
+                          class="action-btn action-btn-success"
+                          pTooltip="Guardar" tooltipPosition="top"
+                          (click)="onRowEditSave(row)"></button>
+
+                  <button *ngIf="editing" pButton pRipple type="button" pCancelEditableRow
+                          icon="pi pi-times"
+                          class="action-btn action-btn-danger"
+                          pTooltip="Cancelar" tooltipPosition="top"
+                          (click)="onRowEditCancel(row, ri)"></button>
+                </div>
+              </td>
+
+              <!-- OT -->
+              <td class="text-center px-2 py-2 text-sm">
+                <a class="text-amber-700 hover:text-amber-900 font-semibold cursor-pointer underline"
+                   (click)="verot(row.idordentrabajo)">{{ row.numcp }}</a>
+              </td>
+
+              <!-- Cámara (siempre visible, click directo) -->
+              <td class="text-center px-1 py-2">
+                <div class="flex gap-1 justify-center">
+                  <button type="button" class="cam-mini"
+                          [class.cam-mini-active]="row.cam === '1'"
+                          (click)="setearCamara(row, '1')">M1</button>
+                  <button type="button" class="cam-mini"
+                          [class.cam-mini-active]="row.cam === '2'"
+                          (click)="setearCamara(row, '2')">M2</button>
+                  <button type="button" class="cam-mini"
+                          [class.cam-mini-active]="row.cam === '3'"
+                          (click)="setearCamara(row, '3')">M3</button>
+                </div>
+              </td>
+
+              <!-- Sin F. en Doc — switch que toma fechaentrega del conductor.
+                   Solo se activa si la OT ya está entregada por el conductor. -->
+              <td class="text-center px-1 py-2">
+                <ng-container *ngIf="editing; else outSwitch">
+                  <p-inputSwitch [(ngModel)]="row.sinFechaEnDoc"
+                                 [disabled]="!puedeAutoCompletarFecha(row)"
+                                 [pTooltip]="puedeAutoCompletarFecha(row)
+                                              ? 'Tomar fecha y hora del conductor (F. ENTREGA)'
+                                              : 'Disponible solo si la OT ya está entregada por el conductor'"
+                                 tooltipPosition="top">
+                  </p-inputSwitch>
+                </ng-container>
+                <ng-template #outSwitch>
+                  <span *ngIf="row.sinFechaEnDoc" class="inline-flex items-center text-emerald-700 text-xs font-semibold">
+                    <i class="pi pi-check mr-1"></i> Sin doc
+                  </span>
+                  <span *ngIf="!row.sinFechaEnDoc" class="text-gray-400 text-xs">—</span>
+                </ng-template>
+              </td>
+
+              <!-- F. Entrega Real (editable) — input usa campo local, output muestra fechaentregaconciliacion (BD).
+                   Se oculta si el switch "Sin F. en doc" está ON. -->
+              <td pEditableColumn class="text-center px-2 py-2 text-sm">
+                <p-cellEditor>
+                  <ng-template pTemplate="input">
+                    <p-calendar *ngIf="!row.sinFechaEnDoc"
+                                [(ngModel)]="row.fechaentregarealdocumentario"
+                                appendTo="body" dateFormat="dd/mm/yy"
+                                [showIcon]="true" [style]="{ width: '100%' }"></p-calendar>
+                    <span *ngIf="row.sinFechaEnDoc" class="text-xs text-gray-500 italic">
+                      {{ row.fechaentrega ? (row.fechaentrega | date:'dd/MM/yyyy') : 'Se tomará F. Entrega' }}
+                    </span>
+                  </ng-template>
+                  <ng-template pTemplate="output">
+                    {{ row.fechaentregaconciliacion ? (row.fechaentregaconciliacion | date:'dd/MM/yyyy') : '—' }}
+                  </ng-template>
+                </p-cellEditor>
+              </td>
+
+              <!-- Hora Real (editable) — input usa campo local, output muestra hora de fechaentregaconciliacion (BD).
+                   Se oculta si el switch "Sin F. en doc" está ON. -->
+              <td pEditableColumn class="text-center px-2 py-2 text-sm">
+                <p-cellEditor>
+                  <ng-template pTemplate="input">
+                    <p-inputMask *ngIf="!row.sinFechaEnDoc"
+                                 mask="99:99" [(ngModel)]="row.horaentregarealdocumentario"
+                                 placeholder="HH:mm" [style]="{ width: '90px' }"></p-inputMask>
+                    <span *ngIf="row.sinFechaEnDoc" class="text-xs text-gray-500 italic">
+                      {{ row.fechaentrega ? (row.fechaentrega | date:'HH:mm') : '—' }}
+                    </span>
+                  </ng-template>
+                  <ng-template pTemplate="output">
+                    {{ row.fechaentregaconciliacion ? (row.fechaentregaconciliacion | date:'HH:mm') : '—' }}
+                  </ng-template>
+                </p-cellEditor>
+              </td>
+
+              <!-- Tipo Entrega (editable) -->
+              <td pEditableColumn class="text-center px-2 py-2 text-sm">
+                <p-cellEditor>
+                  <ng-template pTemplate="input">
+                    <p-dropdown [options]="tiposEntrega" [(ngModel)]="row.estadoentregarealdocumentario"
+                                appendTo="body" placeholder="Seleccione"
+                                [style]="{ width: '100%' }"></p-dropdown>
+                  </ng-template>
+                  <ng-template pTemplate="output">
+                    <span *ngIf="row.estadoentregarealdocumentario"
+                          class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-blue-100 text-blue-800">
+                      {{ row.estadoentregarealdocumentario }}
+                    </span>
+                    <span *ngIf="!row.estadoentregarealdocumentario" class="text-gray-400">—</span>
+                  </ng-template>
+                </p-cellEditor>
+              </td>
+
+              <!-- Solo lectura -->
+              <td class="text-left  px-2 py-2 text-sm">{{ row.remitente }}</td>
+              <td class="text-left  px-2 py-2 text-sm">{{ row.destinatario }}</td>
+              <td class="text-left  px-2 py-2 text-sm">{{ row.destino }}</td>
+              <td class="text-center px-2 py-2 text-sm">
+                <span *ngIf="row.estado" class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-gray-100 text-gray-700">
+                  {{ row.estado }}
+                </span>
+              </td>
+              <td class="text-center px-2 py-2 text-sm">{{ row.fecharecojo            ? (row.fecharecojo            | date:'dd/MM/yyyy') : '' }}</td>
+              <!-- F. ENTREGA del conductor (fechaentrega) — con hora porque siempre se registra -->
+              <td class="text-center px-2 py-2 text-sm">
+                {{ row.fechaentrega ? (row.fechaentrega | date:'dd/MM/yyyy HH:mm') : '—' }}
+              </td>
+              <!-- F. ENTREGA DOC del liquidador (fechaentregareal) — antes era "F. ENTREGA" -->
+              <td class="text-center px-2 py-2 text-sm">{{ row.fechaentregareal       ? (row.fechaentregareal       | date:'dd/MM/yyyy') : '' }}</td>
+              <td class="text-center px-2 py-2 text-sm">{{ row.fechaentregaconciliacion ? (row.fechaentregaconciliacion | date:'dd/MM/yyyy') : '' }}</td>
+              <td class="text-center px-2 py-2">
+                <span class="inline-flex items-center justify-center px-2.5 py-0.5 rounded bg-gray-800 text-white text-xs font-semibold">
+                  {{ row.LeadDocumentario ?? 0 }}
+                </span>
+              </td>
+              <td class="text-center px-2 py-2">
+                <span class="inline-flex items-center justify-center px-2.5 py-0.5 rounded bg-gray-800 text-white text-xs font-semibold">
+                  {{ row.DiasTranscurridos ?? 0 }}
+                </span>
+              </td>
+              <td class="text-left  px-2 py-2 text-sm">{{ row.proveedor }}</td>
+              <td class="text-left  px-2 py-2 text-sm">{{ row.Coordinador }}</td>
+            </tr>
+          </ng-template>
+
+          <ng-template pTemplate="emptymessage">
+            <tr><td colspan="19" class="text-center text-gray-500 py-4">No hay órdenes para mostrar.</td></tr>
+          </ng-template>
+        </p-table>
+      </div>
+    </div>
+  </div>
+</div>
+
+<p-toast />
+<p-confirmDialog />

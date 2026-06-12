@@ -1,30 +1,62 @@
 <div class="flex flex-col flex-auto min-w-0">
-  <div class="flex flex-col sm:flex-row flex-0 sm:items-center sm:justify-between p-6 sm:py-8 sm:px-10 border-b bg-card dark:bg-transparent">
+  <div class="flex flex-col sm:flex-row flex-0 sm:items-center sm:justify-between p-2 sm:py-8 sm:px-10 border-b border-gray-200 bg-white shadow-sm">
     <div class="flex-1 min-w-0">
-      <div class="flex flex-wrap items-center font-medium">
+      <div class="flex flex-wrap items-center font-medium text-sm text-gray-600">
         <div>
-          <a class="whitespace-nowrap text-primary-500">TMS</a>
+          <a class="whitespace-nowrap text-gray-700 hover:text-gray-900">TMS</a>
         </div>
         <div class="flex items-center ml-1 whitespace-nowrap">
-          <mat-icon class="fuse-horizontal-navigation-item-icon" [svgIcon]="'heroicons_solid:chevron-right'"></mat-icon>
-          <a class="ml-1 text-primary-500">Tráfico</a>
+          <mat-icon class="fuse-horizontal-navigation-item-icon text-gray-400" [svgIcon]="'heroicons_solid:chevron-right'"></mat-icon>
+          <a class="ml-1 text-gray-500">Estación</a>
         </div>
         <div class="flex items-center ml-1 whitespace-nowrap">
-          <mat-icon class="fuse-horizontal-navigation-item-icon" [svgIcon]="'heroicons_solid:chevron-right'"></mat-icon>
-          <a class="ml-1 text-primary-500" [routerLink]="['/trafico/integrado']">Ordén de Transporte Remoto</a>
+          <mat-icon class="fuse-horizontal-navigation-item-icon text-gray-400" [svgIcon]="'heroicons_solid:chevron-right'"></mat-icon>
+          <a class="ml-1 text-gray-500" [routerLink]="['/seguimientoot/listadoordentransporte']">Listado de OTs</a>
         </div>
       </div>
       <div class="mt-2">
-        <h2 class="text-3xl md:text-4xl font-extrabold tracking-tight leading-7 sm:leading-10 truncate"> Editar OT  </h2>
+        <h2 class="text-3xl md:text-4xl font-semibold tracking-tight leading-7 sm:leading-10 truncate text-gray-900"> Editar OT  </h2>
       </div>
     </div>
   </div>
 
   <div class="flex flex-col min-w-0 w-full">
 
+    <ng-container *ngIf="cargando; else formContenido">
+      <div class="p-6 space-y-4">
+        <p-skeleton width="20rem" height="2rem" styleClass="mb-3"></p-skeleton>
+        <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+          <p-skeleton height="2.75rem"></p-skeleton>
+          <p-skeleton height="2.75rem"></p-skeleton>
+          <p-skeleton height="2.75rem"></p-skeleton>
+          <p-skeleton height="2.75rem"></p-skeleton>
+          <p-skeleton height="2.75rem"></p-skeleton>
+          <p-skeleton height="2.75rem"></p-skeleton>
+        </div>
+        <p-skeleton width="20rem" height="2rem" styleClass="mb-3 mt-6"></p-skeleton>
+        <div class="grid grid-cols-1 md:grid-cols-4 gap-4">
+          <p-skeleton height="2.75rem"></p-skeleton>
+          <p-skeleton height="2.75rem"></p-skeleton>
+          <p-skeleton height="2.75rem"></p-skeleton>
+          <p-skeleton height="2.75rem"></p-skeleton>
+          <p-skeleton height="2.75rem"></p-skeleton>
+          <p-skeleton height="2.75rem"></p-skeleton>
+        </div>
+        <p-skeleton width="20rem" height="2rem" styleClass="mb-3 mt-6"></p-skeleton>
+        <div class="grid grid-cols-1 md:grid-cols-4 gap-4">
+          <p-skeleton height="2.75rem"></p-skeleton>
+          <p-skeleton height="2.75rem"></p-skeleton>
+          <p-skeleton height="2.75rem"></p-skeleton>
+          <p-skeleton height="2.75rem"></p-skeleton>
+          <p-skeleton height="2.75rem"></p-skeleton>
+          <p-skeleton height="2.75rem"></p-skeleton>
+          <p-skeleton height="2.75rem"></p-skeleton>
+          <p-skeleton height="2.75rem"></p-skeleton>
+        </div>
+      </div>
+    </ng-container>
 
-    
-
+    <ng-template #formContenido>
     <form  [formGroup]="form"  (ngSubmit)="registrar()" >
 
       <p-panel header="Datos generales" class="w-full mb-3 custom-header-panel">
@@ -47,8 +79,8 @@
                                 <span style="vertical-align:left;">{{item.label}}</span>
                             </ng-template>
                       </p-dropdown>
-                      <div *ngIf="form.get('clientes')?.invalid && form.get('clientes')?.touched" class="alert-danger">
-                        <div *ngIf="form.get('clientes')?.errors?.required">Requiere seleccionar un cliente.</div>
+                      <div *ngIf="form.get('idcliente')?.invalid && form.get('idcliente')?.touched" class="alert-danger">
+                        <div *ngIf="form.get('idcliente')?.errors?.required">Requiere seleccionar un cliente.</div>
                       </div>
                     </div>
                     <div class="field flex flex-col">
@@ -59,7 +91,7 @@
                     </label>
                     <p-dropdown name="remitente"
                     [virtualScroll]="true" itemSize="30"
-                      [options]="clientes"
+                      [options]="clientesTodos"
                       formControlName="idremitente"
                       [disabled]="mismoremitente"
                       [showClear]="true" class="input-form-field"
@@ -72,8 +104,8 @@
                               <span style="vertical-align:left;">{{item.label}}</span>
                           </ng-template>
                     </p-dropdown>
-                    <div *ngIf="form.get('remitente')?.invalid && form.get('remitente')?.touched" class="alert-danger">
-                      <div *ngIf="form.get('remitente')?.errors?.required">Requiere seleccionar un remitente.</div>
+                    <div *ngIf="form.get('idremitente')?.invalid && form.get('idremitente')?.touched" class="alert-danger">
+                      <div *ngIf="form.get('idremitente')?.errors?.required">Requiere seleccionar un remitente.</div>
                     </div>
                     </div>
 
@@ -89,7 +121,7 @@
                     </label>
                     <p-dropdown name="destinatario"
                       [virtualScroll]="true" itemSize="30"  [disabled]="mismodestinatario"
-                      [options]="clientes" formControlName="iddestinatario"
+                      [options]="clientesTodos" formControlName="iddestinatario"
                       [showClear]="true" class="input-form-field"
                       placeholder="Seleccione un destinatario"
                       [style]="{'width':'100%'}" [resetFilterOnHide]="false"
@@ -100,8 +132,8 @@
                       <span style="vertical-align:left;">{{item.label}}</span>
                       </ng-template>
                     </p-dropdown>
-                    <div *ngIf="form.get('destinatario')?.invalid && form.get('destinatario')?.touched" class="alert-danger">
-                      <div *ngIf="form.get('destinatario')?.errors?.required">Requiere seleccionar un destinatario.</div>
+                    <div *ngIf="form.get('iddestinatario')?.invalid && form.get('iddestinatario')?.touched" class="alert-danger">
+                      <div *ngIf="form.get('iddestinatario')?.errors?.required">Requiere seleccionar un destinatario.</div>
                     </div>
                     </div> 
 
@@ -121,8 +153,8 @@
                                 <span style="vertical-align:left;">{{item.label}}</span>
                             </ng-template>
                       </p-dropdown>
-                      <div *ngIf="form.get('origen')?.invalid && form.get('origen')?.touched" class="alert-danger">
-                        <div *ngIf="form.get('origen')?.errors?.required">Requiere seleccionar un ubigeo.</div>
+                      <div *ngIf="form.get('idorigen')?.invalid && form.get('idorigen')?.touched" class="alert-danger">
+                        <div *ngIf="form.get('idorigen')?.errors?.required">Requiere seleccionar un ubigeo.</div>
                       </div>
 
 
@@ -158,8 +190,8 @@
                         <span style="vertical-align:left;">{{item.label}}</span>
                       </ng-template>
                     </p-dropdown>
-                    <div *ngIf="form.get('destino')?.invalid && form.get('destino')?.touched" class="alert-danger">
-                      <div *ngIf="form.get('destino')?.errors?.required">Requiere seleccionar un destino.</div>
+                    <div *ngIf="form.get('iddestino')?.invalid && form.get('iddestino')?.touched" class="alert-danger">
+                      <div *ngIf="form.get('iddestino')?.errors?.required">Requiere seleccionar un destino.</div>
                     </div>
 
                     </div>
@@ -559,7 +591,7 @@
                   <div class="row pt-2 pt-sm-5 mt-1">
                     <div class="col-sm-6 pl-0">
                       <p class="text-right">
-                        <p-button [disabled]="!form.valid"  class="btn btn-space btn-primary" type="submit">Editar</p-button>
+                        <p-button class="btn btn-space btn-primary" type="submit">Editar</p-button>
                         <p-button  [routerLink]="['/seguimiento/ordenrecojo']" routerLinkActive="router-link-active"  class="btn btn-space btn-secondary">Cancel</p-button>
                       </p>
                     </div>
@@ -567,7 +599,8 @@
   
   
         </p-panel>
-    </form> 
+    </form>
+    </ng-template>
 
 
 </div>
@@ -593,21 +626,22 @@
 <p-dialog header="Generador Etiquetas" [modal]="true" [(visible)]="dialogEtiqueta" [style]="{ width: '25rem' }">
   <span class="p-text-secondary block mb-5">Generación de Etiquetas</span>
   <div class="flex align-items-center gap-3 mb-3">
-      <label for="Tipo" class="font-semibold w-6rem">Cantidad</label>
-      <p-dropdown 
+      <label for="Tipo" class="font-semibold w-6rem">Tipo</label>
+      <p-dropdown
       name="tipo"
-      [options]="tipos" 
-      [(ngModel)]="model.idtipoetiqueta" 
+      [options]="tipos"
+      [(ngModel)]="model.idtipoetiqueta"
+      [ngModelOptions]="{standalone: true}"
       placeholder="Selecciona un tipo">
     </p-dropdown>
   </div>
   <div class="flex align-items-center gap-3 mb-5">
-      <label for="grrinicial" class="font-semibold w-6rem">Cantidad</label>
-      <p-inputNumber name="cantidadetiqueta" [(ngModel)]="model.cantidadetiqueta" class="flex-auto" autocomplete="off" />
+      <label for="cantidadetiqueta" class="font-semibold w-6rem">Cantidad</label>
+      <p-inputNumber name="cantidadetiqueta" [(ngModel)]="model.cantidadetiqueta" [ngModelOptions]="{standalone: true}" class="flex-auto" autocomplete="off" />
   </div>
   <div class="flex justify-content-end gap-2">
-       <p-button label="Cerrar" severity="secondary" (onClick)="dialogGrr= false" />
-      <p-button label="Agregar" (onClick)="agregaretiqueta()"   /> 
+       <p-button label="Cerrar" severity="secondary" (onClick)="dialogEtiqueta = false" />
+      <p-button label="Agregar" (onClick)="agregaretiqueta(); dialogEtiqueta = false" />
   </div>
 </p-dialog>
 

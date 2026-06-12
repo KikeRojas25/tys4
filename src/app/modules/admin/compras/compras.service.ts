@@ -6,6 +6,7 @@ import {
   DetalleLiquidadoResult,
   LiquidacionCajaDetalleDto,
   LiquidacionCajaDto,
+  LiquidacionCajaExportarRow,
   LiquidacionCajaForCreateDto,
   LiquidacionCajaForUpdateDto,
   MasterLiquidacionResult,
@@ -63,6 +64,54 @@ export class ComprasService {
     return this._httpClient.get<LiquidacionCajaDto[]>(`${this.baseUrl}liquidaciones`, {
       ...this.getHttpOptions(),
       params,
+    });
+  }
+
+  /**
+   * Obtiene las liquidaciones con granularidad a nivel de detalle (una fila por OT)
+   * desde [Facturacion].[pa_listarliquidaciones_exportar].
+   * Pensado para alimentar las exportaciones Excel/PDF en el cliente.
+   */
+  getLiquidacionesExportar(
+    fechaInicio?: Date | string | null,
+    fechaFin?: Date | string | null,
+    idTipoLiquidacion?: number | null
+  ): Observable<LiquidacionCajaExportarRow[]> {
+    let params = new HttpParams();
+    if (fechaInicio) params = params.set('fechaInicio', this.toQueryDate(fechaInicio));
+    if (fechaFin) params = params.set('fechaFin', this.toQueryDate(fechaFin));
+    if (idTipoLiquidacion != null) {
+      const n = Number(idTipoLiquidacion);
+      if (Number.isFinite(n) && n > 0) params = params.set('idTipoLiquidacion', String(n));
+    }
+
+    return this._httpClient.get<LiquidacionCajaExportarRow[]>(`${this.baseUrl}liquidaciones/exportar`, {
+      ...this.getHttpOptions(),
+      params,
+    });
+  }
+
+  /**
+   * Descarga el Excel de liquidaciones desde el backend (ClosedXML).
+   */
+  descargarLiquidacionesExcel(
+    fechaInicio?: Date | string | null,
+    fechaFin?: Date | string | null,
+    idTipoLiquidacion?: number | null
+  ): Observable<Blob> {
+    let params = new HttpParams();
+    if (fechaInicio) params = params.set('fechaInicio', this.toQueryDate(fechaInicio));
+    if (fechaFin) params = params.set('fechaFin', this.toQueryDate(fechaFin));
+    if (idTipoLiquidacion != null) {
+      const n = Number(idTipoLiquidacion);
+      if (Number.isFinite(n) && n > 0) params = params.set('idTipoLiquidacion', String(n));
+    }
+
+    const opts = this.getHttpOptions();
+    return this._httpClient.get(`${this.baseUrl}liquidaciones/excel`, {
+      headers: opts.headers,
+      params,
+      responseType: 'blob',
     });
   }
 

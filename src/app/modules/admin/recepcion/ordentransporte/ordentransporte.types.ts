@@ -58,6 +58,8 @@ export interface OrdenTransporte {
     nummanifiesto?: string;
     placa?: string;
     chofer?: string ;
+    nombrechofer?: string;
+    conductor?: string;
     cliente?: string;
     oriflameid?: number;
     origen?:string;

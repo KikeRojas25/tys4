@@ -28,6 +28,7 @@ export class MantenimientoService {
     private baseUrlTarifa = environment.baseUrl + '/api/tarifa/';
   private baseUrlProveedor = environment.baseUrl + '/api/Proveedor/';
   private baseUrlTarifaAjuste = environment.baseUrl + '/api/TarifaAjuste/';
+  private baseUrlTarifaProveedor = environment.baseUrl + '/api/TarifaProveedor/';
   private baseUrlVehiculo = environment.baseUrl + '/api/Vehiculo/';
   private baseUrlUsers = environment.baseUrl + '/api/Users/';
 
@@ -51,8 +52,14 @@ getClienteDetalle(idCliente: number): Observable<ClienteDetalleResult> {
   return this._httpClient.get<ClienteDetalleResult>(`${this.baseUrlCliente}GetCliente?id=${idCliente}`, httpOptions);
 }
 
-getAllClientes(criterio: string, usuarioid : number, esComercial : boolean = false) : Observable<Cliente[]> {
-  return this._httpClient.get<Cliente[]>(this.baseUrlCliente +"GetAllClientes?criterio="+ criterio+"&UsuarioId=" + usuarioid + "&esComercial=" + esComercial, httpOptions)
+getAllClientes(criterio: string, usuarioid : number, esComercial : boolean | null) : Observable<Cliente[]> {
+  let params = new HttpParams()
+    .set('criterio', criterio ?? '')
+    .set('UsuarioId', String(usuarioid));
+  if (esComercial !== null && esComercial !== undefined) {
+    params = params.set('esComercial', String(esComercial));
+  }
+  return this._httpClient.get<Cliente[]>(this.baseUrlCliente + 'GetAllClientes', { params, ...httpOptions });
   };
 
   registrarCliente(model: any){
@@ -376,5 +383,26 @@ editar_chofer(model: any) {
 
   getFormulas(): Observable<any[]> {
     return this._httpClient.get<any[]>(`${this.baseUrl}GetFormulas`, httpOptions);
+  }
+
+  // ── TarifaProveedor ──────────────────────────────────────────────────────
+  listarTarifasPorProveedor(idProveedor: number): Observable<any[]> {
+    return this._httpClient.get<any[]>(`${this.baseUrlTarifaProveedor}proveedor/${idProveedor}`, httpOptions);
+  }
+
+  obtenerTarifaProveedor(id: number): Observable<any> {
+    return this._httpClient.get<any>(`${this.baseUrlTarifaProveedor}${id}`, httpOptions);
+  }
+
+  crearTarifaProveedor(model: any): Observable<any> {
+    return this._httpClient.post<any>(this.baseUrlTarifaProveedor, model, httpOptions);
+  }
+
+  actualizarTarifaProveedor(id: number, model: any): Observable<any> {
+    return this._httpClient.put<any>(`${this.baseUrlTarifaProveedor}${id}`, model, httpOptions);
+  }
+
+  eliminarTarifaProveedor(id: number): Observable<any> {
+    return this._httpClient.delete<any>(`${this.baseUrlTarifaProveedor}${id}`, httpOptions);
   }
 }

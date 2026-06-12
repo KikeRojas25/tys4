@@ -27,6 +27,7 @@ export interface User {
     usr_str_email?: string;
     idequipo: number;
     usr_int_bloqueado?: number;
+    esCliente?: boolean;
 
 }
 

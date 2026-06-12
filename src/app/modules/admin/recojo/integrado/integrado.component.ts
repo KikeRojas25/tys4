@@ -77,6 +77,8 @@ export class IntegradoComponent implements OnInit {
     const idusuario = this.user?.usr_int_id ?? this.user?.id;
     const idequipo = this.user?.idequipo ?? (this.user as any)?.['idEquipo'];
     this.loading = true;
+
+    console.log('hola:', idusuario, 'equipo:', idequipo);
     this.comercialService.getIntegradoComercialPorCliente(idusuario, idequipo).subscribe({
       next: (list) => {
         this.ordenes = (list ?? []).map((r) => ({

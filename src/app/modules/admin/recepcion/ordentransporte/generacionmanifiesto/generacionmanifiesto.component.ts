@@ -16,6 +16,7 @@ import { OverlayPanelModule } from 'primeng/overlaypanel';
 import { TableModule } from 'primeng/table';
 import { TimelineModule } from 'primeng/timeline';
 import { OrdenTransporteService } from '../ordentransporte.service';
+import { MantenimientoService } from '../../../mantenimiento/mantenimiento.service';
 import { OrdenTransporte } from '../ordentransporte.types';
 import { SidebarModule } from 'primeng/sidebar';
 import { DataViewModule } from 'primeng/dataview';
@@ -94,6 +95,7 @@ export class GeneracionmanifiestoComponent implements OnInit {
     3: [34,35], // "TODOS LOS ESTADOS" incluye todos
 };
   constructor(private ordenTransporteService: OrdenTransporteService,
+              private mantenimientoService: MantenimientoService,
               public dialogService: DialogService,
               private router: Router,
               private confirmationService: ConfirmationService,
@@ -166,7 +168,7 @@ export class GeneracionmanifiestoComponent implements OnInit {
     };
 
 
-    this.ordenTransporteService.getClientes(this.user.idscliente).subscribe(resp => {
+    this.mantenimientoService.getAllClientes('', this.user.usr_int_id, false).subscribe(resp => {
         this.clientes.push({ value: 0,  label : 'TODOS LOS CLIENTES'});
         resp.forEach(element => {
             this.clientes.push({ value: element.idCliente ,  label : element.razonSocial});

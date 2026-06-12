@@ -2,19 +2,27 @@
 
 <div class="tracking-dashboard">
   <!-- Header -->
-  <header class="tracking-header">
-    <div class="tracking-header-content">
-      <nav class="tracking-breadcrumb">
-        <a class="text-amber-600 hover:text-amber-700">TMS</a>
-        <mat-icon class="breadcrumb-icon" [svgIcon]="'heroicons_solid:chevron-right'"></mat-icon>
-        <a class="text-amber-600 hover:text-amber-700">Seguimiento OT</a>
-        <mat-icon class="breadcrumb-icon" [svgIcon]="'heroicons_solid:chevron-right'"></mat-icon>
-        <span class="text-slate-600">Tracking de Orden</span>
-      </nav>
-      <h1 class="tracking-title">Tracking de Orden de Transporte</h1>
-      <p class="tracking-subtitle">Consulte el estado y detalles de sus órdenes por OT</p>
+  <div class="flex flex-col sm:flex-row flex-0 sm:items-center sm:justify-between p-2 sm:py-8 sm:px-10 border-b border-gray-200 bg-white shadow-sm">
+    <div class="flex-1 min-w-0">
+      <div class="flex flex-wrap items-center font-medium text-sm text-gray-600">
+        <div>
+          <a class="whitespace-nowrap text-gray-700 hover:text-gray-900">TMS</a>
+        </div>
+        <div class="flex items-center ml-1 whitespace-nowrap">
+          <mat-icon class="fuse-horizontal-navigation-item-icon text-gray-400" [svgIcon]="'heroicons_solid:chevron-right'"></mat-icon>
+          <a class="ml-1 text-gray-500">Seguimiento OT</a>
+        </div>
+        <div class="flex items-center ml-1 whitespace-nowrap">
+          <mat-icon class="fuse-horizontal-navigation-item-icon text-gray-400" [svgIcon]="'heroicons_solid:chevron-right'"></mat-icon>
+          <a class="ml-1 text-gray-500">Tracking de Orden</a>
+        </div>
+      </div>
+      <div class="mt-2">
+        <h2 class="text-3xl md:text-4xl font-semibold tracking-tight leading-7 sm:leading-10 truncate text-gray-900">Tracking de Orden de Transporte</h2>
+        <p class="text-sm text-gray-500 mt-1.5">Consulte el estado y detalles de sus órdenes por OT</p>
+      </div>
     </div>
-  </header>
+  </div>
 
   <!-- Search box -->
   <section class="tracking-search-section">
@@ -84,6 +92,7 @@
                     <th>Fecha registro</th>
                     <th>Fecha evento</th>
                     <th>Usuario registro</th>
+                    <th>Estación</th>
                     <th>Recurso</th>
                     <th style="width: 110px;">Adjuntos</th>
                   </tr>
@@ -100,6 +109,7 @@
                     <td>{{ event.dateEvent ? (event.dateRegister | date:'dd/MM/yyyy HH:mm') : 'Sin dato' }}</td>
                     <td>{{ event.dateEvent ? (event.dateEvent | date:'dd/MM/yyyy HH:mm') : 'Sin evento' }}</td>
                     <td>{{ event.dateEvent ? (event.user || 'Sin dato') : 'Sin dato' }}</td>
+                    <td>{{ event.dateEvent ? (event.station || '-') : '-' }}</td>
                     <td>
                       <ng-container *ngIf="event.idmaestroevento === 4">{{ event.recursotroncal || '-' }}</ng-container>
                       <ng-container *ngIf="event.idmaestroevento === 38">{{ event.repartidor || '-' }}</ng-container>
@@ -314,4 +324,53 @@
       <p class="empty-hint">Verifique el número de orden (CP) e intente nuevamente.</p>
     </div>
   </section>
+
+  <!-- Diálogo: Entrega al proveedor de reparto (carrusel placeholder) -->
+  <p-dialog
+    header="Entrega al proveedor de reparto"
+    [(visible)]="repartoFotosVisible"
+    [modal]="true"
+    [style]="{ width: '30%' }"
+    [draggable]="false"
+    [resizable]="false">
+    <p-carousel *ngIf="repartoFotos.length > 0"
+                [value]="repartoFotos" [numVisible]="1" [numScroll]="1" [circular]="true">
+      <ng-template let-foto pTemplate="item">
+        <div class="product-item">
+          <div class="product-item-content">
+            <div class="p-mb-3">
+              <img [src]="foto?.src" [alt]="foto?.nombrearchivo || ''" />
+            </div>
+          </div>
+        </div>
+      </ng-template>
+    </p-carousel>
+    <div *ngIf="repartoFotos.length === 0" class="text-center text-gray-500 py-8">
+      Sin imágenes registradas.
+    </div>
+  </p-dialog>
+
+  <!-- Diálogo: Despacho (Hoja de Ruta + Manifiesto) -->
+  <p-dialog
+    header="Despacho"
+    [(visible)]="despachoLinksVisible"
+    [modal]="true"
+    [style]="{ width: '420px' }"
+    [draggable]="false"
+    [resizable]="false">
+    <div class="flex flex-col gap-3 p-2">
+      <button pButton type="button"
+              icon="pi pi-file"
+              label="Ver Hoja de Ruta"
+              class="p-button-outlined w-full"
+              [disabled]="!despachoLinks.iddespacho"
+              (click)="abrirHojaRuta()"></button>
+      <button pButton type="button"
+              icon="pi pi-file"
+              label="Ver Manifiesto"
+              class="p-button-outlined w-full"
+              [disabled]="!despachoLinks.idmanifiesto"
+              (click)="abrirManifiesto()"></button>
+    </div>
+  </p-dialog>
 </div>

@@ -1,7 +1,6 @@
 import { HttpClient, HttpHeaders } from '@angular/common/http';
 import { inject, Injectable } from '@angular/core';
 import { Observable } from 'rxjs';
-import { Cliente } from '../recepcion/ordentransporte/ordentransporte.types';
 import { environment } from 'environments/environment';
 import { Estaciones } from '../planning/planning.types';
 
@@ -30,10 +29,6 @@ export class ReporteService {
 constructor() { }
 
 
-getClientes(criterio): Observable<Cliente[]> {
-  return this._httpClient.get<Cliente[]>(this.baseUrl + 'GetAllClients?idscliente=' + criterio   , httpOptions);
-}
-
  GetAllEstaciones(): Observable<Estaciones[]> {
   return this._httpClient.get<Estaciones[]>(this.baseGeneralUrl + 'GetAllEstaciones' , httpOptions);
   }
@@ -55,6 +50,51 @@ getClientes(criterio): Observable<Cliente[]> {
       params: { formato },
       headers: httpOptions.headers,
       responseType: 'blob',
+    });
+  }
+
+  // === Producción por Cliente ===
+  getProduccionPorCliente(
+    idcliente: number | null,
+    fecini: string,
+    fecfin: string,
+    unidadmedida: number
+  ): Observable<any[]> {
+    let params: any = { fecini, fecfin, unidadmedida: unidadmedida.toString() };
+    if (idcliente != null && idcliente !== 0) params.idcliente = idcliente.toString();
+    return this._httpClient.get<any[]>(`${this.baseReporteUrl}produccioncliente`, {
+      headers: httpOptions.headers,
+      params
+    });
+  }
+
+  descargarProduccionPorClienteExcel(
+    idcliente: number | null,
+    fecini: string,
+    fecfin: string,
+    unidadmedida: number
+  ): Observable<Blob> {
+    let params: any = { fecini, fecfin, unidadmedida: unidadmedida.toString() };
+    if (idcliente != null && idcliente !== 0) params.idcliente = idcliente.toString();
+    return this._httpClient.get(`${this.baseReporteUrl}produccioncliente/excel`, {
+      headers: httpOptions.headers,
+      params,
+      responseType: 'blob'
+    });
+  }
+
+  descargarProduccionPorClientePdf(
+    idcliente: number | null,
+    fecini: string,
+    fecfin: string,
+    unidadmedida: number
+  ): Observable<Blob> {
+    let params: any = { fecini, fecfin, unidadmedida: unidadmedida.toString() };
+    if (idcliente != null && idcliente !== 0) params.idcliente = idcliente.toString();
+    return this._httpClient.get(`${this.baseReporteUrl}produccioncliente/pdf`, {
+      headers: httpOptions.headers,
+      params,
+      responseType: 'blob'
     });
   }
 

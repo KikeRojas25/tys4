@@ -4,6 +4,7 @@ import { FormsModule, FormGroup, FormBuilder, Validators, ReactiveFormsModule } 
 import { MatIcon } from '@angular/material/icon';
 import { Router, ActivatedRoute, RouterModule } from '@angular/router';
 import { OrdenTransporteService } from 'app/modules/admin/recepcion/ordentransporte/ordentransporte.service';
+import { MantenimientoService } from 'app/modules/admin/mantenimiento/mantenimiento.service';
 import { ConfirmationService, MessageService, SelectItem } from 'primeng/api';
 import { ButtonModule } from 'primeng/button';
 import { CalendarModule } from 'primeng/calendar';
@@ -17,6 +18,7 @@ import { OverlayPanelModule } from 'primeng/overlaypanel';
 import { TableModule } from 'primeng/table';
 import { TimelineModule } from 'primeng/timeline';
 import { ToastModule } from 'primeng/toast';
+import { SkeletonModule } from 'primeng/skeleton';
 import { User } from '../../trafico.types';
 import { ChipsModule } from 'primeng/chips';
 import { InputMaskModule } from 'primeng/inputmask';
@@ -54,8 +56,9 @@ interface GuiaGRR {
     TableModule,
     ConfirmDialogModule ,
     ReactiveFormsModule,
-    InputMaskModule 
-    
+    InputMaskModule,
+    SkeletonModule
+
   ],
   providers: [
     ConfirmationService,
@@ -69,6 +72,7 @@ export class EditComponent implements OnInit {
   dialogEtiqueta = false;
   es: any;
   public loading = false;
+  cargando = true;
   model: any = {};
   guias: string[] = [];
   guiasGrr: GuiaGRR[] = [];
@@ -81,6 +85,7 @@ export class EditComponent implements OnInit {
   
 
   clientes: SelectItem[] = [];
+  clientesTodos: SelectItem[] = [];
   tipounidad: SelectItem[] = [];
   mercaderiasEspeciales: SelectItem[] = [];
   ubigeos: SelectItem[] = [];
@@ -110,7 +115,35 @@ export class EditComponent implements OnInit {
     format: 'dd-MM-yyyy',
     defaultOpen: true
   };
+
+  private readonly etiquetasCampos: { [key: string]: string } = {
+    idcliente: 'Cliente',
+    idremitente: 'Remitente',
+    iddestinatario: 'Destinatario',
+    idorigen: 'Origen',
+    puntopartida: 'Dirección de partida',
+    iddestino: 'Destino',
+    puntollegada: 'Dirección de llegada',
+    idvehiculo: 'Placa de recojo',
+    idchofer: 'Conductor de recojo',
+    fecharecojo: 'Fecha de recojo',
+    horarecojo: 'Hora de recojo',
+    guiarecojo: 'Guía de recojo',
+    bulto: 'Cant. Bultos',
+    peso: 'Peso (Kg)',
+    volumen: 'Volumen (m3)',
+    pesovol: 'Peso Vol',
+    idformula: 'Fórmula',
+    idtipotransporte: 'Medio de transporte',
+    idconceptocobro: 'Concepto de cobro',
+    idtipomercaderia: 'Mercadería especial',
+    docgeneral: 'Referencia',
+    descripciongeneral: 'Descripción de mercadería',
+    guiasremitente: 'Guías de remitente (GRR)',
+  };
+
   constructor(private ordenTransporteService: OrdenTransporteService
+            , private mantenimientoService: MantenimientoService
             , private confirmationService: ConfirmationService
             , private router: Router
             ,private fb: FormBuilder
@@ -151,7 +184,8 @@ export class EditComponent implements OnInit {
               const loadDropdowns$ = forkJoin({
                 tipoUnidad: this.ordenTransporteService.getValorTabla(4),
                 mercaderiasEspeciales: this.ordenTransporteService.getValorTabla(16),
-                clientes: this.ordenTransporteService.getClientes(this.user.idscliente || ''),
+                clientes: this.mantenimientoService.getAllClientes('', this.user.id, true),
+                clientesTodos: this.mantenimientoService.getAllClientes('', this.user.id, null),
                 vehiculos: this.ordenTransporteService.getVehiculos(''),
                 choferes: this.ordenTransporteService.getChoferes(''),
                 ubigeo: this.ordenTransporteService.getUbigeo(''),
@@ -162,10 +196,11 @@ export class EditComponent implements OnInit {
                 this.form.get('iddestino')?.valueChanges.subscribe(() => this.cargarFormula());
             
               loadDropdowns$.subscribe({
-                next: ({ tipoUnidad, mercaderiasEspeciales, clientes, vehiculos, choferes, ubigeo }) => {
+                next: ({ tipoUnidad, mercaderiasEspeciales, clientes, clientesTodos, vehiculos, choferes, ubigeo }) => {
                   this.tipounidad = tipoUnidad.map(element => ({ value: element.idValorTabla, label: element.valor }));
                   this.mercaderiasEspeciales = mercaderiasEspeciales.map(element => ({ value: element.idValorTabla, label: element.valor }));
                   this.clientes = clientes.map(element => ({ value: element.idCliente, label: element.razonSocial }));
+                  this.clientesTodos = clientesTodos.map(element => ({ value: element.idCliente, label: element.razonSocial }));
                   this.vehiculos = vehiculos.map(element => ({ value: element.idVehiculo, label: element.placa }));
                   this.choferes = choferes.map(element => ({
                     value: element.idChofer,
@@ -175,12 +210,16 @@ export class EditComponent implements OnInit {
                 },
                 error: (err) => {
                   console.error('Error al cargar los datos de los dropdowns', err);
+                  this.cargando = false;
                 },
                 complete: () => {
-                  if (this.idordentrabajo) {
-                    this.ordenTransporteService.getOrden(this.idordentrabajo).subscribe({
-                      
-                      next: (resp) => {
+                  if (!this.idordentrabajo) {
+                    this.cargando = false;
+                    return;
+                  }
+                  this.ordenTransporteService.getOrden(this.idordentrabajo).subscribe({
+
+                    next: (resp) => {
 
 
                         const { ordenTransporte, guias } = resp;
@@ -228,14 +267,15 @@ export class EditComponent implements OnInit {
                         }));
                         this.guias = this.guiasGrr.map(g => g.nroGrr);
                         this.mostrarTablaGuias = this.guiasGrr.length > 0;
-                        
+
                         this.model.precio = ordenTransporte.precio;
+                        this.cargando = false;
                       },
                       error: (err) => {
                         console.error('Error al cargar la orden', err);
+                        this.cargando = false;
                       }
                     });
-                  }
                 }
               });
             
@@ -252,84 +292,6 @@ export class EditComponent implements OnInit {
             }
             
 
-  cargarDropDows() {
-
-
-    this.user.idscliente === null ? '': this.user.idscliente;
-    console.log(this.user.idscliente);
-    
-    this.ordenTransporteService.getValorTabla(4).subscribe(resp => {
-      resp.forEach(element => {
-          this.tipounidad.push({ value: element.idValorTabla ,  label : element.valor});
-        });
-    });
-
-    this.ordenTransporteService.getValorTabla(16).subscribe(resp => {
-      resp.forEach(element => {
-          this.mercaderiasEspeciales.push({ value: element.idValorTabla ,  label : element.valor});
-        });
-    });
-
-    
-    this.ordenTransporteService.getClientes(this.user.idscliente).subscribe({
-      next: resp => {
-        resp.forEach(element => {
-          this.clientes.push({ value: element.idCliente ,  label : element.razonSocial});
-        });
-
-        // this.model.idcliente = this.modeltemp.idcliente;
-        // this.model.idremitente =  this.modeltemp.idcliente ;
-        // this.model.iddestinatario =   this.modeltemp.idcliente ;
-        // // this.mismoremitente = true;
-        // // this.mismodestinatario = true;
-      }
-
-    }); 
-
-    this.ordenTransporteService.getVehiculos('').subscribe({
-      next: resp => {
-        resp.forEach(element => {
-          this.vehiculos.push({ value: element.idVehiculo ,  label : element.placa});
-        });
-
-
-      }
-    });
-    this.ordenTransporteService.getChoferes('').subscribe({
-      next: resp => {
-        resp.forEach(element => {
-          this.choferes.push({ value: element.idChofer ,  label : `DNI: ${element.dni} NOMBRE: ${element.nombreChofer} ${element.apellidoChofer}` });
-        });
-
-
-      }
-    })
-
-
-
-    
-
-  this.ordenTransporteService.getUbigeo('').subscribe(resp => {
-
-    resp.forEach(element => {
-        this.ubigeos.push({ value: element.idDistrito ,  label : element.ubigeo});
-      });
-
-
-  }, error => {
-
-  }, () => {
-    this.model.idorigen =   this.modeltemp.idorigen;
-    this.model.iddestino =   this.modeltemp.iddestino;
-
-  });
-
-
-
-
-  }
-
-
   numberOnly(event): boolean {
     const charCode = (event.which) ? event.which : event.keyCode;
     if (charCode > 31 && (charCode < 48 || charCode > 57)) {
@@ -337,6 +299,62 @@ export class EditComponent implements OnInit {
     }
     return true;
    }
+
+  private obtenerCamposFaltantes(): string[] {
+    const faltantes: string[] = [];
+    Object.keys(this.form.controls).forEach(key => {
+      const control = this.form.get(key);
+      if (control && control.invalid) {
+        faltantes.push(this.etiquetasCampos[key] || key);
+      }
+    });
+    return faltantes;
+  }
+
+  private alertarCamposFaltantes(): void {
+    const faltantes = this.obtenerCamposFaltantes();
+    if (faltantes.length === 0) {
+      return;
+    }
+    this.messageService.add({
+      severity: 'warn',
+      summary: 'Faltan campos obligatorios',
+      detail: `Por favor complete: ${faltantes.join(', ')}.`,
+      life: 8000,
+    });
+    this.scrollAlPrimerCampoInvalido();
+  }
+
+  private scrollAlPrimerCampoInvalido(): void {
+    const primero = Object.keys(this.form.controls).find(key => this.form.get(key)?.invalid);
+    if (!primero) {
+      return;
+    }
+    setTimeout(() => {
+      const elemento = document.querySelector(`[formcontrolname="${primero}"]`) as HTMLElement | null;
+      if (!elemento) {
+        return;
+      }
+      const offsetSuperior = 140;
+      const destino = window.scrollY + elemento.getBoundingClientRect().top - offsetSuperior;
+      this.scrollSuave(destino, 1000);
+    });
+  }
+
+  private scrollSuave(destino: number, duracion: number): void {
+    const inicio = window.scrollY;
+    const distancia = destino - inicio;
+    const tiempoInicio = performance.now();
+    const easeInOutCubic = (t: number) => (t < 0.5 ? 4 * t * t * t : 1 - Math.pow(-2 * t + 2, 3) / 2);
+    const animar = (ahora: number) => {
+      const progreso = Math.min((ahora - tiempoInicio) / duracion, 1);
+      window.scrollTo(0, inicio + distancia * easeInOutCubic(progreso));
+      if (progreso < 1) {
+        requestAnimationFrame(animar);
+      }
+    };
+    requestAnimationFrame(animar);
+  }
 
   registrar() {
 
@@ -387,6 +405,7 @@ export class EditComponent implements OnInit {
 }
 else {
   this.form.markAllAsTouched(); // Para mostrar los errores en todos los campos
+  this.alertarCamposFaltantes();
   return ;
 }
 

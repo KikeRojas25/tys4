@@ -13,6 +13,7 @@ import { TableModule } from 'primeng/table';
 import { ToastModule } from 'primeng/toast';
 import { FileUpload, FileUploadModule } from 'primeng/fileupload';
 import { OrdenTransporteService } from '../ordentransporte.service';
+import { MantenimientoService } from '../../../mantenimiento/mantenimiento.service';
 import { User } from 'app/core/user/user.types';
 import { ConfirmDialogModule } from 'primeng/confirmdialog';
 import { BadgeModule } from 'primeng/badge';
@@ -97,6 +98,7 @@ export class CargamasivaComponent implements OnInit {
 
 
   constructor(private ordenTransporteService: OrdenTransporteService,
+    private mantenimientoService: MantenimientoService,
     private messageService: MessageService,
     private confirmationService: ConfirmationService ,
     private router: Router,
@@ -128,7 +130,7 @@ export class CargamasivaComponent implements OnInit {
 
      
 
-    this.ordenTransporteService.getClientes(this.user.idclientes).subscribe(resp => {
+    this.mantenimientoService.getAllClientes('', this.user.usr_int_id, false).subscribe(resp => {
 
         const mappedClients = resp.map((item: any) => ({
           value: item.idCliente,

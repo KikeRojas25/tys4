@@ -11,6 +11,7 @@ import { InputNumberModule } from 'primeng/inputnumber';
 import { ConfirmationService, MessageService, SelectItem } from 'primeng/api';
 import { User } from 'app/core/user/user.types';
 import { OrdenTransporteService } from '../ordentransporte.service';
+import { MantenimientoService } from '../../../mantenimiento/mantenimiento.service';
 import { ToastModule } from 'primeng/toast'; 
 import { PanelModule } from 'primeng/panel';
 import { CheckboxModule } from 'primeng/checkbox';
@@ -23,6 +24,7 @@ import { InputMaskModule } from 'primeng/inputmask';
 import { forkJoin } from 'rxjs';
 import { DialogService, DynamicDialogRef } from 'primeng/dynamicdialog';
 import { TagModule } from 'primeng/tag';
+import { SkeletonModule } from 'primeng/skeleton';
 import { NewComponent } from 'app/modules/admin/mantenimiento/cliente/new/new.component';
 import { ChangeDetectorRef } from '@angular/core';
 import { DialogOrdenResumenComponent } from '../dialog-orden-resumen/dialog-orden-resumen.component';
@@ -60,7 +62,8 @@ interface GuiaGRR {
     ConfirmDialogModule ,
     ReactiveFormsModule,
     InputMaskModule,
-    TagModule
+    TagModule,
+    SkeletonModule
 
   ],
   providers: [MessageService,ConfirmationService, DialogService]
@@ -75,6 +78,7 @@ export class CrearotComponent implements OnInit {
   
 
   public loading = false;
+  cargando = true;
 
 
   guias: any[] = [];
@@ -90,6 +94,7 @@ export class CrearotComponent implements OnInit {
   
 
   clientes: SelectItem[] = [];
+  clientesTodos: SelectItem[] = [];
   tipounidad: SelectItem[] = [];
   mercaderiasEspeciales: SelectItem[] = [];
   ubigeo: SelectItem[] = [];
@@ -123,7 +128,35 @@ export class CrearotComponent implements OnInit {
     format: 'dd-MM-yyyy',
     defaultOpen: true
   };
+
+  private readonly etiquetasCampos: { [key: string]: string } = {
+    idcliente: 'Cliente',
+    idremitente: 'Remitente',
+    iddestinatario: 'Destinatario',
+    idorigen: 'Origen',
+    puntopartida: 'Dirección de partida',
+    iddestino: 'Destino',
+    puntollegada: 'Dirección de llegada',
+    idvehiculo: 'Placa de recojo',
+    idchofer: 'Conductor de recojo',
+    fecharecojo: 'Fecha de recojo',
+    horarecojo: 'Hora de recojo',
+    guiarecojo: 'Guía de recojo',
+    bulto: 'Cant. Bultos',
+    peso: 'Peso (Kg)',
+    volumen: 'Volumen (m3)',
+    pesovol: 'Peso Vol',
+    idformula: 'Fórmula',
+    idtipotransporte: 'Medio de transporte',
+    idconceptocobro: 'Concepto de cobro',
+    idtipomercaderia: 'Mercadería especial',
+    docgeneral: 'Referencia',
+    descripciongeneral: 'Descripción de mercadería',
+    guiasremitente: 'Guías de remitente (GRR)',
+  };
+
   constructor(private ordenTransporteService: OrdenTransporteService
+            , private mantenimientoService: MantenimientoService
             , private confirmationService: ConfirmationService
             , private router: Router
             , private fb: FormBuilder
@@ -184,9 +217,9 @@ export class CrearotComponent implements OnInit {
   };
 
    // Cargar los combos.
-    this.cargarDropDows().then(() => {
-     //  this.realizarAsignaciones();
-    });
+    this.cargarDropDows()
+      .then(() => { this.cargando = false; })
+      .catch(() => { this.cargando = false; });
 
 
     //this.idordentrabajo  = this.activatedRoute.snapshot.params["uid"];
@@ -269,16 +302,18 @@ export class CrearotComponent implements OnInit {
       // Prepara todas las llamadas como observables
       const valorTabla4$ = this.ordenTransporteService.getValorTabla(4);
       const valorTabla16$ = this.ordenTransporteService.getValorTabla(16);
-      const clientes$ = this.ordenTransporteService.getClientes(this.user.idscliente || '');
+      const clientes$ = this.mantenimientoService.getAllClientes('', this.user.id, true);
+      const clientesTodos$ = this.mantenimientoService.getAllClientes('', this.user.id, null);
       const vehiculos$ = this.ordenTransporteService.getVehiculos('');
       const choferes$ = this.ordenTransporteService.getChoferes('');
       const ubigeo$ = this.ordenTransporteService.getUbigeo('');
-  
+
       // Combina todas las llamadas en un forkJoin
       forkJoin({
         valorTabla4: valorTabla4$,
         valorTabla16: valorTabla16$,
         clientes: clientes$,
+        clientesTodos: clientesTodos$,
         vehiculos: vehiculos$,
         choferes: choferes$,
         ubigeo: ubigeo$
@@ -295,6 +330,10 @@ export class CrearotComponent implements OnInit {
   
           result.clientes.forEach(element => {
             this.clientes.push({ value: element.idCliente, label: element.razonSocial });
+          });
+
+          result.clientesTodos.forEach(element => {
+            this.clientesTodos.push({ value: element.idCliente, label: element.razonSocial });
           });
   
           result.vehiculos.forEach(element => {
@@ -332,11 +371,75 @@ export class CrearotComponent implements OnInit {
     return true;
    }
 
+  private obtenerCamposFaltantes(): string[] {
+    const faltantes: string[] = [];
+    Object.keys(this.form.controls).forEach(key => {
+      const control = this.form.get(key);
+      if (control && control.invalid) {
+        faltantes.push(this.etiquetasCampos[key] || key);
+      }
+    });
+    return faltantes;
+  }
+
+  private alertarCamposFaltantes(): void {
+    const faltantes = this.obtenerCamposFaltantes();
+    if (faltantes.length === 0) {
+      return;
+    }
+    this.messageService.add({
+      severity: 'warn',
+      summary: 'Faltan campos obligatorios',
+      detail: `Por favor complete: ${faltantes.join(', ')}.`,
+      life: 8000,
+    });
+    this.scrollAlPrimerCampoInvalido();
+  }
+
+  private scrollAlPrimerCampoInvalido(): void {
+    const primero = Object.keys(this.form.controls).find(key => this.form.get(key)?.invalid);
+    if (!primero) {
+      return;
+    }
+    setTimeout(() => {
+      const elemento = document.querySelector(`[formcontrolname="${primero}"]`) as HTMLElement | null;
+      if (!elemento) {
+        return;
+      }
+      const offsetSuperior = 140;
+      const destino = window.scrollY + elemento.getBoundingClientRect().top - offsetSuperior;
+      this.scrollSuave(destino, 1000);
+    });
+  }
+
+  private scrollSuave(destino: number, duracion: number): void {
+    const inicio = window.scrollY;
+    const distancia = destino - inicio;
+    const tiempoInicio = performance.now();
+    const easeInOutCubic = (t: number) => (t < 0.5 ? 4 * t * t * t : 1 - Math.pow(-2 * t + 2, 3) / 2);
+    const animar = (ahora: number) => {
+      const progreso = Math.min((ahora - tiempoInicio) / duracion, 1);
+      window.scrollTo(0, inicio + distancia * easeInOutCubic(progreso));
+      if (progreso < 1) {
+        requestAnimationFrame(animar);
+      }
+    };
+    requestAnimationFrame(animar);
+  }
+
   registrar() {
 
     this.orTouched = true;
 
     if (!this.sinRecojo && !this.orVinculada) {
+      this.messageService.add({
+        severity: 'warn',
+        summary: 'Falta vincular OR',
+        detail: 'Debe vincular una Orden de Recojo o marcar "Sin recojo".',
+        life: 8000,
+      });
+      this.form.markAllAsTouched();
+      this.alertarCamposFaltantes();
       return;
     }
 
@@ -357,7 +460,7 @@ export class CrearotComponent implements OnInit {
         idusuarioregistro: this.user.id,
         etiquetas: [...this.etiquetas], // Agregar las etiquetas actualizadas al modelo
         guiasremitente: guiasRemitenteDto, // Enviar como List<GuiaGrrDto>
-        idotvinculada: this.orVinculada?.idordentrabajo ?? null
+        idorvinculada: this.orVinculada?.idordentrabajo ?? null
     };
 
 
@@ -423,6 +526,7 @@ export class CrearotComponent implements OnInit {
 }
 else {
   this.form.markAllAsTouched(); // Para mostrar los errores en todos los campos
+  this.alertarCamposFaltantes();
   return ;
 }
 
@@ -663,16 +767,16 @@ else {
            // this.load();
 
            this.clientes = [];
+           this.clientesTodos = [];
 
-           this.ordenTransporteService.getClientes(this.user.idscliente || '')
-                .subscribe((clientes) => {
-                  this.clientes = [...clientes.map((c: any) => ({
-                    value: c.idCliente,
-                    label: c.razonSocial
-                  }))];
-                });
-            
-                this.cdr.detectChanges(); // 👈 Forzar refresco
+           forkJoin({
+             clientes: this.mantenimientoService.getAllClientes('', this.user.id, true),
+             clientesTodos: this.mantenimientoService.getAllClientes('', this.user.id, null),
+           }).subscribe(({ clientes, clientesTodos }) => {
+             this.clientes = clientes.map((c: any) => ({ value: c.idCliente, label: c.razonSocial }));
+             this.clientesTodos = clientesTodos.map((c: any) => ({ value: c.idCliente, label: c.razonSocial }));
+             this.cdr.detectChanges(); // 👈 Forzar refresco
+           });
 
           }
         }); 
@@ -680,16 +784,33 @@ else {
 
 
   agregaretiqueta() {
+    if (!this.model.idtipoetiqueta) {
+      this.messageService.add({
+        severity: 'warn',
+        summary: 'Falta el tipo',
+        detail: 'Seleccione un tipo de etiqueta (Paleta o Bulto).'
+      });
+      return;
+    }
+    if (!this.model.cantidadetiqueta || this.model.cantidadetiqueta <= 0) {
+      this.messageService.add({
+        severity: 'warn',
+        summary: 'Falta la cantidad',
+        detail: 'Ingrese una cantidad mayor a 0.'
+      });
+      return;
+    }
 
-  if( this.model.idtipoetiqueta === 2) {
-      this.model.etiqueta = 'Bulto';
-  }
-  else {
-    this.model.etiqueta = 'Paleta';
-  }
+    const tipoLabel = this.model.idtipoetiqueta === 2 ? 'Bulto' : 'Paleta';
 
+    this.etiquetas.push({
+      idtipoetiqueta: this.model.idtipoetiqueta,
+      tipo: tipoLabel,
+      cantidad: this.model.cantidadetiqueta
+    });
 
-    this.etiquetas.push({ idtipoetiqueta: this.model.idtipoetiqueta, tipo: this.model.etiqueta , cantidad: this.model.cantidadetiqueta  });
+    this.model.idtipoetiqueta = null;
+    this.model.cantidadetiqueta = null;
   }
 
   eliminaretiqueta(index) {

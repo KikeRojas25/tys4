@@ -1,0 +1,24 @@
+/* Realza ligeramente la fila seleccionada en las tablas de esta pantalla.
+   Por defecto PrimeNG usa un azul muy tenue (~p-highlight). Lo reemplazamos por
+   un sky un poco más saturado + borde lateral marcado para mejor feedback. */
+
+:host ::ng-deep .p-datatable .p-datatable-tbody > tr.p-highlight {
+  background-color: rgb(186 230 253 / 0.55) !important; /* sky-200 a media saturación */
+  color: inherit;
+  box-shadow: inset 3px 0 0 0 rgb(14 165 233); /* sky-500 como guía lateral */
+}
+
+/* Dark mode */
+:host-context(.dark) ::ng-deep .p-datatable .p-datatable-tbody > tr.p-highlight {
+  background-color: rgb(14 165 233 / 0.15) !important;
+  box-shadow: inset 3px 0 0 0 rgb(56 189 248); /* sky-400 */
+}
+
+/* Hover sobre fila seleccionada — mantener resaltado un poco más fuerte */
+:host ::ng-deep .p-datatable .p-datatable-tbody > tr.p-highlight:hover {
+  background-color: rgb(186 230 253 / 0.75) !important;
+}
+
+:host-context(.dark) ::ng-deep .p-datatable .p-datatable-tbody > tr.p-highlight:hover {
+  background-color: rgb(14 165 233 / 0.25) !important;
+}

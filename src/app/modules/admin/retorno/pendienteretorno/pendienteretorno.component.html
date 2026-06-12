@@ -1,0 +1,159 @@
+<div class="flex flex-col flex-auto min-w-0">
+  <div class="flex flex-col sm:flex-row flex-0 sm:items-center sm:justify-between p-2 sm:py-8 sm:px-10 border-b border-gray-200 bg-white shadow-sm">
+    <div class="flex-1 min-w-0">
+      <div class="flex flex-wrap items-center font-medium text-sm text-gray-600">
+        <div>
+          <a class="whitespace-nowrap text-gray-700 hover:text-gray-900">TMS</a>
+        </div>
+        <div class="flex items-center ml-1 whitespace-nowrap">
+          <mat-icon class="fuse-horizontal-navigation-item-icon text-gray-400" [svgIcon]="'heroicons_solid:chevron-right'"></mat-icon>
+          <a class="ml-1 text-gray-500">Retorno</a>
+        </div>
+      </div>
+      <div class="mt-2">
+        <h2 class="text-3xl md:text-4xl font-semibold tracking-tight leading-7 sm:leading-10 truncate text-gray-900"> Pendiente de Retorno </h2>
+      </div>
+    </div>
+  </div>
+
+
+  <div class="flex flex-col min-w-0 w-full">
+
+    <p-tabView styleClass="tabview-custom">
+
+      <!--
+        ──────────────────────────────────────────────────────────────────
+        TAB "Ver Troncal" — comentado. Reactivar si se necesita el listado de hojas de ruta troncales.
+        ──────────────────────────────────────────────────────────────────
+      <p-tabPanel>
+        <ng-template pTemplate="header">
+          <div class="flex align-items-center gap-2">
+            <i class="fa fa-truck"></i>
+            <span class="font-bold white-space-nowrap m-0">Ver Troncal</span>
+          </div>
+        </ng-template>
+        ...
+      </p-tabPanel>
+      -->
+
+      <p-tabPanel>
+        <ng-template pTemplate="header">
+          <div class="flex align-items-center gap-2">
+            <i class="fa fa-bus"></i>
+            <span class="font-bold white-space-nowrap m-0">
+              Ver Repartidores
+            </span>
+          </div>
+        </ng-template>
+
+        <p-panel [showHeader]="false">
+
+          <!-- Filtros -->
+          <div class="flex flex-wrap gap-2 items-end mb-3 p-2 bg-gray-50 rounded-md border border-gray-200">
+            <div class="flex flex-col">
+              <label class="text-xs text-gray-600 mb-1">Provincia</label>
+              <input pInputText
+                     [(ngModel)]="filtroProvincia"
+                     (ngModelChange)="aplicarFiltros()"
+                     placeholder="Buscar por provincia"
+                     class="text-sm" />
+            </div>
+            <div class="flex flex-col">
+              <label class="text-xs text-gray-600 mb-1">Proveedor</label>
+              <input pInputText
+                     [(ngModel)]="filtroProveedor"
+                     (ngModelChange)="aplicarFiltros()"
+                     placeholder="Buscar por proveedor"
+                     class="text-sm" />
+            </div>
+            <button pButton type="button"
+                    label="Limpiar"
+                    icon="pi pi-times"
+                    class="p-button-sm p-button-secondary"
+                    (click)="limpiarFiltros()">
+            </button>
+          </div>
+
+          <p-table [columns]="cols2" dataKey="iddepartamento"
+                   [value]="ordenes2Filtradas"
+                   sortField="zona"
+                   class="tabla-chica"
+                   selectionMode="single"
+                   [tableStyle]="{ 'table-layout': 'fixed', 'width': '100%' }"
+                   scrollable="true" [scrollHeight]="'600px'"
+                   [rows]="20" [responsive]="true">
+
+            <ng-template pTemplate="header" let-columns>
+              <tr>
+                <th *ngFor="let col of columns" [ngStyle]="{'width': col.width}" [pSortableColumn]="col.field">
+                  {{col.header}}
+                </th>
+              </tr>
+            </ng-template>
+
+            <ng-template pTemplate="body" let-rowData>
+              <tr [pSelectableRow]="rowData">
+                <td class="text-left">
+                  <p-button icon="pi pi-search" severity="success"
+                            (click)="verRepartidor(rowData.idproveedor, rowData.iddepartamento)"
+                            size="small"></p-button>
+                </td>
+
+                <td class="text-left">{{ rowData.departamento }}</td>
+                <td class="text-left">{{ rowData.repartidor }}</td>
+
+                <!--
+                  Columnas comentadas — preservadas por si vuelven a habilitarse.
+                  Recepción:
+                  <td class="text-center">{{ rowData.cantidad_recepcion }}</td>
+                  <td class="text-center">{{ rowData.peso_recepcion | number:'1.0-0' }}</td>
+                  <td class="text-center">{{ rowData.bulto_recepcion }}</td>
+
+                  Recojo:
+                  <td class="text-center">{{ rowData.cantidad_recojo }}</td>
+                  <td class="text-center">{{ rowData.peso_recojo | number:'1.0-0' }}</td>
+                  <td class="text-center">{{ rowData.bulto_recojo }}</td>
+
+                  Entrega:
+                  <td class="text-center">{{ rowData.cantidad_enreparto }}</td>
+                  <td class="text-center">{{ rowData.peso_enreparto | number:'1.0-0' }}</td>
+                  <td class="text-center">{{ rowData.bulto_enreparto }}</td>
+                -->
+
+                <td class="text-center">{{ rowData.cantidad_recabarcargo }}</td>
+                <td class="text-center">{{ rowData.cantidad_enviocargo }}</td>
+
+                <!--
+                  Observadas:
+                  <td class="text-center">{{ rowData.cantidad_observadas }}</td>
+                  <td class="text-center">{{ rowData.cantidad_observadas }}</td>
+                -->
+
+              </tr>
+            </ng-template>
+
+          </p-table>
+
+        </p-panel>
+      </p-tabPanel>
+
+      <!--
+        ──────────────────────────────────────────────────────────────────
+        TAB "Ver Estaciones" — comentado. Reactivar si se necesita el resumen por estación.
+        ──────────────────────────────────────────────────────────────────
+      <p-tabPanel>
+        <ng-template pTemplate="header">
+          <div class="flex align-items-center gap-2">
+            <i class="fa fa-map-marker"></i>
+            <span class="font-bold white-space-nowrap m-0">Ver Estaciones</span>
+          </div>
+        </ng-template>
+        ...
+      </p-tabPanel>
+      -->
+
+    </p-tabView>
+
+  </div>
+
+</div>

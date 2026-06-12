@@ -57,7 +57,7 @@ export class NewComponent implements OnInit {
       idmonedalinea: [1],
       pagocontado:          [false],
       activo:               [true],
-      tieneventasultimoano: [true],
+      tieneventasultimoano: [false],
     });
   }
 

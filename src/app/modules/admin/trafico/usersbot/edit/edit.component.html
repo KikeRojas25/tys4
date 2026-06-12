@@ -1,0 +1,84 @@
+<div class="usersbot-edit">
+  <p-toast />
+
+  <form [formGroup]="form" (ngSubmit)="guardar()">
+    <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+      <!-- Perfil -->
+      <div class="flex flex-col">
+        <label class="mb-1 font-medium text-sm text-gray-700">Perfil <span class="text-red-500">*</span></label>
+        <p-dropdown
+          formControlName="idperfil"
+          [options]="perfiles"
+          placeholder="Seleccione perfil"
+          appendTo="body"
+          [style]="{'width':'100%'}"
+          [showClear]="true">
+        </p-dropdown>
+        <small *ngIf="form.controls['idperfil'].invalid && form.controls['idperfil'].touched"
+               class="text-red-500 text-xs mt-1">Perfil requerido</small>
+      </div>
+
+      <!-- DNI -->
+      <div class="flex flex-col">
+        <label class="mb-1 font-medium text-sm text-gray-700">DNI</label>
+        <input pInputText type="text" formControlName="dni" maxlength="15" />
+      </div>
+
+      <!-- Nombre -->
+      <div class="flex flex-col">
+        <label class="mb-1 font-medium text-sm text-gray-700">Nombre <span class="text-red-500">*</span></label>
+        <input pInputText type="text" formControlName="nombre" maxlength="100" />
+        <small *ngIf="form.controls['nombre'].invalid && form.controls['nombre'].touched"
+               class="text-red-500 text-xs mt-1">Nombre requerido</small>
+      </div>
+
+      <!-- Apellido -->
+      <div class="flex flex-col">
+        <label class="mb-1 font-medium text-sm text-gray-700">Apellido <span class="text-red-500">*</span></label>
+        <input pInputText type="text" formControlName="apellido" maxlength="100" />
+        <small *ngIf="form.controls['apellido'].invalid && form.controls['apellido'].touched"
+               class="text-red-500 text-xs mt-1">Apellido requerido</small>
+      </div>
+
+      <!-- Teléfono -->
+      <div class="flex flex-col sm:col-span-2">
+        <label class="mb-1 font-medium text-sm text-gray-700">Teléfono <span class="text-red-500">*</span></label>
+        <input
+          pInputText
+          type="text"
+          formControlName="telefono"
+          maxlength="12"
+          placeholder="+51XXXXXXXXX"
+          (input)="onTelefonoInput($event)" />
+        <small *ngIf="form.controls['telefono'].invalid && form.controls['telefono'].touched"
+               class="text-red-500 text-xs mt-1">
+          Formato inválido. Debe ser +51 seguido de 9 dígitos (ej. +51963966545).
+        </small>
+        <small *ngIf="form.controls['telefono'].valid"
+               class="text-gray-500 text-xs mt-1">
+          Formato: +51 seguido de 9 dígitos.
+        </small>
+      </div>
+    </div>
+
+    <div class="flex justify-end gap-2 mt-6 pt-4 border-t border-gray-200">
+      <button
+        type="button"
+        pButton
+        class="px-4 py-2 text-sm font-medium text-gray-700 bg-gray-200 hover:bg-gray-300 rounded-md"
+        label="Cancelar"
+        icon="pi pi-times"
+        [disabled]="loading"
+        (click)="cancelar()">
+      </button>
+      <button
+        type="submit"
+        pButton
+        class="px-4 py-2 text-sm font-medium text-white bg-green-600 hover:bg-green-500 rounded-md"
+        [label]="esEdicion ? 'Actualizar' : 'Guardar'"
+        icon="pi pi-check"
+        [disabled]="loading">
+      </button>
+    </div>
+  </form>
+</div>

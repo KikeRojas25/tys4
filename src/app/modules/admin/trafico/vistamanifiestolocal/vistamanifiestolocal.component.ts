@@ -162,7 +162,12 @@ export class VistamanifiestoLocalComponent {
         this.traficoService
             .getAllOrdersForHojaRuta(this.id)
             .subscribe((list) => {
-                this.despachos = list;
+                // Ordenar por hora de cita ascendente; los que no tienen cita van al final.
+                this.despachos = (list ?? []).slice().sort((a: any, b: any) => {
+                    const ta = a?.fechaHoraCita ? new Date(a.fechaHoraCita).getTime() : Number.POSITIVE_INFINITY;
+                    const tb = b?.fechaHoraCita ? new Date(b.fechaHoraCita).getTime() : Number.POSITIVE_INFINITY;
+                    return ta - tb;
+                });
                 this.model.nombrechofer = this.despachos[0].chofer;
                 this.model.numHojaRuta = this.despachos[0].numHojaRuta;
                 this.model.placa = this.despachos[0].placa;
@@ -206,33 +211,42 @@ export class VistamanifiestoLocalComponent {
 
     reasignarPlaca() {
       if (!this.selectedOTs || !this.selectedOTs.idordentrabajo) {
-        this.messageService.add({     
+        this.messageService.add({
           severity: 'warn',
           summary: 'Tráfico',
           detail: 'Debe seleccionar un manifiesto',
         });
         return;
-      }   
+      }
 
+      const ref = this.dialogService.open(DialogReasignarMobileLocalComponent, {
+        header: 'Reasignar Móvil',
+        width: '400px',
+        data: {
+          idordentrabajo: this.selectedOTs.idordentrabajo,
+          placaActual:    this.orden?.placa,
+        }
+      });
 
+      ref.onClose.subscribe((result: { ok: boolean; message?: string } | undefined) => {
+        if (!result) return; // usuario cerró sin guardar
 
-          const ref = this.dialogService.open(DialogReasignarMobileLocalComponent, {
-              header: 'Reasignar Móvil',
-              width: '400px',
-              data: {
-                placaActual: this.orden?.placa  // si ya tiene una asignada
-              }
-            });
-
-            ref.onClose.subscribe((placaSeleccionada) => {
-              if (placaSeleccionada) {
-                console.log('Placa asignada:', placaSeleccionada);
-                // 🔹 Aquí llamas a tu servicio para guardar la asignación
-                // this.comercialService.asignarMovil(this.id, placaSeleccionada).subscribe(...)
-              }
-            });
-
-
+        if (result.ok) {
+          this.messageService.add({
+            severity: 'success',
+            summary: 'Tráfico',
+            detail: 'Móvil reasignado correctamente',
+          });
+          this.reloadDetalles();
+        } else {
+          this.messageService.add({
+            severity: 'error',
+            summary: 'Tráfico',
+            detail: result.message ?? 'No se pudo reasignar el móvil',
+            life: 6000,
+          });
+        }
+      });
     }
 reprogramarArribos(): void {
   if (!this.selectedOTs || !this.selectedOTs.idordentrabajo) {

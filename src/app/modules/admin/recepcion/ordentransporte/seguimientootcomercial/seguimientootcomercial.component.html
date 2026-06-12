@@ -8,7 +8,7 @@
         </div>
         <div class="flex items-center ml-1 whitespace-nowrap">
           <mat-icon class="fuse-horizontal-navigation-item-icon text-gray-400" [svgIcon]="'heroicons_solid:chevron-right'"></mat-icon>
-          <a class="ml-1 text-gray-700 hover:text-gray-900">Recepción</a>
+          <a class="ml-1 text-gray-500">Comercial</a>
         </div>
       </div>
       <div class="mt-2">
@@ -116,19 +116,6 @@
             </p-dropdown>
           </div>
 
-          <!-- Agrupar por -->
-          <div class="flex flex-col">
-            <label class="mb-1">Agrupar por:</label>
-            <p-dropdown name="agrupacion" [options]="opcionesAgrupacion" appendTo="body"
-                        [(ngModel)]="groupByField" [style]="{'width':'100%'}"
-                        (onChange)="onChangeAgrupacion()">
-              <ng-template let-item pTemplate="selectedItem">
-                <span>{{ item.label }}</span>
-              </ng-template>
-            </p-dropdown>
-          </div>
-     
-
         <!-- Botones -->
         <div class="flex flex-col mt-4">
           <button 
@@ -160,22 +147,20 @@
         <p class="text-sm text-amber-300 mt-1.5">Lista de órdenes de transporte encontradas</p>
       </div> -->
       <div class="p-6">
-        <p-table 
-          [value]="ordenesParaGrilla" 
-          [paginator]="!groupByField" 
-          [rows]="60" 
-          [rowsPerPageOptions]="[60,120,320]" 
-          [columns]="cols" 
+        <p-table
+          [value]="ordenesParaGrilla"
+          [paginator]="true"
+          [rows]="60"
+          [rowsPerPageOptions]="[60,120,320]"
+          [columns]="cols"
           scrollHeight="80vh"
-          [resizableColumns]="true" 
+          [resizableColumns]="true"
           [tableStyle]="{ 'table-layout': 'fixed', 'width': '100%' }"
-          [scrollable]="true" 
-          [selection]="selected" 
-          selectionMode="multiple" 
+          [scrollable]="true"
+          [selection]="selected"
+          selectionMode="multiple"
           [(selection)]="selected"
           [styleClass]="'custom-table'"
-          [rowGroupMode]="groupByField ? 'subheader' : null"
-          [groupRowsBy]="groupByField || undefined"
           class="w-full">
 
         <!-- Column Definitions -->
@@ -196,41 +181,9 @@
           </tr>
         </ng-template>
 
-        <!-- Group Header (cuando hay agrupación) -->
-        <ng-template pTemplate="groupheader" let-rowData let-rowIndex="rowIndex">
-          <tr class="group-header-row">
-            <td [attr.colspan]="cols.length" class="group-header-cell">
-              <button
-                type="button"
-                pButton
-                pRipple
-                class="p-button-text p-button-rounded p-button-plain mr-2"
-                [icon]="isGroupExpanded(groupByField === 'provinciaDisplay' ? rowData.provinciaDisplay : rowData.destino) ? 'pi pi-chevron-down' : 'pi pi-chevron-right'"
-                (click)="toggleGroup(groupByField === 'provinciaDisplay' ? rowData.provinciaDisplay : rowData.destino)">
-              </button>
-              <span class="font-semibold text-gray-800">{{ groupByField === 'provinciaDisplay' ? rowData.provinciaDisplay : rowData.destino }}</span>
-            </td>
-          </tr>
-        </ng-template>
-
         <!-- Table Body -->
         <ng-template pTemplate="body" let-rowData let-columns="columns">
-          <!-- Fila colapsada: mostrar "Ver X items" con botón expandir -->
-          <tr *ngIf="rowData._groupCollapsed" class="border-b border-gray-100 hover:bg-gray-50 transition-colors duration-150 group-collapsed-row">
-            <td [attr.colspan]="cols.length" class="px-4 py-2 text-gray-500 text-sm">
-              <button
-                type="button"
-                pButton
-                pRipple
-                class="p-button-text p-button-rounded p-button-plain mr-2"
-                icon="pi pi-chevron-right"
-                (click)="toggleGroup(groupByField === 'provinciaDisplay' ? rowData.provinciaDisplay : rowData.destino)">
-              </button>
-              {{ rowData._groupCount }} {{ rowData._groupCount === 1 ? 'item' : 'items' }} — clic para expandir
-            </td>
-          </tr>
-          <!-- Fila normal -->
-          <tr *ngIf="!rowData._groupCollapsed" [pSelectableRow]="rowData" class="border-b border-gray-100 hover:bg-gray-50 transition-colors duration-150">
+          <tr [pSelectableRow]="rowData" class="border-b border-gray-100 hover:bg-gray-50 transition-colors duration-150">
             <!-- Acción -->
 
             

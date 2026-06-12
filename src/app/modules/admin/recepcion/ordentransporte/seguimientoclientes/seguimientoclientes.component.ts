@@ -18,6 +18,7 @@ import { Table, TableModule } from 'primeng/table';
 import { TimelineModule } from 'primeng/timeline';
 import { ToastModule } from 'primeng/toast';
 import { OrdenTransporteService } from '../ordentransporte.service';
+import { MantenimientoService } from '../../../mantenimiento/mantenimiento.service';
 import { OrdenTransporte } from '../ordentransporte.types';
 import { FileModalComponent } from '../seguimientoot/modalfiles';
 import { DynamicDialogModule } from 'primeng/dynamicdialog';
@@ -117,9 +118,10 @@ clientes: SelectItem[] = [];
 @ViewChild('dt') dt: Table | undefined;
 
   constructor(private ordenTransporteService: OrdenTransporteService,
+              private mantenimientoService: MantenimientoService,
               public dialogService: DialogService,
               private router: Router,
-              
+
               private confirmationService: ConfirmationService,
               public messageService: MessageService
               ) { }
@@ -188,7 +190,7 @@ clientes: SelectItem[] = [];
     };
     this.exportColumns = this.cols.map((col) => ({ title: col.header, dataKey: col.field }));
 
-    this.ordenTransporteService.getClientes(this.user.idscliente).subscribe(resp => {
+    this.mantenimientoService.getAllClientes('', this.user.id, true).subscribe(resp => {
         this.clientes.push({ value: 0,  label : 'TODOS LOS CLIENTES'});
         resp.forEach(element => {
             this.clientes.push({ value: element.idCliente ,  label : element.razonSocial});

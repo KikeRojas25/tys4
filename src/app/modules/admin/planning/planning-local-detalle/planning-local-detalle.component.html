@@ -1,141 +1,220 @@
-<div class="w-full">
-  <div class="p-4 border border-primary rounded-lg shadow-lg">
-    <div class="p-2 font-bold text-lg border-b bg-primary-50">Detalle de Despachos</div>
+<div class="flex flex-col flex-auto min-w-0 bg-gray-50 dark:bg-gray-900">
 
-    <div class="p-4">
-      <!-- Botones de acciones -->
-      <div class="flex mb-4 gap-2">
-        <p-button icon="pi pi-arrow-left" label="Volver" severity="secondary" (click)="volver()"></p-button>
-        <p-button icon="pi pi-save" label="Vincular Tipo de Operación" severity="danger" (click)="vinculartipooperacion()"></p-button>
+  <!-- Cabecera compacta -->
+  <header class="flex flex-col sm:flex-row sm:items-end sm:justify-between px-6 py-4 bg-white dark:bg-gray-800 border-b border-gray-200 dark:border-gray-700">
+    <div>
+      <nav class="flex items-center text-xs text-gray-500 dark:text-gray-400">
+        <span>TMS</span>
+        <mat-icon class="text-gray-400 mx-1" style="font-size:14px;width:14px;height:14px" [svgIcon]="'heroicons_solid:chevron-right'"></mat-icon>
+        <a class="cursor-pointer hover:text-gray-700" (click)="volver()">Planificación</a>
+        <mat-icon class="text-gray-400 mx-1" style="font-size:14px;width:14px;height:14px" [svgIcon]="'heroicons_solid:chevron-right'"></mat-icon>
+        <span>Detalle</span>
+      </nav>
+      <h1 class="mt-1 text-xl sm:text-2xl font-semibold text-gray-900 dark:text-gray-100 tracking-tight">
+        Detalle de Despachos
+      </h1>
+    </div>
+
+    <div class="flex flex-wrap items-center gap-2 mt-3 sm:mt-0">
+      <p-button
+        icon="pi pi-arrow-left"
+        label="Volver"
+        severity="secondary"
+        [text]="true"
+        size="small"
+        (click)="volver()"
+      ></p-button>
+      <p-button
+        icon="pi pi-link"
+        label="Vincular Tipo de Operación"
+        severity="primary"
+        size="small"
+        (click)="vinculartipooperacion()"
+      ></p-button>
+    </div>
+  </header>
+
+  <!-- Contenido principal -->
+  <div class="max-w-screen-2xl w-full mx-auto px-4 sm:px-6 py-6 space-y-6">
+
+    <!-- Tabla de despachos -->
+    <section class="bg-white dark:bg-gray-800 rounded-lg shadow-sm border border-gray-200 dark:border-gray-700">
+      <div class="flex flex-wrap items-center justify-between gap-2 px-5 py-3 border-b border-gray-200 dark:border-gray-700">
+        <h2 class="text-sm font-semibold text-gray-700 dark:text-gray-200 uppercase tracking-wide">
+          Órdenes asignadas
+        </h2>
+        <span class="text-xs text-gray-500 dark:text-gray-400" *ngIf="ordenes11?.length">
+          {{ ordenes11.length }} {{ ordenes11.length === 1 ? 'orden' : 'órdenes' }}
+        </span>
       </div>
 
-      <!-- Tabla -->
-      <p-table #dt2 [columns]="cols2"
-               [value]="ordenes11"
-               dataKey="idordentrabajo"
-               class="w-full"
-               editMode="row"
-               selectionMode="multiple"
-               [(selection)]="selectedOTs"
-               [rows]="120"
-               [rowsPerPageOptions]="[120,240,480,1200]"
-               scrollable="true" [scrollHeight]="'400px'"
-               [globalFilterFields]="['destino','numcp']">
+      <div class="p-4">
+        <p-table
+          [columns]="cols2"
+          [value]="ordenes11"
+          dataKey="idordentrabajo"
+          editMode="row"
+          selectionMode="multiple"
+          [(selection)]="selectedOTs"
+          paginator="true"
+          [rows]="10"
+          [rowsPerPageOptions]="[10, 20, 50, 100, 200]"
+          styleClass="p-datatable-sm"
+          [tableStyle]="{ 'table-layout': 'fixed', 'width': '100%' }"
+          class="w-full"
+        >
+          <!-- Cabecera -->
+          <ng-template pTemplate="header">
+            <tr class="text-xs uppercase tracking-wide text-gray-500 dark:text-gray-400 bg-gray-50 dark:bg-gray-700">
+              <th class="px-3 py-1 text-center font-medium" style="width: 110px">Acciones</th>
+              <th class="px-3 py-1 text-center font-medium" style="width: 100px">H. Programada</th>
+              <th class="px-3 py-1 text-center font-medium" style="width: 80px">H. Cita</th>
+              <th class="px-3 py-1 text-left font-medium" style="width: 200px">Razón Social</th>
+              <th class="px-3 py-1 text-left font-medium" style="width: 170px">Sede</th>
+              <th class="px-3 py-1 text-left font-medium" style="width: 140px">Tipo Operación</th>
+              <th class="px-3 py-1 text-left font-medium" style="width: 130px">Distrito</th>
+              <th class="px-3 py-1 text-left font-medium" style="width: 110px">N° OT</th>
+              <th class="px-3 py-1 text-center font-medium" style="width: 90px">R/E</th>
+              <th class="px-3 py-1 text-right font-medium" style="width: 70px">Bultos</th>
+              <th class="px-3 py-1 text-right font-medium" style="width: 80px">Peso</th>
+              <th class="px-3 py-1 text-right font-medium" style="width: 80px">Secuencia</th>
+            </tr>
+          </ng-template>
 
-        <!-- Filtro global -->
-        <ng-template pTemplate="caption">
-          <div class="flex justify-end">
-            <span class="p-input-icon-left">
-              <input pInputText type="text"
-                     (input)="dt2.filterGlobal($event.target.value, 'contains')"
-                     placeholder="Buscar..." class="input input-sm" />
-            </span>
-          </div>
-        </ng-template>
+          <!-- Cuerpo -->
+          <ng-template pTemplate="body" let-rowData let-editing="editing" let-rowIndex="rowIndex">
+            <tr [pEditableRow]="rowData" [pSelectableRow]="rowData" class="hover:bg-gray-50 dark:hover:bg-gray-700/40 transition-colors text-sm">
+              <!-- Acciones -->
+              <td class="px-3 py-1 text-center">
+                <div class="flex items-center justify-center gap-0.5">
+                  <button *ngIf="!editing"
+                          pButton pRipple type="button"
+                          pInitEditableRow
+                          icon="pi pi-pencil"
+                          (click)="onRowEditInit(rowData)"
+                          class="p-button-rounded p-button-text p-button-sm !p-1 !w-7 !h-7"
+                          pTooltip="Editar">
+                  </button>
+                  <button *ngIf="editing"
+                          pButton pRipple type="button"
+                          pSaveEditableRow
+                          icon="pi pi-check"
+                          (click)="onRowEditSave(rowData)"
+                          class="p-button-rounded p-button-text p-button-success p-button-sm !p-1 !w-7 !h-7"
+                          pTooltip="Guardar">
+                  </button>
+                  <button *ngIf="editing"
+                          pButton pRipple type="button"
+                          pCancelEditableRow
+                          icon="pi pi-times"
+                          (click)="onRowEditCancel(rowData, rowIndex)"
+                          class="p-button-rounded p-button-text p-button-danger p-button-sm !p-1 !w-7 !h-7"
+                          pTooltip="Cancelar">
+                  </button>
+                  <p-button icon="pi pi-trash"
+                            severity="danger"
+                            [text]="true"
+                            size="small"
+                            styleClass="!p-1 !w-7 !h-7"
+                            pTooltip="Desasignar"
+                            (click)="desasignarOT(rowData.idordentrabajo)">
+                  </p-button>
+                </div>
+              </td>
 
-        <!-- Cabecera -->
-        <ng-template pTemplate="header" let-columns>
-          <tr>
-            <th class="text-center p-2 border-b">Acciones</th>
-            <th class="text-center p-2 border-b">Hora Programada</th>
-            <th class="text-center p-2 border-b">Hora Cita</th>
-            <th class="text-center p-2 border-b">Razón Social</th>
-            <th class="text-center p-2 border-b">Sede</th>
-            <th class="text-center p-2 border-b">Tipo Operación</th>
-            <th class="text-center p-2 border-b">Distrito</th>
-            <th class="text-center p-2 border-b">Num CP</th>
-            <th class="text-center p-2 border-b">Operación</th>
-            <th class="text-center p-2 border-b">Bultos</th>
-            <th class="text-center p-2 border-b">Peso</th>
-            <th class="text-center p-2 border-b">Secuencia</th>
-          </tr>
-        </ng-template>
+              <!-- Hora programada (editable) -->
+              <td pEditableColumn class="px-3 py-1 text-center text-gray-800 dark:text-gray-200 tabular-nums">
+                <p-cellEditor>
+                  <ng-template pTemplate="input">
+                    <p-calendar [(ngModel)]="rowData.horaProgramada"
+                                [timeOnly]="true"
+                                appendTo="body"
+                                [showIcon]="true"
+                                hourFormat="24"
+                                inputStyleClass="w-full text-sm px-2 py-1">
+                    </p-calendar>
+                  </ng-template>
+                  <ng-template pTemplate="output">
+                    {{ formatHora(rowData.horaProgramada) }}
+                  </ng-template>
+                </p-cellEditor>
+              </td>
 
-        <!-- Cuerpo -->
-        <ng-template pTemplate="body" let-rowData let-editing="editing" let-rowIndex="rowIndex">
-          <tr [pEditableRow]="rowData" [pSelectableRow]="rowData">
-            <!-- Botones de edición -->
-            <td class="p-2 border text-center">
-              <button *ngIf="!editing"
-                      pButton pRipple type="button"
-                      pInitEditableRow
-                      icon="pi pi-pencil"
-                      (click)="onRowEditInit(rowData)"
-                      class="p-button-rounded p-button-text">
-              </button>
+              <!-- Hora Cita -->
+              <td class="px-3 py-1 text-center text-gray-700 dark:text-gray-300 tabular-nums">
+                {{ rowData.horacita || '—' }}
+              </td>
 
-              <button *ngIf="editing"
-                      pButton pRipple type="button"
-                      pSaveEditableRow
-                      icon="pi pi-check"
-                      (click)="onRowEditSave(rowData)"
-                      class="p-button-rounded p-button-text p-button-success mr-2">
-              </button>
+              <!-- Cliente -->
+              <td class="px-3 py-1 text-gray-800 dark:text-gray-200 truncate" [title]="rowData.razonsocial">
+                {{ rowData.razonsocial | titlecase }}
+              </td>
 
-              <button *ngIf="editing"
-                      pButton pRipple type="button"
-                      pCancelEditableRow
-                      icon="pi pi-times"
-                      (click)="onRowEditCancel(rowData, rowIndex)"
-                      class="p-button-rounded p-button-text p-button-danger">
-              </button>
+              <!-- Sede -->
+              <td class="px-3 py-1 text-gray-700 dark:text-gray-300 truncate" [title]="rowData.sede">
+                {{ rowData.sede | titlecase }}
+              </td>
 
-              <p-button icon="pi pi-trash"
-                        severity="secondary"
-                        size="small"
-                        (click)="desasignarOT(rowData.idordentrabajo)">
-              </p-button>
-            </td>
+              <!-- Tipo Operación -->
+              <td class="px-3 py-1 text-gray-700 dark:text-gray-300 truncate" [title]="rowData.tipooperacion">
+                {{ rowData.tipooperacion }}
+              </td>
 
-            <!-- Campo editable: horaProgramada -->
-            <td pEditableColumn [editable]="false" class="p-2 border">
-              <p-cellEditor>
-                <ng-template pTemplate="input">
-                  <p-calendar [(ngModel)]="rowData.horaProgramada"
-                              [timeOnly]="true"
-                              appendTo="body"
-                              [showIcon]="true"
-                              hourFormat="24"
-                              inputStyleClass="w-full text-sm px-2 py-1">
-                  </p-calendar>
-                </ng-template>
-               <ng-template pTemplate="output">
-               {{ formatHora(rowData.horaProgramada) }}
-              </ng-template>
-              </p-cellEditor>
-            </td>
+              <!-- Distrito -->
+              <td class="px-3 py-1 text-gray-700 dark:text-gray-300 truncate" [title]="rowData.distrito">
+                {{ rowData.distrito | titlecase }}
+              </td>
 
-            <!-- Hora Cita (solo lectura) -->
-            <td class="p-2 border text-center">
-              {{ rowData.horacita }}
-            </td>
+              <!-- N° OT (chip) -->
+              <td class="px-3 py-1">
+                <span class="inline-block font-mono text-xs px-2 py-0.5 rounded bg-sky-50 text-sky-700 dark:bg-sky-900/30 dark:text-sky-300 border border-sky-200 dark:border-sky-800">
+                  {{ rowData.numcp }}
+                </span>
+              </td>
 
-            <!-- Otras columnas -->
-            <td class="p-2 border">{{ rowData.razonsocial }}</td>
-            <td class="p-2 border">{{ rowData.sede }}</td>
-            <td class="p-2 border text-center">{{ rowData.tipooperacion }}</td>
-            <td class="p-2 border text-center">{{ rowData.distrito }}</td>
-            <td class="p-2 border text-center">{{ rowData.numcp }}</td>
-            <td class="p-2 border text-center">{{ (rowData.numcp.includes('OR') ? 'RECOJO' : 'ENTREGA') }}</td>
-            <td class="p-2 border text-center">{{ rowData.bulto }}</td>
-            <td class="p-2 border text-center">{{ rowData.peso | number:'1.0-2' }}</td>
-            <td class="p-2 border text-center">{{ rowData.secuencia }}</td>
-          </tr>
-        </ng-template>
+              <!-- R/E (badge) -->
+              <td class="px-3 py-1 text-center">
+                <span
+                  class="inline-block text-[10px] uppercase tracking-wide px-2 py-0.5 rounded-full border"
+                  [ngClass]="rowData.numcp.includes('OR')
+                    ? 'bg-amber-50 text-amber-700 border-amber-200 dark:bg-amber-900/30 dark:text-amber-300 dark:border-amber-800'
+                    : 'bg-emerald-50 text-emerald-700 border-emerald-200 dark:bg-emerald-900/30 dark:text-emerald-300 dark:border-emerald-800'">
+                  {{ rowData.numcp.includes('OR') ? 'Recojo' : 'Entrega' }}
+                </span>
+              </td>
 
-        <!-- Pie con totales -->
-        <ng-template pTemplate="footer">
-          <tr>
-            <td colspan="9" class="text-right font-bold">Totales</td>
-            <td class="text-center">{{ bultosTotal | number:'1.0-2' }}</td>
-            <td class="text-center">{{ pesoTotal | number:'1.0-2' }}</td>
-            <td></td>
-          </tr>
-        </ng-template>
-      </p-table>
-    </div>
+              <td class="px-3 py-1 text-right tabular-nums text-gray-700 dark:text-gray-200">{{ rowData.bulto }}</td>
+              <td class="px-3 py-1 text-right tabular-nums text-gray-700 dark:text-gray-200">{{ rowData.peso | number:'1.0-2' }}</td>
+              <td class="px-3 py-1 text-right tabular-nums text-gray-600 dark:text-gray-300">{{ rowData.secuencia }}</td>
+            </tr>
+          </ng-template>
+
+          <!-- Empty state -->
+          <ng-template pTemplate="emptymessage">
+            <tr>
+              <td colspan="12" class="py-8 text-center text-gray-400 dark:text-gray-500">
+                <i class="pi pi-inbox text-2xl block mb-1 opacity-50"></i>
+                <p class="text-sm">No hay órdenes asignadas a esta carga.</p>
+              </td>
+            </tr>
+          </ng-template>
+
+          <!-- Pie con totales -->
+          <ng-template pTemplate="footer">
+            <tr class="bg-gray-50 dark:bg-gray-700/40 text-sm">
+              <td colspan="9" class="px-3 py-2 text-right font-medium text-gray-600 dark:text-gray-300">Totales</td>
+              <td class="px-3 py-2 text-right font-semibold tabular-nums text-gray-800 dark:text-gray-100">{{ bultosTotal | number:'1.0-2' }}</td>
+              <td class="px-3 py-2 text-right font-semibold tabular-nums text-gray-800 dark:text-gray-100">{{ pesoTotal | number:'1.0-2' }}</td>
+              <td></td>
+            </tr>
+          </ng-template>
+        </p-table>
+      </div>
+    </section>
+
   </div>
-</div>
 
-<p-confirmDialog header="Confirmación" icon="pi pi-exclamation-triangle"></p-confirmDialog>
-<p-toast></p-toast>
+  <!-- Diálogos y Toasts -->
+  <p-confirmDialog header="Confirmación" icon="pi pi-exclamation-triangle"></p-confirmDialog>
+  <p-toast [baseZIndex]="10000" position="top-right"></p-toast>
+</div>

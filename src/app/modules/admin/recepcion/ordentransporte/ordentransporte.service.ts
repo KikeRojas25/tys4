@@ -37,15 +37,16 @@ export class OrdenTransporteService {
   private _authenticated: boolean = false;
   private _httpClient = inject(HttpClient);
   private _userService = inject(UserService);
+  
   public jwtHelper = new JwtHelperService();
   private decodedToken: any;
 
 
   private baseUrl = environment.baseUrl + '/api/Trafico/';
   private baseMantenimientoUrl = environment.baseUrl + '/api/Mantenimiento/';
-  private baseUrlCliente = environment.baseUrl + '/api/Cliente/';
   private baseUrlOrden = environment.baseUrl + '/api/Orden/';
   private baseUrlPlanning = environment.baseUrl + '/api/Planning/';
+  
 
 
 
@@ -60,12 +61,7 @@ private handleError(error: HttpErrorResponse) {
 getUbigeo(criterio): Observable<Ubigeo[]> {
   return this._httpClient.get<Ubigeo[]>(`${this.baseMantenimientoUrl}GetListUbigeo?criterio=${criterio}`  , httpOptions);
 }
-getClientes(criterio: any): Observable<Cliente[]> {
-  if (criterio === undefined) {
-    criterio = '';
-  }
-  return this._httpClient.get<Cliente[]>(`${this.baseUrlCliente}GetAllClients?idscliente=${criterio}`   , httpOptions);
-}
+
 getValorTabla(TablaId: number): Observable<ValorTabla[]> {
   return this._httpClient.get<ValorTabla[]>(`${this.baseMantenimientoUrl}GetAllValorTabla?TablaId=${TablaId}` , httpOptions);
 }
@@ -246,7 +242,7 @@ actualizarOTR(model: any): Observable<OrdenTransporte> {
 }
 GetAllOrdersDetailDistrito(idestacionorigen: number, model: any) {
   return this._httpClient.get<OrdenTransporte[]>(this.baseUrlOrden + 'GetAllOrdersDetailDistrito?idestacionorigen=' + idestacionorigen + '&iddistrito=' + model.id
- + '&fecini=' + model.fechainicio + '&fecfin=' + model.fechafin , httpOptions);
+ + '&fecha=' + (model.fecha ?? '') , httpOptions);
 }
 GetAllCargasTemporalTrafico(tipo: number, idEstacion: number) {
   const url = `${this.baseUrlOrden}GetAllCargasTemporalTrafico?tipoOperacionCarga=${tipo}&idestacion=${idEstacion}`;
@@ -346,6 +342,45 @@ AsignarOtsCarga(idprovincia: string, idcarga: number) {
       params: { numcp: numcp?.trim() || '' },
       ...httpOptions
     });
+  }
+
+  getRetornoDocumentario(params: {
+    grr?: string | null;
+    numcp?: string | null;
+    idcliente?: number | null;
+    fecini?: string | null;
+    fecfin?: string | null;
+    iddestinatario?: number | null;
+    idproveedor?: number | null;
+    diastranscurridos?: number | null;
+  }): Observable<any[]> {
+    let httpParams = new HttpParams();
+    if (params.grr)                       httpParams = httpParams.set('grr', params.grr);
+    if (params.numcp)                     httpParams = httpParams.set('numcp', params.numcp);
+    if (params.idcliente != null)         httpParams = httpParams.set('idcliente', String(params.idcliente));
+    if (params.fecini)                    httpParams = httpParams.set('fecini', params.fecini);
+    if (params.fecfin)                    httpParams = httpParams.set('fecfin', params.fecfin);
+    if (params.iddestinatario != null)    httpParams = httpParams.set('iddestinatario', String(params.iddestinatario));
+    if (params.idproveedor != null)       httpParams = httpParams.set('idproveedor', String(params.idproveedor));
+    if (params.diastranscurridos != null) httpParams = httpParams.set('diastranscurridos', String(params.diastranscurridos));
+
+    return this._httpClient.get<any[]>(`${this.baseUrlOrden}GetRetornoDocumentario`,
+      { params: httpParams, ...httpOptions });
+  }
+
+  setCamaraOt(idordentrabajo: number, cam: string): Observable<any> {
+    return this._httpClient.post(`${this.baseUrlOrden}SetCamaraOt`,
+      { idordentrabajo, cam }, httpOptions);
+  }
+
+  setEntregaRealDocumentaria(model: {
+    idordentrabajo: number;
+    fechaentregaReal: Date;
+    estadoentregaReal: string;
+    idusuario: number;
+  }): Observable<any> {
+    return this._httpClient.post(`${this.baseUrlOrden}SetEntregaRealDocumentaria`,
+      model, httpOptions);
   }
 
 }

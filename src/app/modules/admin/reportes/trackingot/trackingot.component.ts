@@ -8,14 +8,19 @@ import { ButtonModule } from 'primeng/button';
 import { InputTextModule } from 'primeng/inputtext';
 import { ToastModule } from 'primeng/toast';
 import { TableModule } from 'primeng/table';
+import { DialogModule } from 'primeng/dialog';
+import { CarouselModule } from 'primeng/carousel';
+import { DialogService } from 'primeng/dynamicdialog';
 import { forkJoin } from 'rxjs';
 import { OrdenTrabajoTrackingResult } from './trackingot.types';
+import { FileModalComponent } from '../../recepcion/ordentransporte/seguimientoot/modalfiles';
 
 interface EventItem {
   status?: string;
   dateRegister?: string;
   dateEvent?: string;
   user?: string;
+  station?: string;
   idmaestroevento?: number;
   recursotroncal?: string;
   repartidor?: string;
@@ -41,8 +46,10 @@ interface OrdenConEventos {
     MatIcon,
     ToastModule,
     TableModule,
+    DialogModule,
+    CarouselModule,
   ],
-  providers: [MessageService],
+  providers: [MessageService, DialogService],
 })
 export class TrackingotComponent {
   numcp = '';
@@ -50,9 +57,16 @@ export class TrackingotComponent {
   ordenes: OrdenTrabajoTrackingResult[] = [];
   ordenesConEventos: OrdenConEventos[] = [];
 
+  despachoLinksVisible = false;
+  despachoLinks: { iddespacho?: number; idmanifiesto?: number } = {};
+
+  repartoFotosVisible = false;
+  repartoFotos: any[] = [];
+
   constructor(
     private ordenService: OrdenTransporteService,
-    private messageService: MessageService
+    private messageService: MessageService,
+    public dialogService: DialogService
   ) {}
 
   buscar(): void {
@@ -107,6 +121,7 @@ export class TrackingotComponent {
                 dateRegister: e.fechaRegistro ?? e.dateRegister,
                 dateEvent: e.fechaEvento ?? e.dateEvent,
                 user: (e.usuario === 'ADMIN ADMIN' ? 'CHATBOT' : e.usuario) ?? e.user,
+                station: e.estacionUsuario ?? e.EstacionUsuario ?? null,
                 idmaestroevento: e.idMaestroEvento ?? e.idmaestroevento ?? null,
                 recursotroncal: e.recursotroncal ?? e.Recursotroncal ?? null,
                 repartidor: e.repartidor ?? e.Repartidor ?? null,
@@ -164,8 +179,9 @@ export class TrackingotComponent {
     if (txt.includes('ot creada') || (txt.includes('registr') && txt.includes('orden de transporte'))) return 'ot-creada';
     if (txt.includes('planificada')) return 'ot-planificada';
     if (txt.includes('manifiesto') || txt.includes('hoja ruta') || txt.includes('hr generado')) return 'manifiesto-hr';
-    if (txt.includes('despachada')) return 'ot-despachada';
+    if (txt.includes('despachada') || txt.includes('despachó') || txt.includes('despacho')) return 'ot-despachada';
     if (txt.includes('en zona')) return 'en-zona';
+    if (txt.includes('proveedor de reparto')) return 'entregada-reparto';
     if (txt.includes('en reparto')) return 'en-reparto';
     if (txt.includes('entrega') && (txt.includes('conforme') || txt.includes('(ok)'))) return 'entrega-ok';
     return 'none';
@@ -190,6 +206,46 @@ export class TrackingotComponent {
         return;
       }
 
+      // "Se despachó la orden" → hoja de ruta + manifiesto
+      case 'ot-despachada': {
+        const ot = item?.ordenTransporte ?? {};
+        const iddespacho = ot.idDespacho ?? ot.iddespacho ?? (item?.orden as any)?.iddespacho;
+        const idmanifiesto = ot.idManifiesto ?? ot.idmanifiesto ?? item?.orden?.idmanifiesto;
+        if (!iddespacho && !idmanifiesto) {
+          this.messageService.add({
+            severity: 'warn',
+            summary: 'Adjuntos',
+            detail: 'No se encontró el despacho o manifiesto vinculado a la orden.'
+          });
+          return;
+        }
+        this.despachoLinks = { iddespacho, idmanifiesto };
+        this.despachoLinksVisible = true;
+        return;
+      }
+
+      // "La orden fue entregada al proveedor de reparto" → carrusel (placeholder por ahora)
+      case 'entregada-reparto': {
+        this.repartoFotos = [];
+        this.repartoFotosVisible = true;
+        return;
+      }
+
+      // "Entrega: Conforme (OK)" → visor de fotos de evidencia
+      case 'entrega-ok': {
+        const idOrden = item?.orden?.idordentrabajo ?? (item?.ordenTransporte?.idordentrabajo);
+        if (!idOrden) {
+          this.messageService.add({ severity: 'warn', summary: 'Adjuntos', detail: 'No se encontró el ID de la orden.' });
+          return;
+        }
+        this.dialogService.open(FileModalComponent, {
+          header: 'Visor Fotos',
+          width: '30%',
+          data: { id: idOrden }
+        });
+        return;
+      }
+
       // TODO: agregar el resto de tipos a medida que se vayan definiendo
       default:
         this.messageService.add({
@@ -198,5 +254,17 @@ export class TrackingotComponent {
         });
         console.log('[adjuntos] tipo evento sin handler:', type, '| event:', event, '| item:', item);
     }
+  }
+
+  abrirHojaRuta(): void {
+    const id = this.despachoLinks.iddespacho;
+    if (!id) return;
+    window.open(`http://104.36.166.65/webreports/hojaruta.aspx?iddespacho=${id}`, '_blank');
+  }
+
+  abrirManifiesto(): void {
+    const id = this.despachoLinks.idmanifiesto;
+    if (!id) return;
+    window.open(`http://104.36.166.65/webreports/manifiesto.aspx?idmanifiesto=${id}`, '_blank');
   }
 }

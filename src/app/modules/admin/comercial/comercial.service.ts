@@ -60,9 +60,28 @@ export class ComercialService {
     if (fechaDesde) params.push(`fechaDesde=${fechaDesde}`);
     if (fechaHasta) params.push(`fechaHasta=${fechaHasta}`);
     if (idcliente != null) params.push(`idcliente=${idcliente}`);
+    if (idusuario != null) params.push(`idusuario=${idusuario}`);
     const qs = params.length ? `?${params.join('&')}` : '';
     return this._httpClient.get<IntegradoSemaforoPorClienteResult[]>(
       `${this.baseUrl}integrado-semaforo${qs}`,
+      httpOptions
+    );
+  }
+
+  getIntegradoSemaforoObservadas(
+    idusuario?: number | null,
+    fechaDesde?: string | null,
+    fechaHasta?: string | null,
+    idcliente?:  number | null
+  ): Observable<IntegradoSemaforoPorClienteResult[]> {
+    const params: string[] = [];
+    if (fechaDesde) params.push(`fechaDesde=${fechaDesde}`);
+    if (fechaHasta) params.push(`fechaHasta=${fechaHasta}`);
+    if (idcliente != null) params.push(`idcliente=${idcliente}`);
+    if (idusuario != null) params.push(`idusuario=${idusuario}`);
+    const qs = params.length ? `?${params.join('&')}` : '';
+    return this._httpClient.get<IntegradoSemaforoPorClienteResult[]>(
+      `${this.baseUrl}integrado-semaforo/observadas${qs}`,
       httpOptions
     );
   }

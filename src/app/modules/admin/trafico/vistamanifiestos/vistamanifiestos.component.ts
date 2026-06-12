@@ -114,7 +114,7 @@ ngOnInit() {
 
 
   this.user = JSON.parse(localStorage.getItem('user'));
-  this.model.IdUsuarioRegistro = this.user.usr_int_id;
+  this.model.IdUsuarioRegistro = this.user.id;
 
 
   this.cols =

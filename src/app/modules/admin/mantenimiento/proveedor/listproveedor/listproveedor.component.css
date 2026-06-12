@@ -37,6 +37,15 @@
   transform: scale(1.05);
 }
 
+.action-btn-success {
+  background-color: #16a34a !important;
+  color: white !important;
+}
+.action-btn-success:hover {
+  background-color: #15803d !important;
+  transform: scale(1.05);
+}
+
 .action-btn-danger {
   background-color: #ef4444 !important;
   color: white !important;

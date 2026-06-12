@@ -1,0 +1,77 @@
+<p-confirmDialog />
+
+<form [formGroup]="form" (ngSubmit)="guardar()" class="p-2">
+  <div class="grid grid-cols-1 md:grid-cols-2 gap-3">
+
+    <p-panel header="Destino" class="custom-header-panel">
+      <div class="grid grid-cols-1 gap-3">
+
+        <div class="field flex flex-col">
+          <label>Departamento</label>
+          <p-dropdown
+            [options]="departamentos"
+            formControlName="iddestinodepartamento"
+            appendTo="body"
+            [filter]="true"
+            placeholder="seleccione un departamento"
+            [style]="{'width':'100%'}">
+          </p-dropdown>
+        </div>
+
+        <div class="field flex flex-col">
+          <label>Provincia</label>
+          <p-dropdown
+            [options]="provincias"
+            formControlName="iddestinoprovincia"
+            appendTo="body"
+            [filter]="true"
+            placeholder="seleccione una provincia"
+            [style]="{'width':'100%'}">
+          </p-dropdown>
+        </div>
+
+        <div class="field flex flex-col">
+          <label>Distrito</label>
+          <p-dropdown
+            [options]="distritos"
+            formControlName="iddestinodistrito"
+            appendTo="body"
+            [filter]="true"
+            placeholder="seleccione un distrito"
+            [style]="{'width':'100%'}">
+          </p-dropdown>
+        </div>
+
+      </div>
+    </p-panel>
+
+    <p-panel header="General" class="custom-header-panel">
+      <div class="grid grid-cols-1 gap-3">
+
+        <div class="field flex flex-col">
+          <label>Tipo Unidad</label>
+          <p-dropdown
+            [options]="tiposUnidad"
+            formControlName="idtipounidad"
+            appendTo="body"
+            [filter]="true"
+            placeholder="seleccione un tipo de vehículo"
+            [style]="{'width':'100%'}">
+          </p-dropdown>
+        </div>
+
+        <div class="field flex flex-col">
+          <label>Precio</label>
+          <p-inputNumber formControlName="precio" mode="decimal" [minFractionDigits]="2" [maxFractionDigits]="4" placeholder="Tarifa precio" [style]="{'width':'100%'}"></p-inputNumber>
+        </div>
+
+      </div>
+    </p-panel>
+
+  </div>
+
+  <div class="flex justify-end gap-2 mt-4">
+    <button pButton type="submit" label="Guardar" icon="pi pi-check" [disabled]="loading"></button>
+    <button pButton type="button" label="Cancelar" icon="pi pi-times" class="p-button-secondary" (click)="cancelar()"></button>
+  </div>
+</form>

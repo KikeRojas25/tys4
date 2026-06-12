@@ -107,9 +107,8 @@ export class ListComponent implements OnInit {
 
   buscar() {
 
-    this.validarPlaca();
+    const placa = (this.model.placa ?? '').trim();
     this.loading = true;
-    const placa = (this.model.placa || '').trim();
     const idProv = this.model.idProveedor ?? null;
 
     this.mantenimientoService.vehiculoGetAll(placa === '' ? null : placa, idProv).subscribe({
@@ -211,24 +210,6 @@ console.log('vehiculoselected', id);
 
   }
 });
-}
-  validarPlaca() {
-    // Convertir a mayúsculas
-    if (!this.model.placa) return;
-    this.model.placa = String(this.model.placa).toUpperCase();
-
-    // Expresión regular para formato correcto (1 letra inicial + 5 caracteres alfanuméricos)
-    const placaRegex = /^[A-Z]{1}[A-Z0-9]{5}$/;
-
-    // Validar solo si ingresaron algo
-    if (this.model.placa && !placaRegex.test(this.model.placa)) {
-      this.messageService.add({
-        severity: 'warn',
-        summary: 'Placa inválida',
-        detail: 'La placa debe tener el formato: A6Q330 (1 letra inicial y 5 caracteres alfanuméricos).',
-      });
-      this.model.placa = ''; // Limpiar input si no es válido
-    }
 }
 
 

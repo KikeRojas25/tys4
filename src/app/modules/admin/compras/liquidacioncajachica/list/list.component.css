@@ -1,9 +1,126 @@
-/* Reutiliza la “línea visual” de tablas/acciones del resto del sistema (ver módulo recojo) */
+/* Reutiliza la “línea visual” de tablas/acciones del módulo recojo (seguimiento/ordenrecojo). */
 
 /* ============================================
-   Estilos profesionales para tablas
+   Filtros compactos: dropdowns, calendarios e inputs
+   con la misma altura/estilo que en seguimiento/ordenrecojo
    ============================================ */
+::ng-deep .filter-control-compact {
+  width: 100% !important;
+  max-width: 100% !important;
+  display: block !important;
+}
 
+::ng-deep .filter-control-compact .p-dropdown {
+  height: 32px !important;
+  min-height: 32px !important;
+  max-height: 32px !important;
+  width: 100% !important;
+  font-size: 11px !important;
+}
+
+::ng-deep .filter-control-compact .p-dropdown .p-dropdown-label-container {
+  width: 100% !important;
+  overflow: hidden !important;
+  flex: 1 1 auto !important;
+}
+
+::ng-deep .filter-control-compact .p-dropdown .p-dropdown-label {
+  font-size: 11px !important;
+  padding: 4px 8px !important;
+  line-height: 1.2 !important;
+  overflow: hidden !important;
+  text-overflow: ellipsis !important;
+  white-space: nowrap !important;
+}
+
+::ng-deep .filter-control-compact .p-dropdown .p-dropdown-trigger {
+  width: 28px !important;
+  height: 28px !important;
+}
+
+::ng-deep .filter-control-compact .p-dropdown .p-dropdown-trigger-icon {
+  font-size: 12px !important;
+}
+
+::ng-deep .filter-control-compact .p-dropdown-panel .p-dropdown-items .p-dropdown-item {
+  font-size: 11px !important;
+  padding: 6px 8px !important;
+  line-height: 1.2 !important;
+}
+
+/* Calendarios (Inicio, Fin) */
+::ng-deep p-calendar.filter-control-compact .p-calendar {
+  width: 100% !important;
+}
+
+::ng-deep p-calendar.filter-control-compact .p-inputwrapper {
+  height: 32px !important;
+  min-height: 32px !important;
+  max-height: 32px !important;
+  width: 100% !important;
+  display: flex !important;
+  align-items: center !important;
+  box-sizing: border-box !important;
+}
+
+::ng-deep p-calendar.filter-control-compact .p-inputtext {
+  height: 32px !important;
+  min-height: 32px !important;
+  max-height: 32px !important;
+  font-size: 11px !important;
+  padding: 4px 8px !important;
+  line-height: 1.2 !important;
+  flex: 1 1 auto !important;
+  width: auto !important;
+  box-sizing: border-box !important;
+}
+
+::ng-deep p-calendar.filter-control-compact .p-datepicker-trigger {
+  width: 28px !important;
+  height: 28px !important;
+  min-width: 28px !important;
+  flex-shrink: 0 !important;
+  padding: 0 !important;
+  display: flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+}
+
+::ng-deep p-calendar.filter-control-compact .p-datepicker-trigger-icon {
+  font-size: 12px !important;
+}
+
+/* Input de texto (Destinatario) */
+::ng-deep input.filter-control-compact.p-inputtext,
+::ng-deep input[pInputText].filter-control-compact {
+  height: 32px !important;
+  min-height: 32px !important;
+  max-height: 32px !important;
+  font-size: 11px !important;
+  padding: 4px 8px !important;
+  line-height: 1.2 !important;
+  width: 100% !important;
+  box-sizing: border-box !important;
+  border-radius: 6px !important;
+  border: 1px solid #d1d5db !important;
+  background-color: #ffffff !important;
+}
+
+::ng-deep input.filter-control-compact.p-inputtext:focus,
+::ng-deep input[pInputText].filter-control-compact:focus {
+  outline: none !important;
+  border-color: #f59e0b !important;
+  box-shadow: 0 0 0 3px rgba(245, 158, 11, 0.1) !important;
+}
+
+::ng-deep input.filter-control-compact.p-inputtext::placeholder {
+  color: #9ca3af !important;
+  font-size: 11px !important;
+}
+
+/* ============================================
+   Tabla principal (estilo recojo)
+   ============================================ */
 ::ng-deep .custom-table {
   border-collapse: separate;
   border-spacing: 0;
@@ -27,13 +144,8 @@
   box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1) !important;
 }
 
-::ng-deep .custom-table .p-datatable-wrapper {
-  position: relative;
-}
-
-::ng-deep .custom-table .p-datatable-scrollable-wrapper {
-  position: relative;
-}
+::ng-deep .custom-table .p-datatable-wrapper { position: relative; }
+::ng-deep .custom-table .p-datatable-scrollable-wrapper { position: relative; }
 
 ::ng-deep .custom-table .p-datatable-scrollable-header-table {
   position: sticky !important;
@@ -69,7 +181,20 @@
   color: white;
 }
 
-/* Botones de acción compactos */
+/* Botones generales */
+::ng-deep .p-button {
+  border-radius: 0.375rem;
+  font-weight: 500;
+  transition: all 0.15s ease-in-out;
+}
+
+::ng-deep .p-button:not(.p-button-icon-only) {
+  padding: 0.5rem 1rem;
+}
+
+/* ============================================
+   Botones de acción (mismos colores que recojo)
+   ============================================ */
 .action-btn {
   width: 28px !important;
   height: 28px !important;
@@ -83,25 +208,34 @@
   border: none !important;
 }
 
-/* Estilo minimalista (gris) tipo consola admin */
-.action-btn,
-.action-btn-neutral,
-.action-btn-primary,
-.action-btn-danger {
-  width: 26px !important;
-  height: 26px !important;
-  border-radius: 6px !important;
-  border: 1px solid #e5e7eb !important; /* gray-200 */
-  background-color: #f9fafb !important; /* gray-50 */
-  color: #374151 !important; /* gray-700 */
+/* Neutral – ver detalle */
+.action-btn-neutral {
+  background-color: #6b7280 !important; /* gray-500 */
+  color: white !important;
+}
+.action-btn-neutral:hover {
+  background-color: #4b5563 !important; /* gray-600 */
+  transform: scale(1.05);
 }
 
-.action-btn:hover,
-.action-btn-neutral:hover,
-.action-btn-primary:hover,
+/* Primary – editar (azul oscuro, igual que recojo) */
+.action-btn-primary {
+  background-color: #1e40af !important; /* blue-800 */
+  color: white !important;
+}
+.action-btn-primary:hover {
+  background-color: #1e3a8a !important; /* blue-900 */
+  transform: scale(1.05);
+}
+
+/* Danger – eliminar (rojo, igual que recojo) */
+.action-btn-danger {
+  background-color: #ef4444 !important; /* red-500 */
+  color: white !important;
+}
 .action-btn-danger:hover {
-  background-color: #f3f4f6 !important; /* gray-100 */
-  transform: none;
+  background-color: #dc2626 !important; /* red-600 */
+  transform: scale(1.05);
 }
 
 .action-btn .p-button-icon {
@@ -109,3 +243,7 @@
   margin: 0 !important;
 }
 
+.word-wrap {
+  white-space: normal;
+  word-wrap: break-word;
+}

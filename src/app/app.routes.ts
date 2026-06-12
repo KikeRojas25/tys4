@@ -140,12 +140,24 @@ export const appRoutes: Route[] = [
                     path: 'equipos',
                     loadComponent: () => import('./modules/admin/trafico/equipos/equipos.component')
                                           .then(m => m.EquiposComponent)
+                  },
+                  {
+                    path: 'usersbot',
+                    loadComponent: () => import('./modules/admin/trafico/usersbot/usersbot.component')
+                                          .then(m => m.UsersBotComponent),
+                    children: [
+                      {
+                        path: '',
+                        loadComponent: () => import('./modules/admin/trafico/usersbot/list/list.component')
+                                              .then(m => m.UsersBotListComponent)
+                      }
+                    ]
                   }
 
 
                   //confirmarentregas
 
-                 
+
                 ]
               },
               {
@@ -244,7 +256,52 @@ export const appRoutes: Route[] = [
                     loadComponent: () => import('./modules/admin/recepcion/ordentransporte/cargamasiva/cargamasiva.component')
                                           .then(m => m.CargamasivaComponent)
                   },
-                 
+                  {
+                    path: 'liquidaciondocumentaria',
+                    loadComponent: () => import('./modules/admin/liquidacion/pendientesliquidacion/pendientesliquidacion.component')
+                                          .then(m => m.PendientesliquidacionComponent)
+                  },
+                  {
+                    path: 'pendientesmanifiestos/:uid',
+                    loadComponent: () => import('./modules/admin/liquidacion/pendientesmanifiestos/pendientesmanifiestos.component')
+                                          .then(m => m.PendientesmanifiestosComponent)
+                  },
+                  {
+                    path: 'liquidarorden/:uid/:uid2',
+                    loadComponent: () => import('./modules/admin/liquidacion/liquidarorden/liquidarorden.component')
+                                          .then(m => m.LiquidarordenComponent)
+                  },
+                  {
+                    path: 'liquidarordenot/:uid/:uid2',
+                    loadComponent: () => import('./modules/admin/liquidacion/liquidaordenot/liquidaordenot.component')
+                                          .then(m => m.LiquidaordenotComponent)
+                  },
+                  {
+                    path: 'liquidardocumentos/:uid/:uid2/:uid3',
+                    loadComponent: () => import('./modules/admin/liquidacion/liquidardocumentos/liquidardocumentos.component')
+                                          .then(m => m.LiquidardocumentosComponent)
+                  },
+                  {
+                    path: 'pendientesliquidacionrepartidores',
+                    loadComponent: () => import('./modules/admin/liquidacion/pendientesliquidacionrepartidores/pendientesliquidacionrepartidores.component')
+                                          .then(m => m.PendientesliquidacionrepartidoresComponent)
+                  },
+                  {
+                    path: 'vincularfactura',
+                    loadComponent: () => import('./modules/admin/liquidacion/vincularfactura/vincularfactura.component')
+                                          .then(m => m.VincularfacturaComponent)
+                  },
+                  {
+                    path: 'listadoplacasprogramadas',
+                    loadComponent: () => import('./modules/admin/liquidacion/listadoplacasprogramadas/listadoplacasprogramadas.component')
+                                          .then(m => m.ListadoplacasprogramadasComponent)
+                  },
+                  {
+                    path: 'asignarguias/:uid/:uid2',
+                    loadComponent: () => import('./modules/admin/liquidacion/asignarguias/asignarguias.component')
+                                          .then(m => m.AsignarguiasComponent)
+                  },
+
                 ]
               },
               {
@@ -532,6 +589,11 @@ export const appRoutes: Route[] = [
                     loadComponent: () => import('./modules/admin/mantenimiento/proveedor/editproveedor/editproveedor.component')
                                           .then(m => m.EditproveedorComponent)
                   },
+                  {
+                    path: 'proveedor/:idProveedor/tarifas',
+                    loadComponent: () => import('./modules/admin/mantenimiento/proveedor/tarifaproveedor/listtarifaproveedor/listtarifaproveedor.component')
+                                          .then(m => m.ListtarifaproveedorComponent)
+                  },
                   
                   {
                     path: 'precinto',
@@ -558,6 +620,33 @@ export const appRoutes: Route[] = [
 
                 ]
               },
+              {
+                path: 'retorno',
+                loadComponent: () => import('./modules/admin/retorno/retorno.component')
+                                      .then(m => m.RetornoComponent),
+                children: [
+                  {
+                    path: 'otspendientes',
+                    loadComponent: () => import('./modules/admin/retorno/otspendientes/otspendientes.component')
+                                          .then(m => m.OtsPendientesComponent)
+                  },
+                  {
+                    path: 'pendienteretorno',
+                    loadComponent: () => import('./modules/admin/retorno/pendienteretorno/pendienteretorno.component')
+                                          .then(m => m.PendienteRetornoComponent)
+                  },
+                  {
+                    path: 'vistarepartidor/:idproveedor/:iddepartamento/:idprovincia',
+                    loadComponent: () => import('./modules/admin/retorno/vistarepartidor/vistarepartidor.component')
+                                          .then(m => m.RetornoVistarepartidorComponent)
+                  },
+                  {
+                    path: 'vistarepartidor/:idproveedor/:iddepartamento',
+                    loadComponent: () => import('./modules/admin/retorno/vistarepartidor/vistarepartidor.component')
+                                          .then(m => m.RetornoVistarepartidorComponent)
+                  }
+                ]
+              },
                {
               path: 'seguridad',
               loadComponent: () => import('./modules/admin/seguridad/seguridad.component')
@@ -577,6 +666,11 @@ export const appRoutes: Route[] = [
                   path: 'editusuario/:uid',
                   loadComponent: () => import('./modules/admin/seguridad/edituser/edituser.component')
                                         .then(m => m.EdituserComponent)
+                },
+                {
+                  path: 'mantenimientoroles',
+                  loadComponent: () => import('./modules/admin/seguridad/mantenimientoroles/mantenimientoroles.component')
+                                        .then(m => m.MantenimientorolesComponent)
                 }
 
               ]

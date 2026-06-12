@@ -1,31 +1,63 @@
 <div class="flex flex-col flex-auto min-w-0">
-  <div class="flex flex-col sm:flex-row flex-0 sm:items-center sm:justify-between p-6 sm:py-8 sm:px-10 border-b bg-card dark:bg-transparent">
+  <div class="flex flex-col sm:flex-row flex-0 sm:items-center sm:justify-between p-2 sm:py-8 sm:px-10 border-b border-gray-200 bg-white shadow-sm">
     <div class="flex-1 min-w-0">
-      <div class="flex flex-wrap items-center font-medium">
+      <div class="flex flex-wrap items-center font-medium text-sm text-gray-600">
         <div>
-          <a class="whitespace-nowrap text-primary-500">TMS</a>
+          <a class="whitespace-nowrap text-gray-700 hover:text-gray-900">TMS</a>
         </div>
         <div class="flex items-center ml-1 whitespace-nowrap">
-          <mat-icon class="fuse-horizontal-navigation-item-icon" [svgIcon]="'heroicons_solid:chevron-right'"></mat-icon>
-          <a class="ml-1 text-primary-500">Tráfico</a>
+          <mat-icon class="fuse-horizontal-navigation-item-icon text-gray-400" [svgIcon]="'heroicons_solid:chevron-right'"></mat-icon>
+          <a class="ml-1 text-gray-500">Estación</a>
         </div>
         <div class="flex items-center ml-1 whitespace-nowrap">
-          <mat-icon class="fuse-horizontal-navigation-item-icon" [svgIcon]="'heroicons_solid:chevron-right'"></mat-icon>
-          <a class="ml-1 text-primary-500" [routerLink]="['/trafico/integrado']">Ordén de Transporte</a>
+          <mat-icon class="fuse-horizontal-navigation-item-icon text-gray-400" [svgIcon]="'heroicons_solid:chevron-right'"></mat-icon>
+          <a class="ml-1 text-gray-500" [routerLink]="['/seguimientoot/listadoordentransporte']">Listado de OTs</a>
         </div>
       </div>
       <div class="mt-2">
-        <h2 class="text-3xl md:text-4xl font-extrabold tracking-tight leading-7 sm:leading-10 truncate"> Crear OT </h2>
+        <h2 class="text-3xl md:text-4xl font-semibold tracking-tight leading-7 sm:leading-10 truncate text-gray-900"> Crear OT </h2>
       </div>
     </div>
   </div>
 
   <div class="flex flex-col min-w-0 w-full">
 
+    <ng-container *ngIf="cargando; else formContenido">
+      <div class="p-6 space-y-4">
+        <p-skeleton width="20rem" height="2rem" styleClass="mb-3"></p-skeleton>
+        <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+          <p-skeleton height="2.75rem"></p-skeleton>
+          <p-skeleton height="2.75rem"></p-skeleton>
+          <p-skeleton height="2.75rem"></p-skeleton>
+          <p-skeleton height="2.75rem"></p-skeleton>
+          <p-skeleton height="2.75rem"></p-skeleton>
+          <p-skeleton height="2.75rem"></p-skeleton>
+        </div>
+        <p-skeleton width="20rem" height="2rem" styleClass="mb-3 mt-6"></p-skeleton>
+        <div class="grid grid-cols-1 md:grid-cols-4 gap-4">
+          <p-skeleton height="2.75rem"></p-skeleton>
+          <p-skeleton height="2.75rem"></p-skeleton>
+          <p-skeleton height="2.75rem"></p-skeleton>
+          <p-skeleton height="2.75rem"></p-skeleton>
+          <p-skeleton height="2.75rem"></p-skeleton>
+          <p-skeleton height="2.75rem"></p-skeleton>
+        </div>
+        <p-skeleton width="20rem" height="2rem" styleClass="mb-3 mt-6"></p-skeleton>
+        <div class="grid grid-cols-1 md:grid-cols-4 gap-4">
+          <p-skeleton height="2.75rem"></p-skeleton>
+          <p-skeleton height="2.75rem"></p-skeleton>
+          <p-skeleton height="2.75rem"></p-skeleton>
+          <p-skeleton height="2.75rem"></p-skeleton>
+          <p-skeleton height="2.75rem"></p-skeleton>
+          <p-skeleton height="2.75rem"></p-skeleton>
+          <p-skeleton height="2.75rem"></p-skeleton>
+          <p-skeleton height="2.75rem"></p-skeleton>
+        </div>
+      </div>
+    </ng-container>
 
-    
-
-    <form  [formGroup]="form"  (ngSubmit)="registrar()" >
+    <ng-template #formContenido>
+    <form data-testid="ot-form" [formGroup]="form"  (ngSubmit)="registrar()" >
 
       <p-panel header="Datos generales" class="w-full mb-3 custom-header-panel">
   
@@ -34,8 +66,9 @@
                     <div class="field flex flex-col">
                       <label  for="clientes">Cliente (*) </label>
                       <p-dropdown name="clientes"
+                        data-testid="ot-cliente"
                         [virtualScroll]="true" itemSize="30"
-                        [options]="clientes"  
+                        [options]="clientes"
                         formControlName="idcliente"
                         [showClear]="true" class="input-form-field"
                           placeholder="Seleccione un cliente"  (onChange)="cargarDestinatario()"
@@ -59,8 +92,9 @@
                        
                     </label>
                     <p-dropdown name="remitente"
+                    data-testid="ot-remitente"
                     [virtualScroll]="true" itemSize="30"
-                      [options]="clientes"
+                      [options]="clientesTodos"
                       formControlName="idremitente"
                       [disabled]="mismoremitente"
                       [showClear]="true" class="input-form-field"
@@ -95,7 +129,8 @@
                         </a>
                     
                         <!-- Botón: "Nuevo" como link -->
-                        <p-button 
+                        <p-button
+                          data-testid="ot-btn-nuevo-destinatario"
                           severity="success"
                           size="small"
                           variant="outlined"
@@ -109,10 +144,11 @@
                       <!-- Dropdown de destinatarios -->
                       <p-dropdown
                         name="destinatario"
+                        data-testid="ot-destinatario"
                         [virtualScroll]="true"
                         itemSize="30"
                         [disabled]="mismodestinatario"
-                        [options]="clientes"
+                        [options]="clientesTodos"
                         formControlName="iddestinatario"
                         [showClear]="true"
                         class="input-form-field"
@@ -143,6 +179,7 @@
                     <label>Origen (*) :</label>
 
                     <p-dropdown name="origen"
+                        data-testid="ot-origen"
                         [options]="ubigeo"    formControlName="idorigen"
                         scrollHeight="30vh"  class="input-form-field"
                         [virtualScroll]="true" itemSize="70"
@@ -164,7 +201,7 @@
 
                     <div class="field flex flex-col col-span-2">
                     <label for="puntopartida">Dirección (*) </label>
-                      <input pInputText  minlength="5" maxlength="150"  required class="form-control col-md-12"  autocomplete="off" 
+                      <input pInputText data-testid="ot-puntopartida" minlength="5" maxlength="150"  required class="form-control col-md-12"  autocomplete="off"
                       formControlName="puntopartida" name="puntopartida"  type="text">
                       <div *ngIf="form.get('puntopartida')?.invalid && form.get('puntopartida')?.touched" class="alert-danger">
                         <div *ngIf="form.get('puntopartida')?.errors?.required">Requiere ingresar el punto de partida.</div>
@@ -179,6 +216,7 @@
                     <label>Destino :</label>
 
                     <p-dropdown name="destino"
+                      data-testid="ot-destino"
                       [options]="ubigeo"  formControlName="iddestino"
                       scrollHeight="30vh"  class="input-form-field"
                       [virtualScroll]="true" itemSize="70"
@@ -201,7 +239,7 @@
 
                     <div class="field flex flex-col col-span-2">
                     <label for="puntollegada">Dirección </label>
-                    <input pInputText  minlength="5" maxlength="150"  required class="form-control col-md-12"  autocomplete="off" 
+                    <input pInputText data-testid="ot-puntollegada" minlength="5" maxlength="150"  required class="form-control col-md-12"  autocomplete="off"
                     formControlName="puntollegada" name="puntollegada"  type="text">
                     <div *ngIf="form.get('puntollegada')?.invalid && form.get('puntollegada')?.touched" class="alert-danger">
                       <div *ngIf="form.get('puntollegada')?.errors?.required">Requiere ingresar el punto de llegada.</div>
@@ -221,6 +259,7 @@
             <div class="field flex flex-col">
                 <label>Placa de recojo :</label>
                 <p-dropdown name="placa"
+                    data-testid="ot-vehiculo"
                     [options]="vehiculos" formControlName="idvehiculo"
                     scrollHeight="30vh" class="input-form-field"
                     [virtualScroll]="true" itemSize="70"
@@ -241,6 +280,7 @@
             <div class="field flex flex-col col-span-2">
                 <label>Conductor de recojo :</label>
                 <p-dropdown name="conductor"
+                    data-testid="ot-chofer"
                     [options]="choferes" formControlName="idchofer"
                     scrollHeight="30vh" class="input-form-field"
                     [virtualScroll]="true" itemSize="70"
@@ -261,6 +301,7 @@
             <div class="field flex flex-col">
                 <label>Fecha de recojo :</label>
                 <p-calendar name="fecharecojo"
+                    data-testid="ot-fecharecojo"
                     formControlName="fecharecojo" required
                     [iconDisplay]="'input'"
                     [showIcon]="true"
@@ -272,7 +313,7 @@
     
             <div class="field flex flex-col">
                 <label>Hora de recojo (*) :</label>
-                <p-inputMask formControlName="horarecojo" mask="99:99" required></p-inputMask>
+                <p-inputMask data-testid="ot-horarecojo" formControlName="horarecojo" mask="99:99" required></p-inputMask>
                 <div *ngIf="form.get('horarecojo')?.invalid && form.get('horarecojo')?.touched" class="alert-danger">
                     <div *ngIf="form.get('horarecojo')?.errors?.required">Requiere ingresar la hora de recojo.</div>
                 </div>
@@ -281,7 +322,7 @@
             <div class="field flex flex-col">
                 <label>Guía de recojo (*) :</label>
                 <div class="card p-fluid">
-                    <p-chips formControlName="guiarecojo" required></p-chips>
+                    <p-chips data-testid="ot-guiarecojo" formControlName="guiarecojo" required></p-chips>
                     <div *ngIf="form.get('guiarecojo')?.invalid && (form.get('guiarecojo')?.dirty || form.get('guiarecojo')?.touched)" class="alert-danger">
                         <div *ngIf="form.get('guiarecojo')?.errors?.required">Requiere al menos una guía de recojo.</div>
                     </div>
@@ -292,7 +333,7 @@
                 <div class="flex align-items-center justify-content-between mb-1">
                     <label>Orden de Recojo (OR) <span *ngIf="!sinRecojo" class="text-red-500">*</span></label>
                     <div class="flex align-items-center gap-2">
-                        <p-checkbox [(ngModel)]="sinRecojo" [ngModelOptions]="{standalone: true}"
+                        <p-checkbox data-testid="ot-sin-recojo" [(ngModel)]="sinRecojo" [ngModelOptions]="{standalone: true}"
                             [binary]="true" inputId="sinRecojo"
                             (onChange)="orVinculada = null; numBusquedaOr = ''; orTouched = false">
                         </p-checkbox>
@@ -300,16 +341,16 @@
                     </div>
                 </div>
                 <div class="p-inputgroup">
-                    <input pInputText [(ngModel)]="numBusquedaOr" [ngModelOptions]="{standalone: true}"
+                    <input pInputText data-testid="ot-or-buscar-input" [(ngModel)]="numBusquedaOr" [ngModelOptions]="{standalone: true}"
                         placeholder="Buscar OR..." (blur)="buscarOr()" [disabled]="sinRecojo" />
-                    <button pButton type="button" icon="pi pi-search" class="p-button-primary" (click)="buscarOr()" [disabled]="sinRecojo"></button>
+                    <button pButton data-testid="ot-or-buscar-btn" type="button" icon="pi pi-search" class="p-button-primary" (click)="buscarOr()" [disabled]="sinRecojo"></button>
                 </div>
-                <div *ngIf="orVinculada" class="mt-1 flex align-items-center gap-2">
-                    <p-tag severity="success" [value]="orVinculada.numcp"></p-tag>
-                    <button pButton type="button" icon="pi pi-times" class="p-button-text p-button-danger p-button-sm"
+                <div *ngIf="orVinculada" data-testid="ot-or-vinculada" class="mt-1 flex align-items-center gap-2">
+                    <p-tag data-testid="ot-or-vinculada-tag" severity="success" [value]="orVinculada.numcp"></p-tag>
+                    <button pButton data-testid="ot-or-vinculada-quitar" type="button" icon="pi pi-times" class="p-button-text p-button-danger p-button-sm"
                         (click)="orVinculada = null; numBusquedaOr = ''"></button>
                 </div>
-                <div *ngIf="!sinRecojo && !orVinculada && orTouched" class="alert-danger mt-1">
+                <div *ngIf="!sinRecojo && !orVinculada && orTouched" data-testid="ot-or-error" class="alert-danger mt-1">
                     Debe vincular una Orden de Recojo o marcar "Sin recojo".
                 </div>
             </div>
@@ -322,7 +363,7 @@
     
             <div class="field flex flex-col">
                 <label for="bulto">Cant. Bultos</label>
-                <p-inputNumber name="bulto" inputId="integeronly" [useGrouping]="false" [min]="0" [max]="5000" 
+                <p-inputNumber name="bulto" data-testid="ot-bulto" inputId="integeronly" [useGrouping]="false" [min]="0" [max]="5000"
                                formControlName="bulto" required></p-inputNumber>
                 <div *ngIf="form.get('bulto')?.invalid && form.get('bulto')?.touched" class="alert-danger">
                     <div *ngIf="form.get('bulto')?.errors?.required">Requiere ingresar la cantidad de bultos.</div>
@@ -331,7 +372,7 @@
     
             <div class="field flex flex-col">
                 <label for="peso">Peso Kg.</label>
-                <p-inputNumber name="peso" mode="decimal" [minFractionDigits]="2" [maxFractionDigits]="5" 
+                <p-inputNumber name="peso" data-testid="ot-peso" mode="decimal" [minFractionDigits]="2" [maxFractionDigits]="5"
                                [min]="0" [max]="100000" formControlName="peso" required></p-inputNumber>
                 <div *ngIf="form.get('peso')?.invalid && form.get('peso')?.touched" class="alert-danger">
                     <div *ngIf="form.get('peso')?.errors?.required">Requiere ingresar el peso.</div>
@@ -340,7 +381,7 @@
     
             <div class="field flex flex-col">
                 <label for="volumen">Volumen m3</label>
-                <p-inputNumber name="volumen" mode="decimal" [minFractionDigits]="2" [maxFractionDigits]="5" 
+                <p-inputNumber name="volumen" data-testid="ot-volumen" mode="decimal" [minFractionDigits]="2" [maxFractionDigits]="5"
                                [min]="0" [max]="100000" formControlName="volumen" required></p-inputNumber>
                 <div *ngIf="form.get('volumen')?.invalid && form.get('volumen')?.touched" class="alert-danger">
                     <div *ngIf="form.get('volumen')?.errors?.required">Requiere ingresar el volumen.</div>
@@ -349,7 +390,7 @@
     
             <div class="field flex flex-col">
                 <label for="pesovol">Peso Vol</label>
-                <p-inputNumber name="pesovol" mode="decimal" [minFractionDigits]="2" [maxFractionDigits]="5" 
+                <p-inputNumber name="pesovol" data-testid="ot-pesovol" mode="decimal" [minFractionDigits]="2" [maxFractionDigits]="5"
                                [min]="0" [max]="100000" formControlName="pesovol" required></p-inputNumber>
                 <div *ngIf="form.get('pesovol')?.invalid && form.get('pesovol')?.touched" class="alert-danger">
                     <div *ngIf="form.get('pesovol')?.errors?.required">Requiere ingresar el peso vol.</div>
@@ -358,7 +399,7 @@
     
             <div class="field flex flex-col">
                 <label>Fórmula :</label>
-                <p-dropdown name="formula" [options]="formulas" formControlName="idformula" scrollHeight="30vh" 
+                <p-dropdown name="formula" data-testid="ot-formula" [options]="formulas" formControlName="idformula" scrollHeight="30vh"
                             class="input-form-field" [virtualScroll]="true" itemSize="70" 
                             [style]="{'width':'100%'}" required [resetFilterOnHide]="false" 
                             [hideTransitionOptions]="'0ms'" [showTransitionOptions]="'0ms'" 
@@ -375,7 +416,7 @@
     
             <div class="field flex flex-col">
                 <label>Medio de transporte :</label>
-                <p-dropdown name="tipounidad" [options]="tipounidad" formControlName="idtipotransporte" 
+                <p-dropdown name="tipounidad" data-testid="ot-tipotransporte" [options]="tipounidad" formControlName="idtipotransporte"
                             scrollHeight="30vh" class="input-form-field" [virtualScroll]="true" itemSize="70" 
                             [style]="{'width':'100%'}" required [resetFilterOnHide]="false" 
                             [hideTransitionOptions]="'0ms'" [showTransitionOptions]="'0ms'" 
@@ -392,7 +433,7 @@
     
             <div class="field flex flex-col">
                 <label>Concepto de cobro :</label>
-                <p-dropdown name="concepto" [options]="conceptos" formControlName="idconceptocobro" 
+                <p-dropdown name="concepto" data-testid="ot-concepto" [options]="conceptos" formControlName="idconceptocobro"
                             scrollHeight="30vh" class="input-form-field" [virtualScroll]="true" itemSize="70" 
                             [style]="{'width':'100%'}" required [resetFilterOnHide]="false" 
                             [hideTransitionOptions]="'0ms'" [showTransitionOptions]="'0ms'" 
@@ -408,8 +449,8 @@
     
             <div class="field flex flex-col">
                 <label>Mercadería especial :</label>
-                <p-dropdown name="mercaderiaEspecial" [options]="mercaderiasEspeciales" 
-                            formControlName="idtipomercaderia" scrollHeight="30vh" class="input-form-field" 
+                <p-dropdown name="mercaderiaEspecial" data-testid="ot-mercaderia" [options]="mercaderiasEspeciales"
+                            formControlName="idtipomercaderia" scrollHeight="30vh" class="input-form-field"
                             [virtualScroll]="true" itemSize="70" [style]="{'width':'100%'}" required 
                             [resetFilterOnHide]="false" [hideTransitionOptions]="'0ms'" [showTransitionOptions]="'0ms'" 
                             filter="false">
@@ -424,7 +465,7 @@
     
             <div class="field flex flex-col">
                 <label>Referencia :</label>
-                <input type="text" name="docgeneral" pInputText formControlName="docgeneral" required />
+                <input type="text" data-testid="ot-docgeneral" name="docgeneral" pInputText formControlName="docgeneral" required />
                 <div *ngIf="form.get('docgeneral')?.invalid && form.get('docgeneral')?.touched" class="alert-danger">
                     <div *ngIf="form.get('docgeneral')?.errors?.required">Requiere ingresar una referencia.</div>
                 </div>
@@ -432,7 +473,7 @@
     
             <div class="field flex flex-col">
                 <label>Descripción de Mercadería :</label>
-                <input type="text" name="descripciongeneral" pInputText formControlName="descripciongeneral" required />
+                <input type="text" data-testid="ot-descripciongeneral" name="descripciongeneral" pInputText formControlName="descripciongeneral" required />
                 <div *ngIf="form.get('descripciongeneral')?.invalid && form.get('descripciongeneral')?.touched" class="alert-danger">
                     <div *ngIf="form.get('descripciongeneral')?.errors?.required">Requiere ingresar una descripción de mercadería.</div>
                 </div>
@@ -442,21 +483,23 @@
                 <label>GRR (Guías de remitente) :</label>
                 <div class="card p-fluid">
                     <div class="flex gap-2">
-                        <p-button severity="warning" label="Generar GRRs Masivas..." (onClick)="grr()" class="flex-grow-0"></p-button>
-                        <p-button 
-                            *ngIf="guiasGrr.length > 0" 
-                            [severity]="mostrarTablaGuias ? 'secondary' : 'info'" 
+                        <p-button data-testid="ot-grr-abrir-dialog" severity="warning" label="Generar GRRs Masivas..." (onClick)="grr()" class="flex-grow-0"></p-button>
+                        <p-button
+                            *ngIf="guiasGrr.length > 0"
+                            data-testid="ot-grr-toggle-tabla"
+                            [severity]="mostrarTablaGuias ? 'secondary' : 'info'"
                             [icon]="mostrarTablaGuias ? 'pi pi-eye-slash' : 'pi pi-eye'"
                             [label]="mostrarTablaGuias ? 'Ocultar Tabla' : 'Mostrar Tabla'"
-                            (onClick)="toggleTablaGuias()" 
+                            (onClick)="toggleTablaGuias()"
                             class="flex-grow-0">
                         </p-button>
-                        <p-button 
-                            *ngIf="guiasGrr.length > 0" 
-                            severity="danger" 
+                        <p-button
+                            *ngIf="guiasGrr.length > 0"
+                            data-testid="ot-grr-limpiar-todas"
+                            severity="danger"
                             icon="pi pi-trash"
                             label="Limpiar Todas"
-                            (onClick)="limpiarTodasLasGuiasGrr()" 
+                            (onClick)="limpiarTodasLasGuiasGrr()"
                             class="flex-grow-0">
                         </p-button>
                     </div>
@@ -477,8 +520,9 @@
             </span>
         </div>
 
-        <p-table 
-            [value]="guiasGrr" 
+        <p-table
+            data-testid="ot-grr-tabla"
+            [value]="guiasGrr"
             [scrollable]="true"
             scrollHeight="400px"
             [tableStyle]="{ 'min-width': '30rem' }"
@@ -494,7 +538,7 @@
             </ng-template>
             
             <ng-template pTemplate="body" let-guia let-rowIndex="rowIndex">
-                <tr class="border-b border-gray-100 hover:bg-gray-50">
+                <tr class="border-b border-gray-100 hover:bg-gray-50" [attr.data-testid]="'ot-grr-row-' + rowIndex">
                     <!-- Número de fila -->
                     <td class="text-center px-3 py-2 text-sm font-medium text-gray-700">
                         {{ rowIndex + 1 }}
@@ -502,30 +546,32 @@
                     
                     <!-- Número de GRR (editable inline) -->
                     <td class="px-2 py-2">
-                        <input 
+                        <input
                             *ngIf="guia.editando"
-                            type="text" 
-                            pInputText 
-                            [(ngModel)]="guia.nroGrr" 
+                            [attr.data-testid]="'ot-grr-input-nrogrr-' + rowIndex"
+                            type="text"
+                            pInputText
+                            [(ngModel)]="guia.nroGrr"
                             [ngModelOptions]="{standalone: true}"
                             class="w-full p-2 text-sm border border-blue-400 rounded focus:border-blue-600"
                             placeholder="Ingrese número de GRR">
-                        <span *ngIf="!guia.editando" class="block px-2 py-2 text-sm">
+                        <span *ngIf="!guia.editando" [attr.data-testid]="'ot-grr-celda-nrogrr-' + rowIndex" class="block px-2 py-2 text-sm">
                             {{ guia.nroGrr || '-' }}
                         </span>
                     </td>
                     
                     <!-- Número de Documento (editable inline) -->
                     <td class="px-2 py-2">
-                        <input 
+                        <input
                             *ngIf="guia.editando"
-                            type="text" 
-                            pInputText 
-                            [(ngModel)]="guia.nroDocumento" 
+                            [attr.data-testid]="'ot-grr-input-nrodoc-' + rowIndex"
+                            type="text"
+                            pInputText
+                            [(ngModel)]="guia.nroDocumento"
                             [ngModelOptions]="{standalone: true}"
                             class="w-full p-2 text-sm border border-blue-400 rounded focus:border-blue-600"
                             placeholder="Ingrese número de documento">
-                        <span *ngIf="!guia.editando" class="block px-2 py-2 text-sm">
+                        <span *ngIf="!guia.editando" [attr.data-testid]="'ot-grr-celda-nrodoc-' + rowIndex" class="block px-2 py-2 text-sm">
                             {{ guia.nroDocumento || '-' }}
                         </span>
                     </td>
@@ -534,42 +580,46 @@
                     <td class="text-center px-2 py-2">
                         <div class="flex justify-center gap-1">
                             <!-- Botones cuando NO está editando -->
-                            <p-button 
+                            <p-button
                                 *ngIf="!guia.editando"
-                                icon="pi pi-pencil" 
+                                [attr.data-testid]="'ot-grr-btn-editar-' + rowIndex"
+                                icon="pi pi-pencil"
                                 severity="info"
                                 [rounded]="true"
                                 [text]="true"
-                                title="Editar" 
+                                title="Editar"
                                 (onClick)="editarGuiaGrr(guia)">
                             </p-button>
-                            <p-button 
+                            <p-button
                                 *ngIf="!guia.editando"
-                                icon="pi pi-trash" 
+                                [attr.data-testid]="'ot-grr-btn-eliminar-' + rowIndex"
+                                icon="pi pi-trash"
                                 severity="danger"
                                 [rounded]="true"
                                 [text]="true"
-                                title="Eliminar" 
+                                title="Eliminar"
                                 (onClick)="eliminarGuiaGrr(rowIndex)">
                             </p-button>
-                            
+
                             <!-- Botones cuando SÍ está editando -->
-                            <p-button 
+                            <p-button
                                 *ngIf="guia.editando"
-                                icon="pi pi-check" 
+                                [attr.data-testid]="'ot-grr-btn-guardar-' + rowIndex"
+                                icon="pi pi-check"
                                 severity="success"
                                 [rounded]="true"
                                 [text]="true"
-                                title="Guardar" 
+                                title="Guardar"
                                 (onClick)="actualizarGuiaGrr(guia)">
                             </p-button>
-                            <p-button 
+                            <p-button
                                 *ngIf="guia.editando"
-                                icon="pi pi-times" 
+                                [attr.data-testid]="'ot-grr-btn-cancelar-' + rowIndex"
+                                icon="pi pi-times"
                                 severity="secondary"
                                 [rounded]="true"
                                 [text]="true"
-                                title="Cancelar" 
+                                title="Cancelar"
                                 (onClick)="cancelarEdicionGuiaGrr(guia)">
                             </p-button>
                         </div>
@@ -587,26 +637,6 @@
         </p-table>
     </p-panel>
     
-    <p-dialog header="Generador Etiquetas" [modal]="true" [(visible)]="dialogEtiqueta" [style]="{ width: '25rem' }">
-      <span class="p-text-secondary block mb-5">Generación de Etiquetas</span>
-      <div class="flex align-items-center gap-3 mb-3">
-          <label for="Tipo" class="font-semibold w-6rem">Cantidad</label>
-          <p-dropdown 
-          name="tipo"
-          [options]="tipos" 
-          [(ngModel)]="model.idtipoetiqueta" 
-          placeholder="Selecciona un tipo">
-        </p-dropdown>
-      </div>
-      <div class="flex align-items-center gap-3 mb-5">
-          <label for="grrinicial" class="font-semibold w-6rem">Cantidad</label>
-          <p-inputNumber name="cantidadetiqueta" [(ngModel)]="model.cantidadetiqueta" class="flex-auto" autocomplete="off" />
-      </div>
-      <div class="flex justify-content-end gap-2">
-           <p-button label="Cerrar" severity="secondary" (onClick)="dialogGrr= false" />
-          <p-button label="Agregar" (onClick)="agregaretiqueta()"   /> 
-      </div>
-    </p-dialog>
        <p-panel header="¿Como lo almaceno?" class="w-full mb-3">
     
             <div class="grid grid-cols-1 md:grid-cols-4 gap-4">
@@ -650,7 +680,7 @@
   
   
              
-  <p-button label="Refrescar" (onClick)="calcular()" > </p-button>
+  <p-button data-testid="ot-btn-calcular" label="Refrescar" (onClick)="calcular()" > </p-button>
                   
   
             <div class="field flex flex-col">
@@ -658,7 +688,7 @@
               <div class="mb-4">
                 <div class="w-1/2 p-4 bg-gray-200 rounded-lg shadow-lg text-left">
                     <label for="precio" class="block text-lg font-semibold text-gray-700 mb-2">Subtotal</label>
-                    <div class="text-5xl font-bold text-green-600">
+                    <div data-testid="ot-subtotal" class="text-5xl font-bold text-green-600">
                         S/. {{ model.precio }}
                     </div>
                 </div>
@@ -672,55 +702,57 @@
                   <div class="row pt-2 pt-sm-5 mt-1">
                     <div class="col-sm-6 pl-0">
                       <p class="text-right">
-                        <p-button [disabled]="!form.valid"  class="btn btn-space btn-primary" type="submit">Guardar</p-button>
-                        <p-button  [routerLink]="['/seguimiento/ordenrecojo']" routerLinkActive="router-link-active"  class="btn btn-space btn-secondary">Cancel</p-button>
+                        <p-button data-testid="ot-btn-guardar"  class="btn btn-space btn-primary" type="submit">Guardar</p-button>
+                        <p-button data-testid="ot-btn-cancelar" [routerLink]="['/seguimiento/ordenrecojo']" routerLinkActive="router-link-active"  class="btn btn-space btn-secondary">Cancel</p-button>
                       </p>
                     </div>
                   </div>
   
   
         </p-panel>
-    </form> 
+    </form>
+    </ng-template>
 
 
 </div>
 
 </div>
 
-<p-dialog header="Generador Guías de Remisión" [modal]="true" [(visible)]="dialogGrr" [style]="{ width: '25rem' }">
+<p-dialog data-testid="ot-grr-dialog" header="Generador Guías de Remisión" [modal]="true" [(visible)]="dialogGrr" [style]="{ width: '25rem' }">
   <span class="p-text-secondary block mb-5">Generación correlativa.</span>
   <div class="flex align-items-center gap-3 mb-3">
       <label for="cantidad" class="font-semibold w-6rem">Cantidad</label>
-      <p-inputNumber  name="cantidad" [(ngModel)]="model.cantidadguias" class="flex-auto" autocomplete="off" />
+      <p-inputNumber data-testid="ot-grr-dialog-cantidad" name="cantidad" [(ngModel)]="model.cantidadguias" class="flex-auto" autocomplete="off" />
   </div>
   <div class="flex align-items-center gap-3 mb-5">
       <label for="grrinicial" class="font-semibold w-6rem">GRR Inicial</label>
-      <input pInputText name="grrinicial" [(ngModel)]="model.guiaInicial" class="flex-auto" autocomplete="off" (keydown.enter)="generarGrr()" />
+      <input pInputText data-testid="ot-grr-dialog-inicial" name="grrinicial" [(ngModel)]="model.guiaInicial" class="flex-auto" autocomplete="off" (keydown.enter)="generarGrr()" />
   </div>
   <div class="flex justify-content-end gap-2">
-       <p-button label="Cerrar" severity="secondary" (onClick)="dialogGrr= false" />
-      <p-button label="Generar" (onClick)="generarGrr()"   /> 
+       <p-button data-testid="ot-grr-dialog-cerrar" label="Cerrar" severity="secondary" (onClick)="dialogGrr= false" />
+      <p-button data-testid="ot-grr-dialog-generar" label="Generar" (onClick)="generarGrr()"   />
   </div>
 </p-dialog>
 
 <p-dialog header="Generador Etiquetas" [modal]="true" [(visible)]="dialogEtiqueta" [style]="{ width: '25rem' }">
   <span class="p-text-secondary block mb-5">Generación de Etiquetas</span>
   <div class="flex align-items-center gap-3 mb-3">
-      <label for="Tipo" class="font-semibold w-6rem">Cantidad</label>
-      <p-dropdown 
+      <label for="Tipo" class="font-semibold w-6rem">Tipo</label>
+      <p-dropdown
       name="tipo"
-      [options]="tipos" 
-      [(ngModel)]="model.idtipoetiqueta" 
+      [options]="tipos"
+      [(ngModel)]="model.idtipoetiqueta"
+      [ngModelOptions]="{standalone: true}"
       placeholder="Selecciona un tipo">
     </p-dropdown>
   </div>
   <div class="flex align-items-center gap-3 mb-5">
-      <label for="grrinicial" class="font-semibold w-6rem">Cantidad</label>
-      <p-inputNumber name="cantidadetiqueta" [(ngModel)]="model.cantidadetiqueta" class="flex-auto" autocomplete="off" />
+      <label for="cantidadetiqueta" class="font-semibold w-6rem">Cantidad</label>
+      <p-inputNumber name="cantidadetiqueta" [(ngModel)]="model.cantidadetiqueta" [ngModelOptions]="{standalone: true}" class="flex-auto" autocomplete="off" />
   </div>
   <div class="flex justify-content-end gap-2">
-       <p-button label="Cerrar" severity="secondary" (onClick)="dialogGrr= false" />
-      <p-button label="Agregar" (onClick)="agregaretiqueta()"   /> 
+       <p-button label="Cerrar" severity="secondary" (onClick)="dialogEtiqueta = false" />
+      <p-button label="Agregar" (onClick)="agregaretiqueta(); dialogEtiqueta = false" />
   </div>
 </p-dialog>
 

@@ -1,0 +1,47 @@
+/* Reutiliza el mismo lenguaje visual usado en listuser/seguimientoot */
+::ng-deep .custom-table .p-datatable-thead > tr > th {
+  background-color: #1f2937 !important;
+  color: #f3f4f6 !important;
+  font-weight: 600;
+}
+
+::ng-deep .action-btn {
+  width: 30px !important;
+  height: 30px !important;
+  padding: 0 !important;
+  border-radius: 6px !important;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+}
+
+::ng-deep .action-btn .p-button-icon {
+  font-size: 13px !important;
+}
+
+::ng-deep .action-btn-primary { background-color: #2563eb !important; border-color: #2563eb !important; color: #fff !important; }
+::ng-deep .action-btn-info    { background-color: #0ea5e9 !important; border-color: #0ea5e9 !important; color: #fff !important; }
+::ng-deep .action-btn-warning { background-color: #f59e0b !important; border-color: #f59e0b !important; color: #fff !important; }
+::ng-deep .action-btn-success { background-color: #16a34a !important; border-color: #16a34a !important; color: #fff !important; }
+::ng-deep .action-btn-purple  { background-color: #7c3aed !important; border-color: #7c3aed !important; color: #fff !important; }
+::ng-deep .action-btn-danger  { background-color: #dc2626 !important; border-color: #dc2626 !important; color: #fff !important; }
+
+/* Botones inline de cámara dentro de la celda */
+.cam-mini {
+  min-width: 38px;
+  padding: 4px 8px;
+  border: 1px solid #d1d5db;
+  border-radius: 6px;
+  background-color: #f3f4f6;
+  color: #374151;
+  font-size: 12px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: background-color 0.15s ease, border-color 0.15s ease, color 0.15s ease;
+}
+.cam-mini:hover { background-color: #e5e7eb; }
+.cam-mini-active {
+  background-color: #16a34a !important;
+  border-color: #15803d !important;
+  color: #fff !important;
+}

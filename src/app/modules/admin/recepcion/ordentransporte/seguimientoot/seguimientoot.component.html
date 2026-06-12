@@ -8,7 +8,7 @@
         </div>
         <div class="flex items-center ml-1 whitespace-nowrap">
           <mat-icon class="fuse-horizontal-navigation-item-icon text-gray-400" [svgIcon]="'heroicons_solid:chevron-right'"></mat-icon>
-          <a class="ml-1 text-gray-700 hover:text-gray-900">Recepción</a>
+          <a class="ml-1 text-gray-500">Estación</a>
         </div>
       </div>
       <div class="mt-2">
@@ -261,7 +261,20 @@
             </td>
             <td class="text-center px-4 py-3 text-gray-700 text-sm">{{ rowData.fecharecojo | date:'dd/MM/yyyy' }}</td>
             <td class="text-center px-4 py-3 text-gray-700 text-sm">{{ rowData.fechadespacho | date:'dd/MM/yyyy '}}</td>
-            <td class="text-center px-4 py-3 text-gray-700 text-sm">{{ rowData.fechaentrega | date:'dd/MM/yyyy '}}</td>
+            <td class="text-center px-4 py-3 text-gray-700 text-sm">{{ rowData.fechaentrega | date:'dd/MM/yyyy' }}</td>
+            <td class="text-center px-2 py-3 text-sm"
+                [ngClass]="rowData.tieneDiscrepanciaEntrega ? 'bg-amber-100' : ''">
+              <span *ngIf="rowData.tieneDiscrepanciaEntrega; else sinDisc"
+                    class="inline-flex items-center gap-1 px-2 py-0.5 rounded text-[11px] font-bold bg-amber-500 text-white cursor-help"
+                    [pTooltip]="'Discrepancia entrega:\n· fechaentrega: ' + (rowData.fechaentrega | date:'dd/MM/yyyy HH:mm:ss') + '\n· conciliación: ' + (rowData.fechaentregaconciliacion | date:'dd/MM/yyyy HH:mm:ss')"
+                    tooltipPosition="top"
+                    tooltipStyleClass="whitespace-pre-line">
+                <i class="pi pi-exclamation-triangle"></i> SI
+              </span>
+              <ng-template #sinDisc>
+                <span class="text-gray-400 text-xs">—</span>
+              </ng-template>
+            </td>
             <td class="text-center px-4 py-3 text-gray-700 text-sm word-wrap">{{ rowData.razonsocial }}</td>
             <td class="text-center px-4 py-3 text-gray-700 text-sm word-wrap">{{ rowData.destinatario }}</td>
             <td class="text-center px-4 py-3 text-gray-700 text-sm word-wrap">{{ rowData.estacionorigen }}</td>
@@ -316,69 +329,144 @@
     </div>
   </div>
 </div>
-<p-dialog header="Tracking OTs" [modal]="true" [(visible)]="dialoglifecycle" [style]="{ width: '80rem' }">
-  <div class="p-4">
-    <!-- ... tu encabezado informativo tal cual ... -->
+<p-dialog [modal]="true" [(visible)]="dialoglifecycle" [showHeader]="false"
+          [style]="{ width: '80rem', maxHeight: '90vh' }" styleClass="tracking-dialog"
+          [contentStyle]="{'padding': '0', 'background': '#f8fafc', 'border-radius': '0.75rem', 'overflow': 'hidden', 'display': 'flex', 'flex-direction': 'column'}">
 
-    <!-- 🟨 Tabla de eventos -->
-    <p-table [value]="events" class="text-sm w-full">
-      <ng-template pTemplate="header">
-        <tr>
-          <th>Evento</th>
-          <th>Fecha registro</th>
-          <th>Fecha evento</th>
-          <th>Usuario registro</th>
-          <th style="width: 110px;">Adjuntos</th> <!-- ✅ nueva columna -->
-          <th style="width: 120px;">Acción</th>
-        </tr>
-      </ng-template>
+  <!-- Header del modal con gradient (compacto) -->
+  <div class="px-5 py-3.5 bg-gradient-to-r from-slate-800 via-slate-700 to-slate-800 border-b border-slate-600 flex-shrink-0">
+    <div class="flex items-center gap-3">
+      <div class="flex items-center justify-center w-9 h-9 rounded-full bg-blue-500/20 ring-2 ring-blue-400/30">
+        <i class="pi pi-history text-blue-300 text-base"></i>
+      </div>
+      <div class="flex-1 min-w-0">
+        <h3 class="text-white text-base font-semibold tracking-tight leading-tight">Tracking OTs · Línea de tiempo</h3>
+        <p class="text-slate-300 text-[11px] mt-0.5">
+          <span *ngIf="ordenTransporte?.numcp">OT <span class="font-mono font-semibold text-blue-300">{{ ordenTransporte.numcp }}</span></span>
+          <span *ngIf="!ordenTransporte?.numcp">Resumen de eventos registrados</span>
+        </p>
+      </div>
+      <div class="hidden md:flex items-center gap-1.5 text-[11px] text-slate-300">
+        <span class="inline-flex items-center gap-1 px-2 py-0.5 rounded-full bg-emerald-500/15 ring-1 ring-emerald-400/30">
+          <span class="w-1.5 h-1.5 rounded-full bg-emerald-400"></span> Cumplido
+        </span>
+        <span class="inline-flex items-center gap-1 px-2 py-0.5 rounded-full bg-amber-500/15 ring-1 ring-amber-400/30">
+          <span class="w-1.5 h-1.5 rounded-full bg-amber-400"></span> Pendiente
+        </span>
+      </div>
+      <button type="button"
+              class="ml-1.5 inline-flex items-center justify-center w-7 h-7 rounded-full text-slate-300 hover:bg-white/10 hover:text-white transition-colors"
+              (click)="dialoglifecycle = false"
+              aria-label="Cerrar">
+        <i class="pi pi-times text-sm"></i>
+      </button>
+    </div>
+  </div>
 
-      <ng-template pTemplate="body" let-event>
-        <tr>
-            <td>
-            <span 
-              class="badge-simulation"
-              [ngStyle]="{
-                'background-color': event.dateEvent ? '#17a2b8' : '#ffc107',
-                'color': event.dateEvent ? 'white' : 'black'
-              }"
-              style="display: inline-block; padding: 0.2rem 0.5rem; border-radius: 1rem; text-align: center;">
-              {{ event.status || 'Sin Estado' }}
-            </span>
-          </td>
-          <td>
-            {{ event.dateEvent ? (event.dateRegister ? (event.dateRegister | date:'dd/MM/yyyy HH:mm') : 'Sin dato') : 'Sin dato' }}
-          </td>
-          <td>
-            {{ event.dateEvent ? (event.dateEvent | date:'dd/MM/yyyy HH:mm' ) : 'Sin evento' }}
-          </td>
-          <td>
-            {{ event.dateEvent ? (event.user || 'Sin dato') : 'Sin dato' }}
-          </td>
+  <!-- 🟦 Timeline de eventos (con scroll si exceden el alto) -->
+  <div class="p-4 overflow-y-auto" style="max-height: calc(90vh - 80px);">
+    <div class="relative">
+      <!-- Línea vertical conectora -->
+      <div class="absolute left-[15px] top-2 bottom-2 w-0.5 bg-gradient-to-b from-slate-300 via-slate-200 to-transparent"></div>
 
-          <!-- ✅ Adjuntos del evento (tipo de visor a definir por evento) -->
-          <td class="text-center">
-            <button *ngIf="event.dateEvent" pButton type="button"
-                    icon="pi pi-paperclip"
-                    label="Ver"
-                    class="p-button-sm p-button-outlined p-button-secondary"
-                    (click)="verAdjuntosEvento(event)">
-            </button>
-            <span *ngIf="!event.dateEvent" class="text-gray-400 text-xs">—</span>
-          </td>
+      <div class="space-y-2">
+        <div *ngFor="let event of events; let last = last"
+             class="relative pl-11 group">
 
-          <!-- ✅ botón que abre el diálogo contextual -->
-          <td class="text-center">
-            <button pButton type="button"
-                    icon="pi pi-cog"
-                    label="Ver"
-                    class="p-button-sm"
-                    (click)="openEventAction(event)">
-            </button>
-          </td>
-        </tr>
-      </ng-template>
-    </p-table>
+          <!-- Indicador circular -->
+          <div class="absolute left-0 top-2.5 flex items-center justify-center">
+            <div class="w-8 h-8 rounded-full flex items-center justify-center ring-2 transition-all"
+                 [ngClass]="event.dateEvent
+                            ? 'bg-emerald-500 ring-emerald-100 shadow-sm shadow-emerald-200'
+                            : 'bg-amber-400 ring-amber-100 shadow-sm shadow-amber-200'">
+              <i class="text-white text-xs"
+                 [ngClass]="event.dateEvent ? 'pi pi-check' : 'pi pi-clock'"></i>
+            </div>
+          </div>
+
+          <!-- Card del evento (compacto) -->
+          <div class="bg-white rounded-lg border border-slate-200 shadow-sm hover:shadow transition-all duration-200"
+               [class.opacity-70]="!event.dateEvent">
+            <div class="px-3 py-2">
+              <div class="flex items-center justify-between gap-3 flex-wrap">
+
+                <!-- Lado izquierdo: badge + datos -->
+                <div class="flex-1 min-w-0">
+                  <div class="flex items-center gap-2 mb-1.5">
+                    <span class="inline-flex items-center px-2 py-0.5 rounded-md text-[11px] font-semibold tracking-wide"
+                          [ngClass]="event.dateEvent
+                                     ? 'bg-emerald-50 text-emerald-700 ring-1 ring-emerald-200'
+                                     : 'bg-amber-50 text-amber-700 ring-1 ring-amber-200'">
+                      {{ event.status || 'Sin Estado' }}
+                    </span>
+                    <span *ngIf="!event.dateEvent" class="text-[10px] text-slate-400 italic">— sin registro aún</span>
+                  </div>
+
+                  <div class="grid grid-cols-1 sm:grid-cols-4 gap-2 text-xs">
+                    <div>
+                      <div class="text-[9px] font-semibold uppercase tracking-wider text-slate-400 leading-none mb-0.5">F. Registro</div>
+                      <div class="text-slate-700 font-medium">
+                        <i class="pi pi-calendar text-[10px] text-slate-400 mr-1"></i>
+                        {{ event.dateEvent && event.dateRegister
+                            ? (event.dateRegister | date:'dd/MM/yyyy HH:mm')
+                            : '—' }}
+                      </div>
+                    </div>
+                    <div>
+                      <div class="text-[9px] font-semibold uppercase tracking-wider text-slate-400 leading-none mb-0.5">F. Evento</div>
+                      <div class="text-slate-700 font-medium">
+                        <i class="pi pi-clock text-[10px] text-slate-400 mr-1"></i>
+                        {{ event.dateEvent ? (event.dateEvent | date:'dd/MM/yyyy HH:mm') : '—' }}
+                      </div>
+                    </div>
+                    <div>
+                      <div class="text-[9px] font-semibold uppercase tracking-wider text-slate-400 leading-none mb-0.5">Usuario</div>
+                      <div class="text-slate-700 font-medium truncate" [title]="event.user || ''">
+                        <i class="pi pi-user text-[10px] text-slate-400 mr-1"></i>
+                        {{ event.dateEvent ? (event.user || '—') : '—' }}
+                      </div>
+                    </div>
+                    <div>
+                      <div class="text-[9px] font-semibold uppercase tracking-wider text-slate-400 leading-none mb-0.5">Estación</div>
+                      <div class="text-slate-700 font-medium truncate" [title]="event.station || ''">
+                        <i class="pi pi-map-marker text-[10px] text-slate-400 mr-1"></i>
+                        {{ event.dateEvent ? (event.station || '—') : '—' }}
+                      </div>
+                    </div>
+                  </div>
+                </div>
+
+                <!-- Lado derecho: acciones -->
+                <div class="flex items-center gap-1.5 flex-shrink-0">
+                  <button *ngIf="event.dateEvent"
+                          pButton type="button"
+                          icon="pi pi-paperclip"
+                          label="Adjuntos"
+                          class="p-button-sm p-button-outlined p-button-secondary"
+                          style="padding: 0.25rem 0.6rem; font-size: 0.75rem;"
+                          (click)="verAdjuntosEvento(event)">
+                  </button>
+                  <button pButton type="button"
+                          icon="pi pi-cog"
+                          label="Acción"
+                          class="p-button-sm"
+                          style="padding: 0.25rem 0.6rem; font-size: 0.75rem;"
+                          (click)="openEventAction(event)">
+                  </button>
+                </div>
+
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Mensaje vacío -->
+        <div *ngIf="!events?.length" class="text-center py-10 text-slate-400">
+          <i class="pi pi-inbox text-3xl mb-2 block"></i>
+          <p class="text-sm">No hay eventos registrados para esta OT.</p>
+        </div>
+      </div>
+    </div>
 
     <!-- ✅ Diálogo de acciones por evento -->
     <p-dialog

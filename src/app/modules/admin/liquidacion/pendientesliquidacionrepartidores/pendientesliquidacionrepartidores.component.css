@@ -1,0 +1,14 @@
+::ng-deep .custom-table .p-datatable-scrollable-header,
+::ng-deep .custom-table .p-datatable-scrollable-header-table,
+::ng-deep .custom-table .p-datatable-thead > tr > th {
+  position: sticky !important;
+  top: 0 !important;
+  z-index: 10 !important;
+  background-color: #374151 !important;
+  color: #ffffff !important;
+}
+
+.badge-rojo { background-color: #fee2e2; color: #991b1b; }
+.badge-amarillo { background-color: #fef3c7; color: #92400e; }
+.badge-verde { background-color: #dcfce7; color: #166534; }
+.badge-gris { background-color: #f3f4f6; color: #374151; }

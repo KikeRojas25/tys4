@@ -95,7 +95,7 @@ export class PordespacharComponent implements OnInit {
 
 
 
-    this.model.idusuario = this.user.usr_int_id;
+    this.model.idusuario = this.user.id;
     this.dateInicio.setDate((new Date()).getDate() - 10);
     this.dateFin.setDate((new Date()).getDate() );
     this.model.numcp = '';
@@ -143,6 +143,7 @@ export class PordespacharComponent implements OnInit {
 
 
               this.manifiestos =  list;
+              this.manifiestos.forEach((m, i) => m.idorden = i + 1);
               this.model.numhojaruta = this.manifiestos[0].numHojaRuta;
               this.estado =  this.manifiestos[0].estado;
 
@@ -223,12 +224,7 @@ export class PordespacharComponent implements OnInit {
 
   }
   onRowReorder() {
-   let count = 1;
-
-   this.manifiestos.forEach(list => {
-      //list.ca = count ++;
-    });
-
+    this.manifiestos.forEach((m, i) => m.idorden = i + 1);
   }
   armadoValija() {
 

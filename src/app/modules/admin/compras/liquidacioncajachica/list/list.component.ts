@@ -13,7 +13,7 @@ import { DropdownModule } from 'primeng/dropdown';
 import { TableModule } from 'primeng/table';
 import { ToastModule } from 'primeng/toast';
 import { ComprasService } from '../../compras.service';
-import { DetalleLiquidadoResult, LiquidacionCajaDto } from '../../compras.types';
+import { DetalleLiquidadoResult, LiquidacionCajaDto, LiquidacionCajaExportarRow } from '../../compras.types';
 import { MantenimientoService } from 'app/modules/admin/mantenimiento/mantenimiento.service';
 import { User } from 'app/core/user/user.types';
 import { forkJoin } from 'rxjs';
@@ -120,7 +120,7 @@ export class LiquidacionCajaChicaListComponent implements OnInit {
 
   private getIdLiquidador(): number {
     // En este proyecto se usa tanto user.id como user.usr_int_id; priorizamos id.
-    return Number(this.user?.id ?? this.user?.usr_int_id ?? 0);
+    return Number(this.user?.id ?? this.user?.id ?? 0);
   }
 
   private setDefaultFechas(): void {
@@ -426,56 +426,95 @@ export class LiquidacionCajaChicaListComponent implements OnInit {
       return;
     }
 
-    import('xlsx-js-style').then((xlsx: any) => {
-      const XLSX: any = xlsx?.default ?? xlsx;
-      const exportData = this.buildExportRowsFor(this.liquidaciones ?? []);
+    this.loading = true;
+    this.comprasService
+      .getLiquidacionesExportar(
+        this.filtros.fechaInicio,
+        this.filtros.fechaFin,
+        this.getIdTipoLiquidacion()
+      )
+      .subscribe({
+        next: (data: LiquidacionCajaExportarRow[]) => {
+          if (!data || data.length === 0) {
+            this.messageService.add({
+              severity: 'warn',
+              summary: 'Exportar Excel',
+              detail: 'No hay datos para exportar.',
+            });
+            return;
+          }
 
-      // Totalizado al final
-      exportData.push({});
-      exportData.push({
-        '#': 'TOTAL',
-        'NUM OT': '',
-        'F. LIQ.': '',
-        USUARIO: '',
-        CONCEPTO: `Registros: ${this.totalRegistros}`,
-        'TIPO TRANSF.': '',
-        DESTINATARIO: '',
-        CUENTA: '',
-        'N° OPERACIÓN': '',
-        MONTO: this.totalMonto,
-        COMP: '',
-        'TIPO COMP.': '',
-        'RZ. SOCIAL DOC.': '',
-        'PROV. DEST.': '',
-        OBS: '',
-        'F. REG.': '',
+          const rows = data.map(r => this.exportarRowToExcelRow(r));
+
+          import('xlsx-js-style').then((xlsx: any) => {
+            const XLSX: any = xlsx?.default ?? xlsx;
+            const worksheet = XLSX.utils.json_to_sheet(rows);
+            this.applyExcelStyles(worksheet);
+            worksheet['!cols'] = [
+              { wch: 14 }, // OT
+              { wch: 28 }, // CLIENTE
+              { wch: 14 }, // VALORIZADO
+              { wch: 10 }, // PESO
+              { wch: 26 }, // ORIGEN
+              { wch: 26 }, // DESTINO
+              { wch: 16 }, // N° LIQUIDACION
+              { wch: 12 }, // F. LIQ.
+              { wch: 18 }, // F. REG.
+              { wch: 22 }, // USUARIO
+              { wch: 22 }, // CONCEPTO
+              { wch: 16 }, // TIPO TRANSF.
+              { wch: 26 }, // DESTINATARIO
+              { wch: 18 }, // CUENTA
+              { wch: 16 }, // N° OPERACIÓN
+              { wch: 16 }, // COMP
+              { wch: 14 }, // TIPO COMP.
+              { wch: 28 }, // RZ. SOCIAL DOC.
+              { wch: 14 }, // MONTO
+              { wch: 28 }, // OBS
+            ];
+
+            const workbook = { Sheets: { Liquidaciones: worksheet }, SheetNames: ['Liquidaciones'] };
+            const excelBuffer: any = XLSX.write(workbook, { bookType: 'xlsx', type: 'array' });
+            this.saveAsExcelFile(excelBuffer, 'LiquidacionesCajaChica');
+          });
+        },
+        error: (err: any) => {
+          console.error('Error exportando Excel:', err);
+          this.messageService.add({
+            severity: 'error',
+            summary: 'Exportar Excel',
+            detail: err?.error?.message || 'No se pudo generar el Excel.',
+          });
+        },
+        complete: () => (this.loading = false),
       });
+  }
 
-      const worksheet = XLSX.utils.json_to_sheet(exportData);
-      this.applyExcelStyles(worksheet);
-      worksheet['!cols'] = [
-        { wch: 14 }, // #
-        { wch: 14 }, // NUM OT
-        { wch: 12 }, // F. LIQ.
-        { wch: 16 }, // USUARIO
-        { wch: 18 }, // CONCEPTO
-        { wch: 18 }, // TIPO TRANSF.
-        { wch: 24 }, // DESTINATARIO
-        { wch: 18 }, // CUENTA
-        { wch: 16 }, // N° OPERACIÓN
-        { wch: 12 }, // MONTO
-        { wch: 18 }, // COMP
-        { wch: 16 }, // TIPO COMP.
-        { wch: 28 }, // RZ. SOCIAL DOC.
-        { wch: 16 }, // PROV. DEST.
-        { wch: 28 }, // OBS
-        { wch: 18 }, // F. REG.
-      ];
-
-      const workbook = { Sheets: { Liquidaciones: worksheet }, SheetNames: ['Liquidaciones'] };
-      const excelBuffer: any = XLSX.write(workbook, { bookType: 'xlsx', type: 'array' });
-      this.saveAsExcelFile(excelBuffer, 'LiquidacionesCajaChica');
-    });
+  private exportarRowToExcelRow(r: LiquidacionCajaExportarRow): Record<string, any> {
+    const origen = [r.provinciaorigen, r.distritoorigen].filter(v => !!v && String(v).trim()).join(' - ');
+    const destino = [r.provinciadestino, r.distritodestino].filter(v => !!v && String(v).trim()).join(' - ');
+    return {
+      'OT': r.numcp ?? '',
+      'CLIENTE': r.cliente ?? '',
+      'VALORIZADO': Number(r.valorizado ?? 0),
+      'PESO': Number(r.peso ?? 0),
+      'ORIGEN': origen,
+      'DESTINO': destino,
+      'N° LIQUIDACION': r.numeroliquidacion ?? '',
+      'F. LIQ.': this.formatDate(r.fechaliquidacion, false),
+      'F. REG.': this.formatDate(r.fecharegistro, true),
+      'USUARIO': r.usuarioregistro ?? '',
+      'CONCEPTO': r.concepto ?? '',
+      'TIPO TRANSF.': r.tipotransferencia ?? '',
+      'DESTINATARIO': r.destinatariotransferencia ?? '',
+      'CUENTA': r.cuentatransferencia ?? '',
+      'N° OPERACIÓN': r.numerooperacion ?? '',
+      'COMP': r.numerocomprobante ?? '',
+      'TIPO COMP.': r.tipocomprobante ?? '',
+      'RZ. SOCIAL DOC.': r.razonsocialdocumento ?? '',
+      'MONTO': Number(r.monto ?? 0),
+      'OBS': r.observaciones ?? '',
+    };
   }
 
   exportExcelDetallesLiquidados(tipo: string): void {
@@ -624,6 +663,39 @@ export class LiquidacionCajaChicaListComponent implements OnInit {
       return;
     }
 
+    this.loading = true;
+    let data: LiquidacionCajaExportarRow[] = [];
+    try {
+      data = await new Promise<LiquidacionCajaExportarRow[]>((resolve, reject) => {
+        this.comprasService
+          .getLiquidacionesExportar(
+            this.filtros.fechaInicio,
+            this.filtros.fechaFin,
+            this.getIdTipoLiquidacion()
+          )
+          .subscribe({ next: resolve, error: reject });
+      });
+    } catch (err: any) {
+      console.error('Error obteniendo datos para PDF:', err);
+      this.messageService.add({
+        severity: 'error',
+        summary: 'Exportar PDF',
+        detail: err?.error?.message || 'No se pudo obtener los datos para exportar.',
+      });
+      this.loading = false;
+      return;
+    }
+    this.loading = false;
+
+    if (!data || data.length === 0) {
+      this.messageService.add({
+        severity: 'warn',
+        summary: 'Exportar PDF',
+        detail: 'No hay datos para exportar.',
+      });
+      return;
+    }
+
     const [jspdfModule, autoTableModule] = await Promise.all([import('jspdf'), import('jspdf-autotable')]);
     const jsPDF: any = (jspdfModule as any)?.jsPDF ?? (jspdfModule as any)?.default ?? jspdfModule;
 
@@ -631,7 +703,6 @@ export class LiquidacionCajaChicaListComponent implements OnInit {
       if (typeof m === 'function') return m;
       if (m && typeof m.default === 'function') return m.default;
       if (m && typeof m.autoTable === 'function') return m.autoTable;
-      // Interop CommonJS -> ESM (a veces viene default dentro de default)
       if (m?.default && typeof m.default.default === 'function') return m.default.default;
       if (m?.default && typeof m.default.autoTable === 'function') return m.default.autoTable;
       return null;
@@ -647,7 +718,6 @@ export class LiquidacionCajaChicaListComponent implements OnInit {
     }
 
     const doc = new jsPDF({ orientation: 'landscape', unit: 'pt', format: 'a4' });
-    // Primero intentar tomar la función desde el módulo; si no, usar el plugin registrado en el doc
     const autoTable: any =
       resolveAutoTableFn(autoTableModule) ??
       (doc as any)?.autoTable ??
@@ -669,77 +739,75 @@ export class LiquidacionCajaChicaListComponent implements OnInit {
     doc.setFontSize(9);
     doc.text(`Exportado el: ${fechaExportacion}`, 20, 44);
 
-    const rows = this.buildExportRowsFor(this.liquidaciones ?? []);
     const head = [[
-      '#',
-      'NUM OT',
+      'OT',
+      'CLIENTE',
+      'DESTINO',
+      'N° LIQ.',
       'F. LIQ.',
       'USUARIO',
       'CONCEPTO',
       'TIPO TRANSF.',
       'DESTINATARIO',
-      'CUENTA',
       'N° OPERACIÓN',
       'MONTO',
-      'COMP',
       'TIPO COMP.',
       'RZ. SOCIAL DOC.',
-      'PROV. DEST.',
       'OBS',
-      'F. REG.'
     ]];
-    const body = rows.map((r: any) => [
-      r['#'],
-      r['NUM OT'],
-      r['F. LIQ.'],
-      r['USUARIO'],
-      r['CONCEPTO'],
-      r['TIPO TRANSF.'],
-      r['DESTINATARIO'],
-      r['CUENTA'],
-      r['N° OPERACIÓN'],
-      this.formatMontoPEN(r['MONTO']),
-      r['COMP'],
-      r['TIPO COMP.'],
-      r['RZ. SOCIAL DOC.'],
-      r['PROV. DEST.'],
-      r['OBS'],
-      r['F. REG.'],
-    ]);
+
+    let totalMonto = 0;
+    const body = data.map(r => {
+      const monto = Number(r.monto ?? 0);
+      totalMonto += monto;
+      const destino = [r.provinciadestino, r.distritodestino].filter(v => !!v && String(v).trim()).join(' - ');
+      return [
+        r.numcp ?? '',
+        r.cliente ?? '',
+        destino,
+        r.numeroliquidacion ?? '',
+        this.formatDate(r.fechaliquidacion, false),
+        r.usuarioregistro ?? '',
+        r.concepto ?? '',
+        r.tipotransferencia ?? '',
+        r.destinatariotransferencia ?? '',
+        r.numerooperacion ?? '',
+        this.formatMontoPEN(monto),
+        r.tipocomprobante ?? '',
+        r.razonsocialdocumento ?? '',
+        r.observaciones ?? '',
+      ];
+    });
 
     autoTable(doc, {
       head,
       body,
       startY: 56,
       theme: 'grid',
-      // Fuente más chica + padding menor para dejar aire en bordes y evitar desbordes
       styles: { fontSize: 7, cellPadding: 2, overflow: 'linebreak' },
       headStyles: { fillColor: [55, 65, 81] },
-      // Más margen lateral para que no se pegue a los bordes
       margin: { left: 36, right: 36 },
       columnStyles: {
-        0: { cellWidth: 60 }, // #
-        1: { cellWidth: 60 }, // NUM OT
-        2: { cellWidth: 58 }, // F. LIQ.
-        3: { cellWidth: 70 }, // USUARIO
-        4: { cellWidth: 78 }, // CONCEPTO
-        5: { cellWidth: 78 }, // TIPO TRANSF.
-        6: { cellWidth: 98 }, // DESTINATARIO
-        7: { cellWidth: 72 }, // CUENTA
-        8: { cellWidth: 68 }, // N° OPERACIÓN
-        9: { cellWidth: 58, halign: 'right' }, // MONTO
-        10: { cellWidth: 70 }, // COMP
-        11: { cellWidth: 70 }, // TIPO COMP.
-        12: { cellWidth: 110 }, // RZ. SOCIAL DOC.
-        13: { cellWidth: 78 }, // PROV. DEST.
-        14: { cellWidth: 110 }, // OBS
-        15: { cellWidth: 78 }, // F. REG.
+        0: { cellWidth: 56 },  // OT
+        1: { cellWidth: 110 }, // CLIENTE
+        2: { cellWidth: 90 },  // DESTINO
+        3: { cellWidth: 60 },  // N° LIQ.
+        4: { cellWidth: 56 },  // F. LIQ.
+        5: { cellWidth: 70 },  // USUARIO
+        6: { cellWidth: 70 },  // CONCEPTO
+        7: { cellWidth: 60 },  // TIPO TRANSF.
+        8: { cellWidth: 90 },  // DESTINATARIO
+        9: { cellWidth: 60 },  // N° OPERACIÓN
+        10: { cellWidth: 56, halign: 'right' }, // MONTO
+        11: { cellWidth: 56 }, // TIPO COMP.
+        12: { cellWidth: 100 }, // RZ. SOCIAL DOC.
+        13: { cellWidth: 90 },  // OBS
       },
     });
 
     const finalY = ((doc as any).lastAutoTable?.finalY ?? 56) + 18;
     doc.setFontSize(10);
-    doc.text(`Registros: ${this.totalRegistros}   |   Total monto: ${this.totalMonto.toFixed(2)}`, 20, finalY);
+    doc.text(`Registros: ${data.length}   |   Total monto: ${totalMonto.toFixed(2)}`, 20, finalY);
 
     doc.save(`LiquidacionesCajaChica_${new Date().getTime()}.pdf`);
 

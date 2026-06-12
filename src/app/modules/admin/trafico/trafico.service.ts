@@ -156,7 +156,6 @@ export class TraficoService {
         );
     }
 
-
     VerDespachosxDepartamentoxProveedor(model: any) {
         const idequipo = model.idequipo ? model.idequipo : ''; // Si model.idequipo es null, usar una cadena vacía
         return this._httpClient.get<HojaRuta[]>(
@@ -325,6 +324,20 @@ export class TraficoService {
     }
     asignarMovil(data: { idOrdenTrabajo: number; placa: string; observacion?: string }) {
      return this._httpClient.put(`/api/trafico/orden/${data.idOrdenTrabajo}/asignar-movil`, data);
+    }
+    reasignarMovilManifiesto(data: {
+        idOrdenTrabajo: number;
+        idManifiestoDestino: number;
+        idVehiculoDestino: number;
+        numHojaRutaDestino: string;
+        placaDestino: string;
+        observacion?: string | null;
+    }) {
+     return this._httpClient.put(
+        `${this.baseUrl}orden/${data.idOrdenTrabajo}/reasignar-movil-manifiesto`,
+        data,
+        httpOptions,
+     );
     }
     guardarEquipoProvincia(data: { provincias: number[]; IdEquipo: number }) {
         return this._httpClient.post(`${this.baseUrl}GuardarEquipoProvincia`, data);

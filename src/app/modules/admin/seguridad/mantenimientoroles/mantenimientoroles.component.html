@@ -1,0 +1,203 @@
+<!-- Pantalla Principal -->
+<div class="flex flex-col flex-auto min-w-0 bg-gray-50">
+  <!-- Header -->
+  <div class="flex flex-col sm:flex-row flex-0 sm:items-center sm:justify-between p-2 sm:py-8 sm:px-10 border-b border-gray-200 bg-white shadow-sm">
+    <div class="flex-1 min-w-0">
+      <div class="flex flex-wrap items-center font-medium text-sm text-gray-600">
+        <div>
+          <a class="whitespace-nowrap text-gray-700 hover:text-gray-900">TMS</a>
+        </div>
+        <div class="flex items-center ml-1 whitespace-nowrap">
+          <mat-icon class="fuse-horizontal-navigation-item-icon text-gray-400" [svgIcon]="'heroicons_solid:chevron-right'"></mat-icon>
+          <span class="ml-1 text-gray-500">Seguridad</span>
+        </div>
+        <div class="flex items-center ml-1 whitespace-nowrap">
+          <mat-icon class="fuse-horizontal-navigation-item-icon text-gray-400" [svgIcon]="'heroicons_solid:chevron-right'"></mat-icon>
+          <span class="ml-1 text-gray-500">Mantenimiento de Roles</span>
+        </div>
+      </div>
+      <div class="mt-2">
+        <h2 class="text-3xl md:text-4xl font-semibold tracking-tight leading-7 sm:leading-10 truncate text-gray-900">Mantenimiento de Roles</h2>
+      </div>
+    </div>
+  </div>
+
+  <!-- Contenido Principal -->
+  <div class="main-content container-fluid p-2">
+    <!-- Filtros de Búsqueda -->
+    <div class="bg-white rounded-lg shadow-sm border border-gray-200 mb-2 overflow-hidden">
+      <div class="p-2">
+        <div class="grid grid-cols-1 md:grid-cols-4 gap-4">
+
+          <!-- Búsqueda -->
+          <div class="md:col-span-2">
+            <label class="block text-sm font-semibold text-gray-700 mb-1">Buscar:</label>
+            <input pInputText type="text" [(ngModel)]="param" placeholder="Buscar por nombre o alias"
+                   class="w-full filter-control-compact"
+                   (keyup.enter)="buscar()" />
+          </div>
+
+          <!-- Botones -->
+          <div class="flex items-end justify-end gap-2 md:col-span-2">
+            <button pButton type="button" icon="pi pi-search" label="Buscar" iconPos="left" (click)="buscar()"
+                    class="px-4 py-2.5 text-sm font-medium text-white bg-gray-700 hover:bg-gray-600 rounded-md shadow-sm transition-all duration-150">
+            </button>
+            <button pButton type="button" icon="pi pi-plus" label="Nuevo Rol" iconPos="left" (click)="abrirNuevo()"
+                    class="px-4 py-2.5 text-sm font-medium text-gray-700 bg-white border border-gray-300 hover:bg-gray-50 rounded-md shadow-sm transition-all duration-150">
+            </button>
+          </div>
+
+        </div>
+      </div>
+    </div>
+
+    <!-- Tabla de Roles -->
+    <div class="bg-white rounded-lg shadow-sm border border-gray-200 overflow-hidden">
+      <div class="p-6">
+        <p-table
+          [value]="roles"
+          [paginator]="true"
+          [rows]="20"
+          [rowsPerPageOptions]="[20, 40, 60, 80, 100]"
+          scrollHeight="650px"
+          [scrollable]="true"
+          [styleClass]="'custom-table'"
+          [tableStyle]="{ 'min-width': '50rem' }"
+          class="w-full">
+
+          <ng-template pTemplate="header">
+            <tr class="bg-gray-800 text-white">
+              <th class="text-center px-4 py-3 text-sm font-semibold text-gray-100 border-b border-gray-700" style="width: 80px;">ID</th>
+              <th class="text-center px-4 py-3 text-sm font-semibold text-gray-100 border-b border-gray-700" style="width: 240px;">Nombre Rol</th>
+              <th class="text-center px-4 py-3 text-sm font-semibold text-gray-100 border-b border-gray-700">Descripción</th>
+              <th class="text-center px-4 py-3 text-sm font-semibold text-gray-100 border-b border-gray-700" style="width: 110px;">Estado</th>
+              <th class="text-center px-4 py-3 text-sm font-semibold text-gray-100 border-b border-gray-700" style="width: 160px;">Acciones</th>
+            </tr>
+          </ng-template>
+
+          <ng-template pTemplate="body" let-rol>
+            <tr class="border-b border-gray-100 hover:bg-gray-50 transition-colors duration-150">
+              <td class="text-center px-4 py-3 text-gray-700 text-sm">{{ rol.id }}</td>
+              <td class="text-left px-4 py-3 text-gray-700 text-sm">{{ rol.alias }}</td>
+              <td class="text-left px-4 py-3 text-gray-700 text-sm">{{ rol.descripcion }}</td>
+              <td class="text-center px-4 py-3">
+                <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium"
+                      [ngClass]="{
+                        'bg-green-100 text-green-800': rol.activo,
+                        'bg-red-100 text-red-800': !rol.activo
+                      }">
+                  {{ rol.activo ? 'Activo' : 'Inactivo' }}
+                </span>
+              </td>
+              <td class="text-center px-2 py-2">
+                <div class="flex gap-1 justify-center items-center">
+                  <button pButton icon="pi pi-pencil" class="action-btn action-btn-primary"
+                          pTooltip="Editar datos" tooltipPosition="top"
+                          (click)="abrirEditar(rol)"></button>
+                  <button pButton icon="pi pi-sitemap" class="action-btn action-btn-purple"
+                          pTooltip="Asignar páginas" tooltipPosition="top"
+                          (click)="abrirAsignarPaginas(rol)"></button>
+                  <button pButton
+                          [icon]="rol.activo ? 'pi pi-ban' : 'pi pi-check'"
+                          [class]="rol.activo ? 'action-btn action-btn-danger' : 'action-btn action-btn-success'"
+                          [pTooltip]="rol.activo ? 'Desactivar rol' : 'Activar rol'"
+                          tooltipPosition="top"
+                          (click)="toggleActivo(rol)"></button>
+                </div>
+              </td>
+            </tr>
+          </ng-template>
+
+          <ng-template pTemplate="emptymessage">
+            <tr>
+              <td colspan="5" class="text-center px-4 py-6 text-gray-500 text-sm">No se encontraron roles.</td>
+            </tr>
+          </ng-template>
+        </p-table>
+      </div>
+    </div>
+  </div>
+</div>
+
+<p-confirmDialog header="Confirmación" icon="pi pi-exclamation-triangle"></p-confirmDialog>
+<p-toast />
+
+<!-- Modal Nuevo / Editar Rol (Datos) -->
+<p-dialog
+  [header]="modoEdicion ? 'Editar Rol' : 'Nuevo Rol'"
+  [(visible)]="dialogRolVisible"
+  [modal]="true"
+  [style]="{ width: '560px' }"
+  [draggable]="false"
+  [resizable]="false"
+  [closable]="!guardandoRol">
+  <div class="flex flex-col gap-4">
+
+    <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+      <div>
+        <label class="block text-sm font-semibold text-gray-700 mb-1">Nombre Rol (alias):</label>
+        <input pInputText type="text" [(ngModel)]="rolForm.alias" placeholder="Ej: Trafico"
+               class="w-full" maxlength="50" />
+      </div>
+      <div>
+        <label class="block text-sm font-semibold text-gray-700 mb-1">Descripción:</label>
+        <input pInputText type="text" [(ngModel)]="rolForm.descripcion" placeholder="Ej: Operador de Tráfico"
+               class="w-full" maxlength="100" />
+      </div>
+    </div>
+
+    <div class="flex items-center gap-2">
+      <p-checkbox [(ngModel)]="rolForm.publico" [binary]="true" inputId="chkPublico"></p-checkbox>
+      <label for="chkPublico" class="cursor-pointer text-sm text-gray-700 select-none">Rol público</label>
+    </div>
+
+    <div class="flex justify-end gap-3 mt-2">
+      <p-button label="Cancelar" icon="pi pi-times" class="p-button-text" (click)="cancelarRol()" [disabled]="guardandoRol"></p-button>
+      <p-button [label]="guardandoRol ? 'Guardando...' : 'Guardar'" icon="pi pi-check" class="p-button-success"
+                (click)="guardarRol()" [disabled]="guardandoRol"></p-button>
+    </div>
+  </div>
+</p-dialog>
+
+<!-- Modal Asignar Páginas -->
+<p-dialog
+  [header]="rolParaPaginas ? 'Asignar páginas — ' + rolParaPaginas.descripcion : 'Asignar páginas'"
+  [(visible)]="dialogPaginasVisible"
+  [modal]="true"
+  [style]="{ width: '720px' }"
+  [draggable]="false"
+  [resizable]="false"
+  [closable]="!guardandoPaginas">
+  <div *ngIf="rolParaPaginas" class="flex flex-col gap-4">
+    <div class="text-sm text-gray-700">
+      <strong>Rol:</strong> {{ rolParaPaginas.alias }}
+      <span class="text-gray-500"> ({{ rolParaPaginas.descripcion }})</span>
+    </div>
+
+    <div *ngIf="cargandoArbol" class="flex items-center gap-2 text-sm text-gray-500 py-4">
+      <i class="pi pi-spin pi-spinner"></i>
+      <span>Cargando páginas...</span>
+    </div>
+
+    <p-tree
+      *ngIf="!cargandoArbol"
+      [value]="arbolPaginas"
+      [(selection)]="paginasSeleccionadas"
+      selectionMode="checkbox"
+      [propagateSelectionUp]="true"
+      [propagateSelectionDown]="true"
+      scrollHeight="420px"
+      styleClass="rol-paginas-tree">
+      <ng-template let-node pTemplate="default">
+        <span class="text-sm text-gray-800">{{ node.label }}</span>
+        <span *ngIf="node.data?.url" class="text-xs text-gray-500 ml-2">({{ node.data.url }})</span>
+      </ng-template>
+    </p-tree>
+
+    <div class="flex justify-end gap-3 mt-2">
+      <p-button label="Cancelar" icon="pi pi-times" class="p-button-text" (click)="cancelarPaginas()" [disabled]="guardandoPaginas"></p-button>
+      <p-button [label]="guardandoPaginas ? 'Guardando...' : 'Guardar'" icon="pi pi-check" class="p-button-success"
+                (click)="guardarPaginas()" [disabled]="guardandoPaginas || cargandoArbol"></p-button>
+    </div>
+  </div>
+</p-dialog>
